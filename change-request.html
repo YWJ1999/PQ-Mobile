@@ -14,6 +14,7 @@
   <script src="js/components.js"></script>
   <script src="js/app.js" defer></script>
   <link rel="stylesheet" href="css/form-section-headings.css">
+  <link rel="stylesheet" href="css/cv-change-request-steps.css">
 </head>
 
 <body>
@@ -39,42 +40,18 @@
       </div>
     </div>
 
-    <!-- Top Category Segmented Scroller Bar -->
-    <div class="change-scroller-wrapper">
-      <div class="change-category-scroller" id="changeCatScroller" onscroll="handleCatScrollerScroll(this)">
-        <button class="change-cat-pill active" id="pill-personal" onclick="switchCategory('personal')">
-          <span>👤 Personal</span>
-          <span class="change-cat-count">10</span>
-        </button>
-        <button class="change-cat-pill" id="pill-qualification" onclick="switchCategory('qualification')">
-          <span>🎓 Qualification</span>
-          <span class="change-cat-count">3</span>
-        </button>
-        <button class="change-cat-pill" id="pill-payroll" onclick="switchCategory('payroll')">
-          <span>💳 Payroll</span>
-          <span class="change-cat-count">12</span>
-        </button>
-        <button class="change-cat-pill" id="pill-contacts" onclick="switchCategory('contacts')">
-          <span>📍 Correspondence Contact</span>
-          <span class="change-cat-count">16</span>
-        </button>
-        <button class="change-cat-pill" id="pill-family" onclick="switchCategory('family')">
-          <span>👨‍👩‍👧 Family</span>
-          <span class="change-cat-count">2</span>
-        </button>
-      </div>
-
-      <!-- Right Fade Gradient Mask Overlay -->
-      <div class="change-scroller-fade" id="changeCatFade"></div>
-
-      <!-- Right Expand Grid Sheet Button (1-Tap Direct Switcher) -->
-      <button class="change-expand-grid-btn" onclick="toggleCatGridSheet(true)" title="All 5 Categories Grid" aria-label="View All Categories Grid">
-        <i class="fa-solid fa-grip" style="font-size: 14px;"></i>
-      </button>
-    </div>
-
     <!-- Scrollable Form Container -->
     <div class="main-content" style="padding: 0;">
+      <nav class="cv-stepper" aria-label="CV change request steps">
+        <ol class="cv-step-track" id="cvStepTrack">
+          <li><button class="cv-step active" id="cv-step-personal" type="button" data-category="personal" aria-controls="cat-personal" aria-current="step" aria-label="Step 1 of 5: Personal details" onclick="switchCategory('personal')"><span class="cv-step-circle" aria-hidden="true">1</span><span class="cv-step-label">Personal</span></button></li>
+          <li><button class="cv-step" id="cv-step-qualification" type="button" data-category="qualification" aria-controls="cat-qualification" aria-label="Step 2 of 5: Qualification" onclick="switchCategory('qualification')"><span class="cv-step-circle" aria-hidden="true">2</span><span class="cv-step-label">Qualification</span></button></li>
+          <li><button class="cv-step" id="cv-step-payroll" type="button" data-category="payroll" aria-controls="cat-payroll" aria-label="Step 3 of 5: Payroll and statutory" onclick="switchCategory('payroll')"><span class="cv-step-circle" aria-hidden="true">3</span><span class="cv-step-label">Payroll</span></button></li>
+          <li><button class="cv-step" id="cv-step-contacts" type="button" data-category="contacts" aria-controls="cat-contacts" aria-label="Step 4 of 5: Correspondence contact" onclick="switchCategory('contacts')"><span class="cv-step-circle" aria-hidden="true">4</span><span class="cv-step-label">Contact</span></button></li>
+          <li><button class="cv-step" id="cv-step-family" type="button" data-category="family" aria-controls="cat-family" aria-label="Step 5 of 5: Family details" onclick="switchCategory('family')"><span class="cv-step-circle" aria-hidden="true">5</span><span class="cv-step-label">Family</span></button></li>
+        </ol>
+      </nav>
+
       
       <!-- ==========================================
            CATEGORY 1: PERSONAL DETAILS
@@ -521,7 +498,7 @@ DAMANSARA KOTA</textarea>
       </div>
 
       <div class="change-form-actions">
-        <button class="form-cancel-btn change-cancel-btn" type="button" onclick="cancelChangeRequest()">
+        <button class="form-cancel-btn change-cancel-btn" id="btnPreviousCategory" type="button" onclick="goToPreviousCategory()">
           <i class="fa-solid fa-xmark" aria-hidden="true"></i><span>Cancel</span>
         </button>
         <button class="change-next-btn" id="btnNextCategory" type="button" onclick="goToNextCategory()">
@@ -816,11 +793,6 @@ DAMANSARA KOTA</textarea>
             <div class="change-history-title">CV Change Request History</div>
             <div class="change-history-date">View past submissions &amp; HR approval audit trail</div>
           </div>
-          <div class="change-history-item" style="cursor: pointer; margin-bottom: 0;" onclick="toggleMenuOverlay(false); toggleCatGridSheet(true);">
-            <div style="font-size: 18px; margin-bottom: 4px;">🎛️</div>
-            <div class="change-history-title">All 5 Profile Categories</div>
-            <div class="change-history-date">Quick jump grid for Personal, Qualification, Payroll, Correspondence Contact &amp; Family</div>
-          </div>
         </div>
       </div>
     </div>
@@ -947,46 +919,6 @@ DAMANSARA KOTA</textarea>
       </div>
     </div>
 
-    <!-- All Categories Grid Bottom Sheet Modal (1-Tap Direct Category Selection) -->
-    <div class="indicators-overlay" id="catGridOverlay" onclick="toggleCatGridSheet(false)" style="display: none;">
-      <div class="indicators-sheet profile-category-sheet" onclick="event.stopPropagation()">
-        <div class="sheet-handle"></div>
-        <div class="sheet-header">
-          <div class="sheet-title">
-            <h3 class="profile-category-title">Select Category</h3>
-          </div>
-          <button class="sheet-close-btn" type="button" aria-label="Close categories" onclick="toggleCatGridSheet(false)"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
-        </div>
-
-        <nav class="profile-category-grid" aria-label="Profile categories">
-          <button class="profile-category-card" data-profile-category="personal" type="button" onclick="selectCategoryFromGrid('personal')">
-            <span class="profile-category-icon"><i class="fa-solid fa-user" aria-hidden="true"></i></span>
-            <span class="profile-category-name">Personal Details</span>
-          </button>
-
-          <button class="profile-category-card" data-profile-category="qualification" type="button" onclick="selectCategoryFromGrid('qualification')">
-            <span class="profile-category-icon"><i class="fa-solid fa-graduation-cap" aria-hidden="true"></i></span>
-            <span class="profile-category-name">Qualification</span>
-          </button>
-
-          <button class="profile-category-card" data-profile-category="payroll" type="button" onclick="selectCategoryFromGrid('payroll')">
-            <span class="profile-category-icon"><i class="fa-solid fa-credit-card" aria-hidden="true"></i></span>
-            <span class="profile-category-name">Payroll &amp; Statutory</span>
-          </button>
-
-          <button class="profile-category-card" data-profile-category="contacts" type="button" onclick="selectCategoryFromGrid('contacts')">
-            <span class="profile-category-icon"><i class="fa-solid fa-location-dot" aria-hidden="true"></i></span>
-            <span class="profile-category-name">Correspondence Contact</span>
-          </button>
-
-          <button class="profile-category-card" data-profile-category="family" type="button" onclick="selectCategoryFromGrid('family')">
-            <span class="profile-category-icon"><i class="fa-solid fa-people-roof" aria-hidden="true"></i></span>
-            <span class="profile-category-name">Family Details</span>
-          </button>
-        </nav>
-      </div>
-    </div>
-
     <!-- Interactive Toast Alert -->
     <div class="bonus-toast" id="bonusToast">
       <span id="toastIcon">📄</span>
@@ -1065,15 +997,6 @@ DAMANSARA KOTA</textarea>
     let editingFamilyIndex = -1;
     let editingFamilyAttachments = [];
 
-    // Scroll Handler for Right Fade Mask
-    function handleCatScrollerScroll(el) {
-      const fade = document.getElementById('changeCatFade');
-      if (!fade) return;
-      const isEnd = el.scrollLeft + el.clientWidth >= el.scrollWidth - 8;
-      if (isEnd) fade.style.opacity = '0';
-      else fade.style.opacity = '0.9';
-    }
-
     // Universal Modal Overlay Toggle (Handles .active class for opacity: 1 and pointer-events: auto)
     function toggleOverlay(overlayId, open) {
       const overlay = document.getElementById(overlayId);
@@ -1093,56 +1016,54 @@ DAMANSARA KOTA</textarea>
       }
     }
 
-    // Toggle Category Grid Sheet
-    function toggleCatGridSheet(open) {
-      toggleOverlay('catGridOverlay', open);
-    }
-
-    function selectCategoryFromGrid(catId) {
-      toggleCatGridSheet(false);
-      switchCategory(catId);
-      const pill = document.getElementById(`pill-${catId}`);
-      if (pill) {
-        pill.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
-      }
-    }
-
     const changeCategoryOrder = ['personal', 'qualification', 'payroll', 'contacts', 'family'];
+    let activeChangeCategory = 'personal';
 
     function syncCategoryActions(catId) {
-      const isFinalCategory = catId === changeCategoryOrder[changeCategoryOrder.length - 1];
-      const nextButton = document.getElementById('btnNextCategory');
-      const submitButton = document.getElementById('btnReviewSubmit');
-      if (nextButton) nextButton.hidden = isFinalCategory;
-      if (submitButton) submitButton.hidden = !isFinalCategory;
+      const index = changeCategoryOrder.indexOf(catId);
+      const isFinalCategory = index === changeCategoryOrder.length - 1;
+      document.getElementById('btnNextCategory').hidden = isFinalCategory;
+      document.getElementById('btnReviewSubmit').hidden = !isFinalCategory;
+      const previous = document.getElementById('btnPreviousCategory');
+      previous.querySelector('span').textContent = index === 0 ? 'Cancel' : 'Back';
+      previous.querySelector('i').className = 'fa-solid ' + (index === 0 ? 'fa-xmark' : 'fa-chevron-left');
+      document.getElementById('cvStepTrack').style.setProperty('--cv-step-index', index);
     }
 
     function goToNextCategory() {
-      const activePill = document.querySelector('.change-cat-pill.active');
-      const activeCategory = activePill?.id.replace(/^pill-/, '');
-      const currentIndex = changeCategoryOrder.indexOf(activeCategory);
-      if (currentIndex < 0 || currentIndex >= changeCategoryOrder.length - 1) return;
-      switchCategory(changeCategoryOrder[currentIndex + 1]);
-      const content = document.querySelector('.main-content');
-      if (content) content.scrollTop = 0;
+      const index = changeCategoryOrder.indexOf(activeChangeCategory);
+      if (index >= changeCategoryOrder.length - 1) return;
+      switchCategory(changeCategoryOrder[index + 1]);
+      document.getElementById('cv-step-' + activeChangeCategory).focus({ preventScroll: true });
     }
 
-    // Category Switching
+    function goToPreviousCategory() {
+      const index = changeCategoryOrder.indexOf(activeChangeCategory);
+      if (index === 0) {
+        cancelChangeRequest();
+        return;
+      }
+      switchCategory(changeCategoryOrder[index - 1]);
+      document.getElementById('cv-step-' + activeChangeCategory).focus({ preventScroll: true });
+    }
+
+    // Keep every form mounted so moving between steps preserves unsaved edits.
     function switchCategory(catId) {
-      document.querySelectorAll('.change-cat-pill').forEach(p => p.classList.remove('active'));
-      document.querySelectorAll('.change-form-container').forEach(c => c.style.display = 'none');
-
-      const activePill = document.getElementById(`pill-${catId}`);
-      const activeForm = document.getElementById(`cat-${catId}`);
-
-      if (activePill) {
-        activePill.classList.add('active');
-        activePill.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
-      }
-      if (activeForm) {
-        activeForm.style.display = 'flex';
-      }
+      const index = changeCategoryOrder.indexOf(catId);
+      if (index < 0) return;
+      activeChangeCategory = catId;
+      document.querySelectorAll('.cv-step').forEach((step, stepIndex) => {
+        const active = stepIndex === index;
+        step.classList.toggle('active', active);
+        step.classList.toggle('completed', stepIndex < index);
+        if (active) step.setAttribute('aria-current', 'step');
+        else step.removeAttribute('aria-current');
+      });
+      document.querySelectorAll('.change-form-container').forEach(form => {
+        form.style.display = form.id === 'cat-' + catId ? 'flex' : 'none';
+      });
       syncCategoryActions(catId);
+      document.querySelector('.change-request-page > .main-content').scrollTop = 0;
     }
 
     function handleChangeRequestBack() {
@@ -1580,10 +1501,8 @@ DAMANSARA KOTA</textarea>
     function renderFamilyRecords() {
       const container = document.getElementById('familyItems');
       const count = document.getElementById('familyRecordCount');
-      const tabCount = document.querySelector('#pill-family .change-cat-count');
       if (!container || !count) return;
       count.textContent = familyRecords.length + (familyRecords.length === 1 ? ' member' : ' members');
-      if (tabCount) tabCount.textContent = String(familyRecords.length);
       if (familyRecords.length === 0) {
         container.innerHTML = '<div class="family-empty-state">No family members yet</div>';
         return;
@@ -1762,6 +1681,7 @@ DAMANSARA KOTA</textarea>
 
     renderQualificationRecords();
     renderFamilyRecords();
+    switchCategory('personal');
 
     function cancelChangeRequest() {
       window.location.href = 'me.html';

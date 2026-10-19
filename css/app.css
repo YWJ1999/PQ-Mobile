@@ -6815,6 +6815,11 @@ select option {
 }
 
 .bonus-hero-card {
+  /* These shared summary and employee-ID tokens sit on a purple surface. */
+  --text-muted: #ffffff;
+  --purple-primary: #ffffff;
+  --border-subtle: rgba(255, 255, 255, 0.25);
+  --record-summary-background: rgba(0, 0, 0, 0.16);
   background: rgba(255, 255, 255, 0.12);
   border: 1px solid rgba(255, 255, 255, 0.22);
   backdrop-filter: blur(12px);
@@ -6861,8 +6866,8 @@ select option {
 }
 
 .bonus-user-role {
-  font-size: 10px;
-  color: rgba(233, 213, 255, 0.85);
+  font-size: 11px;
+  color: #ffffff;
   font-weight: 600;
 }
 
@@ -6891,11 +6896,11 @@ select option {
 }
 
 .bonus-kpi-label {
-  font-size: 9.5px;
+  font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  color: rgba(233, 213, 255, 0.75);
+  color: #ffffff;
 }
 
 .bonus-kpi-val {
@@ -6906,9 +6911,9 @@ select option {
 }
 
 .bonus-kpi-sub {
-  font-size: 9px;
+  font-size: 10.5px;
   font-weight: 700;
-  color: #6ee7b7;
+  color: #ffffff;
 }
 
 /* Controls Bar */

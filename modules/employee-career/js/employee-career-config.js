@@ -3,7 +3,8 @@ window.EMPLOYEE_CAREER_OPTIONS = {
     { id: 'feedback', title: 'Feedback', icon: 'fa-message', tone: 'rose', href: 'options/individual/feedback.html' },
     { id: 'whereabout', title: 'Whereabout', icon: 'fa-location-dot', tone: 'cyan', href: 'options/individual/whereabout.html' },
     { id: 'career-plan', title: 'Career Plan', icon: 'fa-route', tone: 'violet', href: 'options/individual/career-plan.html' },
-    { id: 'history', title: 'History', icon: 'fa-clock-rotate-left', tone: 'amber', href: 'options/history.html' }
+    { id: 'history', title: 'History', icon: 'fa-clock-rotate-left', tone: 'amber', href: 'options/history.html' },
+    { id: 'cv-change-request', title: 'CV Change Request', icon: 'fa-file-pen', tone: 'violet', href: '../../change-request.html' }
   ],
   team: [
     { id: 'confirm-new-user', title: 'Confirm New User', icon: 'fa-user-check', tone: 'violet', href: 'options/team/confirm-new-user.html' },

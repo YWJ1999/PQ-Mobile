@@ -13,8 +13,13 @@
   <link rel="stylesheet" href="css/app.css">
   <link rel="stylesheet" href="css/me-profile-header.css">
   <link rel="stylesheet" href="css/me-profile-details.css">
+  <link rel="stylesheet" href="css/me-profile-records.css">
+  <link rel="stylesheet" href="css/me-profile-navigation.css">
   <script src="js/components.js"></script>
   <script src="js/app.js" defer></script>
+  <script src="js/me-profile-collapse.js" defer></script>
+  <script src="js/me-profile-records.js" defer></script>
+  <script src="js/me-profile-navigation.js" defer></script>
 </head>
 
 <body>
@@ -36,9 +41,6 @@
           </button>
           <h1 class="me-profile-heading">My Profile</h1>
         </div>
-        <button class="me-options-btn" onclick="toggleExecutiveOptions(true)" aria-label="More Options" title="Options">
-          <i class="fa-solid fa-ellipsis-vertical" aria-hidden="true"></i>
-        </button>
       </div>
 
       <div class="me-pass-body">
@@ -54,23 +56,15 @@
       </div>
     </header>
 
-    <!-- Sticky Horizontal Category Navigation Bar -->
-    <div class="me-jump-bar-wrapper">
-      <div class="me-jump-bar-container">
-        <div class="me-jump-bar" id="meJumpBar" role="tablist" aria-label="Profile categories" onscroll="handleJumpBarScroll(this)"></div>
-        <!-- Right side gradient fade + chevron hint -->
-        <div class="me-jump-bar-fade" id="meJumpFade">›</div>
-      </div>
-
-      <!-- Right fixed expand button -->
-      <button class="me-jump-expand-btn" onclick="toggleCatSheet(true)" title="View All Categories Grid" aria-label="View All Categories">
-        <i class="fa-solid fa-grip" style="font-size: 14px;"></i>
-      </button>
-    </div>
-
     <!-- Scrollable Main Content -->
     <main class="main-content profile-details" id="meMainScroll" style="padding-bottom: 90px;">
-      <section class="me-bento-section profile-section" id="bento-personal" aria-labelledby="bento-personal-heading">
+      <nav class="profile-directory" id="profileDirectory" aria-label="Profile navigation"></nav>
+      <div class="profile-detail-nav" id="profileDetailNav" hidden>
+        <button type="button" class="profile-directory-back" onclick="showProfileDirectory()">
+          <i class="fa-solid fa-chevron-left" aria-hidden="true"></i><span>All profile categories</span>
+        </button>
+      </div>
+      <section class="me-bento-section profile-section" id="bento-personal" aria-labelledby="bento-personal-heading" hidden>
         <div class="profile-section-heading">
           <span class="profile-section-icon">
             <i class="fa-solid fa-user" aria-hidden="true">
@@ -104,7 +98,7 @@
             <div class="profile-field profile-field-wide">
               <dt>Personal email</dt>
               <dd>
-                <a href="mailto:ebb12@gmail.com">ebb12@gmail.com</a>
+                <a href="mailto:sarah.personal@example.com">sarah.personal@example.com</a>
               </dd>
             </div>
           </dl>
@@ -150,7 +144,7 @@
 
 
       </section>
-      <section class="me-bento-section profile-section" id="bento-education" aria-labelledby="bento-education-heading">
+      <section class="me-bento-section profile-section" id="bento-education" aria-labelledby="bento-education-heading" hidden>
 
         <div class="profile-panel">
           <div class="profile-section-heading">
@@ -210,34 +204,23 @@
           </dl>
         </div>
       </section>
-      <section class="me-bento-section profile-section" id="bento-family" aria-labelledby="bento-family-heading">
-        <div class="profile-panel">
-          <div class="profile-section-heading"><span class="profile-section-icon"><i class="fa-solid fa-people-roof" aria-hidden="true"></i></span><h2 id="bento-family-heading">Family</h2><span class="profile-count">2</span></div>
-          <article class="profile-history-record">
-            <span class="profile-person-initial" aria-hidden="true">A</span>
-            <div class="profile-record-copy">
-              <h3 class="profile-record-title">ABU KARUDDIN</h3>
-              <p class="profile-record-meta">Birth date · 17 Aug 1950</p>
-            </div>
-            <span class="profile-status">Husband</span>
-          </article>
-          <article class="profile-history-record">
-            <span class="profile-person-initial" aria-hidden="true">a</span>
-            <div class="profile-record-copy">
-              <h3 class="profile-record-title">a</h3>
-              <p class="profile-record-meta">Birth date · 1 Apr 2022</p>
-            </div>
-            <span class="profile-status">Daughter</span>
-          </article>
+      <section class="me-bento-section profile-section" id="bento-family" aria-labelledby="bento-family-heading" hidden>
+        <div class="profile-panel profile-record-panel">
+          <div class="profile-section-heading">
+            <span class="profile-section-icon"><i class="fa-solid fa-people-roof" aria-hidden="true"></i></span>
+            <h2 id="bento-family-heading">Family</h2>
+            <span class="profile-count" data-profile-count="bento-family">2</span>
+          </div>
+          <div class="profile-record-table-wrap" data-profile-records="bento-family"></div>
         </div>
       </section>
-      <section class="me-bento-section profile-section" id="bento-contact" aria-labelledby="bento-contact-heading">
+      <section class="me-bento-section profile-section" id="bento-contact" aria-labelledby="bento-contact-heading" hidden>
         <div class="profile-section-heading">
           <span class="profile-section-icon">
             <i class="fa-solid fa-address-book" aria-hidden="true">
             </i>
           </span>
-          <h2 id="bento-contact-heading">Contact &amp; address</h2>
+          <h2 id="bento-contact-heading">Contact Information</h2>
         </div>
         <div class="profile-panel profile-group profile-group-contact-methods">
           <h3 class="profile-group-title">Contact methods</h3>
@@ -245,7 +228,7 @@
             <div class="profile-field profile-field-wide">
               <dt>Company email</dt>
               <dd>
-                <a href="mailto:yewweijiang123@gmail.com">yewweijiang123@gmail.com</a>
+                <a href="mailto:sarah.jenkins@example.com">sarah.jenkins@example.com</a>
               </dd>
             </div>
             <div class="profile-field">
@@ -322,21 +305,15 @@
               <dd>MALAYSIA</dd>
             </div>
           </dl>
-          <dl class="profile-fields">
-            <div class="profile-field">
-              <dt>Remarks</dt>
-              <dd>FATHER</dd>
-            </div>
-          </dl>
         </div>
       </section>
-      <section class="me-bento-section profile-section" id="bento-work" aria-labelledby="bento-work-heading">
+      <section class="me-bento-section profile-section" id="bento-work" aria-labelledby="bento-work-heading" hidden>
         <div class="profile-section-heading">
           <span class="profile-section-icon">
             <i class="fa-solid fa-building" aria-hidden="true">
             </i>
           </span>
-          <h2 id="bento-work-heading">Work information</h2>
+          <h2 id="bento-work-heading">Work Information</h2>
         </div>
         <div class="profile-panel profile-group profile-group-organization">
           <h3 class="profile-group-title">Organization</h3>
@@ -457,13 +434,13 @@
           </dl>
         </div>
       </section>
-      <section class="me-bento-section profile-section" id="bento-finance" aria-labelledby="bento-finance-heading">
+      <section class="me-bento-section profile-section" id="bento-finance" aria-labelledby="bento-finance-heading" hidden>
         <div class="profile-section-heading">
           <span class="profile-section-icon">
             <i class="fa-solid fa-wallet" aria-hidden="true">
             </i>
           </span>
-          <h2 id="bento-finance-heading">Payroll &amp; tax</h2>
+          <h2 id="bento-finance-heading">Payroll Information</h2>
         </div>
         <div class="profile-panel profile-group profile-group-salary-account">
           <h3 class="profile-group-title">Salary account</h3>
@@ -538,340 +515,94 @@
           </dl>
         </div>
       </section>
-      <section class="me-bento-section profile-section" id="bento-career" aria-labelledby="bento-career-heading">
-
-        <div class="profile-panel">
+      <section class="me-bento-section profile-section" id="bento-career" aria-labelledby="bento-career-heading" hidden>
+        <div class="profile-panel profile-record-panel">
           <div class="profile-section-heading">
-          <span class="profile-section-icon">
-            <i class="fa-solid fa-arrow-trend-up" aria-hidden="true">
-            </i>
-          </span>
-          <h2 id="bento-career-heading">Career progression</h2>
-          <span class="profile-count">5</span>
-        </div>
-          <div class="profile-timeline">
-            <article class="profile-history-record">
-              <span class="profile-timeline-point" aria-hidden="true">
-              </span>
-              <div class="profile-record-copy">
-                <p class="profile-record-meta">1 Jan 2017</p>
-                <h3 class="profile-record-title">GROUP HR MANAGER</h3>
-                <span class="profile-movement">INCREMENT</span>
-              </div>
-            </article>
-            <article class="profile-history-record">
-              <span class="profile-timeline-point" aria-hidden="true">
-              </span>
-              <div class="profile-record-copy">
-                <p class="profile-record-meta">1 May 2012</p>
-                <h3 class="profile-record-title">HR MANAGER</h3>
-                <span class="profile-movement">PROMOTION</span>
-              </div>
-            </article>
-            <article class="profile-history-record">
-              <span class="profile-timeline-point" aria-hidden="true">
-              </span>
-              <div class="profile-record-copy">
-                <p class="profile-record-meta">2 Jan 2008</p>
-                <h3 class="profile-record-title">HR MANAGER</h3>
-                <span class="profile-movement">INCREMENT</span>
-              </div>
-            </article>
-            <article class="profile-history-record">
-              <span class="profile-timeline-point" aria-hidden="true">
-              </span>
-              <div class="profile-record-copy">
-                <p class="profile-record-meta">12 Nov 2006</p>
-                <h3 class="profile-record-title">HR MANAGER</h3>
-                <span class="profile-movement">CONFIRMATION</span>
-              </div>
-            </article>
-            <article class="profile-history-record">
-              <span class="profile-timeline-point" aria-hidden="true">
-              </span>
-              <div class="profile-record-copy">
-                <p class="profile-record-meta">12 Aug 2006</p>
-                <h3 class="profile-record-title">BARISTA</h3>
-                <span class="profile-movement">HIRED</span>
-              </div>
-            </article>
+            <span class="profile-section-icon"><i class="fa-solid fa-arrow-trend-up" aria-hidden="true"></i></span>
+            <h2 id="bento-career-heading">Career Progression</h2>
+            <span class="profile-count" data-profile-count="bento-career">5</span>
           </div>
+          <div class="profile-record-table-wrap" data-profile-records="bento-career"></div>
+        </div>
+        <div class="profile-chart-footer">
+          <button type="button" class="profile-chart-button" onclick="openProfileChart('bento-career')" aria-haspopup="dialog" aria-label="View Chart for Career Progression"><i class="fa-solid fa-chart-pie" aria-hidden="true"></i><span>View Chart</span></button>
         </div>
       </section>
-      <section class="me-bento-section profile-section" id="bento-competency" aria-labelledby="bento-competency-heading">
-
-        <div class="profile-panel">
+      <section class="me-bento-section profile-section" id="bento-competency" aria-labelledby="bento-competency-heading" hidden>
+        <div class="profile-panel profile-record-panel">
           <div class="profile-section-heading">
-          <span class="profile-section-icon">
-            <i class="fa-solid fa-list-check" aria-hidden="true">
-            </i>
-          </span>
-          <h2 id="bento-competency-heading">Competencies</h2>
-          <span class="profile-count">6</span>
-        </div>
-          <article class="profile-history-record">
-            <div class="profile-record-copy">
-              <h3 class="profile-record-title">EFFECTIVE</h3>
-              <p class="profile-record-meta profile-expired">Expired · 25/06/2024</p>
-            </div>
-            <span class="profile-status">Level 2</span>
-          </article>
-          <article class="profile-history-record">
-            <div class="profile-record-copy">
-              <h3 class="profile-record-title">TUNNEL ENGINNERING</h3>
-              <p class="profile-record-meta profile-expired">Expired · 30/05/2024</p>
-            </div>
-            <span class="profile-status">Level 5</span>
-          </article>
-          <article class="profile-history-record">
-            <div class="profile-record-copy">
-              <h3 class="profile-record-title">LEADERSHIP</h3>
-              <p class="profile-record-meta">Expiry · 12/09/2027</p>
-            </div>
-            <span class="profile-status">Level 3</span>
-          </article>
-          <article class="profile-history-record">
-            <div class="profile-record-copy">
-              <h3 class="profile-record-title">LEARNING CAPABILITY</h3>
-              <p class="profile-record-meta">Expiry · 31/12/2029</p>
-            </div>
-            <span class="profile-status">Level 4</span>
-          </article>
-          <article class="profile-history-record">
-            <div class="profile-record-copy">
-              <h3 class="profile-record-title">CHANGE MANAGEMENT</h3>
-              <p class="profile-record-meta">Expiry · 18/09/2031</p>
-            </div>
-            <span class="profile-status">Level 1</span>
-          </article>
-          <article class="profile-history-record">
-            <div class="profile-record-copy">
-              <h3 class="profile-record-title">TEAMWORK</h3>
-              <p class="profile-record-meta">Expiry · 15/12/2035</p>
-            </div>
-            <span class="profile-status">Level 5</span>
-          </article>
-        </div>
-      </section>
-      <section class="me-bento-section profile-section" id="bento-performance" aria-labelledby="bento-performance-heading">
-
-        <div class="profile-panel">
-          <div class="profile-section-heading">
-          <span class="profile-section-icon">
-            <i class="fa-solid fa-chart-column" aria-hidden="true">
-            </i>
-          </span>
-          <h2 id="bento-performance-heading">Performance history</h2>
-          <span class="profile-count">6</span>
-        </div>
-          <article class="profile-history-record">
-            <div class="profile-record-copy">
-              <h3 class="profile-record-title">FY 2026 (TSH)</h3>
-              <p class="profile-record-meta">GROUP HR MANAGER</p>
-            </div>
-            <div class="profile-performance-score">
-              <span class="profile-grade profile-grade-positive">A+</span>
-              <span class="profile-record-meta">Score 77</span>
-            </div>
-          </article>
-          <article class="profile-history-record">
-            <div class="profile-record-copy">
-              <h3 class="profile-record-title">FY 2026A</h3>
-              <p class="profile-record-meta">HR MANAGER</p>
-            </div>
-            <div class="profile-performance-score">
-              <span class="profile-grade">D</span>
-              <span class="profile-record-meta">Score 67</span>
-            </div>
-          </article>
-          <article class="profile-history-record">
-            <div class="profile-record-copy">
-              <h3 class="profile-record-title">FY 2026A</h3>
-              <p class="profile-record-meta">HR MANAGER</p>
-            </div>
-            <div class="profile-performance-score">
-              <span class="profile-grade">D</span>
-              <span class="profile-record-meta">Score 0</span>
-            </div>
-          </article>
-          <article class="profile-history-record">
-            <div class="profile-record-copy">
-              <h3 class="profile-record-title">FY 2026A</h3>
-              <p class="profile-record-meta">HR MANAGER</p>
-            </div>
-            <div class="profile-performance-score">
-              <span class="profile-grade">D</span>
-              <span class="profile-record-meta">Score 37</span>
-            </div>
-          </article>
-          <article class="profile-history-record">
-            <div class="profile-record-copy">
-              <h3 class="profile-record-title">FY 2026A</h3>
-              <p class="profile-record-meta">HR MANAGER</p>
-            </div>
-            <div class="profile-performance-score">
-              <span class="profile-grade">D</span>
-              <span class="profile-record-meta">Score 37</span>
-            </div>
-          </article>
-          <article class="profile-history-record">
-            <div class="profile-record-copy">
-              <h3 class="profile-record-title">FY 2026A</h3>
-              <p class="profile-record-meta">HR MANAGER</p>
-            </div>
-            <div class="profile-performance-score">
-              <span class="profile-grade">D</span>
-              <span class="profile-record-meta">Score 31</span>
-            </div>
-          </article>
-        </div>
-      </section>
-      <section class="me-bento-section profile-section" id="bento-training" aria-labelledby="bento-training-heading">
-
-        <div class="profile-panel">
-          <div class="profile-section-heading">
-          <span class="profile-section-icon">
-            <i class="fa-solid fa-book-open" aria-hidden="true">
-            </i>
-          </span>
-          <h2 id="bento-training-heading">Training history</h2>
-          <span class="profile-count">
-            <span id="dossierTrainingCount">33</span>
-          </span>
-        </div>
-          <label class="profile-search" for="dossierTrainingSearch">
-            <i class="fa-solid fa-magnifying-glass" aria-hidden="true">
-            </i>
-            <span class="profile-sr-only">Search training courses</span>
-            <input type="search" id="dossierTrainingSearch" placeholder="Search courses or dates" oninput="filterDossierTraining(this.value)">
-          </label>
-          <div class="profile-record-scroll" id="dossierTrainingList" role="region" aria-label="Training records" tabindex="0">
+            <span class="profile-section-icon"><i class="fa-solid fa-list-check" aria-hidden="true"></i></span>
+            <h2 id="bento-competency-heading">Competencies</h2>
+            <span class="profile-count" data-profile-count="bento-competency">6</span>
           </div>
+          <div class="profile-record-table-wrap" data-profile-records="bento-competency"></div>
         </div>
       </section>
-      <section class="me-bento-section profile-section" id="bento-compliance" aria-labelledby="bento-compliance-heading">
-
-        <div class="profile-panel">
+      <section class="me-bento-section profile-section" id="bento-performance" aria-labelledby="bento-performance-heading" hidden>
+        <div class="profile-panel profile-record-panel">
           <div class="profile-section-heading">
-          <span class="profile-section-icon">
-            <i class="fa-solid fa-shield-halved" aria-hidden="true">
-            </i>
-          </span>
-          <h2 id="bento-compliance-heading">Disciplinary history</h2>
-          <span class="profile-count">0</span>
+            <span class="profile-section-icon"><i class="fa-solid fa-chart-column" aria-hidden="true"></i></span>
+            <h2 id="bento-performance-heading">Performance History</h2>
+            <span class="profile-count" data-profile-count="bento-performance">6</span>
+          </div>
+          <div class="profile-record-table-wrap" data-profile-records="bento-performance"></div>
         </div>
-          <div class="profile-empty-schema" aria-label="Disciplinary record fields">
-            <span>Date</span>
-            <span>Offence</span>
-            <span>Action</span>
-          </div>
-          <div class="profile-empty-state">
-            <span class="profile-empty-icon">
-              <i class="fa-solid fa-shield-halved" aria-hidden="true">
-              </i>
-            </span>
-            <h3>No disciplinary records</h3>
-            <p>There are no entries in this history.</p>
-          </div>
+        <div class="profile-chart-footer">
+          <button type="button" class="profile-chart-button" onclick="openProfileChart('bento-performance')" aria-haspopup="dialog" aria-label="View Chart for Performance History"><i class="fa-solid fa-chart-pie" aria-hidden="true"></i><span>View Chart</span></button>
         </div>
       </section>
-      <section class="me-bento-section profile-section" id="bento-assets" aria-labelledby="bento-assets-heading">
-
-        <div class="profile-panel">
+      <section class="me-bento-section profile-section" id="bento-training" aria-labelledby="bento-training-heading" hidden>
+        <div class="profile-panel profile-record-panel">
           <div class="profile-section-heading">
-          <span class="profile-section-icon">
-            <i class="fa-solid fa-laptop" aria-hidden="true">
-            </i>
-          </span>
-          <h2 id="bento-assets-heading">Asset assignment</h2>
-          <span class="profile-count">4</span>
-        </div>
-          <div class="profile-asset-total">
-            <span>Total assigned value</span>
-            <strong>RM 103,300.00</strong>
+            <span class="profile-section-icon"><i class="fa-solid fa-book-open" aria-hidden="true"></i></span>
+            <h2 id="bento-training-heading">Training History</h2>
+            <span class="profile-count" data-profile-count="bento-training" id="dossierTrainingCount">33</span>
           </div>
-          <article class="profile-history-record">
-            <span class="profile-asset-icon">
-              <i class="fa-solid fa-car" aria-hidden="true">
-              </i>
-            </span>
-            <div class="profile-record-copy">
-              <h3 class="profile-record-title">AVANSER WAR32626</h3>
-              <p class="profile-record-meta">Assigned · 1 Jan 2019</p>
-            </div>
-            <div class="profile-asset-value">
-              <span class="profile-record-meta">RM</span>
-              <strong>96,000.00</strong>
-            </div>
-          </article>
-          <article class="profile-history-record">
-            <span class="profile-asset-icon">
-              <i class="fa-solid fa-mobile-screen-button" aria-hidden="true">
-              </i>
-            </span>
-            <div class="profile-record-copy">
-              <h3 class="profile-record-title">SAMSUNG CX</h3>
-              <p class="profile-record-meta">Assigned · 27 May 2017</p>
-            </div>
-            <div class="profile-asset-value">
-              <span class="profile-record-meta">RM</span>
-              <strong>2,000.00</strong>
-            </div>
-          </article>
-          <article class="profile-history-record">
-            <span class="profile-asset-icon">
-              <i class="fa-solid fa-laptop" aria-hidden="true">
-              </i>
-            </span>
-            <div class="profile-record-copy">
-              <h3 class="profile-record-title">MSI 17&quot; LAPTOP</h3>
-              <p class="profile-record-meta">Assigned · 27 Jul 2015</p>
-            </div>
-            <div class="profile-asset-value">
-              <span class="profile-record-meta">RM</span>
-              <strong>5,000.00</strong>
-            </div>
-          </article>
-          <article class="profile-history-record">
-            <span class="profile-asset-icon">
-              <i class="fa-solid fa-key" aria-hidden="true">
-              </i>
-            </span>
-            <div class="profile-record-copy">
-              <h3 class="profile-record-title">LOCKER 003</h3>
-              <p class="profile-record-meta">Assigned · 1 Jan 2013</p>
-            </div>
-            <div class="profile-asset-value">
-              <span class="profile-record-meta">RM</span>
-              <strong>300.00</strong>
-            </div>
-          </article>
+          <div class="profile-record-toolbar profile-training-toolbar">
+            <label class="profile-search" for="dossierTrainingSearch">
+              <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+              <span class="profile-sr-only">Search training courses or dates</span>
+              <input type="search" id="dossierTrainingSearch" placeholder="Search courses or dates" oninput="filterDossierTraining(this.value)">
+            </label>
+            <button type="button" class="profile-chart-button profile-chart-icon-button" onclick="openProfileChart('bento-training')" aria-haspopup="dialog" aria-label="View Chart for Training History" title="View Chart"><i class="fa-solid fa-chart-pie" aria-hidden="true"></i><span class="profile-sr-only">View Chart</span></button>
+          </div>
+          <div class="profile-record-table-wrap" data-profile-records="bento-training"></div>
         </div>
       </section>
-      <section class="me-bento-section profile-section" id="bento-letters" aria-labelledby="bento-letters-heading">
-
-        <div class="profile-panel">
+      <section class="me-bento-section profile-section" id="bento-compliance" aria-labelledby="bento-compliance-heading" hidden>
+        <div class="profile-panel profile-record-panel">
           <div class="profile-section-heading">
-          <span class="profile-section-icon">
-            <i class="fa-solid fa-file-lines" aria-hidden="true">
-            </i>
-          </span>
-          <h2 id="bento-letters-heading">HR letters</h2>
-          <span class="profile-count">31</span>
-        </div>
-          <div class="profile-record-scroll" id="dossierLettersList" role="region" aria-label="HR letter records" tabindex="0">
+            <span class="profile-section-icon"><i class="fa-solid fa-list" aria-hidden="true"></i></span>
+            <h2 id="bento-compliance-heading">Disciplinary History</h2>
+            <span class="profile-count" data-profile-count="bento-compliance">0</span>
           </div>
+          <div class="profile-record-table-wrap" data-profile-records="bento-compliance"></div>
+        </div>
+        <div class="profile-chart-footer">
+          <button type="button" class="profile-chart-button" onclick="openProfileChart('bento-compliance')" aria-haspopup="dialog" aria-label="View Chart for Disciplinary History"><i class="fa-solid fa-chart-pie" aria-hidden="true"></i><span>View Chart</span></button>
         </div>
       </section>
-      <div class="profile-verification">
-        <span class="profile-verification-icon">
-          <i class="fa-solid fa-circle-check" aria-hidden="true">
-          </i>
-        </span>
-        <div>
-          <span>CV last verified</span>
-          <strong>29 Jan 2024</strong>
+      <section class="me-bento-section profile-section" id="bento-assets" aria-labelledby="bento-assets-heading" hidden>
+        <div class="profile-panel profile-record-panel">
+          <div class="profile-section-heading">
+            <span class="profile-section-icon"><i class="fa-solid fa-laptop" aria-hidden="true"></i></span>
+            <h2 id="bento-assets-heading">Asset Assignment</h2>
+            <span class="profile-count" data-profile-count="bento-assets">4</span>
+          </div>
+          <div class="profile-record-table-wrap" data-profile-records="bento-assets"></div>
         </div>
+      </section>
+      <section class="me-bento-section profile-section" id="bento-letters" aria-labelledby="bento-letters-heading" hidden>
+        <div class="profile-panel profile-record-panel">
+          <div class="profile-section-heading">
+            <span class="profile-section-icon"><i class="fa-solid fa-file-lines" aria-hidden="true"></i></span>
+            <h2 id="bento-letters-heading">HR Letters</h2>
+            <span class="profile-count" data-profile-count="bento-letters">31</span>
+          </div>
+          <div class="profile-record-table-wrap" data-profile-records="bento-letters"></div>
+        </div>
+      </section>
+      <div class="profile-footer-actions" id="profileFooterActions">
         <button type="button" class="profile-back-top" id="scrollTopBtn" onclick="scrollToTop()" title="Scroll to top">
           <span>Back to top</span>
           <i class="fa-solid fa-arrow-up" aria-hidden="true"></i>
@@ -884,108 +615,6 @@
 
     <!-- Slide-in Left Profile Drawer -->
     <left-profile-drawer></left-profile-drawer>
-
-    <!-- Category Quick Navigation Sheet -->
-    <div class="me-cat-sheet" id="meCatSheet" onclick="if(event.target===this) toggleCatSheet(false)">
-      <div class="me-cat-panel">
-        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
-          <div>
-            <div style="font-size: 15px; font-weight: 800; color: var(--text-primary);">Profile categories</div>
-            <div style="font-size: 11px; color: var(--text-muted); margin-top: 1px;">Choose a category to view its information</div>
-          </div>
-          <button onclick="toggleCatSheet(false)" style="background: var(--bg-phone); border: 1px solid var(--border-subtle); width: 28px; height: 28px; border-radius: 50%; color: var(--text-muted); font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center;">✕</button>
-        </div>
-
-        <div class="me-category-grid" id="meCategoryGrid"></div>
-      </div>
-    </div>
-
-    <!-- Executive Options Menu Sheet (Three Dots Action Sheet) -->
-    <div class="me-options-sheet" id="meOptionsSheet" onclick="if(event.target===this) toggleExecutiveOptions(false)">
-      <div class="me-options-panel">
-        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
-          <div>
-            <div style="font-size: 15px; font-weight: 800; color: var(--text-primary);">Executive Actions</div>
-            <div style="font-size: 11px; color: var(--text-muted); margin-top: 1px;">Sarah Jenkins • EBB01</div>
-          </div>
-          <button onclick="toggleExecutiveOptions(false)" style="background: var(--bg-phone); border: 1px solid var(--border-subtle); width: 28px; height: 28px; border-radius: 50%; color: var(--text-muted); font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center;">✕</button>
-        </div>
-
-        <div style="display: flex; flex-direction: column; gap: 4px;">
-          <!-- 1. View JD -->
-          <div class="me-option-row" onclick="openExecutiveFeatureModal('jd')">
-            <div class="me-option-left">
-              <div class="me-option-icon">📄</div>
-              <div>
-                <div class="me-option-title">View JD</div>
-                <div class="me-option-sub">Job Description for Group HR Manager</div>
-              </div>
-            </div>
-            <span style="font-size: 14px; color: var(--text-muted);">›</span>
-          </div>
-
-          <!-- 2. Bonus History -->
-          <div class="me-option-row" onclick="openExecutiveFeatureModal('bonus')">
-            <div class="me-option-left">
-              <div class="me-option-icon">🎁</div>
-              <div>
-                <div class="me-option-title">Bonus History</div>
-                <div class="me-option-sub">Historical annual bonus payouts &amp; multiplier</div>
-              </div>
-            </div>
-            <span style="font-size: 14px; color: var(--text-muted);">›</span>
-          </div>
-
-          <!-- 3. Salary History -->
-          <div class="me-option-row" onclick="openExecutiveFeatureModal('salary')">
-            <div class="me-option-left">
-              <div class="me-option-icon">💰</div>
-              <div>
-                <div class="me-option-title">Salary History</div>
-                <div class="me-option-sub">Base salary revision &amp; increment log</div>
-              </div>
-            </div>
-            <span style="font-size: 14px; color: var(--text-muted);">›</span>
-          </div>
-
-          <!-- 4. Change Request -->
-          <div class="me-option-row" onclick="openExecutiveFeatureModal('change')">
-            <div class="me-option-left">
-              <div class="me-option-icon">📝</div>
-              <div>
-                <div class="me-option-title">Change Request</div>
-                <div class="me-option-sub">Submit employee detail update request</div>
-              </div>
-            </div>
-            <span style="font-size: 14px; color: var(--text-muted);">›</span>
-          </div>
-
-          <!-- 5. Work Behaviour Trend -->
-          <div class="me-option-row" onclick="location.href='work-behaviour.html'">
-            <div class="me-option-left">
-              <div class="me-option-icon">📈</div>
-              <div>
-                <div class="me-option-title">Work Behaviour Trend</div>
-                <div class="me-option-sub">Attendance, punctuality &amp; KPI analytics</div>
-              </div>
-            </div>
-            <span style="font-size: 14px; color: var(--text-muted);">›</span>
-          </div>
-
-          <!-- 6. Subordinates -->
-          <div class="me-option-row" onclick="openExecutiveFeatureModal('subordinates')">
-            <div class="me-option-left">
-              <div class="me-option-icon">👥</div>
-              <div>
-                <div class="me-option-title">Subordinates</div>
-                <div class="me-option-sub">Direct &amp; indirect reporting team members</div>
-              </div>
-            </div>
-            <span style="font-size: 14px; color: var(--text-muted);">›</span>
-          </div>
-        </div>
-      </div>
-    </div>
 
     <!-- Paper Document Job Description (JD) Sheet Modal -->
     <div class="jd-paper-modal" id="jdPaperModal" onclick="if(event.target===this) closeJdModal()">
@@ -1108,188 +737,6 @@
   </div>
 
   <script>
-    // One category definition supplies both the tabs and the category sheet.
-    const PROFILE_CATEGORIES = [
-      {"id":"bento-personal","label":"Personal","icon":"fa-user","count":false},
-      {"id":"bento-education","label":"Qualification","icon":"fa-graduation-cap","count":false},
-      {"id":"bento-family","label":"Family","icon":"fa-people-roof","count":true},
-      {"id":"bento-contact","label":"Contact","icon":"fa-address-book","count":false},
-      {"id":"bento-work","label":"Work","icon":"fa-building","count":false},
-      {"id":"bento-finance","label":"Payroll & Tax","icon":"fa-wallet","count":false},
-      {"id":"bento-career","label":"Career","icon":"fa-arrow-trend-up","count":true},
-      {"id":"bento-competency","label":"Competencies","icon":"fa-list-check","count":true},
-      {"id":"bento-performance","label":"Performance","icon":"fa-chart-column","count":true},
-      {"id":"bento-training","label":"Training","icon":"fa-book-open","count":true},
-      {"id":"bento-compliance","label":"Disciplinary","icon":"fa-shield-halved","count":true},
-      {"id":"bento-assets","label":"Assets","icon":"fa-laptop","count":true},
-      {"id":"bento-letters","label":"HR Letters","icon":"fa-file-lines","count":true}
-    ];
-
-    // All 33 Training Courses exactly matching user specifications
-    const ALL_TRAINING_COURSES = [
-      {"name":"Sample Data","date":"7 Dec 2026","days":"19.00","color":"green"},
-      {"name":"UiPath","date":"9 Nov 2026","days":"19.00","color":"green"},
-      {"name":"TESTING3","date":"7 May 2026","days":"9.00","color":"red"},
-      {"name":"123","date":"7 May 2026","days":"9.00","color":"red"},
-      {"name":"TESTING2","date":"2 Dec 2025","days":"0.00","color":"green"},
-      {"name":"TESTING","date":"28 Nov 2025","days":"1.00","color":"green"},
-      {"name":"TESTING","date":"28 Nov 2025","days":"0.00","color":"green"},
-      {"name":"999","date":"25 Oct 2025","days":"1.00","color":"green"},
-      {"name":"PowerPoint","date":"24 Oct 2025","days":"1.00","color":"green"},
-      {"name":"PeopleKiosk","date":"1 Oct 2025","days":"1.00","color":"green"},
-      {"name":"5S STRATEGIES IN","date":"6 Jun 2025","days":"1.00","color":"green"},
-      {"name":"external course- ABC","date":"5 Jun 2025","days":"1.00","color":"green"},
-      {"name":"TSQL Course for beginner","date":"1 Jun 2025","days":"1.00","color":"green"},
-      {"name":"MICROSOFT","date":"1 Jun 2025","days":"2.00","color":"green"},
-      {"name":"EFFECTIVE CRISIS","date":"1 Jun 2025","days":"1.00","color":"green"},
-      {"name":"Personnel development","date":"23 Dec 2024","days":"1.00","color":"green"},
-      {"name":"HRDF Course","date":"3 Nov 2024","days":"4.00","color":"orange"},
-      {"name":"Microsoft","date":"1 Nov 2024","days":"0.00","color":"green"},
-      {"name":"Power Shell course","date":"26 Jul 2024","days":"1.00","color":"green"},
-      {"name":"JAVA for beginner","date":"2 Aug 2021","days":"1.00","color":"green"},
-      {"name":"PROCESS IMPROVEMENT","date":"1 Aug 2021","days":"1.00","color":"green"},
-      {"name":"PROCESS IMPROVEMENT","date":"1 Aug 2021","days":"1.00","color":"green"},
-      {"name":"Visual Studio Introduction","date":"14 Jul 2021","days":"1.00","color":"green"},
-      {"name":"C# Design Pattern","date":"12 Jul 2021","days":"1.00","color":"green"},
-      {"name":"MICROSOFT","date":"18 Nov 2020","days":"1.00","color":"green"},
-      {"name":"MICROSOFT","date":"11 Nov 2020","days":"1.00","color":"green"},
-      {"name":"Microsoft","date":"14 Jun 2020","days":"1.00","color":"green"},
-      {"name":"TESTING 29052020","date":"29 May 2020","days":"1.00","color":"green"},
-      {"name":"TESTING 29052020","date":"29 May 2020","days":"1.00","color":"green"},
-      {"name":"Leadership","date":"24 Dec 2019","days":"3.00","color":"green"},
-      {"name":"PROCESS IMPROVEMENT","date":"1 Aug 2019","days":"3.00","color":"green"},
-      {"name":"PROCESS IMPROVEMENT","date":"1 Aug 2018","days":"3.00","color":"green"},
-      {"name":"PROCESS IMPROVEMENT","date":"29 May 2017","days":"2.00","color":"green"}
-    ];
-
-    // All 31 HR Letters exactly conforming to schema (including empty date & sign records)
-    const ALL_HR_LETTERS = [
-      {"type":"EA 2025","date":"29 Jul 2026","signed":null},
-      {"type":"Employment","date":"18 May 2026","signed":true},
-      {"type":"Bonus Letter","date":"5 Sep 2022","signed":true},
-      {"type":"Letter of Guarantee","date":"4 Sep 2022","signed":true},
-      {"type":"Employment","date":"9 Aug 2022","signed":true},
-      {"type":"Employment","date":"9 Aug 2021","signed":true},
-      {"type":"Employment","date":"2 Sep 2019","signed":true},
-      {"type":"Letter of Guarantee","date":"21 Jan 2017","signed":true},
-      {"type":"Employment","date":"","signed":null},
-      {"type":"Letter of Guarantee","date":"","signed":null},
-      {"type":"Employment","date":"","signed":null},
-      {"type":"Bonus Letter","date":"","signed":null},
-      {"type":"Employment","date":"","signed":null},
-      {"type":"Bonus Letter","date":"","signed":null},
-      {"type":"Bonus Letter","date":"","signed":null},
-      {"type":"Bonus Letter","date":"","signed":null},
-      {"type":"Employment","date":"","signed":null},
-      {"type":"Employment","date":"","signed":null},
-      {"type":"Letter of Guarantee","date":"","signed":null},
-      {"type":"Bonus Letter","date":"","signed":null},
-      {"type":"Bonus Letter","date":"","signed":null},
-      {"type":"Bonus Letter","date":"","signed":null},
-      {"type":"Letter of Guarantee","date":"","signed":null},
-      {"type":"Letter of Guarantee","date":"","signed":null},
-      {"type":"Letter of Guarantee","date":"","signed":null},
-      {"type":"Letter of Guarantee","date":"","signed":null},
-      {"type":"Letter of Guarantee","date":"","signed":null},
-      {"type":"Letter of Guarantee","date":"","signed":null},
-      {"type":"Letter of Guarantee","date":"","signed":null},
-      {"type":"EA 2025","date":"","signed":null},
-      {"type":"Bonus Letter","date":"","signed":null}
-    ];
-
-    // Reference records use the same flat list styling as the profile details.
-    function escapeProfileText(value) {
-      return String(value).replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;');
-    }
-
-    function renderTrainingList(list) {
-      const container = document.getElementById('dossierTrainingList');
-      if (!container) return;
-      if (!list.length) {
-        container.innerHTML = '<div class="profile-search-empty" role="status">No training records match your search.</div>';
-        return;
-      }
-      container.innerHTML = list.map(course => {
-        const tone = course.color === 'red' ? 'negative' : course.color === 'orange' ? 'warning' : 'positive';
-        return '<article class="profile-history-record"><div class="profile-record-copy"><h3 class="profile-record-title">' + escapeProfileText(course.name) + '</h3><p class="profile-record-meta">' + escapeProfileText(course.date) + '</p></div><span class="profile-training-days profile-text-' + tone + '">' + escapeProfileText(course.days) + '<small>days</small></span></article>';
-      }).join('');
-    }
-
-    function filterDossierTraining(query) {
-      const text = query.trim().toLowerCase();
-      const list = ALL_TRAINING_COURSES.filter(course => course.name.toLowerCase().includes(text) || course.date.toLowerCase().includes(text));
-      renderTrainingList(list);
-      document.getElementById('dossierTrainingCount').textContent = text ? list.length + ' / ' + ALL_TRAINING_COURSES.length : ALL_TRAINING_COURSES.length;
-    }
-
-    function renderLettersList() {
-      const container = document.getElementById('dossierLettersList');
-      if (!container) return;
-      container.innerHTML = ALL_HR_LETTERS.map(doc => {
-        const signed = doc.signed === true;
-        const date = doc.date ? 'Issued · ' + escapeProfileText(doc.date) : 'Issue date not recorded';
-        return '<article class="profile-history-record"><div class="profile-record-copy"><h3 class="profile-record-title">' + escapeProfileText(doc.type) + '</h3><p class="profile-record-meta">' + date + '</p></div><span class="profile-letter-status' + (signed ? ' profile-text-positive' : '') + '">' + (signed ? '<i class="fa-solid fa-check" aria-hidden="true"></i> Signed' : 'Signature not recorded') + '</span></article>';
-      }).join('');
-    }
-
-    function renderProfileCategories() {
-      const labels = [{ id: 'all', controls: 'meMainScroll', icon: 'fa-layer-group', text: 'All' }, ...PROFILE_CATEGORIES.map(category => {
-        const count = document.querySelectorAll('#' + category.id + ' .profile-history-record').length;
-        return { ...category, controls: category.id, text: category.label + (category.count ? ' (' + count + ')' : '') };
-      })];
-      document.getElementById('meJumpBar').innerHTML = labels.map(category =>
-        '<button type="button" class="me-jump-pill" id="profile-tab-' + category.id + '" role="tab" aria-controls="' + category.controls + '" data-category="' + category.id + '" aria-selected="false" tabindex="-1" onclick="scrollToBento(this.dataset.category, this)" onkeydown="handleProfileTabKey(event)">' + escapeProfileText(category.text) + '</button>'
-      ).join('');
-      document.getElementById('meCategoryGrid').innerHTML = labels.map(category =>
-        '<button type="button" class="me-category-option" data-category="' + category.id + '" onclick="selectCategoryFromSheet(this.dataset.category)"><i class="fa-solid ' + category.icon + ' me-category-icon" aria-hidden="true"></i><span class="me-category-label">' + escapeProfileText(category.text) + '</span></button>'
-      ).join('');
-      PROFILE_CATEGORIES.forEach(category => {
-        const section = document.getElementById(category.id);
-        section.setAttribute('role', 'tabpanel');
-        section.setAttribute('aria-labelledby', 'profile-tab-' + category.id);
-      });
-    }
-
-    // Filter the page to the chosen category; all records remain in the document.
-    function scrollToBento(bentoId, btn, instant = false) {
-      const target = document.getElementById(bentoId);
-      const scrollContainer = document.getElementById('meMainScroll');
-      const showAll = bentoId === 'all';
-      if (!scrollContainer || (!showAll && (!target || !target.classList.contains('profile-section')))) return;
-      const changed = target?.hidden;
-      scrollContainer.querySelectorAll(':scope > .profile-section').forEach(section => {
-        section.hidden = !showAll && section !== target;
-      });
-      if (showAll || (bentoId === 'bento-training' && changed)) {
-        document.getElementById('dossierTrainingSearch').value = '';
-        filterDossierTraining('');
-      }
-      let activeButton;
-      document.querySelectorAll('.me-jump-pill').forEach(button => {
-        const active = button.dataset.category === bentoId;
-        button.classList.toggle('active', active);
-        button.setAttribute('aria-selected', String(active));
-        button.tabIndex = active ? 0 : -1;
-        if (active) activeButton = button;
-      });
-      document.querySelectorAll('#meCategoryGrid [data-category]').forEach(button => {
-        button.classList.toggle('is-active', button.dataset.category === bentoId);
-      });
-      scrollContainer.scrollTo({ top: 0, behavior: 'instant' });
-      activeButton?.scrollIntoView({ behavior: instant ? 'instant' : 'smooth', inline: 'center', block: 'nearest' });
-    }
-
-    function handleProfileTabKey(event) {
-      if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
-      const buttons = [...document.querySelectorAll('.me-jump-pill')];
-      const index = buttons.indexOf(event.currentTarget);
-      const next = event.key === 'Home' ? 0 : event.key === 'End' ? buttons.length - 1 :
-        (index + (event.key === 'ArrowRight' ? 1 : -1) + buttons.length) % buttons.length;
-      event.preventDefault();
-      buttons[next].click();
-      buttons[next].focus({ preventScroll: true });
-    }
-
     function scrollToTop() {
       const scrollContainer = document.getElementById('meMainScroll');
       const behavior = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth';
@@ -1297,26 +744,13 @@
     }
 
     function goBackFromProfile() {
+      if (isProfileCategoryOpen()) {
+        showProfileDirectory();
+        return;
+      }
       const canGoBack = window.navigation ? window.navigation.canGoBack : window.history.length > 1;
       if (canGoBack) window.history.back();
       else navTo('home');
-    }
-
-    // Category Sheet Modal & Jump Bar Scroll Handle
-    function toggleCatSheet(open) {
-      const sheet = document.getElementById('meCatSheet');
-      if (sheet) {
-        if (open) sheet.classList.add('open');
-        else sheet.classList.remove('open');
-      }
-    }
-
-    function toggleExecutiveOptions(open) {
-      const sheet = document.getElementById('meOptionsSheet');
-      if (sheet) {
-        if (open) sheet.classList.add('open');
-        else sheet.classList.remove('open');
-      }
     }
 
     function openJdModal() {
@@ -1327,65 +761,6 @@
     function closeJdModal() {
       const modal = document.getElementById('jdPaperModal');
       if (modal) modal.classList.remove('open');
-    }
-
-    function openExecutiveFeatureModal(featureKey) {
-      toggleExecutiveOptions(false);
-      if (featureKey === 'jd') {
-        openJdModal();
-        return;
-      }
-      if (featureKey === 'bonus') {
-        window.location.href = 'bonus-history.html';
-        return;
-      }
-      if (featureKey === 'salary') {
-        window.location.href = 'salary-history.html';
-        return;
-      }
-      if (featureKey === 'change') {
-        window.location.href = 'change-request.html';
-        return;
-      }
-      if (featureKey === 'subordinates') {
-        window.location.href = 'subordinates.html';
-        return;
-      }
-      const titles = {
-        'jd': '📄 Job Description (GROUP HR MANAGER)',
-        'bonus': '🎁 Bonus History Records',
-        'salary': '💰 Salary Revision History',
-        'change': '📝 Submit Change Request',
-        'behaviour': '📈 Work Behaviour & KPI Analytics',
-        'subordinates': '👥 Subordinates (Direct Reports)'
-      };
-      const contents = {
-        'jd': 'Role: GROUP HR MANAGER (Grade G3-EXEC)\n\nKey Responsibilities:\n• Lead Group-wide Talent Acquisition, Payroll & HR Strategy\n• Manage employee relations, industrial compliance & benefit schemes\n• Oversee HR Operations across all branches (Times Square HQ)',
-        'bonus': 'Bonus Payout History:\n• FY 2025: 2.5 Months (RM 18,500.00)\n• FY 2024: 3.0 Months (RM 21,000.00)\n• FY 2023: 2.0 Months (RM 13,000.00)\n• FY 2022: 2.5 Months (RM 15,000.00)',
-        'salary': 'Base Salary Revision History:\n• 1 Jan 2017: Salary Adjusted (Group HR Manager)\n• 1 May 2012: Promoted (HR Manager)\n• 2 Jan 2008: Annual Increment (HR Manager)\n• 12 Nov 2006: Confirmed (HR Manager)\n• 12 Aug 2006: Hired (Barista)',
-        'change': 'Select information field to request updates:\n[ ] Residential Address\n[ ] Personal Phone Number\n[ ] Passport / Driving License Details\n[ ] Emergency Contact Info\n\nClick Submit to route request to HR Operations.',
-        'behaviour': 'Work Behaviour Index: 98.5% (Excellent)\n• Punctuality: 99.2%\n• Attendance Rate: 100%\n• Disciplinary Offences: 0 Incidents\n• Leadership Metric: Top Tier (G3-EXEC)',
-        'subordinates': 'Direct Subordinates (8 Team Members):\n1. EBB05 - Siti Nurhaliza (Senior HR Executive)\n2. EBB08 - Ahmad Razak (Payroll Officer)\n3. EBB14 - Tan Wei Lun (Talent Acquisition Specialist)\n4. EBB19 - Kavitha A/P Gopal (HR Administrator)\n5. EBB22 - Danial Ariff (Training Coordinator)\n+ 3 additional HR Operations staff'
-      };
-
-      setTimeout(() => {
-        alert(`${titles[featureKey]}\n\n${contents[featureKey]}`);
-      }, 150);
-    }
-
-    function selectCategoryFromSheet(bentoId) {
-      toggleCatSheet(false);
-      const btn = document.querySelector(`.me-jump-pill[data-category="${bentoId}"]`);
-      scrollToBento(bentoId, btn);
-      btn?.focus({ preventScroll: true });
-    }
-
-    function handleJumpBarScroll(el) {
-      const fade = document.getElementById('meJumpFade');
-      if (!fade) return;
-      const isEnd = el.scrollLeft + el.clientWidth >= el.scrollWidth - 10;
-      if (isEnd) fade.style.opacity = '0';
-      else fade.style.opacity = '0.9';
     }
 
     // CIMB Account Number Mask Toggle
@@ -1409,12 +784,12 @@
     }
 
     function initProfile() {
-      renderTrainingList(ALL_TRAINING_COURSES);
-      renderLettersList();
-      renderProfileCategories();
+      renderProfileRecordSections();
+      renderProfileNavigation();
+      initProfileCollapsibleCards();
       const requested = new URLSearchParams(window.location.search).get('scroll');
-      const initial = PROFILE_CATEGORIES.some(category => category.id === requested) ? requested : 'all';
-      scrollToBento(initial, null, true);
+      if (PROFILE_CATEGORIES.some(category => category.id === requested)) openProfileCategory(requested);
+      else showProfileDirectory();
     }
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initProfile, { once: true });
     else initProfile();

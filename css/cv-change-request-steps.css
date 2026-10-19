@@ -1,0 +1,145 @@
+/* Five-step navigation follows the Travel Mileage progress bar. */
+.change-request-page .cv-stepper {
+  margin: 14px 14px 0;
+  padding: 14px 8px 12px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 20px;
+  background: var(--bg-card);
+  box-shadow: var(--shadow-card);
+}
+
+.change-request-page .cv-step-track {
+  --cv-step-index: 0;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  position: relative;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.change-request-page .cv-step-track::before,
+.change-request-page .cv-step-track::after {
+  content: '';
+  position: absolute;
+  top: 14px;
+  left: 10%;
+  height: 2px;
+  pointer-events: none;
+}
+
+.change-request-page .cv-step-track::before {
+  width: 80%;
+  background: var(--border-card);
+}
+
+.change-request-page .cv-step-track::after {
+  width: calc(var(--cv-step-index) * 20%);
+  background: linear-gradient(90deg, #10b981, #a855f7);
+  transition: width 250ms ease;
+}
+
+.change-request-page .cv-step-track > li {
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+}
+
+.change-request-page .cv-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  width: 100%;
+  min-height: 48px;
+  padding: 0;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--text-muted);
+  font: inherit;
+  cursor: pointer;
+}
+
+.change-request-page .cv-step-circle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 30px;
+  width: 30px;
+  height: 30px;
+  border: 2px solid var(--border-card);
+  border-radius: 50%;
+  background: var(--bg-input);
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 800;
+  transition: background 200ms ease, border-color 200ms ease, color 200ms ease;
+}
+
+.change-request-page .cv-step-label {
+  font-size: clamp(9px, 2.6vw, 11px);
+  font-weight: 700;
+  line-height: 1.4;
+  letter-spacing: -0.2px;
+  white-space: nowrap;
+}
+
+.change-request-page .cv-step.completed .cv-step-circle {
+  border-color: #10b981;
+  color: #34d399;
+}
+
+.change-request-page .cv-step.completed .cv-step-label {
+  color: #34d399;
+}
+
+.change-request-page .cv-step.active .cv-step-circle {
+  border-color: #a855f7;
+  background: linear-gradient(135deg, #7c3aed, #6d28d9);
+  color: #ffffff;
+  box-shadow: 0 4px 14px rgba(124, 58, 237, 0.34);
+}
+
+.change-request-page .cv-step.active .cv-step-label {
+  color: var(--text-primary);
+  font-weight: 800;
+}
+
+.change-request-page .cv-step:hover .cv-step-circle {
+  border-color: #a855f7;
+}
+
+.change-request-page .cv-step:focus-visible {
+  outline: 2px solid var(--purple-primary);
+  outline-offset: 3px;
+}
+
+[data-theme="light"] .change-request-page .cv-step-circle {
+  border-color: #cbd5e1;
+}
+
+[data-theme="light"] .change-request-page .cv-step.completed .cv-step-circle {
+  border-color: #10b981;
+  background: #ecfdf5;
+  color: #059669;
+}
+
+[data-theme="light"] .change-request-page .cv-step.completed .cv-step-label {
+  color: #059669;
+}
+
+[data-theme="light"] .change-request-page .cv-step.active .cv-step-circle {
+  border-color: #a855f7;
+}
+
+[data-theme="light"] .change-request-page .cv-step.active .cv-step-label {
+  color: #6d28d9;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .change-request-page .cv-step-track::after,
+  .change-request-page .cv-step-circle {
+    transition: none;
+  }
+}

@@ -32,16 +32,6 @@
   letter-spacing: -0.3px;
 }
 
-.me-profile-header .me-options-btn {
-  flex-shrink: 0;
-  width: 34px;
-  height: 34px;
-  background: rgba(255, 255, 255, 0.12);
-  border-color: rgba(255, 255, 255, 0.08);
-  font-size: 16px;
-  transition: background 150ms ease, transform 150ms ease;
-}
-
 .me-profile-header .me-back-btn {
   flex-shrink: 0;
   width: 44px;
@@ -52,16 +42,16 @@
   transition: background 150ms ease, transform 150ms ease;
 }
 
-.me-profile-header :is(.me-back-btn, .me-options-btn):hover {
+.me-profile-header .me-back-btn:hover {
   background: rgba(255, 255, 255, 0.2);
 }
 
-.me-profile-header :is(.me-back-btn, .me-options-btn):active {
+.me-profile-header .me-back-btn:active {
   background: rgba(255, 255, 255, 0.25);
   transform: scale(0.92);
 }
 
-.me-profile-header :is(.me-back-btn, .me-options-btn):focus-visible {
+.me-profile-header .me-back-btn:focus-visible {
   outline: 2px solid #ffffff;
   outline-offset: 3px;
 }
@@ -141,14 +131,72 @@
   margin-inline: 0;
 }
 
+.me-profile-nav .me-jump-bar-container {
+  min-width: 0;
+}
+
+.me-profile-nav .me-jump-bar {
+  gap: 2px;
+  overflow: hidden;
+}
+
+.me-profile-nav .me-jump-pill {
+  flex: 1 1 auto;
+  justify-content: center;
+  min-height: 34px;
+  padding: 6px 7px;
+}
+
+.me-profile-nav .me-jump-expand-btn {
+  width: auto;
+  min-width: 64px;
+  min-height: 44px;
+  height: auto;
+  padding: 10px 14px;
+  font-size: 11.5px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.me-profile-nav .me-jump-expand-btn.active {
+  background: var(--purple-primary);
+  border-color: var(--purple-primary);
+  color: #ffffff;
+}
+
+.me-profile-nav .me-jump-expand-btn:active {
+  transform: scale(0.96);
+}
+
+.me-profile-nav :is(.me-jump-pill, .me-jump-expand-btn):focus-visible {
+  outline: 2px solid var(--purple-primary);
+  outline-offset: -2px;
+}
+
 @media (max-width: 360px) {
+  .me-profile-nav {
+    gap: 4px;
+    padding-inline: 10px;
+  }
+
+  .me-profile-nav .me-jump-pill {
+    padding-inline: 5px;
+    font-size: 10.5px;
+  }
+
+  .me-profile-nav .me-jump-expand-btn {
+    min-width: 60px;
+    padding-inline: 12px;
+    font-size: 10.5px;
+  }
+
   .me-profile-header .me-pass-body {
     gap: 14px;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .me-profile-header :is(.me-back-btn, .me-options-btn) {
+  .me-profile-header .me-back-btn {
     transition: none;
   }
 }

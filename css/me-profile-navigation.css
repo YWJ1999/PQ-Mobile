@@ -1,0 +1,192 @@
+/* Profile destinations share the existing profile palette and grouped row shape. */
+.profile-details .profile-directory {
+  display: grid;
+  gap: 26px;
+  margin: 0 4px 24px;
+}
+
+.profile-details .profile-nav-group {
+  min-width: 0;
+}
+
+.profile-details .profile-nav-group-title {
+  margin: 0 4px 10px;
+  color: var(--profile-label);
+  font-size: 13.5px;
+  font-weight: 700;
+  line-height: 1.4;
+  letter-spacing: -.15px;
+}
+
+.profile-details .profile-nav-list {
+  overflow: hidden;
+  border: 1px solid var(--profile-edge);
+  border-radius: 21px;
+  background: var(--profile-panel);
+}
+
+.profile-details .profile-nav-row {
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1fr) auto 10px;
+  align-items: center;
+  column-gap: 13px;
+  width: 100%;
+  min-width: 0;
+  min-height: 64px;
+  margin: 0;
+  padding: 16px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--profile-ink);
+  font: inherit;
+  font-size: 15px;
+  font-weight: 650;
+  line-height: 1.45;
+  letter-spacing: -.2px;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: background 160ms ease, color 160ms ease;
+}
+
+.profile-details .profile-nav-row + .profile-nav-row {
+  border-top: 1px solid var(--profile-edge);
+}
+
+.profile-details .profile-nav-icon {
+  grid-column: 1;
+  width: 20px;
+  color: var(--profile-control);
+  font-size: 18px;
+  line-height: 1;
+  text-align: center;
+}
+
+.profile-details .profile-nav-label {
+  grid-column: 2;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+
+.profile-details .profile-nav-count {
+  grid-column: 3;
+  display: inline-grid;
+  place-items: center;
+  min-width: 24px;
+  min-height: 24px;
+  padding: 3px 6px;
+  border-radius: 7px;
+  background: var(--profile-tint);
+  color: var(--profile-accent);
+  font-size: 11px;
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.4;
+  letter-spacing: 0;
+  white-space: nowrap;
+}
+
+.profile-details .profile-nav-chevron {
+  grid-column: 4;
+  width: 10px;
+  color: var(--profile-label);
+  font-size: 11px;
+  line-height: 1;
+  text-align: right;
+  transition: transform 160ms ease;
+}
+
+.profile-details .profile-nav-row:active {
+  background: var(--profile-tint);
+}
+
+.profile-details .profile-nav-row:active .profile-nav-chevron {
+  transform: translateX(2px);
+}
+
+.profile-details .profile-nav-row:focus-visible {
+  outline: 2px solid var(--profile-accent);
+  outline-offset: -4px;
+  background: var(--profile-tint);
+}
+
+.profile-details .profile-detail-nav {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  margin: -4px 4px 18px;
+}
+
+.profile-details .profile-directory-back {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  max-width: 100%;
+  min-height: 44px;
+  padding: 10px 13px;
+  border: 1px solid var(--profile-edge);
+  border-radius: 12px;
+  background: var(--profile-panel);
+  color: var(--profile-ink);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 1.5;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: background 160ms ease;
+}
+
+.profile-details .profile-directory-back > i {
+  flex: 0 0 auto;
+  color: var(--profile-control);
+  font-size: 12px;
+}
+
+.profile-details .profile-directory-back > span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.profile-details .profile-directory-back:active {
+  background: var(--profile-tint);
+}
+
+.profile-details .profile-directory-back:focus-visible {
+  outline: 2px solid var(--profile-accent);
+  outline-offset: 3px;
+}
+
+.profile-details .profile-directory[hidden],
+.profile-details .profile-detail-nav[hidden],
+.profile-details .profile-section[hidden] {
+  display: none !important;
+}
+
+@media (hover: hover) {
+  .profile-details .profile-nav-row:hover,
+  .profile-details .profile-directory-back:hover {
+    background: var(--profile-tint);
+  }
+}
+
+@media (max-width: 360px) {
+  .profile-details .profile-nav-row {
+    column-gap: 10px;
+    padding-inline: 14px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .profile-details .profile-nav-row,
+  .profile-details .profile-nav-chevron,
+  .profile-details .profile-directory-back {
+    transition: none;
+  }
+}
