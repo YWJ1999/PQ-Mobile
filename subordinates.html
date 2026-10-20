@@ -13,11 +13,22 @@
   <link rel="stylesheet" href="css/app.css">
   <script src="js/components.js"></script>
   <script src="js/app.js" defer></script>
+  <script src="js/subordinates-tree.js" defer></script>
   <script>
     const savedTheme = localStorage.getItem('peoplehcm_theme') || 'dark';
     document.documentElement.setAttribute('data-theme', savedTheme);
   </script>
   <style>
+    .subordinates-page > .bonus-top-header {
+      position: relative;
+      flex: 0 0 auto;
+    }
+
+    .subordinates-page > .main-content {
+      min-height: 0;
+      overscroll-behavior: contain;
+    }
+
     /* Vertical Org Chart Tree Connector Styles */
     .v-org-container {
       display: flex;
@@ -29,6 +40,8 @@
 
     /* Edge-to-Corner Circular Photo Node Card Base */
     .v-node-card {
+      min-width: 0;
+      max-width: 100%;
       border-radius: 24px;
       padding: 8px 14px 8px 8px;
       box-shadow: var(--shadow-card);
@@ -199,12 +212,14 @@
     /* Data Badge Pill Line (Years Old & Year of Services) */
     .v-metrics-row {
       display: flex;
+      flex-wrap: wrap;
       align-items: center;
       gap: 6px;
       margin-top: 3px;
     }
 
     .metric-chip {
+      white-space: nowrap;
       background: rgba(0, 0, 0, 0.25);
       border: 1px solid rgba(255, 255, 255, 0.15);
       padding: 2px 7px;
@@ -221,12 +236,27 @@
       border-color: rgba(0, 0, 0, 0.12);
     }
 
-    /* Vertical Stem Line */
-    .v-stem-line {
-      width: 2.5px;
-      height: 24px;
-      background: #7c3aed;
+    /* Lines are measured from the rendered cards, including wrapped content. */
+    .v-org-connectors {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      overflow: visible;
+      pointer-events: none;
       z-index: 1;
+    }
+
+    .v-org-connectors path {
+      fill: none;
+      stroke: #7c3aed;
+      stroke-width: 2.5px;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .v-org-container > .v-branch-wrapper {
+      margin-top: 24px;
     }
 
     /* Tree Branch Group Structure */
@@ -239,32 +269,12 @@
       padding-left: 26px;
     }
 
-    .v-branch-wrapper::before {
-      content: '';
-      position: absolute;
-      left: 12px;
-      top: -24px;
-      bottom: 24px;
-      width: 2.5px;
-      background: linear-gradient(to bottom, #7c3aed 0%, rgba(124, 58, 237, 0.4) 100%);
-      border-radius: 2px;
-    }
-
     .v-branch-item {
       position: relative;
       display: flex;
       flex-direction: column;
     }
 
-    .v-branch-item::before {
-      content: '';
-      position: absolute;
-      left: -14px;
-      top: 48px;
-      width: 14px;
-      height: 2.5px;
-      background: #7c3aed;
-    }
   </style>
 </head>
 
@@ -273,7 +283,7 @@
   <!-- Desktop Switcher Bar -->
   <preview-top-bar active-page="me"></preview-top-bar>
 
-  <div class="phone-container">
+  <div class="phone-container subordinates-page">
     
     <!-- Top Executive Header Block (Purple Gradient) -->
     <div class="bonus-top-header">
@@ -329,9 +339,6 @@
             </div>
           </div>
         </div>
-
-        <!-- Vertical Stem Line Connecting Level 0 to Level 1 -->
-        <div class="v-stem-line"></div>
 
         <!-- LEVEL 1 BRANCHES (Direct Reports) -->
         <div class="v-branch-wrapper">

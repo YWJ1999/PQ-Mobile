@@ -521,6 +521,13 @@ company-updates-sheet {
 }
 
 /* Main Scrollable Content */
+html.is-mouse-swiping,
+html.is-mouse-swiping * {
+  cursor: grabbing !important;
+  user-select: none !important;
+  -webkit-user-select: none !important;
+}
+
 .main-content {
   flex: 1;
   overflow-y: auto;

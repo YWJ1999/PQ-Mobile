@@ -1,0 +1,195 @@
+/* Keep the decorative canvas outside the dashboard's scrolling content. */
+.dashboard-page .hero-bg {
+  background: #2b1052 url('../hero-purple-frosted-glass.png') right top / cover no-repeat !important;
+}
+
+.dashboard-page > phone-status-bar,
+.dashboard-page > app-header,
+.dashboard-page > .status-bar,
+.dashboard-page > .app-header {
+  flex: 0 0 auto;
+  position: relative;
+  z-index: 12;
+  transition: background-color 180ms ease, box-shadow 180ms ease;
+}
+
+.dashboard-page > app-header,
+.dashboard-page > .app-header {
+  height: 58px;
+}
+
+.dashboard-page > app-header .app-header,
+.dashboard-page > .app-header {
+  height: 100%;
+  padding: 0 20px;
+}
+
+.dashboard-page > .app-header {
+  height: 58px;
+}
+
+.dashboard-page .logo-container,
+.dashboard-page .logo-text {
+  transition: transform 180ms ease;
+}
+
+.dashboard-page .logo-container {
+  transform-origin: left center;
+}
+
+.dashboard-page .logo-text > span {
+  display: block;
+  line-height: 12px;
+  transition: opacity 180ms ease;
+}
+
+.dashboard-page.is-header-compact > phone-status-bar,
+.dashboard-page.is-header-compact > app-header,
+.dashboard-page.is-header-compact > .status-bar,
+.dashboard-page.is-header-compact > .app-header {
+  background-color: #2b1052;
+}
+
+.dashboard-page.is-header-compact > app-header,
+.dashboard-page.is-header-compact > .app-header {
+  height: 56px;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, .12), 0 6px 14px rgba(24, 9, 49, .2);
+}
+
+.dashboard-page.is-header-compact > app-header .app-header,
+.dashboard-page.is-header-compact > .app-header {
+  /* Balance the status bar's 8px lower padding below the toolbar controls. */
+  padding-bottom: 8px;
+}
+
+.dashboard-page.is-header-compact .app-header {
+  display: grid;
+  grid-template-columns: 36px minmax(0, 1fr) 36px;
+  column-gap: 12px;
+}
+
+.dashboard-page.is-header-compact .header-left {
+  display: contents;
+}
+
+.dashboard-page.is-header-compact .header-actions {
+  justify-self: end;
+}
+
+/* Older dashboard headers have no menu control; reserve the same left space. */
+.dashboard-page.is-header-compact > .app-header > .logo-container {
+  grid-column: 2;
+}
+
+.dashboard-page.is-header-compact > .app-header > .header-actions {
+  grid-column: 3;
+}
+
+.dashboard-page.is-header-compact .profile-pill > i {
+  display: none;
+}
+
+.dashboard-page.is-header-compact .logo-container {
+  justify-self: center;
+  min-width: 0;
+  transform: scale(.94);
+  transform-origin: center;
+}
+
+.dashboard-page.is-header-compact .logo-text {
+  transform: translateY(6px);
+}
+
+.dashboard-page.is-header-compact .logo-text > span {
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dashboard-page > phone-status-bar,
+  .dashboard-page > app-header,
+  .dashboard-page > .status-bar,
+  .dashboard-page > .app-header,
+  .dashboard-page .logo-container,
+  .dashboard-page .logo-text,
+  .dashboard-page .logo-text > span {
+    transition: none;
+  }
+}
+
+.dashboard-page > .main-content {
+  min-height: 0;
+}
+
+.dashboard-page.dashboard-apps .hero-bg {
+  inset: 0;
+  height: 100%;
+}
+
+.dashboard-apps .main-content > .section-header .section-action {
+  color: #ffffff;
+  text-shadow: 0 1px 4px rgba(32, 12, 67, .25);
+}
+
+.dashboard-apps > .main-content {
+  background-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent var(--apps-fade-start, 180px),
+    var(--bg-phone) var(--apps-fade-end, 360px)
+  );
+  background-attachment: local;
+  background-repeat: no-repeat;
+}
+
+.dashboard-page .explore-header .explore-title,
+.dashboard-apps .recently-used-section .section-title {
+  color: var(--text-primary) !important;
+  text-shadow: none;
+}
+
+.dashboard-apps .recently-used-section .section-link {
+  color: var(--purple-text) !important;
+}
+
+/* Fade alongside Insights, then keep the feed on the theme's plain canvas.
+   The artwork stays still; the opaque feed surface follows its own content. */
+.dashboard-page.dashboard-home .hero-bg {
+  height: var(--home-hero-height, 620px);
+}
+
+.dashboard-page .hero-bg::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    to bottom,
+    rgba(32, 10, 68, .38) 0,
+    rgba(32, 10, 68, .48) 180px,
+    transparent 340px
+  );
+}
+
+.dashboard-page .hero-bg svg {
+  display: none;
+}
+
+.dashboard-home .greeting-sub,
+.dashboard-home .team-meta-sub {
+  color: rgba(255, 255, 255, .95);
+}
+
+.dashboard-home[data-dashboard-intro=".recently-used-section"] .recently-used-section :is(.section-title, .section-link) {
+  color: #ffffff;
+}
+
+.dashboard-home > .main-content {
+  background-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent var(--home-fade-start, 300px),
+    var(--bg-phone) var(--home-fade-end, 460px)
+  );
+  background-attachment: local;
+  background-repeat: no-repeat;
+}

@@ -1,0 +1,106 @@
+/* Bring standalone dashboard previews into the same frame as Home.
+   Their page-specific card layouts and existing interactions stay intact. */
+html,
+body {
+  height: 100vh;
+  height: 100dvh;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+body {
+  background: var(--bg-page);
+  color: var(--text-primary);
+}
+
+body > .theme-switch-bar {
+  height: 37px;
+  flex: 0 0 37px;
+  max-width: min(440px, 100%);
+  margin-bottom: 14px;
+  padding: 5px 10px;
+  border: 1px solid var(--border-card);
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 6px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+body > .theme-switch-bar .mode-btn {
+  flex: 0 0 auto;
+  padding: 5px 10px;
+  font-size: 11.5px;
+  white-space: nowrap;
+}
+
+.phone-container.dashboard-page {
+  height: min(900px, calc(100vh - 20px));
+  height: min(900px, calc(100dvh - 20px));
+  min-height: 0;
+  background: var(--bg-phone);
+  box-shadow: var(--shadow-phone);
+}
+
+.dashboard-page > .main-content {
+  min-height: 0;
+  padding-bottom: 100px;
+}
+
+.dashboard-page .status-icons i {
+  font-size: 12px;
+}
+
+.dashboard-page .header-actions {
+  color: white;
+}
+
+.dashboard-page .profile-img {
+  display: block;
+}
+
+.dashboard-page .section-title {
+  color: var(--text-primary);
+}
+
+.dashboard-page .section-link {
+  color: var(--purple-text);
+}
+
+.dashboard-page .team-meta-sub {
+  flex-wrap: wrap;
+}
+
+.dashboard-page .tab-switch {
+  background: rgba(32, 10, 68, .45);
+}
+
+.dashboard-page :is(.section-header, .pulse-header, .stack-header) {
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 360px) {
+  .dashboard-page :is(.manager-shortcuts, .matrix-grid) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .dashboard-page .stack-item {
+    flex-wrap: wrap;
+  }
+
+  .dashboard-page .bento-pulse-card {
+    gap: 10px;
+    padding: 12px;
+  }
+}
+
+html.is-mouse-swiping,
+html.is-mouse-swiping * {
+  cursor: grabbing !important;
+  user-select: none !important;
+  -webkit-user-select: none !important;
+}

@@ -1,5 +1,6 @@
 /* Reference-style employee records, scoped to the profile's history panels. */
 .profile-details .profile-record-panel {
+  --profile-collapse-surface: var(--profile-tint);
   --table-header-background: var(--profile-tint);
   --table-header-text: var(--profile-accent);
   --table-header-divider: var(--profile-rule);

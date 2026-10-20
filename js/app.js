@@ -23,8 +23,8 @@ const APP_ROUTES = {
 
   // Top Header / Drawer
   'my_profile': 'me.html',
-  'settings': '#settings',
-  'change_password': '#change-password',
+  'settings': () => `settings.html?theme=${getCurrentTheme()}`,
+  'change_password': () => `change-password.html?theme=${getCurrentTheme()}`,
   'help_support': '#help-support',
   'sign_out': 'index.html',
 
@@ -1268,6 +1268,12 @@ function initExploreScrollListener() {
   const mainScroll = document.querySelector('.main-content');
   const exploreTitle = document.querySelector('.explore-title');
   if (!mainScroll || !exploreTitle) return;
+  // Dashboard headings stay on the plain surface below the fixed artwork.
+  if (mainScroll.closest('.dashboard-page')) {
+    exploreTitle.style.removeProperty('color');
+    exploreTitle.style.removeProperty('text-shadow');
+    return;
+  }
 
   function handleExploreScroll() {
     const isLight = (document.documentElement.getAttribute('data-theme') || 'dark') === 'light';
@@ -1836,3 +1842,15 @@ if (document.readyState === 'loading') {
   observePendingApprovalActionButtons();
 }
 window.addEventListener('load', initExploreScrollListener);
+
+// Share desktop swipe support with standalone dashboard previews as well.
+{
+  const source = document.currentScript?.src;
+  if (source && !document.querySelector('script[data-mouse-swipe], script[src$="/mouse-swipe.js"]')) {
+    const script = document.createElement('script');
+    script.src = new URL('mouse-swipe.js', source).href;
+    script.dataset.mouseSwipe = '';
+    script.async = false;
+    document.head.append(script);
+  }
+}

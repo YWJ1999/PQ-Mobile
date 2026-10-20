@@ -232,25 +232,25 @@ class LeftProfileDrawer extends HTMLElement {
             </a>
 
             <!-- 2. Settings -->
-            <a class="drawer-menu-item" href="javascript:void(0)" onclick="navTo('settings', event); closeProfileDrawerDirect();">
+            <a class="drawer-menu-item ${window.location.pathname.endsWith('/settings.html') ? 'active' : ''}" ${window.location.pathname.endsWith('/settings.html') ? 'aria-current="page"' : ''} href="javascript:void(0)" onclick="navTo('settings', event); closeProfileDrawerDirect();">
               <div class="drawer-menu-icon" style="background: rgba(148, 163, 184, 0.16); color: #94a3b8;">
                 <i class="fa-solid fa-gear"></i>
               </div>
               <div class="drawer-menu-text">
                 <div class="drawer-menu-label">Settings</div>
-                <div class="drawer-menu-desc">Preferences & notifications</div>
+                <div class="drawer-menu-desc">Clocking, location & language</div>
               </div>
               <span class="drawer-menu-arrow"><i class="fa-solid fa-chevron-right" style="font-size: 11px;"></i></span>
             </a>
 
             <!-- 3. Change Password -->
-            <a class="drawer-menu-item" href="javascript:void(0)" onclick="navTo('change_password', event); closeProfileDrawerDirect();">
+            <a class="drawer-menu-item ${window.location.pathname.endsWith('/change-password.html') ? 'active' : ''}" ${window.location.pathname.endsWith('/change-password.html') ? 'aria-current="page"' : ''} href="javascript:void(0)" onclick="navTo('change_password', event); closeProfileDrawerDirect();">
               <div class="drawer-menu-icon" style="background: rgba(148, 163, 184, 0.16); color: #94a3b8;">
-                <i class="fa-solid fa-lock"></i>
+                <i class="fa-solid fa-key"></i>
               </div>
               <div class="drawer-menu-text">
                 <div class="drawer-menu-label">Change Password</div>
-                <div class="drawer-menu-desc">Security & 2FA</div>
+                <div class="drawer-menu-desc">Update your login password</div>
               </div>
               <span class="drawer-menu-arrow"><i class="fa-solid fa-chevron-right" style="font-size: 11px;"></i></span>
             </a>
