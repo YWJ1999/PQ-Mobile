@@ -44,158 +44,131 @@
       <!-- ========================================================
            1. INSIGHTS CARD (MY & TEAM INSIGHTS)
            ======================================================== -->
-      <div class="insights-card">
+      <section class="insights-card" aria-labelledby="insightCardTitle">
         <div class="insights-header">
           <div class="insights-title-group">
-            <span class="insights-title" id="insightCardTitle">My Insights</span>
+            <h2 class="insights-title" id="insightCardTitle">My Insights</h2>
+            <p class="insights-metric-count" id="insightMetricCount">14 metrics</p>
           </div>
-          <div class="insights-pills">
-            <button class="insight-pill active" id="pillMy" onclick="switchInsightTab('my')">My</button>
-            <button class="insight-pill" id="pillTeam" onclick="switchInsightTab('team')">Team</button>
-          </div>
-        </div>
-
-        <!-- TAB 1: MY INSIGHTS -->
-        <div class="insight-tab-pane active" id="paneMy">
-          <div class="indicator-status-grid">
-            <!-- Positive Bento Card -->
-            <div class="indicator-status-card pos" onclick="openIndicatorsModal()">
-              <div class="indicator-icon-circle pos">
-                <i class="fa-solid fa-thumbs-up" style="font-size: 14px;"></i>
-              </div>
-              <div class="indicator-status-text">
-                <h4>Positive</h4>
-                <p>1 of 4 needs attention</p>
-              </div>
-            </div>
-
-            <!-- Negative Bento Card -->
-            <div class="indicator-status-card neg" onclick="openIndicatorsModal()">
-              <div class="indicator-icon-circle neg">
-                <i class="fa-solid fa-thumbs-down" style="font-size: 14px;"></i>
-              </div>
-              <div class="indicator-status-text">
-                <h4>Negative</h4>
-                <p>2 of 10 need attention</p>
-              </div>
-            </div>
-          </div>
-
-          <!-- Top Attention List -->
-          <div class="top-attention-sec">
-            <div class="top-attention-label">Top attention list</div>
-
-            <!-- 1. Attendance -->
-            <div class="attention-row" onclick="openIndicatorsModal()">
-              <div class="attention-left">
-                <span class="attention-idx">1.</span>
-                <span class="attention-name">Attendance</span>
-              </div>
-              <div class="attention-right">
-                <span class="attention-badge amber">Late In</span>
-                <span class="attention-val">+0.00%</span>
-              </div>
-            </div>
-
-            <!-- 2. Unauthorised OT -->
-            <div class="attention-row" onclick="openIndicatorsModal()">
-              <div class="attention-left">
-                <span class="attention-idx">2.</span>
-                <span class="attention-name">Unauthorised OT</span>
-              </div>
-              <div class="attention-right">
-                <span class="attention-badge red">17 hrs</span>
-                <span class="attention-val">Alert</span>
-              </div>
-            </div>
-
-            <!-- 3. Medical Leave -->
-            <div class="attention-row" onclick="openIndicatorsModal()">
-              <div class="attention-left">
-                <span class="attention-idx">3.</span>
-                <span class="attention-name">Medical Leave</span>
-              </div>
-              <div class="attention-right">
-                <span class="attention-badge green">1 day</span>
-                <span class="attention-val">MC</span>
-              </div>
-            </div>
-
-            <!-- View All 14 Indicators Button -->
-            <button class="view-all-btn" onclick="openIndicatorsModal()">
-              <span>View all 14 indicators & breakdown</span>
-              <span>&rarr;</span>
-            </button>
+          <div class="insights-pills" role="group" aria-label="Insights scope">
+            <button type="button" class="insight-pill active" id="pillMy" aria-pressed="true" aria-controls="paneMy" onclick="switchInsightTab('my')">My</button>
+            <button type="button" class="insight-pill" id="pillTeam" aria-pressed="false" aria-controls="paneTeam" onclick="switchInsightTab('team')">Team</button>
           </div>
         </div>
 
-        <!-- TAB 2: TEAM INSIGHTS -->
-        <div class="insight-tab-pane" id="paneTeam">
-          <div class="indicator-status-grid">
-            <div class="indicator-status-card pos" onclick="openIndicatorsModal('team')">
-              <div class="indicator-icon-circle pos">
-                <i class="fa-solid fa-thumbs-up" style="font-size: 14px;"></i>
+        <div class="insight-tab-pane active" id="paneMy" data-insight-scope="my" role="region" aria-label="My insights">
+          <div class="insight-metrics-grid">
+            <section class="insight-metric-group" data-group="positive" aria-label="Positive metrics">
+              <button type="button" class="insight-group-header" onclick="openInsightBreakdown('my', 'positive')" aria-label="View all 4 positive metrics">
+                <span class="insight-group-heading">
+                  <span class="insight-group-title">Positive</span>
+                  <span class="insight-group-count">4</span>
+                </span>
+                <span class="insight-group-hint">Higher is better</span>
+              </button>
+              <div class="insight-trend-list">
+                <button type="button" class="insight-trend-row" data-trend="improved" onclick="openInsightBreakdown('my', 'positive', 'improved')" aria-label="Positive metrics: Improved, 1">
+                  <span class="insight-trend-label">Improved</span>
+                  <span class="insight-trend-count">1</span>
+                  <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
+                </button>
+                <button type="button" class="insight-trend-row" data-trend="worsened" onclick="openInsightBreakdown('my', 'positive', 'worsened')" aria-label="Positive metrics: Worsened, 0">
+                  <span class="insight-trend-label">Worsened</span>
+                  <span class="insight-trend-count">0</span>
+                  <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
+                </button>
+                <button type="button" class="insight-trend-row" data-trend="unchanged" onclick="openInsightBreakdown('my', 'positive', 'unchanged')" aria-label="Positive metrics: No change, 3">
+                  <span class="insight-trend-label">No change</span>
+                  <span class="insight-trend-count">3</span>
+                  <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
+                </button>
               </div>
-              <div class="indicator-status-text">
-                <h4>Positive</h4>
-                <p>1 of 3 needs attention</p>
+            </section>
+            <section class="insight-metric-group" data-group="negative" aria-label="Negative metrics">
+              <button type="button" class="insight-group-header" onclick="openInsightBreakdown('my', 'negative')" aria-label="View all 10 negative metrics">
+                <span class="insight-group-heading">
+                  <span class="insight-group-title">Negative</span>
+                  <span class="insight-group-count">10</span>
+                </span>
+                <span class="insight-group-hint">Lower is better</span>
+              </button>
+              <div class="insight-trend-list">
+                <button type="button" class="insight-trend-row" data-trend="improved" onclick="openInsightBreakdown('my', 'negative', 'improved')" aria-label="Negative metrics: Improved, 0">
+                  <span class="insight-trend-label">Improved</span>
+                  <span class="insight-trend-count">0</span>
+                  <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
+                </button>
+                <button type="button" class="insight-trend-row" data-trend="worsened" onclick="openInsightBreakdown('my', 'negative', 'worsened')" aria-label="Negative metrics: Worsened, 1">
+                  <span class="insight-trend-label">Worsened</span>
+                  <span class="insight-trend-count">1</span>
+                  <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
+                </button>
+                <button type="button" class="insight-trend-row" data-trend="unchanged" onclick="openInsightBreakdown('my', 'negative', 'unchanged')" aria-label="Negative metrics: No change, 9">
+                  <span class="insight-trend-label">No change</span>
+                  <span class="insight-trend-count">9</span>
+                  <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
+                </button>
               </div>
-            </div>
-
-            <div class="indicator-status-card neg" onclick="openIndicatorsModal('team')">
-              <div class="indicator-icon-circle neg">
-                <i class="fa-solid fa-thumbs-down" style="font-size: 14px;"></i>
-              </div>
-              <div class="indicator-status-text">
-                <h4>Negative</h4>
-                <p>2 of 9 need attention</p>
-              </div>
-            </div>
-          </div>
-
-          <div class="top-attention-sec">
-            <div class="top-attention-label">Top Attention List (Team)</div>
-
-            <div class="attention-row" onclick="openIndicatorsModal('team')">
-              <div class="attention-left">
-                <span class="attention-idx">1.</span>
-                <span class="attention-name">Avg Attendance%</span>
-              </div>
-              <div class="attention-right">
-                <span class="attention-badge red">69.39%</span>
-                <span class="attention-val">-1.04%</span>
-              </div>
-            </div>
-
-            <div class="attention-row" onclick="openIndicatorsModal('team')">
-              <div class="attention-left">
-                <span class="attention-idx">2.</span>
-                <span class="attention-name">Avg Medical Leave</span>
-              </div>
-              <div class="attention-right">
-                <span class="attention-badge red">0.30</span>
-                <span class="attention-val">+16.67%</span>
-              </div>
-            </div>
-
-            <div class="attention-row" onclick="openIndicatorsModal('team')">
-              <div class="attention-left">
-                <span class="attention-idx">3.</span>
-                <span class="attention-name">Avg Unauthorised OT</span>
-              </div>
-              <div class="attention-right">
-                <span class="attention-badge amber">11.63</span>
-                <span class="attention-val">-1.03%</span>
-              </div>
-            </div>
-
-            <button class="view-all-btn" onclick="openIndicatorsModal('team')">
-              <span>View all indicator and breakdown</span>
-              <span>&rarr;</span>
-            </button>
+            </section>
           </div>
         </div>
-      </div>
+        <div class="insight-tab-pane" id="paneTeam" data-insight-scope="team" role="region" aria-label="Team insights" hidden>
+          <div class="insight-metrics-grid">
+            <section class="insight-metric-group" data-group="positive" aria-label="Positive metrics">
+              <button type="button" class="insight-group-header" onclick="openInsightBreakdown('team', 'positive')" aria-label="View all 3 positive metrics">
+                <span class="insight-group-heading">
+                  <span class="insight-group-title">Positive</span>
+                  <span class="insight-group-count">3</span>
+                </span>
+                <span class="insight-group-hint">Higher is better</span>
+              </button>
+              <div class="insight-trend-list">
+                <button type="button" class="insight-trend-row" data-trend="improved" onclick="openInsightBreakdown('team', 'positive', 'improved')" aria-label="Positive metrics: Improved, 1">
+                  <span class="insight-trend-label">Improved</span>
+                  <span class="insight-trend-count">1</span>
+                  <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
+                </button>
+                <button type="button" class="insight-trend-row" data-trend="worsened" onclick="openInsightBreakdown('team', 'positive', 'worsened')" aria-label="Positive metrics: Worsened, 1">
+                  <span class="insight-trend-label">Worsened</span>
+                  <span class="insight-trend-count">1</span>
+                  <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
+                </button>
+                <button type="button" class="insight-trend-row" data-trend="unchanged" onclick="openInsightBreakdown('team', 'positive', 'unchanged')" aria-label="Positive metrics: No change, 1">
+                  <span class="insight-trend-label">No change</span>
+                  <span class="insight-trend-count">1</span>
+                  <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
+                </button>
+              </div>
+            </section>
+            <section class="insight-metric-group" data-group="negative" aria-label="Negative metrics">
+              <button type="button" class="insight-group-header" onclick="openInsightBreakdown('team', 'negative')" aria-label="View all 9 negative metrics">
+                <span class="insight-group-heading">
+                  <span class="insight-group-title">Negative</span>
+                  <span class="insight-group-count">9</span>
+                </span>
+                <span class="insight-group-hint">Lower is better</span>
+              </button>
+              <div class="insight-trend-list">
+                <button type="button" class="insight-trend-row" data-trend="improved" onclick="openInsightBreakdown('team', 'negative', 'improved')" aria-label="Negative metrics: Improved, 4">
+                  <span class="insight-trend-label">Improved</span>
+                  <span class="insight-trend-count">4</span>
+                  <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
+                </button>
+                <button type="button" class="insight-trend-row" data-trend="worsened" onclick="openInsightBreakdown('team', 'negative', 'worsened')" aria-label="Negative metrics: Worsened, 1">
+                  <span class="insight-trend-label">Worsened</span>
+                  <span class="insight-trend-count">1</span>
+                  <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
+                </button>
+                <button type="button" class="insight-trend-row" data-trend="unchanged" onclick="openInsightBreakdown('team', 'negative', 'unchanged')" aria-label="Negative metrics: No change, 4">
+                  <span class="insight-trend-label">No change</span>
+                  <span class="insight-trend-count">4</span>
+                  <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
+                </button>
+              </div>
+            </section>
+          </div>
+        </div>
+      </section>
 
 
       <!-- ========================================================

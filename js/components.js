@@ -543,24 +543,31 @@ class IndicatorsSheet extends HTMLElement {
             <button class="sheet-close-btn" onclick="closeIndicatorsDirect()" aria-label="Close"><i class="fa-solid fa-xmark"></i></button>
           </div>
 
-          <!-- Segmented Filter Control (No scope bar, directly filter cards) -->
-          <div class="sheet-filter-bar">
-            <button class="sheet-filter-pill active" onclick="filterDrawerIndicators('all', this)">
+          <!-- Metric groups and change filters -->
+          <div class="sheet-filter-bar" role="group" aria-label="Metric category">
+            <button type="button" class="sheet-filter-pill active" data-group="all" aria-pressed="true" onclick="filterDrawerIndicators('all', this)">
               <span>All</span>
               <span class="sheet-tag-badge neutral" id="indicatorCountAll">12</span>
             </button>
-            <button class="sheet-filter-pill" onclick="filterDrawerIndicators('positive', this)">
+            <button type="button" class="sheet-filter-pill" data-group="positive" aria-pressed="false" onclick="filterDrawerIndicators('positive', this)">
               <span>Positive</span>
               <span class="sheet-tag-badge green" id="indicatorCountPos">3</span>
             </button>
-            <button class="sheet-filter-pill" onclick="filterDrawerIndicators('negative', this)">
+            <button type="button" class="sheet-filter-pill" data-group="negative" aria-pressed="false" onclick="filterDrawerIndicators('negative', this)">
               <span>Negative</span>
               <span class="sheet-tag-badge red" id="indicatorCountNeg">9</span>
             </button>
           </div>
+          <div class="insight-trend-filters sheet-filter-bar" role="group" aria-label="Metric change">
+            <button type="button" class="sheet-filter-pill active" data-trend="all" aria-pressed="true" onclick="filterIndicatorTrend('all')">All changes</button>
+            <button type="button" class="sheet-filter-pill" data-trend="improved" aria-pressed="false" onclick="filterIndicatorTrend('improved')">Improved</button>
+            <button type="button" class="sheet-filter-pill" data-trend="worsened" aria-pressed="false" onclick="filterIndicatorTrend('worsened')">Worsened</button>
+            <button type="button" class="sheet-filter-pill" data-trend="unchanged" aria-pressed="false" onclick="filterIndicatorTrend('unchanged')">No change</button>
+          </div>
 
           <!-- Scrollable Indicators Cards List -->
           <div class="sheet-list-scroll" id="indicatorsListContainer">
+            <p class="insight-empty-state" id="indicatorEmptyState" role="status" hidden></p>
             <div id="feedCardsContainer">
               
               <!-- FEED: TEAM INDICATORS (Rich Card Design with Avg ... metrics) -->

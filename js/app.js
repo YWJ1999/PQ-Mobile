@@ -707,7 +707,47 @@ function actionRejectRequest() {
   renderForYouSheetUI();
 }
 
-// 7. V1 Insights Tab Switcher (My vs Team)
+// 7. Insights summaries use the same metric changes as their breakdown.
+function getInsightMetricTrend(card) {
+  const badge = card.querySelector('.feed-badge-pill');
+  const change = (badge?.textContent || '').replace(/\u2212/g, '-').replace(/,/g, '').match(/([+-]?\d+(?:\.\d+)?)\s*%/);
+  const delta = change ? Number(change[1]) : 0;
+  if (delta === 0) return 'unchanged';
+  const improved = card.dataset.group === 'positive' ? delta > 0 : delta < 0;
+  return improved ? 'improved' : 'worsened';
+}
+
+function getInsightMetrics(scope) {
+  const feed = document.getElementById(scope === 'team' ? 'teamIndicatorsFeed' : 'myIndicatorsFeed');
+  return [...(feed?.querySelectorAll('.metric-feed-card') || [])].map(card => ({
+    card,
+    group: card.dataset.group,
+    trend: getInsightMetricTrend(card)
+  }));
+}
+
+function updateInsightSummaries() {
+  document.querySelectorAll('[data-insight-scope]').forEach(pane => {
+    const scope = pane.dataset.insightScope;
+    const metrics = getInsightMetrics(scope);
+    pane.querySelectorAll('.insight-metric-group').forEach(group => {
+      const groupMetrics = metrics.filter(metric => metric.group === group.dataset.group);
+      const groupName = group.dataset.group === 'positive' ? 'Positive' : 'Negative';
+      const count = group.querySelector('.insight-group-count');
+      if (count) count.textContent = groupMetrics.length;
+      group.querySelector('.insight-group-header')?.setAttribute('aria-label', `${groupName}: ${groupMetrics.length} metrics. View all`);
+      group.querySelectorAll('.insight-trend-row').forEach(row => {
+        const total = groupMetrics.filter(metric => metric.trend === row.dataset.trend).length;
+        const trendName = row.dataset.trend === 'unchanged' ? 'No change' : row.dataset.trend === 'improved' ? 'Improved' : 'Worsened';
+        const value = row.querySelector('.insight-trend-count');
+        if (value) value.textContent = total;
+        row.setAttribute('aria-label', `${groupName}, ${trendName}: ${total} ${total === 1 ? 'metric' : 'metrics'}`);
+      });
+    });
+  });
+  switchInsightTab(document.getElementById('paneTeam')?.classList.contains('active') ? 'team' : 'my');
+}
+
 function switchInsightTab(tab) {
   const pillMy = document.getElementById('pillMy');
   const pillTeam = document.getElementById('pillTeam');
@@ -715,19 +755,20 @@ function switchInsightTab(tab) {
   const paneTeam = document.getElementById('paneTeam');
   const title = document.getElementById('insightCardTitle');
 
-  if (tab === 'my') {
-    if (pillMy) pillMy.classList.add('active');
-    if (pillTeam) pillTeam.classList.remove('active');
-    if (paneMy) paneMy.classList.add('active');
-    if (paneTeam) paneTeam.classList.remove('active');
-    if (title) title.textContent = 'My Insights';
-  } else {
-    if (pillTeam) pillTeam.classList.add('active');
-    if (pillMy) pillMy.classList.remove('active');
-    if (paneTeam) paneTeam.classList.add('active');
-    if (paneMy) paneMy.classList.remove('active');
-    if (title) title.textContent = 'Team Insights';
-  }
+  const isTeam = tab === 'team';
+  [[pillMy, !isTeam], [pillTeam, isTeam]].forEach(([pill, active]) => {
+    if (!pill) return;
+    pill.classList.toggle('active', active);
+    pill.setAttribute('aria-pressed', String(active));
+  });
+  [[paneMy, !isTeam], [paneTeam, isTeam]].forEach(([pane, active]) => {
+    if (!pane) return;
+    pane.classList.toggle('active', active);
+    pane.hidden = !active;
+  });
+  if (title) title.textContent = isTeam ? 'Team Insights' : 'My Insights';
+  const count = document.getElementById('insightMetricCount');
+  if (count) count.textContent = `${getInsightMetrics(isTeam ? 'team' : 'my').length} metrics`;
 }
 
 // 8. V1 Indicators Bottom Sheet Drawer Controls (Team & Individual)
@@ -745,57 +786,41 @@ function openIndicatorsModal(scope = null, instant = false) {
     scope = isTeam ? 'team' : 'my';
   }
 
+  scope = scope === 'team' ? 'team' : 'my';
+  const overlay = document.getElementById('indicatorsOverlay');
+  if (!overlay) return;
   const titleEl = document.getElementById('indicatorsSheetTitle');
-  const subEl = document.getElementById('indicatorsSheetSubtitle');
   const myFeed = document.getElementById('myIndicatorsFeed');
   const teamFeed = document.getElementById('teamIndicatorsFeed');
-
-  if (scope === 'team') {
-    if (titleEl) titleEl.innerText = 'Team Indicator';
-    if (subEl) subEl.innerText = 'Department Aggregated Metrics (12) • Breakdown';
-    if (myFeed) myFeed.style.display = 'none';
-    if (teamFeed) teamFeed.style.display = 'block';
-    const cAll = document.getElementById('indicatorCountAll');
-    const cPos = document.getElementById('indicatorCountPos');
-    const cNeg = document.getElementById('indicatorCountNeg');
-    if (cAll) cAll.innerText = '12';
-    if (cPos) cPos.innerText = '3';
-    if (cNeg) cNeg.innerText = '9';
-  } else {
-    if (titleEl) titleEl.innerText = 'My Indicators';
-    if (subEl) subEl.innerText = 'Personal Work & HR Metrics (14) • Breakdown';
-    if (myFeed) myFeed.style.display = 'block';
-    if (teamFeed) teamFeed.style.display = 'none';
-    const cAll = document.getElementById('indicatorCountAll');
-    const cPos = document.getElementById('indicatorCountPos');
-    const cNeg = document.getElementById('indicatorCountNeg');
-    if (cAll) cAll.innerText = '14';
-    if (cPos) cPos.innerText = '4';
-    if (cNeg) cNeg.innerText = '10';
-  }
-
-  // Reset filter pills to All
-  const filterPills = document.querySelectorAll('.sheet-filter-bar .sheet-filter-pill');
-  filterPills.forEach((p, idx) => {
-    if (idx === 0) p.classList.add('active');
-    else p.classList.remove('active');
+  const metrics = getInsightMetrics(scope);
+  if (titleEl) titleEl.textContent = scope === 'team' ? 'Team Indicators' : 'My Indicators';
+  if (myFeed) myFeed.style.display = scope === 'my' ? 'block' : 'none';
+  if (teamFeed) teamFeed.style.display = scope === 'team' ? 'block' : 'none';
+  [['indicatorCountAll', metrics.length],
+    ['indicatorCountPos', metrics.filter(metric => metric.group === 'positive').length],
+    ['indicatorCountNeg', metrics.filter(metric => metric.group === 'negative').length]
+  ].forEach(([id, count]) => {
+    const badge = document.getElementById(id);
+    if (badge) badge.textContent = count;
   });
-
-  const activeContainer = scope === 'team' ? teamFeed : myFeed;
-  if (activeContainer) {
-    activeContainer.querySelectorAll('.metric-feed-card, .feed-section-label').forEach(el => {
-      el.style.display = 'flex';
-    });
+  overlay.dataset.scope = scope;
+  overlay.dataset.group = 'all';
+  overlay.dataset.trend = 'all';
+  applyIndicatorFilters();
+  if (instant) {
+    overlay.classList.add('instant');
+    setTimeout(() => overlay.classList.remove('instant'), 300);
   }
+  overlay.classList.add('active');
+}
 
+function openInsightBreakdown(scope, group, trend = 'all') {
+  openIndicatorsModal(scope);
   const overlay = document.getElementById('indicatorsOverlay');
-  if (overlay) {
-    if (instant) {
-      overlay.classList.add('instant');
-      setTimeout(() => overlay.classList.remove('instant'), 300);
-    }
-    overlay.classList.add('active');
-  }
+  if (!overlay) return;
+  overlay.dataset.group = group;
+  overlay.dataset.trend = trend;
+  applyIndicatorFilters();
 }
 
 function closeIndicatorsDirect() {
@@ -807,33 +832,54 @@ function closeIndicatorsModal(e) {
   if (e.target.id === 'indicatorsOverlay') closeIndicatorsDirect();
 }
 
-function filterDrawerIndicators(group, btnElement) {
-  const tabs = btnElement.parentElement.querySelectorAll('.sheet-filter-pill');
-  tabs.forEach(tab => tab.classList.remove('active'));
-  btnElement.classList.add('active');
+function filterDrawerIndicators(group) {
+  const overlay = document.getElementById('indicatorsOverlay');
+  if (!overlay) return;
+  overlay.dataset.group = group;
+  overlay.dataset.trend = 'all';
+  applyIndicatorFilters();
+}
 
-  const teamFeed = document.getElementById('teamIndicatorsFeed');
-  const myFeed = document.getElementById('myIndicatorsFeed');
-  const activeFeed = (teamFeed && teamFeed.style.display !== 'none') ? teamFeed : myFeed;
-  if (!activeFeed) return;
+function filterIndicatorTrend(trend) {
+  const overlay = document.getElementById('indicatorsOverlay');
+  if (!overlay) return;
+  overlay.dataset.trend = trend;
+  applyIndicatorFilters();
+}
 
-  const cards = activeFeed.querySelectorAll('.metric-feed-card');
-  cards.forEach(card => {
-    if (group === 'all' || card.getAttribute('data-group') === group) {
-      card.style.display = 'flex';
-    } else {
-      card.style.display = 'none';
-    }
+function applyIndicatorFilters() {
+  const overlay = document.getElementById('indicatorsOverlay');
+  if (!overlay) return;
+  const scope = overlay.dataset.scope || 'team';
+  const group = overlay.dataset.group || 'all';
+  const trend = overlay.dataset.trend || 'all';
+  const metrics = getInsightMetrics(scope);
+  const visibleMetrics = metrics.filter(metric => (group === 'all' || metric.group === group) && (trend === 'all' || metric.trend === trend));
+  const visibleCards = new Set(visibleMetrics.map(metric => metric.card));
+  metrics.forEach(({ card }) => { card.style.display = visibleCards.has(card) ? 'flex' : 'none'; });
+  const activeFeed = document.getElementById(scope === 'team' ? 'teamIndicatorsFeed' : 'myIndicatorsFeed');
+  activeFeed?.querySelectorAll('.feed-section-label').forEach(label => {
+    const count = visibleMetrics.filter(metric => metric.group === label.dataset.group).length;
+    label.style.display = count ? 'flex' : 'none';
+    const text = label.querySelector('span')?.lastChild;
+    if (text?.nodeType === Node.TEXT_NODE) text.textContent = `${label.dataset.group === 'positive' ? 'Positive' : 'Negative'} Indicator (${count})`;
   });
-
-  const sectionLabels = activeFeed.querySelectorAll('.feed-section-label');
-  sectionLabels.forEach(lbl => {
-    if (group === 'all' || lbl.getAttribute('data-group') === group) {
-      lbl.style.display = 'flex';
-    } else {
-      lbl.style.display = 'none';
-    }
+  overlay.querySelectorAll('.sheet-filter-pill[data-group], .sheet-filter-pill[data-trend]').forEach(pill => {
+    const active = pill.dataset.group ? pill.dataset.group === group : pill.dataset.trend === trend;
+    pill.classList.toggle('active', active);
+    pill.setAttribute('aria-pressed', String(active));
   });
+  const trendNames = { all: 'All changes', improved: 'Improved', worsened: 'Worsened', unchanged: 'No change' };
+  const groupName = group === 'all' ? 'All metrics' : group === 'positive' ? 'Positive' : 'Negative';
+  const subtitle = document.getElementById('indicatorsSheetSubtitle');
+  if (subtitle) subtitle.textContent = `${groupName} • ${trendNames[trend]} • ${visibleMetrics.length} ${visibleMetrics.length === 1 ? 'metric' : 'metrics'}`;
+  const empty = document.getElementById('indicatorEmptyState');
+  if (empty) {
+    empty.hidden = visibleMetrics.length !== 0;
+    empty.textContent = `No ${group === 'all' ? '' : group + ' '}metrics ${trend === 'unchanged' ? 'with no change' : trend === 'all' ? 'to display' : 'have ' + trend}.`;
+  }
+  const list = document.getElementById('indicatorsListContainer');
+  if (list) list.scrollTop = 0;
 }
 
 // 9. V1 Company Updates Bottom Sheet Drawer Controls
@@ -1002,6 +1048,7 @@ function previewPolicyDoc(fileName) {
 // Auto-run on DOM ready
 document.addEventListener('DOMContentLoaded', () => {
   initTheme();
+  updateInsightSummaries();
   const urlParams = new URLSearchParams(window.location.search);
   if (urlParams.get('drawer') === 'open' || urlParams.get('openDrawer') === 'true') {
     setTimeout(openProfileDrawer, 100);
