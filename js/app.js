@@ -61,6 +61,12 @@ const APP_ROUTES = {
   'performance': () => `modules/performance/index.html?scope=individual&theme=${getCurrentTheme()}`,
   'performance_goals': () => `modules/performance/index.html?scope=individual&theme=${getCurrentTheme()}`,
   'learning_dev': () => `modules/training-competency/index.html?scope=individual&theme=${getCurrentTheme()}`,
+  // Notification categories open the approval view directly.
+  'leave_approvals': () => `leave.html?mode=team&view=approvals&tab=leave&theme=${getCurrentTheme()}`,
+  'claims_approvals': () => `modules/claims/options/pending-approval.html?theme=${getCurrentTheme()}`,
+  'attendance_approvals': () => `modules/attendance/options/team.html?view=approvals&theme=${getCurrentTheme()}`,
+  'payroll_approvals': () => `modules/payroll/options/pending-approval.html?theme=${getCurrentTheme()}`,
+  'performance_approvals': () => `modules/performance/options/pending-approval.html?theme=${getCurrentTheme()}`,
   'people_documents': 'team.html',
   'work_behaviour': 'work-behaviour.html',
   'change_request': 'change-request.html',
@@ -243,6 +249,7 @@ function openForYouModal() {
 }
 
 function closeForYouDirect() {
+  closeNotificationFilter();
   const overlay = document.getElementById('forYouOverlay');
   if (overlay) overlay.classList.remove('active');
 }
@@ -268,138 +275,74 @@ function filterForYouTab(tabCategory, btnElement) {
   applyForYouFilters();
 }
 
-function filterForYouDocType(docType) {
-  selectedDocTypes = [docType];
-  updateMultiSelectUI();
-  applyForYouFilters();
+// Dialog selections remain a draft until Apply Filters is pressed.
+let draftNotificationDocTypes = ['all'];
+
+function openNotificationFilter() {
+  const dialog = document.getElementById('notificationDocumentDialog');
+  if (!dialog || dialog.open) return;
+  draftNotificationDocTypes = [...selectedDocTypes];
+  syncNotificationFilterOptions();
+  dialog.showModal();
 }
 
-function toggleDocTypeDropdown(e) {
-  if (e) e.stopPropagation();
-  const menu = document.getElementById('docTypeDropdownMenu');
-  if (menu) {
-    menu.classList.toggle('show');
+function closeNotificationFilter() {
+  const dialog = document.getElementById('notificationDocumentDialog');
+  if (!dialog?.open) return;
+  dialog.close();
+  document.getElementById('notificationFilterButton')?.focus();
+}
+
+function dismissNotificationFilterBackdrop(event) {
+  const dialog = event.currentTarget;
+  if (event.target !== dialog) return;
+  const bounds = dialog.getBoundingClientRect();
+  if (event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom) {
+    closeNotificationFilter();
   }
 }
 
-function toggleMultiSelectDocType(value, itemElem, e) {
-  if (e) e.stopPropagation();
-
-  if (value === 'all') {
-    selectedDocTypes = ['all'];
-  } else {
-    const allIdx = selectedDocTypes.indexOf('all');
-    if (allIdx !== -1) {
-      selectedDocTypes.splice(allIdx, 1);
-    }
-
-    const idx = selectedDocTypes.indexOf(value);
-    if (idx !== -1) {
-      selectedDocTypes.splice(idx, 1);
-    } else {
-      selectedDocTypes.push(value);
-    }
-
-    if (selectedDocTypes.length === 0) {
-      selectedDocTypes = ['all'];
-    }
-  }
-
-  updateMultiSelectUI();
-  applyForYouFilters();
-}
-
-const docTypeIconMap = {
-  'Leave Request': 'Leave Request',
-  'Medical Claim': 'Medical Claim',
-  'Overtime': 'Overtime',
-  'Change Request': 'Change Request',
-  'Tax EA Form': 'Tax EA Form',
-  'Performance Goal': 'Performance Goal'
-};
-
-function removeDocTypePill(value) {
-  const idx = selectedDocTypes.indexOf(value);
-  if (idx !== -1) {
-    selectedDocTypes.splice(idx, 1);
-  }
-  if (selectedDocTypes.length === 0) {
-    selectedDocTypes = ['all'];
-  }
-  updateMultiSelectUI();
-  applyForYouFilters();
-}
-
-function clearAllDocTypePills() {
-  selectedDocTypes = ['all'];
-  updateMultiSelectUI();
-  applyForYouFilters();
-}
-
-function updateMultiSelectUI() {
-  const menu = document.getElementById('docTypeDropdownMenu');
-  if (!menu) return;
-
-  const items = menu.querySelectorAll('.dropdown-item');
-  const isAll = selectedDocTypes.includes('all');
-
-  items.forEach(item => {
-    const val = item.getAttribute('data-value');
-    const chk = item.querySelector('input[type="checkbox"]');
-
-    if (isAll) {
-      if (val === 'all') {
-        item.classList.add('active');
-        if (chk) chk.checked = true;
-      } else {
-        item.classList.remove('active');
-        if (chk) chk.checked = false;
-      }
-    } else {
-      if (selectedDocTypes.includes(val)) {
-        item.classList.add('active');
-        if (chk) chk.checked = true;
-      } else {
-        item.classList.remove('active');
-        if (chk) chk.checked = false;
-      }
-    }
+function syncNotificationFilterOptions() {
+  document.querySelectorAll('#notificationDocumentDialog input[type="checkbox"]').forEach(input => {
+    input.checked = draftNotificationDocTypes.includes(input.value);
   });
-
-  const label = document.getElementById('selectedDocTypeLabel');
-  if (label) {
-    if (isAll || selectedDocTypes.length === 0) {
-      label.innerHTML = '<span class="doctype-placeholder">Document Type</span>';
-      label.title = 'Document Type';
-    } else {
-      let html = selectedDocTypes.map(val => {
-        const titleText = docTypeIconMap[val] || val;
-        return `
-          <div class="inline-active-pill" onclick="removeDocTypePill('${val}'); event.stopPropagation();">
-            <span>${titleText}</span>
-          </div>
-        `;
-      }).join('');
-      label.innerHTML = `<div class="inline-pills-container">${html}</div>`;
-      label.title = selectedDocTypes.join(', ');
-    }
-  }
-
-  // Hide the old separate pills row as we now render inline
-  const pillsRow = document.getElementById('activeFilterPillsRow');
-  if (pillsRow) {
-    pillsRow.style.display = 'none';
-  }
 }
 
-document.addEventListener('click', function(e) {
-  const menu = document.getElementById('docTypeDropdownMenu');
-  if (menu && menu.classList.contains('show')) {
-    if (!e.target.closest('.custom-dropdown-container')) {
-      menu.classList.remove('show');
-    }
+function changeNotificationDocumentType(value, checked) {
+  if (value === 'all') {
+    draftNotificationDocTypes = ['all'];
+  } else {
+    draftNotificationDocTypes = draftNotificationDocTypes.filter(type => type !== 'all' && type !== value);
+    if (checked) draftNotificationDocTypes.push(value);
+    const total = document.querySelectorAll('#notificationDocumentDialog input:not([value="all"])').length;
+    if (!draftNotificationDocTypes.length || draftNotificationDocTypes.length === total) draftNotificationDocTypes = ['all'];
   }
-});
+  syncNotificationFilterOptions();
+}
+
+function resetNotificationFilter() {
+  draftNotificationDocTypes = ['all'];
+  syncNotificationFilterOptions();
+}
+
+function applyNotificationFilter() {
+  selectedDocTypes = [...draftNotificationDocTypes];
+  updateNotificationFilterSummary();
+  applyForYouFilters();
+  closeNotificationFilter();
+}
+
+function updateNotificationFilterSummary() {
+  const isFiltered = !selectedDocTypes.includes('all');
+  const button = document.getElementById('notificationFilterButton');
+  button?.classList.toggle('has-filter', isFiltered);
+  button?.setAttribute('aria-label', isFiltered ? `Filter notifications: ${selectedDocTypes.length} document types selected` : 'Filter notifications');
+  const summary = document.getElementById('notificationFilterSummary');
+  if (summary) {
+    summary.hidden = !isFiltered;
+    summary.textContent = isFiltered ? `Showing: ${selectedDocTypes.join(' · ')}` : '';
+  }
+}
 
 // Notifications Catalog Data with Grouping by File Type & Rich Details
 let NOTIFICATIONS_CATALOG = [
@@ -565,11 +508,16 @@ let NOTIFICATIONS_CATALOG = [
 
 let activeNotifItem = null;
 
-function toggleNotifGroupAccordion(groupId) {
-  const groupEl = document.getElementById(groupId);
-  if (groupEl) {
-    groupEl.classList.toggle('collapsed');
-  }
+function openNotificationCategory(category) {
+  const routes = {
+    'Leave Requests': 'leave_approvals',
+    'Medical & Expense Claims': 'claims_approvals',
+    'Overtime & Shift Requests': 'attendance_approvals',
+    'Tax & Official Documents': 'payroll_approvals',
+    'Performance & KPI Goals': 'performance_approvals'
+  };
+  const route = routes[category];
+  if (route) navTo(route);
 }
 
 function applyForYouFilters() {
@@ -610,29 +558,14 @@ function renderForYouSheetUI() {
     const items = grouped[catTitle];
     const groupDomId = `notif_grp_${idx}`;
     return `
-      <div class="notif-group-card" id="${groupDomId}">
-        <div class="notif-group-header" onclick="toggleNotifGroupAccordion('${groupDomId}')">
-          <div class="group-title-box">
-            <span class="group-title-text">${catTitle}</span>
-            <span class="group-count-badge">${items.length} Request${items.length > 1 ? 's' : ''}</span>
-          </div>
-          <span class="group-chevron">▼</span>
-        </div>
-
-        <div class="notif-group-body">
-          ${items.map(item => `
-            <div class="sheet-item-card" onclick="openApprovalDetailModal('${item.id}', event)">
-              <div class="item-left-box">
-                <div class="item-info">
-                  <h5>${item.title}</h5>
-                  <span>${item.subtitle}</span>
-                </div>
-              </div>
-              <span style="font-size: 11px; font-weight: 700; color: var(--text-muted);">Details ›</span>
-            </div>
-          `).join('')}
-        </div>
-      </div>
+      <button type="button" class="notif-group-card notif-category-card" id="${groupDomId}"
+        onclick="openNotificationCategory('${catTitle}')" aria-label="${catTitle}, ${items.length} ${items.length === 1 ? 'request' : 'requests'}. View Detail">
+        <span class="notif-category-copy">
+          <span class="group-title-text">${catTitle}</span>
+          <span class="group-count-badge">${items.length}</span>
+        </span>
+        <span class="notif-category-action">View Detail <i class="fa-solid fa-chevron-right" aria-hidden="true"></i></span>
+      </button>
     `;
   }).join('');
 }
@@ -789,6 +722,8 @@ function openIndicatorsModal(scope = null, instant = false) {
   scope = scope === 'team' ? 'team' : 'my';
   const overlay = document.getElementById('indicatorsOverlay');
   if (!overlay) return;
+  overlay.classList.remove('insight-detail-breakdown');
+  document.getElementById('insightBreakdownCards')?.replaceChildren();
   const titleEl = document.getElementById('indicatorsSheetTitle');
   const myFeed = document.getElementById('myIndicatorsFeed');
   const teamFeed = document.getElementById('teamIndicatorsFeed');
@@ -820,7 +755,65 @@ function openInsightBreakdown(scope, group, trend = 'all') {
   if (!overlay) return;
   overlay.dataset.group = group;
   overlay.dataset.trend = trend;
+  overlay.classList.add('insight-detail-breakdown');
   applyIndicatorFilters();
+}
+
+// Keep the existing indicator feed as the source for values and trend membership.
+// Both summary scopes share this focused presentation.
+function renderInsightBreakdown(metrics, scope) {
+  let container = document.getElementById('insightBreakdownCards');
+  if (!container) {
+    container = document.createElement('div');
+    container.id = 'insightBreakdownCards';
+    document.getElementById('indicatorsListContainer').append(container);
+  }
+  const names = {
+    'Competency Match%': 'Competency match',
+    'Goal Achievement%': 'Goal achievement',
+    'Attendance%': 'Attendance rate',
+    'Work Incident Points': 'Work incident points',
+    'Odd Clocking Count': 'Odd clocking',
+    'Late In Count': 'Late arrivals',
+    'Absent Count': 'Absences',
+    'Emergency Leave Count': 'Emergency leave',
+    'Medical Leave Count': 'Medical leave',
+    'OT Absent Count': 'Overtime absences',
+    'Unauthorised OT Count': 'Unauthorised overtime',
+    'Training Absent Count': 'Training absences',
+    'Warning Letter Count': 'Warning letters',
+    'Unacknowledged Letter Count': 'Unacknowledged letters',
+    'Early Out Count': 'Early departures'
+  };
+  container.replaceChildren(...metrics.map(({ card, group, trend }) => {
+    const item = document.createElement('article');
+    item.className = 'insight-detail-metric';
+    item.dataset.group = group;
+    item.dataset.trend = trend;
+    const sourceName = card.querySelector('h5').textContent.trim();
+    const metricName = sourceName.replace(/^Avg /, '');
+    item.dataset.metricName = sourceName;
+    item.innerHTML = `
+      <header class="insight-detail-metric-header"><span class="insight-detail-metric-icon" aria-hidden="true"></span><h5></h5></header>
+      <div class="insight-detail-metric-body">
+        <div><span class="insight-detail-value-label"></span><div class="insight-detail-current"><strong></strong><span></span></div></div>
+        <div class="insight-detail-change-column"><span class="insight-detail-value-label">Change</span><div class="insight-detail-change"><span aria-hidden="true"></span><strong></strong></div></div>
+      </div>`;
+    const icon = card.querySelector('.feed-icon-box i');
+    if (icon) item.querySelector('.insight-detail-metric-icon').append(icon.cloneNode(true));
+    item.querySelector('h5').textContent = names[metricName] || metricName;
+    item.querySelector('.insight-detail-value-label').textContent = scope === 'team' ? 'Team average' : group === 'positive' ? 'Current score' : 'Current value';
+    item.querySelector('.insight-detail-current strong').textContent = card.querySelector('.feed-val-big').textContent.trim();
+    const unit = card.querySelector('.feed-val-unit').textContent.trim();
+    item.querySelector('.insight-detail-current span').textContent = scope === 'team'
+      ? (metricName === 'OT Absent Count' ? 'times' : unit)
+      : (metricName === 'Unauthorised OT Count' ? 'times' : unit === 'req' ? 'requests' : unit);
+    const change = card.querySelector('.feed-badge-pill').textContent.replace(/\u2212/g, '-').match(/[+-]?\d+(?:\.\d+)?%/);
+    const value = change ? change[0] : '0.00%';
+    item.querySelector('.insight-detail-change > span').textContent = trend === 'unchanged' ? '−' : parseFloat(value) > 0 ? '↑' : '↓';
+    item.querySelector('.insight-detail-change strong').textContent = trend === 'unchanged' ? '0.00%' : value;
+    return item;
+  }));
 }
 
 function closeIndicatorsDirect() {
@@ -873,6 +866,11 @@ function applyIndicatorFilters() {
   const groupName = group === 'all' ? 'All metrics' : group === 'positive' ? 'Positive' : 'Negative';
   const subtitle = document.getElementById('indicatorsSheetSubtitle');
   if (subtitle) subtitle.textContent = `${groupName} • ${trendNames[trend]} • ${visibleMetrics.length} ${visibleMetrics.length === 1 ? 'metric' : 'metrics'}`;
+  if (overlay.classList.contains('insight-detail-breakdown')) {
+    document.getElementById('indicatorsSheetTitle').textContent = trend === 'all' ? groupName : trendNames[trend];
+    if (subtitle) subtitle.textContent = `${scope === 'team' ? 'Team averages' : 'My'} · ${groupName} · ${visibleMetrics.length} ${visibleMetrics.length === 1 ? 'metric' : 'metrics'}`;
+    renderInsightBreakdown(visibleMetrics, scope);
+  }
   const empty = document.getElementById('indicatorEmptyState');
   if (empty) {
     empty.hidden = visibleMetrics.length !== 0;

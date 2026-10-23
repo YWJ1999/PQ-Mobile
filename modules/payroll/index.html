@@ -9,6 +9,7 @@
   <script src="../../js/payroll/payroll-config.js"></script>
   <script src="../../js/payroll/payroll-pending-data.js"></script>
   <script src="../../js/payroll/payroll-app.js" defer></script>
+  <script src="../../js/payroll/tax-information.js" defer></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -1189,16 +1190,16 @@
           <h2>My Tax Information</h2>
         </div>
         <section class="payroll-info-card" aria-label="Tax information">
-          <button type="button" class="payroll-card-link" onclick="window.PayrollEngine.previewIndividualFeature('tax-profile', 'Tax Profile')" style="width:100%; border:0; background:transparent; text-align:left; cursor:pointer;">
+          <a class="payroll-card-link" href="options/tax-profile.html" data-tax-link style="width:100%; border:0; background:transparent; text-align:left; text-decoration:none;">
             <span class="tax-info-icon"><i class="fa-solid fa-user-group" aria-hidden="true"></i></span>
-            <span class="tax-info-copy"><strong>Tax Profile</strong><span>Married · View tax details</span></span>
+            <span class="tax-info-copy"><strong>Tax Profile</strong><span id="taxProfileSummary">View tax details</span></span>
             <i class="fa-solid fa-chevron-right" aria-hidden="true" style="color:var(--text-muted);"></i>
-          </button>
-          <button type="button" class="payroll-card-link" onclick="window.PayrollEngine.previewIndividualFeature('dependants', 'Dependants')" style="width:100%; border-left:0; border-right:0; border-bottom:0; background:transparent; text-align:left; cursor:pointer;">
+          </a>
+          <a class="payroll-card-link" href="options/tax-profile.html?tab=dependants" data-tax-link style="width:100%; border-left:0; border-right:0; border-bottom:0; background:transparent; text-align:left; text-decoration:none;">
             <span class="tax-info-icon"><i class="fa-solid fa-child-reaching" aria-hidden="true"></i></span>
-            <span class="tax-info-copy"><strong>Dependants</strong><span>0 registered dependants</span></span>
+            <span class="tax-info-copy"><strong>Dependants</strong><span id="taxDependantsSummary">View registered dependants</span></span>
             <i class="fa-solid fa-chevron-right" aria-hidden="true" style="color:var(--text-muted);"></i>
-          </button>
+          </a>
         </section>
       </div>
 

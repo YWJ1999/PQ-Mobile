@@ -193,7 +193,6 @@ class LeftProfileDrawer extends HTMLElement {
       <div class="profile-drawer-overlay drawer-overlay" id="profileDrawerOverlay" onclick="closeProfileDrawerModal(event)">
         <div class="profile-drawer-card drawer-card" onclick="event.stopPropagation()">
           <div class="profile-drawer-top">
-            <span class="drawer-pill-tag">PEOPLEHCM MENU</span>
             <button class="drawer-close-btn" onclick="closeProfileDrawerDirect()" aria-label="Close menu"><i class="fa-solid fa-xmark"></i></button>
           </div>
 
@@ -291,11 +290,16 @@ class NotificationSheet extends HTMLElement {
               <h3>For You (7)</h3>
               <p>Action Items & Reminders</p>
             </div>
-            <button class="sheet-close-btn" onclick="closeForYouDirect()" aria-label="Close"><i class="fa-solid fa-xmark"></i></button>
+            <div class="notification-header-actions">
+              <button type="button" id="notificationFilterButton" class="notification-filter-button" onclick="openNotificationFilter()" aria-haspopup="dialog" aria-controls="notificationDocumentDialog" aria-label="Filter notifications" title="Filter notifications">
+                <i class="fa-solid fa-sliders" aria-hidden="true"></i>
+              </button>
+              <button type="button" class="sheet-close-btn" onclick="closeForYouDirect()" aria-label="Close"><i class="fa-solid fa-xmark"></i></button>
+            </div>
           </div>
 
           <!-- 3 Tabs: All, Pending Approval, Pending Resubmit -->
-          <div class="sheet-filter-bar">
+          <div class="sheet-filter-bar notification-status-tabs">
             <button class="sheet-filter-pill active" onclick="filterForYouTab('all', this)">
               <span>All (7)</span>
             </button>
@@ -309,76 +313,12 @@ class NotificationSheet extends HTMLElement {
             </button>
           </div>
 
-          <!-- Custom Floating Rounded Dropdown Filter -->
-          <div class="custom-dropdown-container">
-            <button class="sheet-doctype-bar-row" onclick="toggleDocTypeDropdown(event)" type="button" aria-label="Select Document Type">
-              <div class="doctype-bar-left" style="flex: 1; min-width: 0;">
-                <div class="doctype-icon-box">
-                  <i class="fa-solid fa-sliders" style="font-size: 13px;"></i>
-                </div>
-                <div id="selectedDocTypeLabel">
-                  <span class="doctype-placeholder">Document Type Filter</span>
-                </div>
-              </div>
-              <div class="doctype-select-arrow">
-                <i class="fa-solid fa-chevron-down" style="font-size: 11px;"></i>
-              </div>
-            </button>
-
-            <!-- Multi-Select Rounded Popup Menu (border-radius: 18px) -->
-            <div class="custom-dropdown-menu multi-select" id="docTypeDropdownMenu">
-              <div class="dropdown-item active" data-value="all" onclick="toggleMultiSelectDocType('all', this, event)">
-                <div class="chk-box-wrap">
-                  <input type="checkbox" checked id="chk-all">
-                  <span>All Document Types</span>
-                </div>
-              </div>
-              <div class="dropdown-item" data-value="Leave Request" onclick="toggleMultiSelectDocType('Leave Request', this, event)">
-                <div class="chk-box-wrap">
-                  <input type="checkbox" id="chk-leave">
-                  <span>Leave Request</span>
-                </div>
-              </div>
-              <div class="dropdown-item" data-value="Medical Claim" onclick="toggleMultiSelectDocType('Medical Claim', this, event)">
-                <div class="chk-box-wrap">
-                  <input type="checkbox" id="chk-claim">
-                  <span>Medical Claim</span>
-                </div>
-              </div>
-              <div class="dropdown-item" data-value="Overtime" onclick="toggleMultiSelectDocType('Overtime', this, event)">
-                <div class="chk-box-wrap">
-                  <input type="checkbox" id="chk-ot">
-                  <span>Overtime</span>
-                </div>
-              </div>
-              <div class="dropdown-item" data-value="Change Request" onclick="toggleMultiSelectDocType('Change Request', this, event)">
-                <div class="chk-box-wrap">
-                  <input type="checkbox" id="chk-change">
-                  <span>Change Request</span>
-                </div>
-              </div>
-              <div class="dropdown-item" data-value="Tax EA Form" onclick="toggleMultiSelectDocType('Tax EA Form', this, event)">
-                <div class="chk-box-wrap">
-                  <input type="checkbox" id="chk-tax">
-                  <span>Tax EA Form</span>
-                </div>
-              </div>
-              <div class="dropdown-item" data-value="Performance Goal" onclick="toggleMultiSelectDocType('Performance Goal', this, event)">
-                <div class="chk-box-wrap">
-                  <input type="checkbox" id="chk-kpi">
-                  <span>Performance Goal</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Active Selected Filter Pills (Horizontal Scroll Row) -->
-          <div class="active-filter-pills-row" id="activeFilterPillsRow" style="display: none;"></div>
+          <p id="notificationFilterSummary" class="notification-filter-summary" aria-live="polite" hidden></p>
 
           <div class="sheet-list-scroll" id="forYouListScroll">
-            <!-- Grouped by File Type Accordions -->
+            <!-- Category cards link to their own pages -->
             <div id="forYouGroupedContainer">
-              <!-- Dynamically populated via renderNotificationGroupedUI() -->
+              <!-- Dynamically populated via renderForYouSheetUI() -->
             </div>
 
             <!-- Empty State when filtered results are 0 -->
@@ -390,6 +330,32 @@ class NotificationSheet extends HTMLElement {
         </div>
       </div>
       
+      <dialog id="notificationDocumentDialog" class="notification-filter-dialog" aria-labelledby="notificationDocumentTitle" aria-describedby="notificationDocumentDescription" oncancel="event.preventDefault(); closeNotificationFilter()" onclick="dismissNotificationFilterBackdrop(event)">
+        <div class="notification-filter-heading">
+          <div>
+            <h2 id="notificationDocumentTitle">Filter notifications</h2>
+            <p id="notificationDocumentDescription">Choose the document types to show.</p>
+          </div>
+          <button type="button" class="sheet-close-btn" onclick="closeNotificationFilter()" aria-label="Close filter"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
+        </div>
+        <div class="notification-filter-options-heading">
+          <span id="notificationDocumentOptionsLabel">Document type</span>
+          <button type="button" onclick="resetNotificationFilter()">Reset</button>
+        </div>
+        <div class="notification-filter-options" role="group" aria-labelledby="notificationDocumentOptionsLabel">
+          ${['all', 'Leave Request', 'Medical Claim', 'Overtime', 'Change Request', 'Tax EA Form', 'Performance Goal'].map(value => `
+            <label class="notification-filter-option">
+              <input type="checkbox" value="${value}" onchange="changeNotificationDocumentType(this.value, this.checked)">
+              <span>${value === 'all' ? 'All document types' : value}</span>
+            </label>
+          `).join('')}
+        </div>
+        <div class="notification-filter-footer">
+          <button type="button" class="notification-filter-cancel" onclick="closeNotificationFilter()">Cancel</button>
+          <button type="button" class="notification-filter-apply" onclick="applyNotificationFilter()">Apply Filters</button>
+        </div>
+      </dialog>
+
       <!-- Integrated Approval Details Modal Sheet -->
       <approval-detail-sheet></approval-detail-sheet>
     `;

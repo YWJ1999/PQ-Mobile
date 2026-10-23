@@ -21,6 +21,31 @@ window.PAYROLL_CONFIG = {
     bankAccount: '•••• •••• 6821'
   },
 
+  // Sample tax records for the Individual tax information views.
+  taxInformation: {
+    profile: {
+      maritalStatus: 'Married',
+      handicap: false,
+      taxReliefChildren: 1,
+      taxExemptChildren: 1,
+      taxBranch: '',
+      spouseName: 'Daniel Jenkins',
+      spouseWorking: false,
+      spouseTaxNumber: '',
+      spouseTaxBranch: ''
+    },
+    dependants: [
+      {
+        name: 'Sophie Jenkins',
+        relation: 'Daughter (Female)',
+        dateOfBirth: '2022-04-01',
+        birthCertificate: 'BC-2022-00418',
+        identityNumber: '',
+        taxStatus: 'Child ≤ 18'
+      }
+    ]
+  },
+
   // 1. INDIVIDUAL: QUICK OPTIONS
   individualOptions: [
     {

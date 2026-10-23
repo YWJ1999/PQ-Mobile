@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PeopleHCM - My Tax Information</title>
+  <script src="../../../js/components.js"></script>
+  <script src="../../../js/app.js" defer></script>
+  <script src="../../../js/payroll/payroll-config.js"></script>
+  <script src="../../../js/payroll/tax-information.js" defer></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="../../../css/theme.css">
+  <link rel="stylesheet" href="../../../css/app.css">
+  <link rel="stylesheet" href="../../../css/payroll-documents.css">
+  <link rel="stylesheet" href="../../../css/tax-information.css">
+</head>
+<body data-tax-view="information">
+  <preview-top-bar active-page="payroll"></preview-top-bar>
+  <div class="phone-container tax-information-phone">
+    <header class="payroll-document-header">
+      <phone-status-bar time="9:41" style="color:#fff;"></phone-status-bar>
+      <div class="payroll-header-row">
+        <a class="payroll-header-action" href="../index.html?scope=individual" data-tax-link aria-label="Back to Payroll"><i class="fa-solid fa-chevron-left" aria-hidden="true"></i></a>
+        <div class="payroll-header-copy"><h1>My Tax Information</h1></div>
+      </div>
+    </header>
+    <div class="tax-tabs" role="tablist" aria-label="My tax information">
+      <button type="button" id="taxProfileTab" role="tab" aria-selected="true" aria-controls="taxProfilePanel" data-tax-tab="profile">Tax Profile</button>
+      <button type="button" id="taxDependantsTab" role="tab" aria-selected="false" aria-controls="taxDependantsPanel" tabindex="-1" data-tax-tab="dependants">Dependants</button>
+    </div>
+    <main class="payroll-document-main">
+      <div id="taxProfilePanel" role="tabpanel" aria-labelledby="taxProfileTab" tabindex="0">
+        <div class="tax-page-intro"><p>Your personal and spouse tax information on record.</p></div>
+        <section class="tax-detail-card" aria-labelledby="taxPersonalTitle">
+          <h2 id="taxPersonalTitle"><i class="fa-solid fa-user" aria-hidden="true"></i>Personal Tax Details</h2>
+          <dl class="tax-detail-fields" id="taxPersonalFields"></dl>
+        </section>
+        <section class="tax-detail-card" aria-labelledby="taxSpouseTitle">
+          <h2 id="taxSpouseTitle"><i class="fa-solid fa-user-group" aria-hidden="true"></i>Spouse Details</h2>
+          <dl class="tax-detail-fields" id="taxSpouseFields"></dl>
+        </section>
+      </div>
+      <div id="taxDependantsPanel" role="tabpanel" aria-labelledby="taxDependantsTab" tabindex="0" hidden>
+        <div class="tax-page-intro">
+          <p>Your registered dependants and their tax details.</p>
+          <p class="tax-record-count" id="taxRecordCount"></p>
+        </div>
+        <div id="taxDependantsList"></div>
+      </div>
+    </main>
+    <phone-bottom-nav active="apps"></phone-bottom-nav>
+  </div>
+</body>
+</html>

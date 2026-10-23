@@ -2,6 +2,8 @@ const assert = require('node:assert/strict');
 const path = require('node:path');
 const { pathToFileURL } = require('node:url');
 const puppeteer = require('puppeteer');
+const screenshotDir = path.join(require('node:os').tmpdir(), 'pq-insight-detail-verification');
+require('node:fs').mkdirSync(screenshotDir, { recursive: true });
 
 // Expected memberships are taken from the existing metric percentage changes.
 // A negative metric improves when its value falls; a zero change is unchanged
@@ -54,6 +56,8 @@ async function visibleNames(page, scope) {
     return overlay.classList.contains('active') && getComputedStyle(overlay).opacity === '1'
       && new DOMMatrix(getComputedStyle(sheet).transform).m42 === 0;
   });
+  const focused = await page.$eval('#indicatorsOverlay', el => el.classList.contains('insight-detail-breakdown'));
+  if (focused) return page.$$eval('#insightBreakdownCards .insight-detail-metric', cards => cards.map(card => card.dataset.metricName).sort());
   return page.$$eval(`#${scope}IndicatorsFeed .metric-feed-card`, cards => cards
     .filter(card => card.getClientRects().length > 0)
     .map(card => card.querySelector('h5').textContent.trim()).sort());
@@ -106,7 +110,67 @@ async function assertDrilldowns(page, scope, context) {
       assert.equal(await page.$eval(trendButton(trend), el => el.classList.contains('active')), true, 'Selected trend');
       assert.equal(await page.$eval('#indicatorEmptyState', el => el.getClientRects().length > 0), expected[scope][group][trend].length === 0, 'Empty state');
       const labels = await page.$$eval(`#${scope}IndicatorsFeed .feed-section-label`, els => els.filter(el => el.getClientRects().length).map(el => el.dataset.group));
-      assert.deepEqual(labels, expected[scope][group][trend].length ? [group] : [], 'Only relevant section heading visible');
+      assert.deepEqual(labels, [], 'Focused sheet hides original section headings');
+      {
+        const count = expected[scope][group][trend].length;
+        assert.equal(await page.$eval('#indicatorsSheetTitle', el => el.textContent), { improved: 'Improved', worsened: 'Worsened', unchanged: 'No change' }[trend]);
+        assert.equal(await page.$eval('#indicatorsSheetSubtitle', el => el.textContent), `${scope === 'team' ? 'Team averages' : 'My'} · ${group === 'positive' ? 'Positive' : 'Negative'} · ${count} ${count === 1 ? 'metric' : 'metrics'}`);
+        assert.equal(await page.$eval(categoryButton('all'), el => el.getClientRects().length), 0, 'Focused sheet hides category filters');
+        for (const width of [320, 390, 420]) {
+          await page.setViewport({ width, height: 844, deviceScaleFactor: 1 });
+          const layout = await page.$eval('#indicatorsOverlay .indicators-sheet', sheet => ({
+            overflow: sheet.scrollWidth > sheet.clientWidth,
+            cardOverflow: [...sheet.querySelectorAll('.insight-detail-metric')].some(card => card.scrollWidth > card.clientWidth),
+            scrolls: sheet.querySelector('.sheet-list-scroll').scrollHeight > sheet.querySelector('.sheet-list-scroll').clientHeight
+          }));
+          assert.equal(layout.overflow, false, `${width}: sheet fits`);
+          assert.equal(layout.cardOverflow, false, `${width}: cards fit`);
+          if (count >= 4) {
+            assert.equal(layout.scrolls, true, 'Long list scrolls');
+            assert.equal(await page.$eval('#indicatorsListContainer', list => {
+              list.scrollTop = list.scrollHeight;
+              const last = list.querySelector('.insight-detail-metric:last-child');
+              const reachable = last.getBoundingClientRect().bottom <= list.getBoundingClientRect().bottom + 1;
+              list.scrollTop = 0;
+              return reachable;
+            }), true, 'Final metric is reachable');
+          }
+          if (width === 390 && count) await page.screenshot({ path: path.join(screenshotDir, `${scope}-insight-${context.split(' ')[0]}-${group}-${trend}.png`) });
+        }
+        await page.setViewport({ width: 390, height: 844, deviceScaleFactor: 1 });
+        if (scope === 'my' && group === 'positive' && trend === 'improved') {
+          assert.equal(await page.$eval('.insight-detail-current', el => el.textContent), '95.00%');
+          assert.equal(await page.$eval('.insight-detail-change strong', el => el.textContent), '+4.21%');
+        }
+        if (scope === 'my' && group === 'negative' && trend === 'worsened') {
+          assert.equal(await page.$eval('.insight-detail-current', el => el.textContent), '17times');
+          assert.equal(await page.$eval('.insight-detail-change strong', el => el.textContent), '+11.76%');
+        }
+        if (scope === 'team') {
+          const teamDetails = {
+            positive: {
+              improved: [['Competency match', '4.53pts', '+100.00%']],
+              worsened: [['Attendance rate', '69.39%', '-1.04%']],
+              unchanged: [['Goal achievement', '0.00%', '0.00%']]
+            },
+            negative: {
+              improved: [['Odd clocking', '0.37avg', '-56.76%'], ['Late arrivals', '2.80times', '-12.50%'], ['Absences', '8.51days', '-1.76%'], ['Unauthorised overtime', '11.63hrs', '-1.03%']],
+              worsened: [['Medical leave', '0.30days', '+16.67%']],
+              unchanged: [['Emergency leave', '0.00leaves', '0.00%'], ['Overtime absences', '0.00times', '0.00%'], ['Training absences', '0.00courses', '0.00%'], ['Early departures', '0.00early', '0.00%']]
+            }
+          };
+          assert.deepEqual(await page.$$eval('#insightBreakdownCards article', cards => cards.map(card => [
+            card.querySelector('h5').textContent,
+            card.querySelector('.insight-detail-current').textContent,
+            card.querySelector('.insight-detail-change strong').textContent
+          ])), teamDetails[group][trend], 'Team card titles, values, units and changes match references');
+          assert.equal(await page.$$eval('#insightBreakdownCards article', cards => cards.every(card => card.querySelector('.insight-detail-value-label').textContent === 'Team average')), true);
+        }
+        // Reopening the full feed restores its original presentation and filters.
+        await closeSheet(page);
+        await page.evaluate(scope => openIndicatorsModal(scope), scope);
+        assert.equal(await page.$eval('#indicatorsOverlay', el => el.classList.contains('insight-detail-breakdown')), false);
+      }
       // All must clear both filters, including a zero-match status.
       await page.click(categoryButton('all'));
       assert.deepEqual(await visibleNames(page, scope), allNames(scope), `${context}: All restores the full feed`);
@@ -133,9 +197,9 @@ async function assertDrilldowns(page, scope, context) {
         for (const scope of scopes) {
           await assertSummary(page, scope, `${theme} ${width}px ${scope}`);
           if (width === 390) {
-            await page.screenshot({ path: `scratch/insights-${theme}-${scope}.png` });
+            await page.screenshot({ path: path.join(screenshotDir, `insights-${theme}-${scope}.png`) });
             const card = await page.$('.insights-card');
-            await card.screenshot({ path: `scratch/insights-card-${theme}-${scope}.png` });
+            await card.screenshot({ path: path.join(screenshotDir, `insights-card-${theme}-${scope}.png`) });
           }
         }
       }

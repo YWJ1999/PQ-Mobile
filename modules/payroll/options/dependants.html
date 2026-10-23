@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PeopleHCM - Dependants</title>
+  <script>
+    // Preserve old links while keeping both tax views on one screen.
+    const destination = new URL('tax-profile.html', window.location.href);
+    destination.search = window.location.search;
+    destination.searchParams.set('tab', 'dependants');
+    window.location.replace(destination.href);
+  </script>
+</head>
+<body>
+  <a href="tax-profile.html?tab=dependants">Open Dependants in My Tax Information</a>
+</body>
+</html>

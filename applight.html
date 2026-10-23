@@ -159,6 +159,26 @@
       </div>
 
       <div class="explore-list">
+        <div class="explore-row" data-module="workplace" role="button" tabindex="0" onclick="navTo('workplace', event)" onkeydown="if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); this.click(); }">
+          <div class="explore-left">
+            <div class="explore-icon-box violet"><i class="fa-solid fa-building-shield" style="font-size: 18px;" aria-hidden="true"></i></div>
+            <div class="explore-text">
+              <h4>Workplace</h4>
+            </div>
+          </div>
+          <span class="explore-chevron">&#8250;</span>
+        </div>
+
+        <div class="explore-row" data-module="employee-career" role="button" tabindex="0" onclick="navTo('employee_career', event)" onkeydown="if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); this.click(); }">
+          <div class="explore-left">
+            <div class="explore-icon-box teal"><i class="fa-solid fa-id-card" style="font-size: 18px;"></i></div>
+            <div class="explore-text">
+              <h4>Employee &amp; Career</h4>
+            </div>
+          </div>
+          <span class="explore-chevron">&#8250;</span>
+        </div>
+
         <div class="explore-row" role="button" tabindex="0" onclick="navTo('time_attendance', event)" onkeydown="if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); this.click(); }">
           <div class="explore-left">
             <div class="explore-icon-box purple"><i class="fa-solid fa-clock" style="font-size: 18px;"></i></div>
@@ -179,31 +199,11 @@
           <span class="explore-chevron">&#8250;</span>
         </div>
 
-        <div class="explore-row" data-module="training-competency" role="button" tabindex="0" onclick="navTo('learning_dev', event)" onkeydown="if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); this.click(); }">
+        <div class="explore-row" role="button" tabindex="0" onclick="navTo('claims_expenses', event)" onkeydown="if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); this.click(); }">
           <div class="explore-left">
-            <div class="explore-icon-box blue"><i class="fa-solid fa-graduation-cap" style="font-size: 18px;"></i></div>
+            <div class="explore-icon-box teal"><i class="fa-solid fa-receipt" style="font-size: 18px;"></i></div>
             <div class="explore-text">
-              <h4>Training &amp; Competency</h4>
-            </div>
-          </div>
-          <span class="explore-chevron">&#8250;</span>
-        </div>
-
-        <div class="explore-row" data-module="performance" role="button" tabindex="0" onclick="navTo('performance', event)" onkeydown="if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); this.click(); }">
-          <div class="explore-left">
-            <div class="explore-icon-box violet"><i class="fa-solid fa-bullseye" style="font-size: 18px;"></i></div>
-            <div class="explore-text">
-              <h4>Performance</h4>
-            </div>
-          </div>
-          <span class="explore-chevron">&#8250;</span>
-        </div>
-
-        <div class="explore-row" data-module="employee-career" role="button" tabindex="0" onclick="navTo('employee_career', event)" onkeydown="if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); this.click(); }">
-          <div class="explore-left">
-            <div class="explore-icon-box teal"><i class="fa-solid fa-id-card" style="font-size: 18px;"></i></div>
-            <div class="explore-text">
-              <h4>Employee &amp; Career</h4>
+              <h4>Benefit, Claim &amp; Travel</h4>
             </div>
           </div>
           <span class="explore-chevron">&#8250;</span>
@@ -219,16 +219,6 @@
           <span class="explore-chevron">&#8250;</span>
         </div>
 
-        <div class="explore-row" role="button" tabindex="0" onclick="navTo('claims_expenses', event)" onkeydown="if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); this.click(); }">
-          <div class="explore-left">
-            <div class="explore-icon-box teal"><i class="fa-solid fa-receipt" style="font-size: 18px;"></i></div>
-            <div class="explore-text">
-              <h4>Benefits, Claims &amp; Travel</h4>
-            </div>
-          </div>
-          <span class="explore-chevron">&#8250;</span>
-        </div>
-
         <div class="explore-row" role="button" tabindex="0" onclick="navTo('project_task', event)" onkeydown="if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); this.click(); }">
           <div class="explore-left">
             <div class="explore-icon-box blue"><i class="fa-solid fa-list-check" style="font-size: 18px;"></i></div>
@@ -239,11 +229,21 @@
           <span class="explore-chevron">&#8250;</span>
         </div>
 
-        <div class="explore-row" data-module="workplace" role="button" tabindex="0" onclick="navTo('workplace', event)" onkeydown="if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); this.click(); }">
+        <div class="explore-row" data-module="performance" role="button" tabindex="0" onclick="navTo('performance', event)" onkeydown="if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); this.click(); }">
           <div class="explore-left">
-            <div class="explore-icon-box violet"><i class="fa-solid fa-building-shield" style="font-size: 18px;" aria-hidden="true"></i></div>
+            <div class="explore-icon-box violet"><i class="fa-solid fa-bullseye" style="font-size: 18px;"></i></div>
             <div class="explore-text">
-              <h4>Workplace</h4>
+              <h4>Performance</h4>
+            </div>
+          </div>
+          <span class="explore-chevron">&#8250;</span>
+        </div>
+
+        <div class="explore-row" data-module="training-competency" role="button" tabindex="0" onclick="navTo('learning_dev', event)" onkeydown="if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); this.click(); }">
+          <div class="explore-left">
+            <div class="explore-icon-box blue"><i class="fa-solid fa-graduation-cap" style="font-size: 18px;"></i></div>
+            <div class="explore-text">
+              <h4>Training &amp; Competency</h4>
             </div>
           </div>
           <span class="explore-chevron">&#8250;</span>
