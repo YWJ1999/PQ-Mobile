@@ -242,7 +242,10 @@ function handleSignOut() {
 }
 
 // 6. Notification (For You) Bottom Sheet Drawer Controls
-function openForYouModal() {
+function openForYouModal(tabCategory = 'pending_approval') {
+  currentForYouTab = tabCategory === 'pending_resubmit' ? 'pending_resubmit' : 'pending_approval';
+  selectedDocTypes = ['all'];
+  updateNotificationFilterSummary();
   renderForYouSheetUI();
   const overlay = document.getElementById('forYouOverlay');
   if (overlay) overlay.classList.add('active');
@@ -258,7 +261,7 @@ function closeForYouModal(e) {
   if (e.target.id === 'forYouOverlay') closeForYouDirect();
 }
 
-let currentForYouTab = 'all';
+let currentForYouTab = 'pending_approval';
 let selectedDocTypes = ['all'];
 
 function filterForYou(category, btnElement) {
@@ -524,15 +527,56 @@ function applyForYouFilters() {
   renderForYouSheetUI();
 }
 
+function renderHomeForYou(counts) {
+  const summaries = [
+    { status: 'pending_approval', title: 'Pending Approval', icon: 'fa-user-check', tone: 'amber',
+      description: count => count ? `${count} ${count === 1 ? 'request is' : 'requests are'} waiting for your approval` : 'No requests are waiting for your approval' },
+    { status: 'pending_resubmit', title: 'Pending Resubmit', icon: 'fa-rotate-right', tone: 'violet',
+      description: count => count ? `${count} ${count === 1 ? 'request needs' : 'requests need'} updates before resubmission` : 'No requests need resubmission' }
+  ];
+  document.querySelectorAll('[data-home-notifications]').forEach(list => {
+    list.innerHTML = summaries.map(summary => `
+      <button type="button" class="for-you-card" data-pending-status="${summary.status}"
+        onclick="openForYouModal('${summary.status}')" aria-haspopup="dialog" aria-controls="forYouOverlay">
+        <span class="fy-left">
+          <span class="fy-avatar" style="background: var(--tag-${summary.tone}-bg); color: var(--tag-${summary.tone}-text);">
+            <i class="fa-solid ${summary.icon}" aria-hidden="true"></i>
+          </span>
+          <span class="fy-text">
+            <span class="fy-title">${summary.title}</span>
+            <span class="fy-description">${summary.description(counts[summary.status])}</span>
+          </span>
+        </span>
+        <span class="fy-right" style="color: var(--tag-${summary.tone}-text);" aria-hidden="true">
+          <i class="fa-solid fa-chevron-right"></i>
+        </span>
+      </button>
+    `).join('');
+  });
+}
+
 function renderForYouSheetUI() {
   const groupedContainer = document.getElementById('forYouGroupedContainer');
   const emptyEl = document.getElementById('forYouEmptyState');
 
   if (!groupedContainer) return;
 
+  const counts = {
+    pending_approval: NOTIFICATIONS_CATALOG.filter(item => item.fy === 'pending_approval').length,
+    pending_resubmit: NOTIFICATIONS_CATALOG.filter(item => item.fy === 'pending_resubmit').length
+  };
+  document.getElementById('badgePendingApprovalCount').textContent = counts.pending_approval;
+  document.getElementById('badgePendingResubmitCount').textContent = counts.pending_resubmit;
+  const total = NOTIFICATIONS_CATALOG.length;
+  document.querySelector('#forYouOverlay .sheet-title h3').textContent = `For You (${total})`;
+  document.querySelectorAll('[data-for-you-tab]').forEach(tab => {
+    tab.classList.toggle('active', tab.dataset.forYouTab === currentForYouTab);
+  });
+  renderHomeForYou(counts);
+
   // Filter Catalog Items
   const filteredList = NOTIFICATIONS_CATALOG.filter(item => {
-    const matchTab = (currentForYouTab === 'all' || item.fy === currentForYouTab);
+    const matchTab = item.fy === currentForYouTab;
     const isAllDocs = selectedDocTypes.includes('all');
     const matchDocType = isAllDocs || selectedDocTypes.includes(item.doctype);
     return matchTab && matchDocType;
@@ -1047,6 +1091,7 @@ function previewPolicyDoc(fileName) {
 document.addEventListener('DOMContentLoaded', () => {
   initTheme();
   updateInsightSummaries();
+  renderForYouSheetUI();
   const urlParams = new URLSearchParams(window.location.search);
   if (urlParams.get('drawer') === 'open' || urlParams.get('openDrawer') === 'true') {
     setTimeout(openProfileDrawer, 100);

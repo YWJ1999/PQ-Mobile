@@ -132,8 +132,7 @@
     if (button.dataset.optionId === 'training-calendar') {
       button.addEventListener('click', () => {
         const section = document.getElementById('trainingCalendarSection');
-        section.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        document.getElementById('trainingCalendarMonth').focus({ preventScroll: true });
+        section.dispatchEvent(new Event('training:showcalendar'));
       });
       return;
     }

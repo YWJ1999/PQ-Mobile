@@ -179,58 +179,7 @@
         <a class="section-action" href="javascript:void(0)" onclick="openForYouModal()">View all</a>
       </div>
 
-      <div class="for-you-list">
-        <!-- 1. Approval needed -->
-        <div class="for-you-card" onclick="navTo('team', event)">
-          <div class="fy-left">
-            <div class="fy-avatar" style="background: var(--tag-amber-bg); color: var(--tag-amber-text);">
-              <i class="fa-solid fa-user-check" style="font-size: 16px;"></i>
-            </div>
-            <div class="fy-text">
-              <h4>Approval needed</h4>
-              <p>2 leave requests are waiting for your approval</p>
-            </div>
-          </div>
-          <div class="fy-right" style="color: var(--tag-amber-text);">
-            <span>Today</span>
-            <span style="font-size: 14px;">›</span>
-          </div>
-        </div>
-
-        <!-- 2. Payslip ready -->
-        <div class="for-you-card" onclick="navTo('payslip', event)">
-          <div class="fy-left">
-            <div class="fy-avatar" style="background: var(--tag-violet-bg); color: var(--tag-violet-text);">
-              <i class="fa-solid fa-file-invoice-dollar" style="font-size: 16px;"></i>
-            </div>
-            <div class="fy-text">
-              <h4>Payslip ready</h4>
-              <p>Your July 2026 payslip is available</p>
-            </div>
-          </div>
-          <div class="fy-right" style="color: var(--purple-primary);">
-            <span>Today</span>
-            <span style="font-size: 14px;">›</span>
-          </div>
-        </div>
-
-        <!-- 3. Team update -->
-        <div class="for-you-card" onclick="navTo('team', event)">
-          <div class="fy-left">
-            <div class="fy-avatar" style="background: var(--tag-teal-bg); color: var(--tag-teal-text);">
-              <i class="fa-solid fa-users" style="font-size: 16px;"></i>
-            </div>
-            <div class="fy-text">
-              <h4>Team update</h4>
-              <p>3 colleagues are away tomorrow</p>
-            </div>
-          </div>
-          <div class="fy-right" style="color: var(--tag-teal-text);">
-            <span>Yesterday</span>
-            <span style="font-size: 14px;">›</span>
-          </div>
-        </div>
-      </div>
+      <div class="for-you-list" data-home-notifications aria-label="Pending notifications"></div>
 
       <!-- ========================================================
            4. COMPANY UPDATES

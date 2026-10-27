@@ -16,6 +16,85 @@
   <link rel="stylesheet" href="css/app.css">
   <link rel="stylesheet" href="css/work-status.css">
   <style>
+    #viewTeamApprovals .approval-date-range {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) clamp(48px, 16vw, 64px) minmax(0, 1fr);
+      align-items: center;
+      gap: 8px;
+      padding: 12px;
+      margin-bottom: 14px;
+      border: 1px solid var(--border-subtle);
+      border-radius: 14px;
+      background: var(--bg-input);
+    }
+
+    #viewTeamApprovals .approval-date-endpoint {
+      min-width: 0;
+    }
+
+    #viewTeamApprovals .approval-date-endpoint:last-child {
+      text-align: right;
+    }
+
+    #viewTeamApprovals .approval-date-label {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 10.5px;
+      font-weight: 700;
+      color: var(--text-muted);
+    }
+
+    #viewTeamApprovals .approval-date-endpoint time {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    #viewTeamApprovals .approval-date-weekday {
+      font-size: 10.5px;
+      font-weight: 700;
+      color: var(--text-muted);
+    }
+
+    #viewTeamApprovals .approval-date-value {
+      font-size: 12px;
+      font-weight: 800;
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+      color: var(--text-primary);
+    }
+
+    #viewTeamApprovals .approval-date-duration {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+      padding-top: 14px;
+      color: var(--purple-text);
+      font-size: 10.5px;
+      font-weight: 800;
+      text-align: center;
+      white-space: nowrap;
+    }
+
+    #viewTeamApprovals .approval-date-duration > span {
+      padding: 3px 7px;
+      border-radius: 999px;
+      background: var(--tag-violet-bg);
+      line-height: 1.2;
+    }
+
+    #viewTeamApprovals .approval-date-arrow {
+      display: block;
+      width: 100%;
+      height: 16px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
     /* Staff Leave Entitlement follows the Staff Benefit Entitlement reference. */
     #viewStaffEntitlement .entitlement-staff-header {
       display: flex;
@@ -5568,29 +5647,24 @@
               </div>
 
               <!-- Date Timeline Section -->
-              <div style="background: var(--bg-input); border-radius: 14px; padding: 12px; margin-bottom: 14px; border: 1px solid var(--border-subtle);">
-                <div style="display: flex; justify-content: space-between; font-size: 10.5px; font-weight: 700; color: var(--text-muted); margin-bottom: 6px;">
-                  <span>Date Start</span>
-                  <span>Date End</span>
+              <div class="approval-date-range">
+                <div class="approval-date-endpoint">
+                  <span class="approval-date-label">Date Start</span>
+                  <time datetime="2026-02-23">
+                    <span class="approval-date-weekday">Tue,</span>
+                    <span class="approval-date-value">23/02/2026</span>
+                  </time>
                 </div>
-                <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
-                  <div style="display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 800; color: var(--text-primary);">
-                    <span>Tue, 23/02/2026</span>
-                    <span style="color: var(--purple-primary); font-size: 13px;">🟣</span>
-                  </div>
-
-                  <!-- Arrow in center with duration -->
-                  <div style="flex: 1; display: flex; flex-direction: column; align-items: center;">
-                    <span style="font-size: 10.5px; font-weight: 800; color: var(--purple-primary); margin-bottom: -2px;">3 Days</span>
-                    <div style="width: 100%; height: 2px; background: var(--purple-primary); position: relative;">
-                      <div style="position: absolute; right: 0; top: -3px; width: 0; height: 0; border-top: 4px solid transparent; border-bottom: 4px solid transparent; border-left: 6px solid var(--purple-primary);"></div>
-                    </div>
-                  </div>
-
-                  <div style="display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 800; color: var(--text-primary);">
-                    <span style="color: var(--purple-primary); font-size: 13px;">🟣</span>
-                    <span>Thu, 25/02/2026</span>
-                  </div>
+                <div class="approval-date-duration">
+                  <span>3 Days</span>
+                  <svg class="approval-date-arrow" viewBox="0 0 64 16" aria-hidden="true" focusable="false"><path d="M4 8H60M54 2L60 8L54 14"/></svg>
+                </div>
+                <div class="approval-date-endpoint">
+                  <span class="approval-date-label">Date End</span>
+                  <time datetime="2026-02-25">
+                    <span class="approval-date-weekday">Thu,</span>
+                    <span class="approval-date-value">25/02/2026</span>
+                  </time>
                 </div>
               </div>
 
@@ -5671,29 +5745,24 @@
               </div>
 
               <!-- Date Timeline Section -->
-              <div style="background: var(--bg-input); border-radius: 14px; padding: 12px; margin-bottom: 14px; border: 1px solid var(--border-subtle);">
-                <div style="display: flex; justify-content: space-between; font-size: 10.5px; font-weight: 700; color: var(--text-muted); margin-bottom: 6px;">
-                  <span>Date Start</span>
-                  <span>Date End</span>
+              <div class="approval-date-range">
+                <div class="approval-date-endpoint">
+                  <span class="approval-date-label">Date Start</span>
+                  <time datetime="2026-09-12">
+                    <span class="approval-date-weekday">Sat,</span>
+                    <span class="approval-date-value">12/09/2026</span>
+                  </time>
                 </div>
-                <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
-                  <div style="display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 800; color: var(--text-primary);">
-                    <span>Sat, 12/09/2026</span>
-                    <span style="color: var(--purple-primary); font-size: 13px;">🟣</span>
-                  </div>
-
-                  <!-- Arrow in center with duration -->
-                  <div style="flex: 1; display: flex; flex-direction: column; align-items: center;">
-                    <span style="font-size: 10.5px; font-weight: 800; color: var(--purple-primary); margin-bottom: -2px;">1 Day</span>
-                    <div style="width: 100%; height: 2px; background: var(--purple-primary); position: relative;">
-                      <div style="position: absolute; right: 0; top: -3px; width: 0; height: 0; border-top: 4px solid transparent; border-bottom: 4px solid transparent; border-left: 6px solid var(--purple-primary);"></div>
-                    </div>
-                  </div>
-
-                  <div style="display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 800; color: var(--text-primary);">
-                    <span style="color: var(--purple-primary); font-size: 13px;">🟣</span>
-                    <span>Sat, 12/09/2026</span>
-                  </div>
+                <div class="approval-date-duration">
+                  <span>1 Day</span>
+                  <svg class="approval-date-arrow" viewBox="0 0 64 16" aria-hidden="true" focusable="false"><path d="M4 8H60M54 2L60 8L54 14"/></svg>
+                </div>
+                <div class="approval-date-endpoint">
+                  <span class="approval-date-label">Date End</span>
+                  <time datetime="2026-09-12">
+                    <span class="approval-date-weekday">Sat,</span>
+                    <span class="approval-date-value">12/09/2026</span>
+                  </time>
                 </div>
               </div>
 
@@ -5764,26 +5833,24 @@
                 </div>
               </div>
 
-              <div style="background: var(--bg-input); border-radius: 14px; padding: 12px; margin-bottom: 14px; border: 1px solid var(--border-subtle);">
-                <div style="display: flex; justify-content: space-between; font-size: 10.5px; font-weight: 700; color: var(--text-muted); margin-bottom: 6px;">
-                  <span>Date Start</span>
-                  <span>Date End</span>
+              <div class="approval-date-range">
+                <div class="approval-date-endpoint">
+                  <span class="approval-date-label">Date Start</span>
+                  <time datetime="2026-09-15">
+                    <span class="approval-date-weekday">Tue,</span>
+                    <span class="approval-date-value">15/09/2026</span>
+                  </time>
                 </div>
-                <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
-                  <div style="display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 800; color: var(--text-primary);">
-                    <span>Tue, 15/09/2026</span>
-                    <span style="color: var(--purple-primary); font-size: 13px;">🟣</span>
-                  </div>
-                  <div style="flex: 1; display: flex; flex-direction: column; align-items: center;">
-                    <span style="font-size: 10.5px; font-weight: 800; color: var(--purple-primary); margin-bottom: -2px;">2 Days</span>
-                    <div style="width: 100%; height: 2px; background: var(--purple-primary); position: relative;">
-                      <div style="position: absolute; right: 0; top: -3px; width: 0; height: 0; border-top: 4px solid transparent; border-bottom: 4px solid transparent; border-left: 6px solid var(--purple-primary);"></div>
-                    </div>
-                  </div>
-                  <div style="display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 800; color: var(--text-primary);">
-                    <span style="color: var(--purple-primary); font-size: 13px;">🟣</span>
-                    <span>Wed, 16/09/2026</span>
-                  </div>
+                <div class="approval-date-duration">
+                  <span>2 Days</span>
+                  <svg class="approval-date-arrow" viewBox="0 0 64 16" aria-hidden="true" focusable="false"><path d="M4 8H60M54 2L60 8L54 14"/></svg>
+                </div>
+                <div class="approval-date-endpoint">
+                  <span class="approval-date-label">Date End</span>
+                  <time datetime="2026-09-16">
+                    <span class="approval-date-weekday">Wed,</span>
+                    <span class="approval-date-value">16/09/2026</span>
+                  </time>
                 </div>
               </div>
 
@@ -5852,26 +5919,24 @@
                 </div>
               </div>
 
-              <div style="background: var(--bg-input); border-radius: 14px; padding: 12px; margin-bottom: 14px; border: 1px solid var(--border-subtle);">
-                <div style="display: flex; justify-content: space-between; font-size: 10.5px; font-weight: 700; color: var(--text-muted); margin-bottom: 6px;">
-                  <span>Date Start</span>
-                  <span>Date End</span>
+              <div class="approval-date-range">
+                <div class="approval-date-endpoint">
+                  <span class="approval-date-label">Date Start</span>
+                  <time datetime="2026-09-29">
+                    <span class="approval-date-weekday">Tue,</span>
+                    <span class="approval-date-value">29/09/2026</span>
+                  </time>
                 </div>
-                <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
-                  <div style="display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 800; color: var(--text-primary);">
-                    <span>Tue, 29/09/2026</span>
-                    <span style="color: var(--purple-primary); font-size: 13px;">🟣</span>
-                  </div>
-                  <div style="flex: 1; display: flex; flex-direction: column; align-items: center;">
-                    <span style="font-size: 10.5px; font-weight: 800; color: var(--purple-primary); margin-bottom: -2px;">1 Day</span>
-                    <div style="width: 100%; height: 2px; background: var(--purple-primary); position: relative;">
-                      <div style="position: absolute; right: 0; top: -3px; width: 0; height: 0; border-top: 4px solid transparent; border-bottom: 4px solid transparent; border-left: 6px solid var(--purple-primary);"></div>
-                    </div>
-                  </div>
-                  <div style="display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 800; color: var(--text-primary);">
-                    <span style="color: var(--purple-primary); font-size: 13px;">🟣</span>
-                    <span>Tue, 29/09/2026</span>
-                  </div>
+                <div class="approval-date-duration">
+                  <span>1 Day</span>
+                  <svg class="approval-date-arrow" viewBox="0 0 64 16" aria-hidden="true" focusable="false"><path d="M4 8H60M54 2L60 8L54 14"/></svg>
+                </div>
+                <div class="approval-date-endpoint">
+                  <span class="approval-date-label">Date End</span>
+                  <time datetime="2026-09-29">
+                    <span class="approval-date-weekday">Tue,</span>
+                    <span class="approval-date-value">29/09/2026</span>
+                  </time>
                 </div>
               </div>
 

@@ -15,6 +15,7 @@
   <link rel="stylesheet" href="css/dashboard-background.css">
   <script src="js/components.js"></script>
   <script src="js/app.js" defer></script>
+  <script src="js/shortcuts.js" defer></script>
   <script src="js/dashboard-background.js" defer></script>
 </head>
 
@@ -45,10 +46,10 @@
            ======================================================== -->
       <div class="section-header">
         <span class="section-title">My Shortcuts</span>
-        <a class="section-action" href="javascript:void(0)" onclick="navTo('settings', event)">
+        <button type="button" class="section-action shortcut-edit-button" id="editShortcutsButton" aria-haspopup="dialog" aria-controls="shortcutEditor">
           <i class="fa-solid fa-pen-to-square" style="font-size: 13px;"></i>
           <span>Edit</span>
-        </a>
+        </button>
       </div>
 
       <div class="shortcuts-grid">

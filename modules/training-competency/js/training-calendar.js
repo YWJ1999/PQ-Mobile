@@ -31,7 +31,7 @@
   }
 
   function dashboardUrl(date) {
-    return `../index.html?scope=individual&date=${encodeURIComponent(date)}&theme=${theme()}#trainingCalendarSection`;
+    return `../index.html?scope=individual&date=${encodeURIComponent(date)}&theme=${theme()}`;
   }
 
   function detailsUrl(event) {
@@ -51,6 +51,13 @@
     const classDetailsFields = document.getElementById('trainingClassDetailsFields');
     const classDetailsClose = document.getElementById('trainingClassDetailsClose');
     const main = document.querySelector('main');
+    const calendarFragment = location.hash === '#trainingCalendarSection';
+    if (calendarFragment) {
+      // Older return links must not trigger a browser jump through the phone frame.
+      const url = new URL(location.href);
+      url.hash = '';
+      history.replaceState(null, '', url);
+    }
     const initialParts = (source.initialMonth || '2026-10').split('-').map(Number);
     const requestedDate = parseDateKey(params.get('date'));
     let visibleMonth = requestedDate || new Date(initialParts[0], initialParts[1] - 1, 1);
@@ -58,6 +65,19 @@
     let selectedDate = requestedDate ? params.get('date') : '';
     let lastEventTrigger = null;
     let lastClassDetailsTrigger = null;
+
+    function scrollToCalendar(behavior = 'auto') {
+      const margin = parseFloat(getComputedStyle(section).scrollMarginTop) || 0;
+      main.scrollTo({
+        top: main.scrollTop + section.getBoundingClientRect().top - main.getBoundingClientRect().top - margin,
+        behavior
+      });
+    }
+
+    section.addEventListener('training:showcalendar', () => {
+      scrollToCalendar('smooth');
+      monthTitle.focus({ preventScroll: true });
+    });
 
     function eventsFor(key) {
       return source.events.filter(event => event.date === key);
@@ -277,8 +297,8 @@
       }
     });
     render();
+    if (calendarFragment || selectedDate) scrollToCalendar();
     if (selectedDate && eventsFor(selectedDate).length) {
-      section.scrollIntoView({ block: 'start' });
       const trigger = grid.querySelector(`[data-date="${selectedDate}"]`);
       requestAnimationFrame(() => openEventSheet(selectedDate, trigger));
     }

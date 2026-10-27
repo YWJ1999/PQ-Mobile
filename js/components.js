@@ -298,18 +298,13 @@ class NotificationSheet extends HTMLElement {
             </div>
           </div>
 
-          <!-- 3 Tabs: All, Pending Approval, Pending Resubmit -->
+          <!-- Pending Approval and Pending Resubmit -->
           <div class="sheet-filter-bar notification-status-tabs">
-            <button class="sheet-filter-pill active" onclick="filterForYouTab('all', this)">
-              <span>All (7)</span>
+            <button class="sheet-filter-pill active" data-for-you-tab="pending_approval" onclick="filterForYouTab('pending_approval', this)">
+              <span>Pending Approval (<span id="badgePendingApprovalCount">4</span>)</span>
             </button>
-            <button class="sheet-filter-pill" onclick="filterForYouTab('pending_approval', this)">
-              <span>Pending Approval</span>
-              <span class="sheet-tag-badge red" id="badgePendingApprovalCount">4</span>
-            </button>
-            <button class="sheet-filter-pill" onclick="filterForYouTab('pending_resubmit', this)">
-              <span>Pending Resubmit</span>
-              <span class="sheet-tag-badge amber" id="badgePendingResubmitCount">3</span>
+            <button class="sheet-filter-pill" data-for-you-tab="pending_resubmit" onclick="filterForYouTab('pending_resubmit', this)">
+              <span>Pending Resubmit (<span id="badgePendingResubmitCount">3</span>)</span>
             </button>
           </div>
 

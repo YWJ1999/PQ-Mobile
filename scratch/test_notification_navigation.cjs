@@ -33,9 +33,8 @@ async function openNotifications(page, url) {
       await page.setViewport({ width: 390, height: 844 });
       await openNotifications(page, url);
       for (const [tab, names, counts] of [
-        [1, destinations.map(([name]) => name), [2, 2, 1, 1, 1]],
-        [2, destinations.filter((_, i) => i !== 2).map(([name]) => name), [1, 1, 1, 1]],
-        [3, destinations.slice(0, 3).map(([name]) => name), [1, 1, 1]]
+        [1, destinations.filter((_, i) => i !== 2).map(([name]) => name), [1, 1, 1, 1]],
+        [2, destinations.slice(0, 3).map(([name]) => name), [1, 1, 1]]
       ]) {
         await page.click(`.notification-status-tabs button:nth-child(${tab})`);
         const cards = await page.$$eval('.notif-category-card', els => els.map(el => ({
@@ -54,9 +53,9 @@ async function openNotifications(page, url) {
       assert.equal(await page.$('#docTypeDropdownMenu'), null, 'Old dropdown removed');
       await page.click('#notificationFilterButton');
       await page.click(option('Leave Request'));
-      assert.equal(await groupCount(), 5, 'Draft selection does not change notifications');
+      assert.equal(await groupCount(), 4, 'Draft selection does not change notifications');
       await page.click('.notification-filter-cancel');
-      assert.equal(await groupCount(), 5, 'Cancel keeps previous selection');
+      assert.equal(await groupCount(), 4, 'Cancel keeps previous selection');
       assert.equal(await page.evaluate(() => document.activeElement.id), 'notificationFilterButton', 'Focus returns to Filter');
       await page.click('#notificationFilterButton');
       assert.equal(await page.$eval(option('all'), el => el.checked), true);
@@ -64,7 +63,7 @@ async function openNotifications(page, url) {
       await page.click(option('Medical Claim'));
       await page.click('.notification-filter-apply');
       assert.equal(await page.$eval('#notificationDocumentDialog', el => el.open), false);
-      assert.deepEqual(await page.$$eval('.notif-category-card .group-count-badge', els => els.map(el => el.textContent)), ['2', '1']);
+      assert.deepEqual(await page.$$eval('.notif-category-card .group-count-badge', els => els.map(el => el.textContent)), ['1', '1']);
       assert.equal(await page.$eval('#notificationFilterButton', el => el.getAttribute('aria-label')), 'Filter notifications: 2 document types selected');
       assert.equal(await page.$eval('#notificationFilterButton', el => el.textContent.trim()), '', 'Filter button is icon-only');
       await page.click('#notificationFilterButton');
@@ -86,21 +85,22 @@ async function openNotifications(page, url) {
       await page.click('#notificationFilterButton');
       await page.click('.notification-filter-options-heading button');
       await page.click('.notification-filter-apply');
-      assert.equal(await groupCount(), 5, 'Apply reset restores all categories');
+      assert.equal(await groupCount(), 4, 'Apply reset restores all Pending Approval categories');
       assert.equal(await page.$eval('#notificationFilterButton', el => el.classList.contains('has-filter')), false);
       // Every document type applies independently, and the status tabs still combine with it.
-      for (const [type, name, count] of [
-        ['Leave Request', 'Leave Requests', '2'], ['Medical Claim', 'Medical & Expense Claims', '1'],
-        ['Overtime', 'Overtime & Shift Requests', '1'], ['Change Request', 'Medical & Expense Claims', '1'],
-        ['Tax EA Form', 'Tax & Official Documents', '1'], ['Performance Goal', 'Performance & KPI Goals', '1']
+      for (const [type, name, status] of [
+        ['Leave Request', 'Leave Requests', 'pending_approval'], ['Medical Claim', 'Medical & Expense Claims', 'pending_approval'],
+        ['Overtime', 'Overtime & Shift Requests', 'pending_resubmit'], ['Change Request', 'Medical & Expense Claims', 'pending_resubmit'],
+        ['Tax EA Form', 'Tax & Official Documents', 'pending_approval'], ['Performance Goal', 'Performance & KPI Goals', 'pending_approval']
       ]) {
+        await page.click(`[data-for-you-tab="${status}"]`);
         await page.click('#notificationFilterButton');
         await page.click('.notification-filter-options-heading button');
         await page.click(option(type));
         await page.click('.notification-filter-apply');
-        assert.deepEqual(await page.$$eval('.notif-category-card', els => els.map(el => [el.querySelector('.group-title-text').textContent, el.querySelector('.group-count-badge').textContent])), [[name, count]]);
+        assert.deepEqual(await page.$$eval('.notif-category-card', els => els.map(el => [el.querySelector('.group-title-text').textContent, el.querySelector('.group-count-badge').textContent])), [[name, '1']]);
       }
-      await page.click('.notification-status-tabs button:nth-child(3)');
+      await page.click('[data-for-you-tab="pending_resubmit"]');
       assert.equal(await groupCount(), 0);
       assert.equal(await page.$eval('#forYouEmptyState', el => el.getClientRects().length > 0), true);
       await page.click('.notification-status-tabs button:first-child');
@@ -149,7 +149,8 @@ async function openNotifications(page, url) {
       await page.click('.notification-filter-cancel');
       for (let i = 0; i < destinations.length; i++) {
         if (i) await openNotifications(page, url);
-        const card = `.notif-category-card:nth-child(${i + 1})`;
+        if (i === 2) await page.click('[data-for-you-tab="pending_resubmit"]');
+        const card = `.notif-category-card[aria-label^="${destinations[i][0]},"]`;
         // Verify actual navigation, including native keyboard activation.
         if (i === 0) {
           await page.focus(card);

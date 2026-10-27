@@ -22,8 +22,41 @@ const moduleUrl = (file, query = '') => pathToFileURL(path.join(root, 'modules/t
 
     const open = url => page.goto(url, { waitUntil: 'domcontentloaded' });
     const click = async selector => {
-      await page.$eval(selector, node => node.scrollIntoView({ block: 'center' }));
+      await page.waitForFunction(selector => {
+        for (let node = document.querySelector(selector); node; node = node.parentElement) {
+          if (node.getAnimations().some(animation => animation.playState === 'running')) return false;
+        }
+        return true;
+      }, {}, selector);
+      await page.$eval(selector, node => {
+        // Scroll only the containing content area, not the phone or document.
+        let scroller = node.parentElement;
+        while (scroller && !/(auto|scroll)/.test(getComputedStyle(scroller).overflowY)) scroller = scroller.parentElement;
+        if (scroller) {
+          const target = node.getBoundingClientRect(), bounds = scroller.getBoundingClientRect();
+          scroller.scrollTop += target.top - bounds.top - (scroller.clientHeight - target.height) / 2;
+        }
+      });
       await page.click(selector);
+    };
+    const assertFrame = async label => {
+      const frame = await page.evaluate(() => {
+        const phone = document.querySelector('.phone-container');
+        const header = document.querySelector('.training-competency-header');
+        const nav = document.querySelector('.bottom-nav');
+        return {
+          phoneScroll: phone.scrollTop,
+          bodyScroll: document.body.scrollTop,
+          documentScroll: document.documentElement.scrollTop,
+          headerOffset: Math.abs(header.getBoundingClientRect().top - phone.getBoundingClientRect().top),
+          navOffset: Math.abs(nav.getBoundingClientRect().bottom - phone.getBoundingClientRect().bottom)
+        };
+      });
+      assert.equal(frame.phoneScroll, 0, label);
+      assert.equal(frame.bodyScroll, 0, label);
+      assert.equal(frame.documentScroll, 0, label);
+      assert.ok(frame.headerOffset < 1, label + ': header stays visible');
+      assert.ok(frame.navOffset < 1, label + ': navigation stays at the bottom');
     };
 
     await open(moduleUrl('index.html', '?scope=individual&theme=dark'));
@@ -54,6 +87,7 @@ const moduleUrl = (file, query = '') => pathToFileURL(path.join(root, 'modules/t
     await page.click('[data-option-ref="training-calendar"]');
     await page.waitForFunction(() => document.activeElement?.id === 'trainingCalendarMonth');
     assert.equal(await page.$eval('#trainingCompetencyOptionsOverlay', node => node.hidden), true);
+    await assertFrame('Calendar shortcut');
 
     assert.equal(await page.$eval('#trainingCalendarMonth', node => node.textContent.trim()), 'October 2026');
     assert.deepEqual(await page.$$eval('.training-calendar-weekdays span', nodes => nodes.map(node => node.textContent.trim())), ['M', 'T', 'W', 'T', 'F', 'S', 'S']);
@@ -189,11 +223,12 @@ const moduleUrl = (file, query = '') => pathToFileURL(path.join(root, 'modules/t
       documentStatus: 'Approved',
       attendanceStatus: 'Registered'
     });
-    assert.equal(await page.$eval('#trainingRequestCancel', node => node.getAttribute('href')), '../index.html?scope=individual&date=2026-10-20&theme=dark#trainingCalendarSection');
+    assert.equal(await page.$eval('#trainingRequestCancel', node => node.getAttribute('href')), '../index.html?scope=individual&date=2026-10-20&theme=dark');
     await Promise.all([page.waitForNavigation({ waitUntil: 'domcontentloaded' }), click('#trainingRequestCancel')]);
     await page.waitForSelector('#trainingCalendarSheet.is-open');
     assert.equal(await page.$eval('#trainingCalendarGrid .cal-day-cell.selected', node => node.dataset.date), '2026-10-20');
     await click('#trainingCalendarSheetCancel');
+    await assertFrame('Return from request details and close date');
     await click('#trainingCalendarGrid .cal-day-cell[data-date="2026-10-27"]');
     await page.waitForSelector('#trainingCalendarSheet.is-open');
     assert.deepEqual(await page.$eval('.training-calendar-event-card', card => ({
@@ -215,6 +250,13 @@ const moduleUrl = (file, query = '') => pathToFileURL(path.join(root, 'modules/t
         await click('.training-calendar-event-card');
         await page.waitForSelector('#trainingClassDetailsModal.is-open');
         assert.ok(await page.$eval('#trainingClassDetailsModal [role="dialog"]', node => node.scrollWidth - node.clientWidth <= 1), `${theme} class details fit at ${width}px`);
+        await click('#trainingClassDetailsCancel');
+        await click('#trainingCalendarSheetCancel');
+        await assertFrame(`${theme} ${width}px after closing date details`);
+        await open(moduleUrl('index.html', `?scope=individual&theme=${theme}&date=2026-10-20#trainingCalendarSection`));
+        await page.waitForSelector('#trainingCalendarSheet.is-open');
+        await click('#trainingCalendarSheetCancel');
+        await assertFrame(`${theme} ${width}px legacy return link`);
       }
     }
 

@@ -726,6 +726,63 @@ html.is-mouse-swiping * {
   margin-bottom: 22px;
 }
 
+.shortcut-edit-button {
+  border: 0;
+  background: transparent;
+  padding: 4px 0;
+  font-family: inherit;
+}
+
+.shortcut-edit-button:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 4px;
+  border-radius: 4px;
+}
+
+.shortcut-options fieldset {
+  border: 0;
+  padding: 0;
+  margin: 0 0 14px;
+  min-width: 0;
+}
+
+.shortcut-options legend {
+  padding: 8px 0;
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--text-muted);
+}
+
+.shortcut-option {
+  margin-bottom: 4px;
+  border: 1px solid transparent;
+}
+
+.shortcut-option:has(input:checked) {
+  background: var(--tag-violet-bg);
+  border-color: var(--border-subtle);
+}
+
+.shortcut-option:has(input:disabled) {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.shortcut-selection-hint,
+.shortcut-save-error {
+  margin: 0;
+  padding: 0 20px 10px;
+  font-size: 11px;
+  line-height: 1.4;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.shortcut-editor button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
 .shortcut-card {
   background: var(--bg-card);
   border: 1px solid var(--border-card);
@@ -1205,6 +1262,41 @@ html.is-mouse-swiping * {
 /* ========================================================
    LEFT PROFILE MENU DRAWER CARD
    ======================================================== */
+/* Keep artwork clear of the clipped corner once the drawer covers it. */
+.phone-container:has(> left-profile-drawer .profile-drawer-overlay) .hero-bg {
+  transition: border-radius 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.phone-container:has(> left-profile-drawer .profile-drawer-overlay.active) {
+  background: var(--bg-drawer);
+}
+
+.phone-container:has(> left-profile-drawer .profile-drawer-overlay.active) .hero-bg {
+  border-top-left-radius: 56px;
+  border-bottom-left-radius: 56px;
+}
+
+/* Back the clipped drawer edge so the header cannot bleed through its curve. */
+.phone-container:has(> left-profile-drawer .profile-drawer-overlay)::before {
+  content: '';
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 292px;
+  max-width: 82%;
+  border-radius: 0 26px 26px 0;
+  background: var(--bg-drawer);
+  pointer-events: none;
+  opacity: 0;
+  transform: translateX(-100%);
+  transition: opacity 0.25s ease, transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 99;
+}
+
+.phone-container:has(> left-profile-drawer .profile-drawer-overlay.active)::before {
+  opacity: 1;
+  transform: translateX(0);
+}
+
 .profile-drawer-overlay,
 .drawer-overlay {
   position: absolute;
@@ -1980,6 +2072,20 @@ html.is-mouse-swiping * {
 .notification-filter-dialog::backdrop {
   background: rgba(24, 15, 45, 0.4);
   backdrop-filter: blur(4px);
+}
+
+.notification-filter-dialog.shortcut-editor {
+  inset: auto;
+  left: var(--shortcut-center-x);
+  top: var(--shortcut-center-y);
+  width: var(--shortcut-width);
+  max-height: min(640px, var(--shortcut-height));
+  margin: 0;
+  transform: translate(-50%, -50%);
+}
+
+.shortcut-editor::backdrop {
+  clip-path: inset(var(--shortcut-clip-top) var(--shortcut-clip-right) var(--shortcut-clip-bottom) var(--shortcut-clip-left) round var(--shortcut-radius));
 }
 
 .notification-filter-heading {
@@ -3752,6 +3858,21 @@ select option {
   box-shadow: var(--shadow-card-hover);
 }
 
+[data-home-notifications] .for-you-card {
+  width: 100%;
+  gap: 12px;
+  font: inherit;
+  text-align: left;
+}
+
+[data-home-notifications] .for-you-card:focus-visible {
+  outline: 2px solid var(--purple-primary);
+  outline-offset: 3px;
+}
+
+[data-home-notifications] .fy-left { min-width: 0; }
+[data-home-notifications] .fy-avatar { font-size: 16px; }
+
 .fy-left {
   display: flex;
   align-items: center;
@@ -3768,18 +3889,24 @@ select option {
   flex-shrink: 0;
 }
 
-.fy-text h4 {
+.fy-text h4,
+.fy-text .fy-title {
+  display: block;
   font-size: 13px;
   font-weight: 700;
   color: var(--text-primary);
   line-height: 1.2;
 }
 
-.fy-text p {
+.fy-text p,
+.fy-text .fy-description {
+  display: block;
   font-size: 11px;
   color: var(--text-muted);
   margin-top: 2px;
 }
+
+[data-home-notifications] .fy-description { line-height: 1.4; }
 
 .fy-right {
   display: flex;

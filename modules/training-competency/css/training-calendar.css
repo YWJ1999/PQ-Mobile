@@ -1,5 +1,8 @@
 .training-request-page [hidden] { display: none !important; }
 
+/* Calendar jumps must scroll the content, never the header or bottom navigation. */
+[data-training-calendar-page="dashboard"] > .phone-container { overflow: clip; }
+
 .training-dashboard-calendar { scroll-margin-top: 14px; }
 .training-dashboard-calendar .training-competency-section-title { display: flex; align-items: center; gap: 6px; }
 .training-dashboard-calendar .training-competency-section-title i { font-size: 11px; }
