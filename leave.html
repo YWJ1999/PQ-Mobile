@@ -8162,7 +8162,7 @@
 
         <div id="staffOnLeaveList" style="display: flex; flex-direction: column; gap: 12px; max-height: 520px; overflow-y: auto; overflow-x: hidden; padding-right: 4px;">
           <article class="history-item-card staff-on-leave-card" data-status="approved">
-            <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;">
+            <div class="record-card-header" style="display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;">
               <div style="min-width: 0;">
                 <h3 class="staff-on-leave-name" style="margin: 0; color: var(--text-primary); font-size: 14.5px; font-weight: 800;">Afifah Nasir</h3>
                 <div class="employee-id-standard">#004177</div>
@@ -8178,7 +8178,7 @@
           </article>
 
           <article class="history-item-card staff-on-leave-card" data-status="approved">
-            <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;">
+            <div class="record-card-header" style="display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;">
               <div style="min-width: 0;">
                 <h3 class="staff-on-leave-name" style="margin: 0; color: var(--text-primary); font-size: 14.5px; font-weight: 800;">Siti Nurhaliza</h3>
                 <div class="employee-id-standard">#006734</div>
@@ -8194,7 +8194,7 @@
           </article>
 
           <article class="history-item-card staff-on-leave-card" data-status="approved">
-            <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;">
+            <div class="record-card-header" style="display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;">
               <div style="min-width: 0;">
                 <h3 class="staff-on-leave-name" style="margin: 0; color: var(--text-primary); font-size: 14.5px; font-weight: 800;">Marcus Tan</h3>
                 <div class="employee-id-standard">#008129</div>
@@ -8210,7 +8210,7 @@
           </article>
 
           <article class="history-item-card staff-on-leave-card" data-status="approved">
-            <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;">
+            <div class="record-card-header" style="display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;">
               <div style="min-width: 0;">
                 <h3 class="staff-on-leave-name" style="margin: 0; color: var(--text-primary); font-size: 14.5px; font-weight: 800;">Kavitha Murugan</h3>
                 <div class="employee-id-standard">#007452</div>
@@ -9675,15 +9675,15 @@
     function buildHistoryActionsHTML(item, context = 'card') {
       if (!['submitted', 'approved', 'draft'].includes(item.status)) return '';
       const isDetail = context === 'detail';
-      const cardStyle = 'padding: 8px 16px; border-radius: 20px; background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%); border: none; color: white; font-size: 12px; font-weight: 700; cursor: pointer; box-shadow: 0 4px 10px rgba(124, 58, 237, 0.2);';
-      const buttonAttributes = isDetail ? 'class="history-detail-action"' : `style="${cardStyle}"`;
+      const buttonAttributes = isDetail ? 'class="history-detail-action"' : 'class="record-card-cancel"';
+      const applyAttributes = isDetail ? buttonAttributes : 'class="record-card-apply"';
       const buttons = [];
       if (item.status === 'draft') {
-        buttons.push(`<button type="button" ${buttonAttributes} onclick="event.stopPropagation(); cancelHistoryItem('${item.ref}', 'submitted')">Apply</button>`);
+        buttons.push(`<button type="button" ${applyAttributes} onclick="event.stopPropagation(); cancelHistoryItem('${item.ref}', 'submitted')">Apply</button>`);
       }
       buttons.push(`<button type="button" ${buttonAttributes} onclick="event.stopPropagation(); cancelHistoryItem('${item.ref}', 'cancelled')">Cancel</button>`);
       if (isDetail) return buttons.join('');
-      return `<div style="margin-top: 12px; display: flex; justify-content: flex-end; gap: 8px;">${buttons.join('')}</div>`;
+      return `<div class="record-card-actions" style="margin-top: 16px; display: flex; justify-content: flex-end; gap: 8px;">${buttons.join('')}</div>`;
     }
 
     function buildLeaveCardHTML(item) {
@@ -9697,7 +9697,7 @@
       const actionHTML = buildHistoryActionsHTML(item);
       return `
         <div class="history-item-card" onclick="openHistoryDetailsModal('${item.ref}')" data-status="${item.status}" data-ref="${item.ref}" data-type="${item.type}">
-          <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px;">
+          <div class="record-card-header" style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px;">
             <div style="flex: 1; min-width: 0; padding-right: 8px;">
               <h3 style="font-size: 14.5px; font-weight: 800; color: var(--text-primary); margin: 0;">${getLeaveTypeLabel(item.type)}</h3>
               <div style="font-size: 11px; font-weight: 700; color: var(--purple-text); margin-top: 3px;">Ref: ${item.ref}</div>
@@ -9717,7 +9717,7 @@
       const actionHTML = buildHistoryActionsHTML(item);
       return `
         <div class="history-item-card" onclick="openHistoryDetailsModal('${item.ref}')" data-status="${item.status}" data-ref="${item.ref}" data-type="${item.type || 'replacement'}">
-          <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px;">
+          <div class="record-card-header" style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px;">
             <div style="flex: 1; min-width: 0; padding-right: 8px;">
               <h3 style="font-size: 14.5px; font-weight: 800; color: var(--text-primary); margin: 0;">${item.title}</h3>
               <div style="font-size: 11px; font-weight: 700; color: var(--purple-text); margin-top: 3px;">Ref: ${item.ref}</div>
@@ -9736,7 +9736,7 @@
     function buildOffTimeCardHTML(item) {
       return `
         <div class="history-item-card" onclick="openHistoryDetailsModal('${item.ref}')" data-status="${item.status}" data-ref="${item.ref}">
-          <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px;">
+          <div class="record-card-header" style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px;">
             <div style="flex: 1; min-width: 0; padding-right: 8px;">
               <h3 style="font-size: 14.5px; font-weight: 800; color: var(--text-primary); margin: 0;">Time Off</h3>
               <div style="font-size: 11px; font-weight: 700; color: var(--purple-text); margin-top: 3px;">Ref: ${item.ref}</div>

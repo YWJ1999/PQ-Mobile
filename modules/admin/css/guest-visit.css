@@ -87,7 +87,7 @@
 .visit-category-actions .claim-button-secondary { min-height: 0; padding: 11px 22px; border-width: 1.5px; font-size: 13.5px; font-weight: 700; box-shadow: var(--shadow-sm); }
 .guest-visit-page .visit-list-card { padding: 0; overflow: hidden; }
 .visit-list-heading { display: flex; align-items: center; gap: 12px; padding: 14px 16px; border-bottom: 1px solid var(--border-subtle); }
-.visit-list-heading-copy { flex: 1; min-width: 0; }
+.visit-list-heading-copy { display: flex; flex-direction: column; gap: 12px; flex: 1; min-width: 0; }
 .visit-list-heading .form-section-heading { font-size: 15px; margin: 0; line-height: normal; letter-spacing: normal; }
 .visit-list-count { color: var(--text-muted); font-size: 11.5px; font-weight: 600; }
 .visit-add-record { flex: 0 0 40px; width: 40px; min-height: 40px; padding: 0; border-radius: 12px; }
