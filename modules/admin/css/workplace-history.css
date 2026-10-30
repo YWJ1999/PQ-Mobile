@@ -8,7 +8,8 @@
 .workplace-history-page .admin-content { margin-bottom: 88px; padding-bottom: 24px; }
 .workplace-history-page .history-sr-only { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 .workplace-history-page .history-card-ref { display: block; }
-.workplace-history-page .history-card-header { align-items: flex-start; }
+/* Keep headers equally tall whether or not they include a reference number. */
+.workplace-history-page .history-card-header { align-items: flex-start; min-height: 75px; }
 .workplace-history-page .history-card-details { display: flex; flex-direction: column; gap: 7px; }
 .workplace-history-page .history-card-row { align-items: flex-start; line-height: 1.55; }
 .workplace-history-page .history-card-row > span { font-weight: 600; }

@@ -1,6 +1,23 @@
-/* Record cards use the saturated 105deg gradient style of insight metric headers.
+/* Record cards use 105deg gradients; purple matches the Attendance rate metric.
    Only records with a heading are included; form and chart containers keep
    their own layouts. Overrides also cover legacy inline presentation. */
+:root {
+  --record-draft-surface: var(--card-header-purple-background);
+  --record-draft-accent: #7e2be5;
+  --record-submitted-surface: linear-gradient(105deg, #e7b032, #f8cd40);
+  --record-submitted-accent: #e7b032;
+  --record-approved-surface: linear-gradient(105deg, #009c17 0%, #0caa23 50%, #1cba32 100%);
+  --record-approved-accent: #009c17;
+  --record-rejected-surface: linear-gradient(105deg, #8e2d42, #bd3b54);
+  --record-rejected-accent: #bd3b54;
+  --record-cancelled-surface: linear-gradient(105deg, #394b66, #596c87);
+  --record-cancelled-accent: #596c87;
+  --record-resubmit-surface: var(--card-header-blue-background);
+  --record-resubmit-accent: #2e6dca;
+  --record-action-fill: var(--record-draft-surface);
+  --record-action-ink: #fff;
+}
+
 html body :is(
   .history-card-item:has(.history-card-header, .summary-history-card-header),
   .history-item-card:has(.record-card-header),
@@ -8,14 +25,11 @@ html body :is(
   .incident-history-card,
   .active-headcount-employee-card
 ) {
-  --record-accent: #8d3be3;
-  --record-status-ink: #fff;
-  --record-header-start: #7130c8;
-  --record-header-end: #8d3be3;
-  --record-header-fill: linear-gradient(105deg, var(--record-header-start), var(--record-header-end));
+  --record-accent: var(--record-draft-accent);
+  --record-header-fill: var(--record-draft-surface);
   --record-header-ink: #fff;
-  --record-header-muted: rgba(255, 255, 255, .92);
-  --record-badge-ink: var(--record-status-ink);
+  --record-header-muted: rgba(255, 255, 255, .97);
+  --record-badge-ink: var(--record-header-ink);
   display: block !important;
   padding: 18px !important;
   border: 1px solid var(--border-subtle) !important;
@@ -26,39 +40,36 @@ html body :is(
   min-width: 0;
 }
 
-/* Keep status hues while matching the reference header's direction and saturation. */
+/* Status colours share the gradient direction; green and yellow use dark text for contrast. */
 html body :is(.history-card-item, .history-item-card, .project-history-card):is([data-status="approved"], [data-status="normal"]),
 html body .incident-history-card:has(.incident-history-card-header) {
-  --record-accent: #27825c;
-  --record-header-start: #1f664c;
-  --record-header-end: #27825c;
+  --record-accent: var(--record-approved-accent);
+  --record-header-fill: var(--record-approved-surface);
+  --record-header-ink: #1c1c1c;
+  --record-header-muted: #1c1c1c;
 }
 html body :is(.history-card-item, .history-item-card, .project-history-card):is(
   [data-status="submitted"], [data-status="overtime"], [data-status="late-in"], [data-status="pending-review"]
 ),
 html body .attendance-history-page .history-card-item[data-status="resubmit"] {
-  --record-accent: #efb333;
-  --record-status-ink: #302107;
-  --record-header-start: #f4b632;
-  --record-header-end: #ffda70;
+  --record-accent: var(--record-submitted-accent);
+  --record-header-fill: var(--record-submitted-surface);
   --record-header-ink: #302107;
-  --record-header-muted: #48340e;
+  --record-header-muted: #47340f;
 }
 html body :is(.history-card-item, .history-item-card):is([data-status="rejected"], [data-status="early-out"]),
 html body .career-history-phone .history-card-item[data-status="cancelled"] {
-  --record-accent: #bd3b54;
-  --record-header-start: #8e2d42;
-  --record-header-end: #bd3b54;
+  --record-accent: var(--record-rejected-accent);
+  --record-header-fill: var(--record-rejected-surface);
 }
 html body :is(.history-card-item, .history-item-card)[data-status="cancelled"] {
-  --record-accent: #596c87;
-  --record-header-start: #394b66;
-  --record-header-end: #596c87;
+  --record-accent: var(--record-cancelled-accent);
+  --record-header-fill: var(--record-cancelled-surface);
 }
-html body :is(.workplace-history-page, .team-history-phone) .history-card-item[data-status="resubmit"] {
-  --record-accent: #2e6dca;
-  --record-header-start: #254f88;
-  --record-header-end: #2e6dca;
+html body.workplace-history-page .history-card-item[data-status="resubmit"],
+html body .team-history-phone .history-card-item[data-status="resubmit"] {
+  --record-accent: var(--record-resubmit-accent);
+  --record-header-fill: var(--record-resubmit-surface);
 }
 
 html body :is(.history-card-item, .history-item-card, .project-history-card, .incident-history-card, .active-headcount-employee-card)
@@ -98,9 +109,9 @@ html body :is(.history-card-item, .history-item-card, .project-history-card)
 }
 html body :is(.history-card-header, .record-card-header, .incident-history-card-header, .active-headcount-employee-card .manpower-employee-identity)
 :is(.employee-id, .employee-id-standard, .history-employee-id, .team-history-employee-id, .staff-feedback-emp-no, .goal-summary-employee-id, .incident-history-id, .booking-employee-id, .daily-ot-card-id, .staff-emp-badge) {
-  color: var(--record-header-ink) !important;
+  color: var(--record-header-muted) !important;
   font: 700 11.5px monospace, sans-serif !important;
-  opacity: .9;
+  opacity: 1;
   margin-bottom: 4px;
 }
 
@@ -164,9 +175,9 @@ html body :is(.history-card-item:has(.history-card-header, .summary-history-card
 html body :is(.history-card-item:has(.history-card-header, .summary-history-card-header), .history-item-card:has(.record-card-header), .project-history-card)
 :is(.history-card-actions, .record-card-actions, .project-history-card-actions)
 :is(.history-submit-btn, .history-card-action-primary, .project-history-card-action-primary, .record-card-apply) {
-  background: var(--purple-primary) !important;
+  background: var(--record-action-fill) !important;
   border-color: transparent !important;
-  color: #fff !important;
+  color: var(--record-action-ink) !important;
 }
 html body :is(.history-card-actions, .record-card-actions, .project-history-card-actions, .incident-history-actions, .career-history-card-actions, .staff-feedback-card-actions, .summary-history-actions, .clocking-card-actions)
 :is(button, a):hover {

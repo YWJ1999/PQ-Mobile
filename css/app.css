@@ -3440,11 +3440,11 @@ select option {
   min-height: 52px;
   padding: 10px 12px;
   color: #fff;
-  background: linear-gradient(105deg, #592398, #7e2be5);
+  background: var(--card-header-purple-background);
 }
 
 .insight-detail-metric[data-group="negative"] .insight-detail-metric-header {
-  background: linear-gradient(105deg, #254f88, #2e6dca);
+  background: var(--card-header-blue-background);
 }
 
 .insight-detail-metric-icon {

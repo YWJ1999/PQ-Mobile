@@ -5,6 +5,9 @@
 :root {
   /* One title-bar gradient for every module, in both themes. */
   --module-header-background: linear-gradient(135deg, #4c1d95 0%, #6d28d9 50%, #7c3aed 100%);
+  /* Shared by insight metrics and record cards in both themes. */
+  --card-header-purple-background: linear-gradient(105deg, #592398, #7e2be5);
+  --card-header-blue-background: linear-gradient(105deg, #254f88, #2e6dca);
   /* Column headers use the same solid brand purple in both themes. */
   --table-header-background: #7c3aed;
   --table-header-text: #ffffff;
