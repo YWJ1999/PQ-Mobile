@@ -115,6 +115,7 @@ const moduleUrl = (file, query = '') => pathToFileURL(path.join(root, 'modules/t
       modal: node.querySelector('[role="dialog"]').getAttribute('aria-modal'),
       title: node.querySelector('#trainingCalendarSheetDate').textContent.trim()
     })), { hidden: 'false', modal: 'true', title: '20 Oct 2026' });
+    assert.equal(await page.$('#trainingCalendarSheetCancel'), null, 'Training Schedule only needs its close icon');
     assert.equal(await page.$eval('main', node => node.inert), true);
     assert.deepEqual(await page.$$eval('.training-calendar-event-card', cards => cards.map(card => ({
       classCode: card.querySelector('.history-card-title')?.textContent.trim() || null,
@@ -227,7 +228,7 @@ const moduleUrl = (file, query = '') => pathToFileURL(path.join(root, 'modules/t
     await Promise.all([page.waitForNavigation({ waitUntil: 'domcontentloaded' }), click('#trainingRequestCancel')]);
     await page.waitForSelector('#trainingCalendarSheet.is-open');
     assert.equal(await page.$eval('#trainingCalendarGrid .cal-day-cell.selected', node => node.dataset.date), '2026-10-20');
-    await click('#trainingCalendarSheetCancel');
+    await click('#trainingCalendarSheetClose');
     await assertFrame('Return from request details and close date');
     await click('#trainingCalendarGrid .cal-day-cell[data-date="2026-10-27"]');
     await page.waitForSelector('#trainingCalendarSheet.is-open');
@@ -251,11 +252,11 @@ const moduleUrl = (file, query = '') => pathToFileURL(path.join(root, 'modules/t
         await page.waitForSelector('#trainingClassDetailsModal.is-open');
         assert.ok(await page.$eval('#trainingClassDetailsModal [role="dialog"]', node => node.scrollWidth - node.clientWidth <= 1), `${theme} class details fit at ${width}px`);
         await click('#trainingClassDetailsCancel');
-        await click('#trainingCalendarSheetCancel');
+        await click('#trainingCalendarSheetClose');
         await assertFrame(`${theme} ${width}px after closing date details`);
         await open(moduleUrl('index.html', `?scope=individual&theme=${theme}&date=2026-10-20#trainingCalendarSection`));
         await page.waitForSelector('#trainingCalendarSheet.is-open');
-        await click('#trainingCalendarSheetCancel');
+        await click('#trainingCalendarSheetClose');
         await assertFrame(`${theme} ${width}px legacy return link`);
       }
     }

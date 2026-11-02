@@ -1376,9 +1376,7 @@ class PendingApprovalCard extends HTMLElement {
     const purpose = this.getAttribute('purpose') || this.getAttribute('title') || this.getAttribute('description') || 'General claim reimbursement request';
     const itemId = this.getAttribute('item-id') || '';
 
-    const badgeBg = 'rgba(59, 130, 246, 0.12)';
-    const badgeBorder = '1px solid rgba(59, 130, 246, 0.3)';
-    const badgeColor = '#3b82f6';
+    const recordStatus = docStatus.toLowerCase().includes('draft') ? 'draft' : 'submitted';
     const icon = '<i class="fa-solid fa-paper-plane"></i>';
 
     // 2-Column Grid: Benefit Type & Claim Date, followed by Period (non-benefit/medical) & Amount / Hour for cards
@@ -1413,8 +1411,8 @@ class PendingApprovalCard extends HTMLElement {
 
     this.innerHTML = `
       <div class="approval-request-card" data-item-id="${itemId}" style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 20px; overflow: hidden; box-shadow: var(--shadow-card); transition: all 0.2s ease; text-align: left; margin-bottom: 14px;">
-        <!-- 1. Executive Purple Header Banner (Identical to Attendance) -->
-        <div style="background: linear-gradient(135deg, #7c3aed 0%, #4c1d95 100%); padding: 12px 14px; display: flex; align-items: center; justify-content: space-between; color: #ffffff;">
+        <!-- Record header -->
+        <div class="approval-record-header" style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
           <div style="display: flex; align-items: center; gap: 12px; flex: 1; cursor: pointer;" onclick="if (!event.target.closest('.approval-card-checkbox')) { window.ClaimsEngine && window.ClaimsEngine.triggerClaimViewDetails ? window.ClaimsEngine.triggerClaimViewDetails('${itemId}') : null; }">
             <div style="display: flex; align-items: center;">
               <input type="checkbox" class="approval-card-checkbox" style="width: 20px; height: 20px; accent-color: #ffffff; cursor: pointer; border-radius: 6px;">
@@ -1427,6 +1425,7 @@ class PendingApprovalCard extends HTMLElement {
             </div>
           </div>
           <div style="display: flex; align-items: center; gap: 8px;">
+            <span class="approval-header-status" data-approval-status="${recordStatus}">${icon} ${docStatus}</span>
             <button type="button" class="three-dots-btn" onclick="window.ClaimsEngine && window.ClaimsEngine.openClaimThreeDotsMenu ? window.ClaimsEngine.openClaimThreeDotsMenu(this, '${itemId}') : null" title="Options" style="width: 28px; height: 28px; border-radius: 50%; background: rgba(255, 255, 255, 0.2); border: 1px solid rgba(255, 255, 255, 0.35); color: #ffffff; display: flex; align-items: center; justify-content: center; cursor: pointer; backdrop-filter: blur(4px);">
               <i class="fa-solid fa-ellipsis-vertical" style="font-size: 13px;"></i>
             </button>
@@ -1437,10 +1436,6 @@ class PendingApprovalCard extends HTMLElement {
         <div style="padding: 14px; cursor: pointer;" onclick="if (!event.target.closest('.action-btn-approve, .action-btn-reject, .action-btn-resubmit, .approval-card-checkbox, .three-dots-btn')) { window.ClaimsEngine && window.ClaimsEngine.triggerClaimViewDetails ? window.ClaimsEngine.triggerClaimViewDetails('${itemId}') : null; }">
           <!-- Status Badge & Submit Date Row -->
           <div style="margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between;">
-            <div style="display: inline-flex; align-items: center; gap: 6px; background: ${badgeBg}; border: ${badgeBorder}; color: ${badgeColor}; font-weight: 800; font-size: 11.5px; padding: 4.5px 11px; border-radius: 12px;">
-              <span>${icon}</span>
-              <span>${docStatus}</span>
-            </div>
             <div style="font-size: 11.5px; font-weight: 700; color: var(--text-muted); display: flex; align-items: center; gap: 4px;">
               <i class="fa-regular fa-calendar-check" style="color: var(--purple-primary);"></i>
               <span>Submit Date: <strong style="color: var(--text-primary); font-family: monospace, sans-serif;">${submitDate}</strong></span>
@@ -1468,3 +1463,29 @@ class PendingApprovalCard extends HTMLElement {
   }
 }
 customElements.define('pending-approval-card', PendingApprovalCard);
+
+// Shared by the Home reminder and the Training Calendar.
+class TrainingScheduleSheet extends HTMLElement {
+  connectedCallback() {
+    if (this.childElementCount) return;
+    this.innerHTML = `
+      <div id="trainingCalendarSheet" class="training-calendar-sheet-overlay" aria-hidden="true">
+        <section class="training-calendar-sheet" role="dialog" aria-modal="true" aria-labelledby="trainingCalendarSheetDate">
+          <div class="training-calendar-sheet-handle" aria-hidden="true"></div>
+          <header class="training-calendar-sheet-heading"><div><p>Training Schedule</p><h2 id="trainingCalendarSheetDate">Selected Date</h2></div><button id="trainingCalendarSheetClose" type="button" aria-label="Close training schedule"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button></header>
+          <div id="trainingCalendarEvents" class="training-calendar-events"></div>
+        </section>
+      </div>
+      <div id="trainingClassDetailsModal" class="training-calendar-detail-overlay" aria-hidden="true">
+        <section class="training-calendar-detail-modal" role="dialog" aria-modal="true" aria-labelledby="trainingClassDetailsTitle">
+          <header class="training-calendar-detail-heading">
+            <h2 id="trainingClassDetailsTitle">Training Class Details</h2>
+            <button id="trainingClassDetailsClose" type="button" aria-label="Close training class details"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
+          </header>
+          <div class="training-calendar-detail-scroll"><dl id="trainingClassDetailsFields" class="training-calendar-class-details"></dl></div>
+          <footer class="training-calendar-detail-footer"><button id="trainingClassDetailsCancel" type="button">Cancel</button></footer>
+        </section>
+      </div>`;
+  }
+}
+customElements.define('training-schedule-sheet', TrainingScheduleSheet);

@@ -36,10 +36,11 @@
 
   function detailsUrl(event) {
     const query = new URLSearchParams({ request: event.id, date: event.date, theme: theme() });
-    return `options/training-request-details.html?${query}`;
+    const base = pageType === 'home' ? 'modules/training-competency/' : '';
+    return `${base}options/training-request-details.html?${query}`;
   }
 
-  function initDashboardCalendar() {
+  function initCalendarAndSchedule() {
     const section = document.getElementById('trainingCalendarSection');
     const grid = document.getElementById('trainingCalendarGrid');
     const monthTitle = document.getElementById('trainingCalendarMonth');
@@ -50,8 +51,8 @@
     const classDetailsOverlay = document.getElementById('trainingClassDetailsModal');
     const classDetailsFields = document.getElementById('trainingClassDetailsFields');
     const classDetailsClose = document.getElementById('trainingClassDetailsClose');
-    const main = document.querySelector('main');
-    const calendarFragment = location.hash === '#trainingCalendarSection';
+    const main = document.querySelector('main, .dashboard-home > .main-content');
+    const calendarFragment = !!section && location.hash === '#trainingCalendarSection';
     if (calendarFragment) {
       // Older return links must not trigger a browser jump through the phone frame.
       const url = new URL(location.href);
@@ -65,6 +66,7 @@
     let selectedDate = requestedDate ? params.get('date') : '';
     let lastEventTrigger = null;
     let lastClassDetailsTrigger = null;
+    let backgroundState = [];
 
     function scrollToCalendar(behavior = 'auto') {
       const margin = parseFloat(getComputedStyle(section).scrollMarginTop) || 0;
@@ -74,7 +76,7 @@
       });
     }
 
-    section.addEventListener('training:showcalendar', () => {
+    section?.addEventListener('training:showcalendar', () => {
       scrollToCalendar('smooth');
       monthTitle.focus({ preventScroll: true });
     });
@@ -109,6 +111,7 @@
     }
 
     function render() {
+      if (!grid) return;
       const year = visibleMonth.getFullYear();
       const month = visibleMonth.getMonth();
       monthTitle.textContent = new Intl.DateTimeFormat('en-GB', { month: 'long', year: 'numeric' }).format(visibleMonth);
@@ -166,8 +169,11 @@
       eventOverlay.inert = true;
       classDetailsOverlay.setAttribute('aria-hidden', 'false');
       requestAnimationFrame(() => {
+        if (classDetailsOverlay.getAttribute('aria-hidden') === 'true') return;
         classDetailsOverlay.classList.add('is-open');
-        classDetailsClose.focus({ preventScroll: true });
+        requestAnimationFrame(() => {
+          if (classDetailsOverlay.getAttribute('aria-hidden') === 'false') classDetailsClose.focus({ preventScroll: true });
+        });
       });
     }
 
@@ -176,16 +182,18 @@
       closeClassDetails(false);
       eventOverlay.classList.remove('is-open');
       eventOverlay.setAttribute('aria-hidden', 'true');
-      main.inert = false;
+      backgroundState.forEach(({ element, inert }) => { element.inert = inert; });
+      backgroundState = [];
       if (restoreFocus && lastEventTrigger?.isConnected) lastEventTrigger.focus({ preventScroll: true });
     }
 
     function openEventSheet(key, trigger) {
+      if (eventOverlay.getAttribute('aria-hidden') === 'false') return;
       const events = eventsFor(key);
       if (!events.length) return;
       selectedDate = key;
       render();
-      lastEventTrigger = grid.querySelector(`[data-date="${key}"]`) || trigger;
+      lastEventTrigger = grid?.querySelector(`[data-date="${key}"]`) || trigger;
       eventDate.textContent = formatDate(key);
       eventList.replaceChildren(...events.map(event => {
         const details = event.classDetails;
@@ -245,6 +253,7 @@
         });
         card.addEventListener('click', () => openClassDetails(event, card));
         card.addEventListener('keydown', keyEvent => {
+          if (keyEvent.target !== card) return;
           if (keyEvent.key === 'Enter' || keyEvent.key === ' ') {
             keyEvent.preventDefault();
             openClassDetails(event, card);
@@ -255,29 +264,34 @@
         card.append(header, body, actions);
         return card;
       }));
-      main.inert = true;
+      backgroundState = [...eventOverlay.closest('.phone-container').children]
+        .filter(element => !element.contains(eventOverlay) && !element.contains(classDetailsOverlay))
+        .map(element => ({ element, inert: element.inert }));
+      backgroundState.forEach(({ element }) => { element.inert = true; });
       eventOverlay.setAttribute('aria-hidden', 'false');
       requestAnimationFrame(() => {
+        if (eventOverlay.getAttribute('aria-hidden') === 'true') return;
         eventOverlay.classList.add('is-open');
-        eventClose.focus({ preventScroll: true });
+        requestAnimationFrame(() => {
+          if (eventOverlay.getAttribute('aria-hidden') === 'false') eventClose.focus({ preventScroll: true });
+        });
       });
     }
 
-    document.getElementById('trainingCalendarPrevious').addEventListener('click', () => {
+    document.getElementById('trainingCalendarPrevious')?.addEventListener('click', () => {
       visibleMonth = new Date(visibleMonth.getFullYear(), visibleMonth.getMonth() - 1, 1);
       selectedDate = '';
       render();
     });
-    document.getElementById('trainingCalendarNext').addEventListener('click', () => {
+    document.getElementById('trainingCalendarNext')?.addEventListener('click', () => {
       visibleMonth = new Date(visibleMonth.getFullYear(), visibleMonth.getMonth() + 1, 1);
       selectedDate = '';
       render();
     });
-    document.getElementById('trainingCalendarInfo').addEventListener('click', () => {
+    document.getElementById('trainingCalendarInfo')?.addEventListener('click', () => {
       if (typeof window.showToast === 'function') window.showToast('Purple dates indicate scheduled training activities.');
     });
     eventClose.addEventListener('click', () => closeEventSheet());
-    document.getElementById('trainingCalendarSheetCancel').addEventListener('click', () => closeEventSheet());
     eventOverlay.addEventListener('click', event => {
       if (event.target === eventOverlay) closeEventSheet();
     });
@@ -287,18 +301,34 @@
       if (event.target === classDetailsOverlay) closeClassDetails();
     });
     document.addEventListener('keydown', event => {
-      if (event.key !== 'Escape') return;
-      if (classDetailsOverlay.getAttribute('aria-hidden') === 'false') {
+      const classDetailsOpen = classDetailsOverlay.getAttribute('aria-hidden') === 'false';
+      const activeOverlay = classDetailsOpen ? classDetailsOverlay
+        : eventOverlay.getAttribute('aria-hidden') === 'false' ? eventOverlay : null;
+      if (!activeOverlay) return;
+      if (event.key === 'Escape') {
         event.preventDefault();
-        closeClassDetails();
-      } else if (eventOverlay.getAttribute('aria-hidden') === 'false') {
-        event.preventDefault();
-        closeEventSheet();
+        if (classDetailsOpen) closeClassDetails();
+        else closeEventSheet();
+      } else if (event.key === 'Tab') {
+        const controls = [...activeOverlay.querySelectorAll('button, a[href], [tabindex]:not([tabindex="-1"])')]
+          .filter(element => !element.disabled && element.getClientRects().length);
+        const first = controls[0], last = controls.at(-1);
+        if (event.shiftKey && document.activeElement === first) {
+          event.preventDefault();
+          last?.focus({ preventScroll: true });
+        } else if (!event.shiftKey && document.activeElement === last) {
+          event.preventDefault();
+          first?.focus({ preventScroll: true });
+        }
       }
     });
+    document.querySelector('[data-home-notifications]')?.addEventListener('click', event => {
+      const trigger = event.target.closest('[data-reminder-type="training"]');
+      if (trigger) openEventSheet(trigger.dataset.trainingDate, trigger);
+    });
     render();
-    if (calendarFragment || selectedDate) scrollToCalendar();
-    if (selectedDate && eventsFor(selectedDate).length) {
+    if (section && (calendarFragment || selectedDate)) scrollToCalendar();
+    if (grid && selectedDate && eventsFor(selectedDate).length) {
       const trigger = grid.querySelector(`[data-date="${selectedDate}"]`);
       requestAnimationFrame(() => openEventSheet(selectedDate, trigger));
     }
@@ -373,6 +403,6 @@
     );
   }
 
-  if (pageType === 'dashboard') initDashboardCalendar();
+  if (pageType === 'dashboard' || pageType === 'home') initCalendarAndSchedule();
   if (pageType === 'details') initDetails();
 })();

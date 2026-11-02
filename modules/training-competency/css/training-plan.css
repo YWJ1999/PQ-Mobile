@@ -11,16 +11,14 @@
 .training-plan-records { margin-top: 18px; }
 .training-plan-courses { display: grid; gap: 14px; }
 .training-plan-card { min-width: 0; overflow: hidden; border: 1px solid var(--border-subtle); border-radius: 18px; background: var(--bg-card); box-shadow: var(--shadow-card); }
-.training-plan-card-header { padding: 15px 16px; background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%); color: #fff; }
+.training-plan-card-header { display: flex; justify-content: space-between; align-items: center; }
+.training-plan-card-header h2 { flex: 1; min-width: 0; }
 .training-plan-card-header h2 { color: #fff; font-size: 14px; font-weight: 800; line-height: 1.4; overflow-wrap: anywhere; }
-.training-plan-card-details { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; padding: 12px; }
-.training-plan-detail { min-width: 0; padding: 10px 11px; border: 1px solid var(--border-subtle); border-radius: 13px; background: var(--bg-input); }
-.training-plan-detail dt { margin-bottom: 4px; color: var(--text-muted); font-size: 10px; font-weight: 800; line-height: 1.4; }
-.training-plan-detail dd { margin: 0; color: var(--text-primary); font-size: 11.5px; font-weight: 800; line-height: 1.5; overflow-wrap: anywhere; white-space: pre-line; }
-.training-plan-detail[data-field="next-due-date"], .training-plan-detail[data-field="remarks"] { grid-column: 1 / -1; }
+.training-plan-card-details { display: grid; gap: 7px; }
+.training-plan-detail { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+.training-plan-detail dt { flex-shrink: 0; color: var(--text-muted); font-size: 11.5px; font-weight: 600; }
+.training-plan-detail dd { min-width: 0; margin: 0; color: var(--text-primary); font-size: 11.5px; font-weight: 800; line-height: 1.5; text-align: right; overflow-wrap: anywhere; white-space: pre-line; }
 .training-plan-detail[data-field="remarks"] dd { font-weight: 600; }
-.training-plan-completed dd { color: var(--status-ready-text); }
-.training-plan-pending dd { color: var(--status-action-text, #d97706); }
 .training-plan-empty { padding: 28px 18px; border: 1px dashed var(--border-subtle); border-radius: 18px; color: var(--text-muted); text-align: center; }
 .training-plan-empty h2 { margin-bottom: 6px; color: var(--text-primary); font-size: 14px; }
 .training-plan-empty p { font-size: 12px; line-height: 1.5; }

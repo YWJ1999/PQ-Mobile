@@ -75,7 +75,8 @@
     menu.setAttribute('aria-haspopup', 'dialog');
     menu.append(icon('fa-ellipsis-vertical'));
     menu.addEventListener('click', () => { currentId = item.id; openSheet('careerPendingMenu', menu); });
-    header.append(checkbox, identity(item.employeeName, item.empNo, isEngagement ? null : item.position), menu);
+    header.append(checkbox, identity(item.employeeName, item.empNo, isEngagement ? null : item.position),
+      node('span', 'payroll-approval-status', 'Pending Approval'), menu);
     const body = node('div', 'payroll-approval-card-body');
     const review = node('div', 'career-pending-review');
     review.tabIndex = 0;

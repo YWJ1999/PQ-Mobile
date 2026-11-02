@@ -1,20 +1,18 @@
-/* Record cards use 105deg gradients; purple matches the Attendance rate metric.
+/* Record cards use shared 105deg gradients.
    Only records with a heading are included; form and chart containers keep
    their own layouts. Overrides also cover legacy inline presentation. */
 :root {
-  --record-draft-surface: var(--card-header-purple-background);
-  --record-draft-accent: #7e2be5;
-  --record-submitted-surface: linear-gradient(105deg, #e7b032, #f8cd40);
-  --record-submitted-accent: #e7b032;
-  --record-approved-surface: linear-gradient(105deg, #009c17 0%, #0caa23 50%, #1cba32 100%);
-  --record-approved-accent: #009c17;
-  --record-rejected-surface: linear-gradient(105deg, #8e2d42, #bd3b54);
-  --record-rejected-accent: #bd3b54;
+  --record-draft-surface: var(--card-header-blue-background);
+  --record-draft-accent: #2e6dca;
+  --record-submitted-surface: linear-gradient(105deg, #7e3005, #b85e0e);
+  --record-submitted-accent: #b85e0e;
+  --record-approved-surface: linear-gradient(105deg, #15553f, #228156);
+  --record-approved-accent: #228156;
+  --record-rejected-surface: linear-gradient(105deg, #8f1111, #dc2626);
+  --record-rejected-accent: #dc2626;
   --record-cancelled-surface: linear-gradient(105deg, #394b66, #596c87);
   --record-cancelled-accent: #596c87;
-  --record-resubmit-surface: var(--card-header-blue-background);
-  --record-resubmit-accent: #2e6dca;
-  --record-action-fill: var(--record-draft-surface);
+  --record-action-fill: var(--card-header-purple-background);
   --record-action-ink: #fff;
 }
 
@@ -25,12 +23,12 @@ html body :is(
   .incident-history-card,
   .active-headcount-employee-card
 ) {
-  --record-accent: var(--record-draft-accent);
-  --record-header-fill: var(--record-draft-surface);
+  --record-accent: #7e2be5;
+  --record-header-fill: var(--card-header-purple-background);
   --record-header-ink: #fff;
   --record-header-muted: rgba(255, 255, 255, .97);
   --record-badge-ink: var(--record-header-ink);
-  display: block !important;
+  display: block;
   padding: 18px !important;
   border: 1px solid var(--border-subtle) !important;
   border-radius: 18px !important;
@@ -40,42 +38,47 @@ html body :is(
   min-width: 0;
 }
 
-/* Status colours share the gradient direction; green and yellow use dark text for contrast. */
-html body :is(.history-card-item, .history-item-card, .project-history-card):is([data-status="approved"], [data-status="normal"]),
+/* Workflow statuses and attendance categories use the same palette across modules. */
+html body :is(.history-card-item, .history-item-card, .project-history-card):is(
+  [data-status="draft"], [data-status="resubmit"], [data-status="new"], .theme-blue
+) {
+  --record-accent: var(--record-draft-accent);
+  --record-header-fill: var(--record-draft-surface);
+}
+html body :is(.history-card-item, .history-item-card, .project-history-card):is(
+  [data-status="approved"], [data-status="normal"], [data-status="completed"], [data-status="hired"],
+  .good-theme, .theme-green, .clocking-in-card, .attendance-record-card[data-exception="none"], .staff-card-item:not(.exception-theme)
+),
 html body .incident-history-card:has(.incident-history-card-header) {
   --record-accent: var(--record-approved-accent);
   --record-header-fill: var(--record-approved-surface);
-  --record-header-ink: #1c1c1c;
-  --record-header-muted: #1c1c1c;
 }
 html body :is(.history-card-item, .history-item-card, .project-history-card):is(
-  [data-status="submitted"], [data-status="overtime"], [data-status="late-in"], [data-status="pending-review"]
+  [data-status="submitted"], [data-status="pending"], [data-status="pending-review"], [data-status="not-attended"],
+  [data-status="overtime"], [data-status="late-in"], [data-status="missing-clock-out"], .caution-theme, .theme-orange,
+  .attendance-record-card.exception-theme, .staff-card-item.exception-theme
 ),
-html body .attendance-history-page .history-card-item[data-status="resubmit"] {
+html body .summary-history-card:has(.summary-history-status[data-status="exception"]) {
   --record-accent: var(--record-submitted-accent);
   --record-header-fill: var(--record-submitted-surface);
-  --record-header-ink: #302107;
-  --record-header-muted: #47340f;
 }
-html body :is(.history-card-item, .history-item-card):is([data-status="rejected"], [data-status="early-out"]),
-html body .career-history-phone .history-card-item[data-status="cancelled"] {
+html body :is(.history-card-item, .history-item-card, .project-history-card):is(
+  [data-status="rejected"], [data-status="early-out"], [data-status="unapproved-ot"], .poor-theme, .theme-red
+) {
   --record-accent: var(--record-rejected-accent);
   --record-header-fill: var(--record-rejected-surface);
 }
-html body :is(.history-card-item, .history-item-card)[data-status="cancelled"] {
+html body :is(.history-card-item, .history-item-card, .project-history-card)[data-status="cancelled"] {
   --record-accent: var(--record-cancelled-accent);
   --record-header-fill: var(--record-cancelled-surface);
-}
-html body.workplace-history-page .history-card-item[data-status="resubmit"],
-html body .team-history-phone .history-card-item[data-status="resubmit"] {
-  --record-accent: var(--record-resubmit-accent);
-  --record-header-fill: var(--record-resubmit-surface);
 }
 
 html body :is(.history-card-item, .history-item-card, .project-history-card, .incident-history-card, .active-headcount-employee-card)
 :is(.history-card-header, .summary-history-card-header, .record-card-header, .project-history-card-top, .incident-history-card-header, .manpower-employee-identity) {
   width: auto !important;
   max-width: none;
+  box-sizing: border-box;
+  min-height: 75px;
   margin: -18px -18px 0 !important;
   padding: 16px 18px !important;
   border: 0;
@@ -186,4 +189,29 @@ html body :is(.history-card-actions, .record-card-actions, .project-history-card
 html body :is(.history-card-header, .record-card-header, .incident-history-card-header) :focus-visible {
   outline-color: var(--record-header-ink);
   outline-offset: 3px;
+}
+
+/* Approval queues retain their selection checkbox and options menu in the banner. */
+html body :is(.approval-request-card, .project-approval-card) { border-radius: 18px !important; }
+html body :is(.approval-record-header, .payroll-approval-card-header, .project-approval-card-banner) {
+  min-height: 75px;
+  padding: 14px 18px;
+  background: var(--record-submitted-surface);
+  color: white;
+}
+html body :is(.approval-request-card, .project-approval-card) :is(.approval-record-header, .payroll-approval-card-header, .project-approval-card-banner)
+:is(.approval-header-status, .approval-status-badge, .payroll-approval-status, .project-approval-status) {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: white;
+  font-size: 10.5px;
+  font-weight: 700;
+}
+html body .approval-record-header:has([data-approval-status="resubmitted"], [data-approval-status="draft" i]) {
+  background: var(--record-draft-surface);
 }

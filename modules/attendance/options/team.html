@@ -4111,9 +4111,6 @@
           const remarkText = item.remark || '';
           const docStatusStr = item.docStatus || item.statusText || 'Submitted';
           const isDraft = docStatusStr.toLowerCase().includes('draft');
-          const statusBadgeBg = isDraft ? 'rgba(100, 116, 139, 0.12)' : 'rgba(124, 58, 237, 0.08)';
-          const statusBadgeBorder = isDraft ? '1px solid rgba(100, 116, 139, 0.25)' : '1px solid rgba(124, 58, 237, 0.22)';
-          const statusBadgeColor = isDraft ? 'var(--text-muted)' : 'var(--purple-primary)';
           const statusIcon = isDraft ? '<i class="fa-solid fa-file-pen"></i>' : '<i class="fa-solid fa-hourglass-half"></i>';
 
           // Differentiate OT Plan Requests, Attendance Feedback, and Final OT Requests
@@ -4167,8 +4164,8 @@
           return `
             <div class="approval-request-card" id="pendingCard_${idx}" data-category="${item.category || ''}" data-type="${typeStr}" data-ot-type="${typeStr}" style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 20px; overflow: hidden; box-shadow: var(--shadow-card); transition: all 0.2s ease; text-align: left;">
               
-              <!-- 1. Executive Purple Header Banner -->
-              <div style="background: linear-gradient(135deg, #7c3aed 0%, #4c1d95 100%); padding: 12px 14px; display: flex; align-items: center; justify-content: space-between; color: #ffffff;">
+              <!-- Record header -->
+              <div class="approval-record-header" style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
                 <div style="display: flex; align-items: center; gap: 12px;">
                   <div style="display: flex; align-items: center;">
                     <input type="checkbox" class="approval-card-checkbox" style="width: 20px; height: 20px; accent-color: #ffffff; cursor: pointer; border-radius: 6px;">
@@ -4181,6 +4178,7 @@
                 </div>
 
                 <div style="display: flex; align-items: center; gap: 8px;">
+                  <span class="approval-header-status" data-approval-status="${isDraft ? 'draft' : 'submitted'}">${statusIcon} ${docStatusStr}</span>
                   <button type="button" onclick="openAttendanceThreeDotsMenu(this, '${item.id}')" title="Options" style="width: 26px; height: 26px; border-radius: 50%; background: rgba(255, 255, 255, 0.2); border: 1px solid rgba(255, 255, 255, 0.35); color: #ffffff; display: flex; align-items: center; justify-content: center; cursor: pointer; backdrop-filter: blur(4px);">
                     <i class="fa-solid fa-ellipsis-vertical" style="font-size: 13px;"></i>
                   </button>
@@ -4191,10 +4189,6 @@
               <div style="padding: 14px;">
                 <!-- Document Status Badge & Date -->
                 <div style="margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between;">
-                  <div style="display: inline-flex; align-items: center; gap: 6px; background: ${statusBadgeBg}; border: ${statusBadgeBorder}; color: ${statusBadgeColor}; font-weight: 800; font-size: 11.5px; padding: 4.5px 11px; border-radius: 12px;">
-                    <span>${statusIcon}</span>
-                    <span>${docStatusStr}</span>
-                  </div>
                   <div style="font-size: 11.5px; font-weight: 700; color: var(--text-muted);">
                     <i class="fa-regular fa-calendar" style="color: var(--purple-primary);"></i> ${startDateStr}
                   </div>
@@ -4385,9 +4379,6 @@
             const durationStr = item.duration || '3 Days';
             const docStatusStr = item.docStatus || item.statusText || 'Submitted';
             const isDraft = docStatusStr.toLowerCase().includes('draft');
-            const statusBadgeBg = isDraft ? 'rgba(100, 116, 139, 0.12)' : 'rgba(124, 58, 237, 0.08)';
-            const statusBadgeBorder = isDraft ? '1px solid rgba(100, 116, 139, 0.25)' : '1px solid rgba(124, 58, 237, 0.22)';
-            const statusBadgeColor = isDraft ? 'var(--text-muted)' : 'var(--purple-primary)';
             const statusIcon = isDraft ? '<i class="fa-solid fa-file-pen"></i>' : '<i class="fa-solid fa-hourglass-half"></i>';
             const isUnplanned = item.isUnplanned ? '<div style="font-size: 11px; font-weight: 800; color: #ef4444; margin-top: 1px;">(Unplanned)</div>' : '';
             const requestedByHtml = item.requestedBy ? `
@@ -4412,8 +4403,8 @@
             return `
               <div class="approval-request-card" id="staffApprovalCard_${idx}" data-ot-type="${typeStr}" style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 20px; overflow: hidden; box-shadow: var(--shadow-card); transition: all 0.2s ease; margin-bottom: 14px; text-align: left;">
                 
-                <!-- 1. Header Banner (Executive Purple Brand Bar) -->
-                <div style="background: linear-gradient(135deg, #7c3aed 0%, #4c1d95 100%); padding: 12px 14px; display: flex; align-items: center; justify-content: space-between; color: #ffffff;">
+                <!-- Record header -->
+                <div class="approval-record-header" style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
                   <div style="display: flex; align-items: center; gap: 12px;">
                     <div style="display: flex; align-items: center;">
                       <input type="checkbox" class="approval-card-checkbox" style="width: 20px; height: 20px; accent-color: #ffffff; cursor: pointer; border-radius: 6px;">
@@ -4426,6 +4417,7 @@
                   </div>
 
                   <div style="display: flex; align-items: center; gap: 8px;">
+                    <span class="approval-header-status" data-approval-status="${isDraft ? 'draft' : 'submitted'}">${statusIcon} ${docStatusStr}</span>
                     <button type="button" onclick="openAttendanceThreeDotsMenu(this, '${item.id}')" title="Options" style="width: 26px; height: 26px; border-radius: 50%; background: rgba(255, 255, 255, 0.2); border: 1px solid rgba(255, 255, 255, 0.35); color: #ffffff; display: flex; align-items: center; justify-content: center; cursor: pointer; backdrop-filter: blur(4px);">
                       <i class="fa-solid fa-ellipsis-vertical" style="font-size: 13px;"></i>
                     </button>
@@ -4435,13 +4427,6 @@
 
                 <!-- 2. Card Content Body -->
                 <div style="padding: 14px;">
-                  <!-- Dedicated Document Status Bar -->
-                  <div style="margin-bottom: 12px; display: flex; align-items: center;">
-                    <div style="display: inline-flex; align-items: center; gap: 6px; background: ${statusBadgeBg}; border: ${statusBadgeBorder}; color: ${statusBadgeColor}; font-weight: 800; font-size: 11.5px; padding: 4.5px 11px; border-radius: 12px;">
-                      <span>${statusIcon}</span>
-                      <span>${docStatusStr}</span>
-                    </div>
-                  </div>
 
                   <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px;">
                     <div>

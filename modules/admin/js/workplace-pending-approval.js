@@ -122,14 +122,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const status = node('span', 'payroll-approval-status');
     status.append(icon('fa-hourglass-half'), node('span', '', 'Submitted'));
     const submitted = node('span', 'payroll-approval-date', 'Submit Date: ' + date(item.submitDate));
-    statusRow.append(status, submitted);
+    header.insertBefore(status, menu);
+    statusRow.append(submitted);
     const reference = node('p', 'workplace-approval-reference', 'Ref: ' + item.reference);
     const facts = node('div', 'payroll-approval-facts');
     const rows = item.kind === 'inventory-request'
       ? [['Quantity', String(item.quantity)], ['Request Item', item.requestItem], ['Reason', item.reason]]
       : [['Visit Date', date(item.visitDate)], ['Visit Time', `${item.startTime} – ${item.endTime}`], ['Total Guest', String(item.totalGuest)]];
     facts.append(fieldGrid(rows));
-    review.append(statusRow, reference, facts);
+    header.querySelector('.payroll-employee-copy').append(reference);
+    review.append(statusRow, facts);
     review.addEventListener('click', () => openDetails(item.id, review));
     review.addEventListener('keydown', event => { if (['Enter', ' '].includes(event.key)) { event.preventDefault(); openDetails(item.id, review); } });
     body.append(review, actionButtons());

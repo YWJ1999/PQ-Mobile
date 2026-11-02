@@ -3872,6 +3872,20 @@ select option {
   outline-offset: 3px;
 }
 
+[data-home-notifications] .for-you-reminder {
+  text-decoration: none;
+}
+
+[data-home-notifications] article.for-you-reminder {
+  cursor: default;
+}
+
+[data-home-notifications] article.for-you-reminder:hover {
+  transform: none;
+  border-color: var(--border-card);
+  box-shadow: var(--shadow-card);
+}
+
 [data-home-notifications] .fy-left { min-width: 0; }
 [data-home-notifications] .fy-avatar { font-size: 16px; }
 

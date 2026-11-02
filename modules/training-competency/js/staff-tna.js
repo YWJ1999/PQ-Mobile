@@ -93,7 +93,7 @@
     card.setAttribute('aria-labelledby', ids.name);
     card.setAttribute('aria-describedby', `${ids.employeeId} ${ids.status} ${ids.position} ${ids.period}`);
 
-    const header = node('div', 'staff-tna-card-header');
+    const header = node('div', 'staff-tna-card-header record-card-header');
     const heading = node('div', 'staff-tna-card-heading');
     const name = node('h2', 'staff-tna-employee-name', record.employee);
     const empNo = node('span', 'staff-tna-employee-id', employeeId(record.empNo));

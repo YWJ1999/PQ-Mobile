@@ -118,7 +118,8 @@
     const dateCopy = node('span');
     dateCopy.append(document.createTextNode(item.category === 'tax' ? 'Submit Date: ' : 'Request Date: '), node('strong', '', date(item.submitDate || item.requestDate)));
     submitted.append(icon('fa-calendar-check'), dateCopy);
-    statusRow.append(status, submitted);
+    header.insertBefore(status, menu);
+    statusRow.append(submitted);
     body.append(statusRow);
     const facts = node('div', 'payroll-approval-facts');
     if (item.category === 'tax') {

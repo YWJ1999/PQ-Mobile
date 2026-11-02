@@ -1,4 +1,5 @@
 .training-request-page [hidden] { display: none !important; }
+training-schedule-sheet { display: contents; }
 
 /* Calendar jumps must scroll the content, never the header or bottom navigation. */
 [data-training-calendar-page="dashboard"] > .phone-container { overflow: clip; }
@@ -62,7 +63,7 @@
   pointer-events: none;
   transition: opacity .24s ease, visibility .24s ease;
 }
-.training-calendar-sheet-overlay.is-open { opacity: 1; visibility: visible; pointer-events: auto; }
+.training-calendar-sheet-overlay.is-open { opacity: 1; visibility: visible; pointer-events: auto; transition: opacity .24s ease, visibility 0s; }
 .training-calendar-sheet {
   box-sizing: border-box;
   width: 100%;
@@ -98,7 +99,6 @@
 .training-calendar-event-time strong { max-width: 68%; color: var(--text-primary); font-size: 11.5px; font-weight: 800; line-height: 1.45; text-align: right; overflow-wrap: anywhere; }
 .training-calendar-event-actions { margin-top: 12px; }
 .training-calendar-detail { display: inline-flex; align-items: center; justify-content: center; min-height: 38px; padding: 9px 17px; border: 0; border-radius: 12px; background: linear-gradient(135deg, #7c3aed, #6d28d9); color: #fff; box-shadow: 0 4px 13px rgba(124, 58, 237, .3); font: inherit; font-size: 12px; font-weight: 800; text-decoration: none; cursor: pointer; }
-.training-calendar-sheet-cancel { min-height: 44px; margin-top: 16px; border: 1px solid var(--border-subtle); border-radius: 14px; background: var(--bg-input); color: var(--text-primary); font: inherit; font-size: 13px; font-weight: 800; cursor: pointer; }
 
 .training-calendar-detail-overlay {
   position: absolute;
@@ -116,7 +116,7 @@
   pointer-events: none;
   transition: opacity .22s ease, visibility .22s ease;
 }
-.training-calendar-detail-overlay.is-open { opacity: 1; visibility: visible; pointer-events: auto; }
+.training-calendar-detail-overlay.is-open { opacity: 1; visibility: visible; pointer-events: auto; transition: opacity .22s ease, visibility 0s; }
 .training-calendar-detail-modal {
   box-sizing: border-box;
   width: 100%;

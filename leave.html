@@ -5600,8 +5600,8 @@
           <!-- CARD 1: Afifah Nasir -->
           <div class="approval-request-card" id="approvalCard1" data-category="leave" data-name="Afifah Nasir" data-empno="004177" data-type="Annual Leave" data-submit-date="23 Feb 2026" data-start="2026-02-23" data-end="2026-02-25" data-days="3" style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 20px; overflow: hidden; box-shadow: var(--shadow-card); transition: all 0.2s ease;">
             
-            <!-- 1. Header Banner (Executive Purple Brand Bar for ALL Cards) -->
-            <div style="background: linear-gradient(135deg, #7c3aed 0%, #4c1d95 100%); padding: 12px 14px; display: flex; align-items: center; justify-content: space-between; color: #ffffff;">
+            <!-- Record header -->
+            <div class="approval-record-header" style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
               <div style="display: flex; align-items: center; gap: 12px;">
                 
                 <!-- Custom Selection Checkbox replacing Avatar Circle -->
@@ -5619,6 +5619,7 @@
               <!-- Right: Sleek Mini 3-Dots Button & Pending Pill Tag -->
               <div style="display: flex; align-items: center; gap: 8px;">
                 <!-- Sleek Mini 3-Dots Button -->
+                <div class="approval-status-badge is-pending" data-approval-status="pending"><i class="fa-solid fa-hourglass-half" aria-hidden="true"></i><span>Pending Approval</span></div>
                 <button type="button" onclick="openApprovalThreeDotsMenu('Afifah Nasir', 'Annual Leave', '23 Feb 2026 - 25 Feb 2026', '3 Days', 'Personnel Issues', { docRef: 'VLV000000000790', docStatus: 'Pending Approval', employee: 'Afifah Nasir • Emp #004177', branch: 'TIMES SQUARE BRANCH', department: 'Quality Assurance', leaveYear: '2026', cutoffPeriod: '01/01/2026 – 31/12/2026', submitter: 'Afifah Nasir', submitDate: '23 Feb 2026', fromDate: '23 Feb 2026', toDate: '25 Feb 2026', duration: '3 Days', leaveDays: '3.000', mcChitNo: '', reliever: 'Benjamin Lee (On Behalf)', remark: 'Urgent personnel emergency leave for home repair & family assistance.', attachment: 'supporting_emergency_docs.pdf', advanceLeave: 'No', shortNotice: 'Yes' })" title="Options" style="width: 26px; height: 26px; border-radius: 50%; background: rgba(255, 255, 255, 0.2); border: 1px solid rgba(255, 255, 255, 0.35); color: #ffffff; display: flex; align-items: center; justify-content: center; cursor: pointer; backdrop-filter: blur(4px);">
                   <i class="fa-solid fa-ellipsis-vertical" style="font-size: 13px;"></i>
                 </button>
@@ -5628,10 +5629,6 @@
 
             <!-- 2. Card Content Body -->
 <div style="padding: 14px;">
-              <!-- Dedicated Status Bar (Option A) -->
-              <div style="margin-bottom: 12px; display: flex; align-items: center;">
-                <div class="approval-status-badge is-pending" data-approval-status="pending"><i class="fa-solid fa-hourglass-half" aria-hidden="true"></i><span>Pending Approval</span></div>
-              </div>
               
               <!-- Type & Reason (2 Column Layout) -->
               <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px;">
@@ -5699,8 +5696,8 @@
           <!-- CARD 2: Hailizam bin Mohamed -->
           <div class="approval-request-card" id="approvalCard2" data-category="leave" data-name="Hailizam bin Mohamed" data-empno="007216" data-type="Medical Leave" data-submit-date="12 Sep 2026" data-start="2026-09-12" data-end="2026-09-12" data-days="1" style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 20px; overflow: hidden; box-shadow: var(--shadow-card); transition: all 0.2s ease;">
             
-            <!-- 1. Header Banner (Executive Purple Brand Bar for ALL Cards) -->
-            <div style="background: linear-gradient(135deg, #7c3aed 0%, #4c1d95 100%); padding: 12px 14px; display: flex; align-items: center; justify-content: space-between; color: #ffffff;">
+            <!-- Record header -->
+            <div class="approval-record-header" style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
               <div style="display: flex; align-items: center; gap: 12px;">
                 
                 <!-- Custom Selection Checkbox replacing Avatar Circle -->
@@ -5717,6 +5714,7 @@
 
               <!-- Right: Sleek Mini 3-Dots Button & Pending Pill Tag -->
               <div style="display: flex; align-items: center; gap: 8px;">
+                <div class="approval-status-badge is-pending" data-approval-status="pending"><i class="fa-solid fa-hourglass-half" aria-hidden="true"></i><span>Pending Approval</span></div>
                 <button type="button" onclick="openApprovalThreeDotsMenu('Hailizam bin Mohamed', 'Medical Leave', '12 Sep 2026', '1 Day', 'Medical Checkup (MC Attached)', { docRef: 'VLV000000000791', docStatus: 'Pending Approval', employee: 'Hailizam bin Mohamed • Emp #007216', branch: 'TIMES SQUARE BRANCH', department: 'Operations', leaveYear: '2026', cutoffPeriod: '01/01/2026 – 31/12/2026', submitter: 'Hailizam bin Mohamed', submitDate: '12 Sep 2026', fromDate: '12 Sep 2026', toDate: '12 Sep 2026', duration: '1 Day', leaveDays: '1.000', mcChitNo: 'MC-12312123', reliever: 'Sarah Jenkins', remark: 'Medical Checkup (MC Attached)', attachment: 'clinic_mc_slip.jpg', advanceLeave: 'No', shortNotice: 'No' })" title="Options" style="width: 26px; height: 26px; border-radius: 50%; background: rgba(255, 255, 255, 0.2); border: 1px solid rgba(255, 255, 255, 0.35); color: #ffffff; display: flex; align-items: center; justify-content: center; cursor: pointer; backdrop-filter: blur(4px);">
                   <i class="fa-solid fa-ellipsis-vertical" style="font-size: 13px;"></i>
                 </button>
@@ -5726,10 +5724,6 @@
 
             <!-- 2. Card Content Body -->
 <div style="padding: 14px;">
-              <!-- Dedicated Status Bar (Option A) -->
-              <div style="margin-bottom: 12px; display: flex; align-items: center;">
-                <div class="approval-status-badge is-pending" data-approval-status="pending"><i class="fa-solid fa-hourglass-half" aria-hidden="true"></i><span>Pending Approval</span></div>
-              </div>
               
               <!-- Type & Reason (2 Column Layout) -->
               <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px;">
@@ -5796,7 +5790,7 @@
           <!-- CARD 3: Nurfarhana binti Mohamad Yusoff -->
           <div class="approval-request-card" id="approvalCard3" data-category="leave" data-name="Nurfarhana binti Mohamad Yusoff" data-empno="008004" data-type="Annual Leave" data-submit-date="10 Sep 2026" data-start="2026-09-15" data-end="2026-09-16" data-days="2" style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 20px; overflow: hidden; box-shadow: var(--shadow-card); transition: all 0.2s ease;">
             
-            <div style="background: linear-gradient(135deg, #7c3aed 0%, #4c1d95 100%); padding: 12px 14px; display: flex; align-items: center; justify-content: space-between; color: #ffffff;">
+            <div class="approval-record-header" style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
               <div style="display: flex; align-items: center; gap: 12px;">
                 <div style="display: flex; align-items: center;">
                   <input type="checkbox" class="approval-card-checkbox" onchange="updateBatchApprovalCount()" style="width: 20px; height: 20px; accent-color: #ffffff; cursor: pointer; border-radius: 6px;">
@@ -5809,6 +5803,7 @@
               </div>
 
               <div style="display: flex; align-items: center; gap: 8px;">
+                <div class="approval-status-badge is-resubmitted" data-approval-status="resubmitted"><i class="fa-solid fa-rotate-left" aria-hidden="true"></i><span>Resubmitted</span></div>
                 <button type="button" onclick="openApprovalThreeDotsMenu('Nurfarhana binti Mohamad', 'Annual Leave', '15 Sep 2026 - 16 Sep 2026', '2 Days', 'Family Vacation', { docRef: 'VLV000000000792', docStatus: 'Resubmitted', employee: 'Nurfarhana binti Mohamad • Emp #008004', branch: 'SUNWAY BRANCH', department: 'FINANCE & BANKING', leaveYear: '2026', cutoffPeriod: '01/01/2026 – 31/12/2026', submitter: 'Nurfarhana binti Mohamad', submitDate: '10 Sep 2026', fromDate: '15 Sep 2026', toDate: '16 Sep 2026', duration: '2 Days', leaveDays: '2.000', mcChitNo: '', reliever: 'Ahmad Rafy', remark: 'Scheduled family vacation trip to Penang.', attachment: 'flight_itinerary.pdf', advanceLeave: 'No', shortNotice: 'No' })" title="Options" style="width: 26px; height: 26px; border-radius: 50%; background: rgba(255, 255, 255, 0.2); border: 1px solid rgba(255, 255, 255, 0.35); color: #ffffff; display: flex; align-items: center; justify-content: center; cursor: pointer; backdrop-filter: blur(4px);">
                   <i class="fa-solid fa-ellipsis-vertical" style="font-size: 13px;"></i>
                 </button>
@@ -5817,10 +5812,6 @@
             </div>
 
 <div style="padding: 14px;">
-              <!-- Dedicated Status Bar (Option A) -->
-              <div style="margin-bottom: 12px; display: flex; align-items: center;">
-                <div class="approval-status-badge is-resubmitted" data-approval-status="resubmitted"><i class="fa-solid fa-rotate-left" aria-hidden="true"></i><span>Resubmitted</span></div>
-              </div>
               <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px;">
                 <div>
                   <div style="font-size: 10.5px; font-weight: 700; color: var(--text-muted); margin-bottom: 3px;">Type</div>
@@ -5882,7 +5873,7 @@
           <!-- CARD 4: Alex Tan Chin Hock -->
           <div class="approval-request-card" id="approvalCard4" data-category="leave" data-name="Alex Tan Chin Hock" data-empno="009102" data-type="Emergency Leave" data-submit-date="29 Sep 2026" data-start="2026-09-29" data-end="2026-09-29" data-days="1" style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 20px; overflow: hidden; box-shadow: var(--shadow-card); transition: all 0.2s ease;">
             
-            <div style="background: linear-gradient(135deg, #7c3aed 0%, #4c1d95 100%); padding: 12px 14px; display: flex; align-items: center; justify-content: space-between; color: #ffffff;">
+            <div class="approval-record-header" style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
               <div style="display: flex; align-items: center; gap: 12px;">
                 <div style="display: flex; align-items: center;">
                   <input type="checkbox" class="approval-card-checkbox" onchange="updateBatchApprovalCount()" style="width: 20px; height: 20px; accent-color: #ffffff; cursor: pointer; border-radius: 6px;">
@@ -5895,6 +5886,7 @@
               </div>
 
               <div style="display: flex; align-items: center; gap: 8px;">
+                <div class="approval-status-badge is-pending" data-approval-status="pending"><i class="fa-solid fa-hourglass-half" aria-hidden="true"></i><span>Pending Approval</span></div>
                 <button type="button" onclick="openApprovalThreeDotsMenu('Alex Tan Chin Hock', 'Emergency Leave', '29 Sep 2026', '1 Day', 'Urgent Home Repair', { docRef: 'VLV000000000793', docStatus: 'Pending Approval', employee: 'Alex Tan Chin Hock • Emp #009102', branch: 'TIMES SQUARE BRANCH', department: 'TECH & IT', leaveYear: '2026', cutoffPeriod: '01/01/2026 – 31/12/2026', submitter: 'Alex Tan Chin Hock', submitDate: '29 Sep 2026', fromDate: '29 Sep 2026', toDate: '29 Sep 2026', duration: '1 Day', leaveDays: '1.000', mcChitNo: '', reliever: 'None Assigned', remark: 'Sudden water pipe burst at apartment requiring urgent repair.', attachment: 'repair_invoice.pdf', advanceLeave: 'No', shortNotice: 'Yes' })" title="Options" style="width: 26px; height: 26px; border-radius: 50%; background: rgba(255, 255, 255, 0.2); border: 1px solid rgba(255, 255, 255, 0.35); color: #ffffff; display: flex; align-items: center; justify-content: center; cursor: pointer; backdrop-filter: blur(4px);">
                   <i class="fa-solid fa-ellipsis-vertical" style="font-size: 13px;"></i>
                 </button>
@@ -5903,10 +5895,6 @@
             </div>
 
 <div style="padding: 14px;">
-              <!-- Dedicated Status Bar (Option A) -->
-              <div style="margin-bottom: 12px; display: flex; align-items: center;">
-                <div class="approval-status-badge is-pending" data-approval-status="pending"><i class="fa-solid fa-hourglass-half" aria-hidden="true"></i><span>Pending Approval</span></div>
-              </div>
               <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px;">
                 <div>
                   <div style="font-size: 10.5px; font-weight: 700; color: var(--text-muted); margin-bottom: 3px;">Type</div>
@@ -5971,7 +5959,7 @@
           <!-- CARD CREDIT 1: Farhan binti rahmat -->
           <div class="approval-request-card" id="approvalCardCredit1" data-category="credit" data-name="Farhan binti rahmat" data-empno="EBB12" data-type="Working on Public Holiday" data-submit-date="12 Jul 2024" data-start="2024-07-03" data-end="2024-07-03" data-days="1" style="display: none; background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 20px; overflow: hidden; box-shadow: var(--shadow-card); transition: all 0.2s ease;">
             
-            <div style="background: linear-gradient(135deg, #7c3aed 0%, #4c1d95 100%); padding: 12px 14px; display: flex; align-items: center; justify-content: space-between; color: #ffffff;">
+            <div class="approval-record-header" style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
               <div style="display: flex; align-items: center; gap: 12px;">
                 <div style="display: flex; align-items: center;">
                   <input type="checkbox" class="approval-card-checkbox" onchange="updateBatchApprovalCount()" style="width: 20px; height: 20px; accent-color: #ffffff; cursor: pointer; border-radius: 6px;">
@@ -5984,6 +5972,7 @@
               </div>
 
               <div style="display: flex; align-items: center; gap: 8px;">
+                <div class="approval-status-badge is-pending" data-approval-status="pending"><i class="fa-solid fa-hourglass-half" aria-hidden="true"></i><span>Pending Approval</span></div>
                 <button type="button" onclick="openApprovalThreeDotsMenu('Farhan binti rahmat', 'REPLACEMENT LEAVE', '3 Jul 2024', '1.000 Day', 'OTHERS', { isCredit: true, docRef: 'LVR000000000589', docStatus: 'Pending Approval', employee: 'EBB12 - Farhan binti rahmat', creditLeave: 'REPLACEMENT LEAVE', offsetLeave: '', creditType: 'Working on Public Holiday', submitter: 'EBB12 - Farhan binti rahmat', submitDate: '12 Jul 2024', fromDate: '3 Jul 2024', toDate: '3 Jul 2024', creditDays: '1.000', effectiveDate: '4 Jul 2024', reason: 'OTHERS', remark: 'Worked Overtime for adhoc request', attachment: '5fae9b25c05f463990e88cb6dc4c96b0.jpg' })" title="Options" style="width: 26px; height: 26px; border-radius: 50%; background: rgba(255, 255, 255, 0.2); border: 1px solid rgba(255, 255, 255, 0.35); color: #ffffff; display: flex; align-items: center; justify-content: center; cursor: pointer; backdrop-filter: blur(4px);">
                   <i class="fa-solid fa-ellipsis-vertical" style="font-size: 13px;"></i>
                 </button>
@@ -5992,10 +5981,6 @@
             </div>
 
 <div style="padding: 14px;">
-              <!-- Dedicated Status Bar (Option A) -->
-              <div style="margin-bottom: 12px; display: flex; align-items: center;">
-                <div class="approval-status-badge is-pending" data-approval-status="pending"><i class="fa-solid fa-hourglass-half" aria-hidden="true"></i><span>Pending Approval</span></div>
-              </div>
               <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px;">
                 <div>
                   <div style="font-size: 10.5px; font-weight: 700; color: var(--text-muted); margin-bottom: 3px;">Credit Type</div>
@@ -6065,7 +6050,7 @@
           <!-- CARD CREDIT 2: Priya Raman -->
           <div class="approval-request-card" id="approvalCardCredit2" data-category="credit" data-name="Priya Raman" data-empno="003890" data-type="Holiday Standby Credit" data-submit-date="01 May 2026" data-start="2026-05-01" data-end="2026-05-01" data-days="1" style="display: none; background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 20px; overflow: hidden; box-shadow: var(--shadow-card); transition: all 0.2s ease;">
             
-            <div style="background: linear-gradient(135deg, #7c3aed 0%, #4c1d95 100%); padding: 12px 14px; display: flex; align-items: center; justify-content: space-between; color: #ffffff;">
+            <div class="approval-record-header" style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
               <div style="display: flex; align-items: center; gap: 12px;">
                 <div style="display: flex; align-items: center;">
                   <input type="checkbox" class="approval-card-checkbox" onchange="updateBatchApprovalCount()" style="width: 20px; height: 20px; accent-color: #ffffff; cursor: pointer; border-radius: 6px;">
@@ -6078,6 +6063,7 @@
               </div>
 
               <div style="display: flex; align-items: center; gap: 8px;">
+                <div class="approval-status-badge is-resubmitted" data-approval-status="resubmitted"><i class="fa-solid fa-rotate-left" aria-hidden="true"></i><span>Resubmitted</span></div>
                 <button type="button" onclick="openApprovalThreeDotsMenu('Priya Raman', 'Holiday Standby Credit', '01 May 2026', '+8.0 Hours (+1 Day)', 'Holiday Cloud Standby', { isCredit: true, creditLeave: 'REPLACEMENT LEAVE', creditType: 'Holiday Standby Credit', creditDays: '1.000', effectiveDate: '31 Dec 2026', effectiveDateLabel: 'Credit Expiry', docRef: 'VCR000000000413', docStatus: 'Resubmitted', employee: 'Priya Raman • Emp #003890', branch: 'TIMES SQUARE BRANCH', department: 'Cloud Infrastructure', leaveYear: '2026', cutoffPeriod: '01/01/2026 – 31/12/2026', submitter: 'Priya Raman', submitDate: '01 May 2026', fromDate: '01 May 2026', toDate: '01 May 2026', duration: '+8.0 Hours (+1 Day)', leaveDays: '1.000', mcChitNo: '', reliever: 'None Required', remark: 'Labor Day holiday standby and emergency cluster failover monitoring.', attachment: 'standby_roster_log.pdf', advanceLeave: 'No', shortNotice: 'No' })" title="Options" style="width: 26px; height: 26px; border-radius: 50%; background: rgba(255, 255, 255, 0.2); border: 1px solid rgba(255, 255, 255, 0.35); color: #ffffff; display: flex; align-items: center; justify-content: center; cursor: pointer; backdrop-filter: blur(4px);">
                   <i class="fa-solid fa-ellipsis-vertical" style="font-size: 13px;"></i>
                 </button>
@@ -6086,10 +6072,6 @@
             </div>
 
 <div style="padding: 14px;">
-              <!-- Dedicated Status Bar (Option A) -->
-              <div style="margin-bottom: 12px; display: flex; align-items: center;">
-                <div class="approval-status-badge is-resubmitted" data-approval-status="resubmitted"><i class="fa-solid fa-rotate-left" aria-hidden="true"></i><span>Resubmitted</span></div>
-              </div>
               <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px;">
                 <div>
                   <div style="font-size: 10.5px; font-weight: 700; color: var(--text-muted); margin-bottom: 3px;">Credit Type</div>
@@ -6162,7 +6144,7 @@
           <!-- CARD OFFTIME 1: Siti Nurhaliza -->
           <div class="approval-request-card" id="approvalCardOfftime1" data-category="offtime" data-name="Siti Nurhaliza" data-empno="006734" data-type="Personal Time Off" data-submit-date="23 Sep 2026" data-start="2026-09-23" data-end="2026-09-23" data-days="0.31" style="display: none; background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 20px; overflow: hidden; box-shadow: var(--shadow-card); transition: all 0.2s ease;">
             
-            <div style="background: linear-gradient(135deg, #7c3aed 0%, #4c1d95 100%); padding: 12px 14px; display: flex; align-items: center; justify-content: space-between; color: #ffffff;">
+            <div class="approval-record-header" style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
               <div style="display: flex; align-items: center; gap: 12px;">
                 <div style="display: flex; align-items: center;">
                   <input type="checkbox" class="approval-card-checkbox" onchange="updateBatchApprovalCount()" style="width: 20px; height: 20px; accent-color: #ffffff; cursor: pointer; border-radius: 6px;">
@@ -6175,6 +6157,7 @@
               </div>
 
               <div style="display: flex; align-items: center; gap: 8px;">
+                <div class="approval-status-badge is-pending" data-approval-status="pending"><i class="fa-solid fa-hourglass-half" aria-hidden="true"></i><span>Pending Approval</span></div>
                 <button type="button" onclick="openApprovalThreeDotsMenu('Siti Nurhaliza', 'Personal Time Off', '23 Sep 2026', '2.5 Hours (14:30 - 17:00)', 'Urgent Family Care', { docRef: 'VOT000000000281', docStatus: 'Pending Approval', employee: 'Siti Nurhaliza • Emp #006734', branch: 'TIMES SQUARE BRANCH', department: 'Product & Design', leaveYear: '2026', cutoffPeriod: '01/01/2026 – 31/12/2026', submitter: 'Siti Nurhaliza', submitDate: '23 Sep 2026', fromDate: '23 Sep 2026', toDate: '23 Sep 2026', duration: '2.5 Hours', leaveDays: '0.313', mcChitNo: '', reliever: 'Rachel Lee', remark: 'Emergency visit to school clinic for child health concern.', attachment: 'school_clinic_notice.pdf', advanceLeave: 'No', shortNotice: 'Yes' })" title="Options" style="width: 26px; height: 26px; border-radius: 50%; background: rgba(255, 255, 255, 0.2); border: 1px solid rgba(255, 255, 255, 0.35); color: #ffffff; display: flex; align-items: center; justify-content: center; cursor: pointer; backdrop-filter: blur(4px);">
                   <i class="fa-solid fa-ellipsis-vertical" style="font-size: 13px;"></i>
                 </button>
@@ -6183,10 +6166,6 @@
             </div>
 
 <div style="padding: 14px;">
-              <!-- Dedicated Status Bar (Option A) -->
-              <div style="margin-bottom: 12px; display: flex; align-items: center;">
-                <div class="approval-status-badge is-pending" data-approval-status="pending"><i class="fa-solid fa-hourglass-half" aria-hidden="true"></i><span>Pending Approval</span></div>
-              </div>
               <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px;">
                 <div>
                   <div style="font-size: 10.5px; font-weight: 700; color: var(--text-muted); margin-bottom: 3px;">Type</div>
@@ -6253,7 +6232,7 @@
           <!-- CARD OFFTIME 2: Marcus Tan -->
           <div class="approval-request-card" id="approvalCardOfftime2" data-category="offtime" data-name="Marcus Tan" data-empno="008129" data-type="Medical Time Off" data-submit-date="24 Sep 2026" data-start="2026-09-24" data-end="2026-09-24" data-days="0.25" style="display: none; background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 20px; overflow: hidden; box-shadow: var(--shadow-card); transition: all 0.2s ease;">
             
-            <div style="background: linear-gradient(135deg, #7c3aed 0%, #4c1d95 100%); padding: 12px 14px; display: flex; align-items: center; justify-content: space-between; color: #ffffff;">
+            <div class="approval-record-header" style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
               <div style="display: flex; align-items: center; gap: 12px;">
                 <div style="display: flex; align-items: center;">
                   <input type="checkbox" class="approval-card-checkbox" onchange="updateBatchApprovalCount()" style="width: 20px; height: 20px; accent-color: #ffffff; cursor: pointer; border-radius: 6px;">
@@ -6266,6 +6245,7 @@
               </div>
 
               <div style="display: flex; align-items: center; gap: 8px;">
+                <div class="approval-status-badge is-pending" data-approval-status="pending"><i class="fa-solid fa-hourglass-half" aria-hidden="true"></i><span>Pending Approval</span></div>
                 <button type="button" onclick="openApprovalThreeDotsMenu('Marcus Tan', 'Medical Time Off', '24 Sep 2026', '2.0 Hours (10:00 - 12:00)', 'Dental Specialist Appointment', { docRef: 'VOT000000000282', docStatus: 'Pending Approval', employee: 'Marcus Tan • Emp #008129', branch: 'TIMES SQUARE BRANCH', department: 'IT Enterprise', leaveYear: '2026', cutoffPeriod: '01/01/2026 – 31/12/2026', submitter: 'Marcus Tan', submitDate: '24 Sep 2026', fromDate: '24 Sep 2026', toDate: '24 Sep 2026', duration: '2.0 Hours', leaveDays: '0.250', mcChitNo: '', reliever: 'None Assigned', remark: 'Scheduled orthodontic checkup at specialist dental clinic.', attachment: 'dental_appointment_card.jpg', advanceLeave: 'No', shortNotice: 'No' })" title="Options" style="width: 26px; height: 26px; border-radius: 50%; background: rgba(255, 255, 255, 0.2); border: 1px solid rgba(255, 255, 255, 0.35); color: #ffffff; display: flex; align-items: center; justify-content: center; cursor: pointer; backdrop-filter: blur(4px);">
                   <i class="fa-solid fa-ellipsis-vertical" style="font-size: 13px;"></i>
                 </button>
@@ -6274,10 +6254,6 @@
             </div>
 
 <div style="padding: 14px;">
-              <!-- Dedicated Status Bar (Option A) -->
-              <div style="margin-bottom: 12px; display: flex; align-items: center;">
-                <div class="approval-status-badge is-pending" data-approval-status="pending"><i class="fa-solid fa-hourglass-half" aria-hidden="true"></i><span>Pending Approval</span></div>
-              </div>
               <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px;">
                 <div>
                   <div style="font-size: 10.5px; font-weight: 700; color: var(--text-muted); margin-bottom: 3px;">Type</div>
@@ -6344,7 +6320,7 @@
           <!-- CARD OFFTIME 3: Kavitha Murugan -->
           <div class="approval-request-card" id="approvalCardOfftime3" data-category="offtime" data-name="Kavitha Murugan" data-empno="007452" data-type="Official Affairs Time Off" data-submit-date="25 Sep 2026" data-start="2026-09-25" data-end="2026-09-25" data-days="0.19" style="display: none; background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 20px; overflow: hidden; box-shadow: var(--shadow-card); transition: all 0.2s ease;">
             
-            <div style="background: linear-gradient(135deg, #7c3aed 0%, #4c1d95 100%); padding: 12px 14px; display: flex; align-items: center; justify-content: space-between; color: #ffffff;">
+            <div class="approval-record-header" style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
               <div style="display: flex; align-items: center; gap: 12px;">
                 <div style="display: flex; align-items: center;">
                   <input type="checkbox" class="approval-card-checkbox" onchange="updateBatchApprovalCount()" style="width: 20px; height: 20px; accent-color: #ffffff; cursor: pointer; border-radius: 6px;">
@@ -6357,6 +6333,7 @@
               </div>
 
               <div style="display: flex; align-items: center; gap: 8px;">
+                <div class="approval-status-badge is-pending" data-approval-status="pending"><i class="fa-solid fa-hourglass-half" aria-hidden="true"></i><span>Pending Approval</span></div>
                 <button type="button" onclick="openApprovalThreeDotsMenu('Kavitha Murugan', 'Official Affairs Time Off', '25 Sep 2026', '1.5 Hours (15:30 - 17:00)', 'Government Office Submission', { docRef: 'VOT000000000283', docStatus: 'Pending Approval', employee: 'Kavitha Murugan • Emp #007452', branch: 'TIMES SQUARE BRANCH', department: 'Legal & Compliance', leaveYear: '2026', cutoffPeriod: '01/01/2026 – 31/12/2026', submitter: 'Kavitha Murugan', submitDate: '25 Sep 2026', fromDate: '25 Sep 2026', toDate: '25 Sep 2026', duration: '1.5 Hours', leaveDays: '0.188', mcChitNo: '', reliever: 'None Assigned', remark: 'Urgent physical submission of statutory compliance documents at SSM office.', attachment: 'ssm_filing_acknowledgment.pdf', advanceLeave: 'No', shortNotice: 'No' })" title="Options" style="width: 26px; height: 26px; border-radius: 50%; background: rgba(255, 255, 255, 0.2); border: 1px solid rgba(255, 255, 255, 0.35); color: #ffffff; display: flex; align-items: center; justify-content: center; cursor: pointer; backdrop-filter: blur(4px);">
                   <i class="fa-solid fa-ellipsis-vertical" style="font-size: 13px;"></i>
                 </button>
@@ -6365,10 +6342,6 @@
             </div>
 
 <div style="padding: 14px;">
-              <!-- Dedicated Status Bar (Option A) -->
-              <div style="margin-bottom: 12px; display: flex; align-items: center;">
-                <div class="approval-status-badge is-pending" data-approval-status="pending"><i class="fa-solid fa-hourglass-half" aria-hidden="true"></i><span>Pending Approval</span></div>
-              </div>
               <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px;">
                 <div>
                   <div style="font-size: 10.5px; font-weight: 700; color: var(--text-muted); margin-bottom: 3px;">Type</div>

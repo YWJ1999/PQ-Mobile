@@ -45,8 +45,78 @@ const puppeteer = require('puppeteer');
         await page.setViewport({ width, height: 844 });
         const url = pathToFileURL(path.resolve(__dirname, `../home${theme}.html`)).href;
         await page.goto(url, { waitUntil: 'networkidle0' });
-        assert.deepEqual(await page.$$eval('[data-home-notifications] .fy-title', nodes => nodes.map(node => node.textContent)), ['Pending Approval', 'Pending Resubmit']);
+        assert.deepEqual(await page.$$eval('[data-home-notifications] .fy-title', nodes => nodes.map(node => node.textContent)), ['Pending Approval', 'Pending Resubmit', 'Training Reminder', 'Clocking Reminder', 'OT Plan Reminder']);
+        assert.equal(await page.$('.section-action[onclick="openForYouModal()"]'), null, 'For You no longer has View all');
+        assert.deepEqual(await page.$$eval('[data-reminder-type] .fy-description', nodes => nodes.map(node => node.textContent)), [
+          'You have 1 training class today from 09:00 to 17:00.',
+          'Your current shift starts from 09:00 to 18:00 today. Please remember to clock in/out.',
+          'You have planned OT of 2 hours from 18:00 to 20:00.'
+        ]);
         assert.equal(await page.$eval('[data-home-notifications]', element => element.scrollWidth <= element.clientWidth), true);
+        assert.deepEqual(await page.$$eval('[data-reminder-type]', nodes => nodes.map(node => [node.dataset.reminderType, node.tagName, !!node.querySelector('.fa-chevron-right')])), [
+          ['training', 'BUTTON', true], ['clocking', 'A', true], ['ot-plan', 'ARTICLE', false]
+        ], 'OT is informational, Training opens a dialog, and Clocking navigates');
+        assert.equal(await page.$$eval('[data-reminder-type] .fy-description', nodes => nodes.every(node => node.scrollWidth <= node.clientWidth)), true, 'Reminder copy fits beside the navigation chevrons');
+        await page.$eval('[data-reminder-type="ot-plan"]', element => {
+          const main = element.closest('.main-content');
+          main.scrollTop += element.getBoundingClientRect().top - main.getBoundingClientRect().top - 30;
+        });
+        await page.click('[data-reminder-type="ot-plan"]');
+        assert.equal(page.url(), url, 'OT Plan Reminder must not navigate');
+        assert.equal(await page.$eval('[data-reminder-type="ot-plan"]', element => element.tabIndex), -1);
+        assert.equal(await page.$eval('[data-reminder-type="ot-plan"]', element => getComputedStyle(element).cursor), 'default');
+
+        const trainingReminder = '[data-reminder-type="training"]';
+        await page.$eval(trainingReminder, element => {
+          const main = element.closest('.main-content');
+          main.scrollTop += element.getBoundingClientRect().top - main.getBoundingClientRect().top - 50;
+          element.focus({ preventScroll: true });
+        });
+        const homeState = await page.evaluate(() => ({ historyLength: history.length, scrollTop: document.querySelector('.main-content').scrollTop }));
+        const scheduleSettled = () => page.waitForFunction(() => {
+          const sheet = document.querySelector('#trainingCalendarSheet .training-calendar-sheet');
+          return sheet.parentElement.classList.contains('is-open')
+            && !sheet.getAnimations().some(animation => animation.playState === 'running')
+            && document.activeElement.id === 'trainingCalendarSheetClose';
+        });
+        const assertHomeRestored = async () => {
+          assert.equal(page.url(), url, 'Training Schedule must stay on Home');
+          const state = await page.evaluate(() => ({ historyLength: history.length, scrollTop: document.querySelector('.main-content').scrollTop, inert: document.querySelector('.main-content').inert, focusedReminder: document.activeElement.dataset.reminderType }));
+          assert.equal(state.historyLength, homeState.historyLength);
+          assert.ok(Math.abs(state.scrollTop - homeState.scrollTop) < 1, 'Closing preserves Home scroll position');
+          assert.equal(state.inert, false);
+          assert.equal(state.focusedReminder, 'training');
+          assert.equal(await page.$eval('#trainingCalendarSheet', element => element.getAttribute('aria-hidden')), 'true');
+        };
+        await page.click(trainingReminder);
+        await scheduleSettled();
+        assert.equal(page.url(), url, 'Opening Training Schedule must not navigate');
+        assert.equal(await page.$eval('#trainingCalendarSheetDate', element => element.textContent), '20 Oct 2026');
+        assert.equal(await page.$eval('#trainingCalendarEvents .history-card-title', element => element.textContent), 'A01');
+        assert.equal(await page.$eval('#trainingCalendarEvents .history-card-ref', element => element.textContent), 'Course: Microsoft 365 Productivity');
+        assert.equal(await page.$eval('#trainingCalendarEvents .training-calendar-event-time strong', element => element.textContent), '9:00 AM – 5:00 PM');
+        assert.equal(await page.$('#trainingCalendarSheetCancel'), null);
+        assert.equal(await page.$eval('.main-content', element => element.inert), true);
+        assert.equal(await page.$eval('phone-bottom-nav', element => element.inert), true);
+        assert.equal(await page.$eval('.training-calendar-sheet', element => element.scrollWidth <= element.clientWidth), true);
+        assert.equal(await page.evaluate(() => document.activeElement.id), 'trainingCalendarSheetClose');
+        await page.keyboard.down('Shift');
+        await page.keyboard.press('Tab');
+        await page.keyboard.up('Shift');
+        assert.equal(await page.evaluate(() => document.activeElement.classList.contains('training-calendar-detail')), true);
+        await page.keyboard.press('Tab');
+        assert.equal(await page.evaluate(() => document.activeElement.id), 'trainingCalendarSheetClose');
+        await page.click('#trainingCalendarSheetClose');
+        await assertHomeRestored();
+        await page.keyboard.press('Enter');
+        await scheduleSettled();
+        await page.keyboard.press('Escape');
+        await assertHomeRestored();
+        await page.keyboard.press('Space');
+        await scheduleSettled();
+        const backdrop = await page.$eval('#trainingCalendarSheet', element => { const rect = element.getBoundingClientRect(); return { x: rect.x + rect.width / 2, y: rect.y + 40 }; });
+        await page.mouse.click(backdrop.x, backdrop.y);
+        await assertHomeRestored();
 
         await openCard('pending_approval', true);
         assert.equal(page.url(), url, 'Home cards open the notification sheet without leaving Home');
@@ -72,21 +142,55 @@ const puppeteer = require('puppeteer');
         await openNotifications();
         await close();
 
-        await page.click('.section-action[onclick="openForYouModal()"]');
-        await settled();
+        await openCard('pending_approval');
         assert.deepEqual(await groupCounts(), [1, 1, 1, 1], 'Category badges show counts for Pending Approval');
         assert.equal(await page.$eval('.notification-status-tabs .active', element => element.dataset.forYouTab), 'pending_approval');
 
         await page.evaluate(() => { openApprovalDetailModal('notif_1'); actionApproveRequest(); });
         assert.deepEqual(await labels(), ['Pending Approval (3)', 'Pending Resubmit (3)']);
         assert.equal(await page.$eval(`${card('pending_approval')} .fy-description`, element => element.textContent), '3 requests are waiting for your approval');
+        assert.equal(await page.$$eval('[data-reminder-type]', nodes => nodes.length), 3, 'Reminders stay visible when pending counts change');
         await page.evaluate(() => { NOTIFICATIONS_CATALOG = []; renderForYouSheetUI(); });
         await close();
         await openCard('pending_approval');
         assert.equal(await page.$eval('#forYouEmptyState', element => getComputedStyle(element).display), 'block');
         assert.deepEqual(await labels(), ['Pending Approval (0)', 'Pending Resubmit (0)']);
-        console.log(`PASS ${theme} ${width}px: home shortcuts, Notification defaults to Pending Approval, two tabs, filter reset, live counts and empty state`);
+        console.log(`PASS ${theme} ${width}px: three reminders, no View all, home shortcuts, notification tabs, filter reset, live counts and empty state`);
       }
+      await page.setViewport({ width: 390, height: 844 });
+      for (const [type, destination, headingSelector, heading] of [
+        ['clocking', 'modules/attendance/options/clocking.html', '.cal-top-header h1', 'Clocking']
+      ]) {
+        const url = pathToFileURL(path.resolve(__dirname, `../home${theme}.html`)).href;
+        await page.goto(url, { waitUntil: 'domcontentloaded' });
+        const reminder = `[data-reminder-type="${type}"]`;
+        await page.$eval(reminder, element => {
+          element.scrollIntoView({ block: 'center' });
+          element.focus({ preventScroll: true });
+        });
+        await Promise.all([
+          page.waitForNavigation({ waitUntil: 'domcontentloaded' }),
+          theme === 'dark' ? page.keyboard.press('Enter') : page.click(reminder)
+        ]);
+        assert.ok(new URL(page.url()).pathname.endsWith('/' + destination));
+        assert.equal(new URL(page.url()).searchParams.get('theme'), theme);
+        assert.equal(await page.$eval(headingSelector, element => element.textContent.trim()), heading);
+        assert.equal(await page.$eval('html', element => element.dataset.theme), theme);
+        await page.goBack({ waitUntil: 'domcontentloaded' });
+        assert.equal(page.url(), url);
+        assert.equal(await page.$$eval('[data-reminder-type]', nodes => nodes.length), 3);
+        console.log(`PASS ${theme}: ${type} reminder opens ${heading} via ${theme === 'dark' ? 'keyboard' : 'click'}, preserves theme and supports browser Back`);
+      }
+      // Detail remains an explicit link after opening the schedule on Home.
+      await page.goto(pathToFileURL(path.resolve(__dirname, `../home${theme}.html`)).href, { waitUntil: 'domcontentloaded' });
+      await page.$eval('[data-reminder-type="training"]', element => element.scrollIntoView({ block: 'center' }));
+      await page.click('[data-reminder-type="training"]');
+      await page.waitForFunction(() => document.getElementById('trainingCalendarSheet').classList.contains('is-open') && !document.querySelector('.training-calendar-sheet').getAnimations().some(animation => animation.playState === 'running'));
+      await page.focus('.training-calendar-detail');
+      await Promise.all([page.waitForNavigation({ waitUntil: 'domcontentloaded' }), page.keyboard.press('Enter')]);
+      assert.ok(new URL(page.url()).pathname.endsWith('/modules/training-competency/options/training-request-details.html'));
+      assert.equal(new URL(page.url()).searchParams.get('request'), 'microsoft-365-productivity');
+      assert.equal(new URL(page.url()).searchParams.get('theme'), theme);
     }
     assert.deepEqual(errors, []);
   } finally {

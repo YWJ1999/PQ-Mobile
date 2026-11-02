@@ -11,14 +11,19 @@
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
     rel="stylesheet">
   <link rel="stylesheet" href="css/theme.css">
+  <link rel="stylesheet" href="css/company-updates.css">
   <link rel="stylesheet" href="css/app.css">
   <link rel="stylesheet" href="css/dashboard-background.css">
+  <link rel="stylesheet" href="css/history-cards.css">
+  <link rel="stylesheet" href="modules/training-competency/css/training-calendar.css">
   <script src="js/components.js"></script>
   <script src="js/app.js" defer></script>
   <script src="js/dashboard-background.js" defer></script>
+  <script src="modules/training-competency/js/training-competency-data.js" defer></script>
+  <script src="modules/training-competency/js/training-calendar.js" defer></script>
 </head>
 
-<body>
+<body data-training-calendar-page="home">
 
   <!-- Desktop Switcher Bar (Instant Theme & Page Navigation) -->
   <preview-top-bar active-page="v1"></preview-top-bar>
@@ -176,58 +181,45 @@
            ======================================================== -->
       <div class="section-header">
         <span class="section-title">For You</span>
-        <a class="section-action" href="javascript:void(0)" onclick="openForYouModal()">View all</a>
       </div>
 
-      <div class="for-you-list" data-home-notifications aria-label="Pending notifications"></div>
+      <div class="for-you-list" data-home-notifications aria-label="Notifications and reminders"></div>
 
       <!-- ========================================================
            4. COMPANY UPDATES
            ======================================================== -->
       <div class="section-header">
         <span class="section-title">Company Updates</span>
-        <a class="section-action" href="javascript:void(0)" onclick="openUpdatesModal()">See all</a>
+        <a class="section-action" data-company-updates-link href="company-updates.html?theme=light">View All</a>
       </div>
 
       <div class="updates-list">
-        <!-- 1. Town Hall this Friday (Unread -> Red) -->
-        <div class="update-card" onclick="openUpdatesModal()">
-          <div class="unread-indicator" style="background: #ef4444; box-shadow: 0 0 8px #ef4444;"></div>
-          <div class="update-thumb" style="background: radial-gradient(circle, #fee2e2, #fecaca);">
-            <span style="transform: rotate(-10deg); display: inline-block;">📢</span>
-          </div>
+        <div class="update-card" data-category="news" onclick="openUpdatesModal()">
+          <span class="unread-indicator" aria-hidden="true"></span>
+          <div class="update-thumb" aria-hidden="true"><i class="fa-solid fa-bullhorn"></i></div>
           <div class="update-content">
-            <span class="update-tag" style="color: #ef4444; font-weight: 700;">UNREAD</span>
+            <span class="update-tag">News · Unread</span>
             <h4 class="update-title">Town Hall this Friday</h4>
-            <p class="update-desc">Join the quarterly company update at 3:00 PM</p>
-            <span class="update-meta">Today • 3 min read</span>
+            <span class="update-meta">Today</span>
           </div>
         </div>
 
-        <!-- 2. Hybrid & Remote Work Policy -->
-        <div class="update-card" onclick="openUpdatesModal()">
-          <div class="unread-indicator" style="background: #0ea5e9; box-shadow: 0 0 8px #0ea5e9;"></div>
-          <div class="update-thumb" style="background: radial-gradient(circle, #e0f2fe, #bae6fd);">
-            <span>📋</span>
-          </div>
+        <div class="update-card" data-category="policy" onclick="openUpdatesModal()">
+          <div class="update-thumb" aria-hidden="true"><i class="fa-solid fa-clipboard-list"></i></div>
           <div class="update-content">
-            <span class="update-tag" style="color: var(--tag-blue-text);">POLICY & SOP</span>
+            <span class="update-tag">Policy &amp; SOP</span>
             <h4 class="update-title">Hybrid & Remote Work Policy 2026</h4>
-            <p class="update-desc">Updated guidelines on flexible hours</p>
+            <span class="update-meta">Effective <time datetime="2026-01-15">15/01/2026</time></span>
           </div>
           <span style="align-self: center; color: var(--text-muted); font-size: 16px;">›</span>
         </div>
 
-        <!-- 3. PeopleQuest wins industry award (Read -> Green) -->
-        <div class="update-card" onclick="openUpdatesModal()">
-          <div class="unread-indicator" style="background: #10b981; box-shadow: 0 0 8px #10b981;"></div>
-          <div class="update-thumb" style="background: radial-gradient(circle, #d1fae5, #a7f3d0);">
-            <span>🏆</span>
-          </div>
+        <div class="update-card" data-category="news" onclick="openUpdatesModal()">
+          <div class="update-thumb" aria-hidden="true"><i class="fa-solid fa-trophy"></i></div>
           <div class="update-content">
-            <span class="update-tag" style="color: #059669; font-weight: 700;">NEWS</span>
+            <span class="update-tag">News</span>
             <h4 class="update-title">PeopleQuest wins industry award</h4>
-            <p class="update-desc">Celebrating the team behind the achievement</p>
+            <span class="update-meta">Yesterday</span>
           </div>
           <span style="align-self: center; color: var(--text-muted); font-size: 16px;">›</span>
         </div>
@@ -242,12 +234,10 @@
 
     <!-- For You Notification Bottom Sheet Drawer -->
     <notification-sheet></notification-sheet>
+    <training-schedule-sheet></training-schedule-sheet>
 
     <!-- All 14 Indicators Bottom Sheet Drawer -->
     <indicators-sheet></indicators-sheet>
-
-    <!-- Company Updates Bottom Sheet Drawer -->
-    <company-updates-sheet></company-updates-sheet>
 
     <!-- Policy & SOP Detail Bottom Sheet Drawer -->
     <policy-detail-sheet></policy-detail-sheet>

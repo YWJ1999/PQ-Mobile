@@ -30,13 +30,13 @@ const url = (file, theme) => pathToFileURL(path.join(root, 'modules/training-com
       assert.ok(await page.$('.record-summary-card .record-summary-metric .record-summary-value'), 'Total Records uses the shared design');
       assert.equal(await page.$eval('#trainingPlanTotalRecords', node => node.textContent), '2');
       assert.deepEqual(await page.$$eval('.training-plan-card-header h2', nodes => nodes.map(node => node.textContent)), ['Channel Assembly', 'Bolt Fitment']);
-      assert.ok(await page.$$eval('.training-plan-card-header', nodes => nodes.every(node => getComputedStyle(node).backgroundImage.includes('124, 58, 237'))), 'Course headers use the standard purple');
-      assert.ok(await page.$$eval('.training-plan-card', nodes => nodes.every(node => JSON.stringify([...node.querySelectorAll('dt')].map(node => node.textContent)) === JSON.stringify(['Last Attended', 'Attendance Status', 'Next Due Date', 'Remarks']))), 'Every course displays the four requested fields');
+      assert.deepEqual(await page.$$eval('.training-plan-card-header .card-status-badge', nodes => nodes.map(node => node.textContent)), ['Not Attended', 'Completed']);
+      assert.ok(await page.$$eval('.training-plan-card', nodes => nodes.every(node => JSON.stringify([...node.querySelectorAll('dt')].map(node => node.textContent)) === JSON.stringify(['Last Attended', 'Next Due Date', 'Remarks']))), 'Each course shows its details below the status header');
       assert.deepEqual(await page.$eval('[data-course-id="channel-assembly"]', card => [...card.querySelectorAll('dd')].map(node => node.textContent)), [
-        'Not yet attended', 'Not Attended', '15 Nov 2026', 'Please enroll in this course as soon as possible.'
+        'Not yet attended', '15 Nov 2026', 'Please enroll in this course as soon as possible.'
       ]);
       assert.deepEqual(await page.$eval('[data-course-id="bolt-fitment"]', card => [...card.querySelectorAll('dd')].map(node => node.textContent)), [
-        '18 Sep 2026', 'Completed', '18 Sep 2027', 'You have completed this course.'
+        '18 Sep 2026', '18 Sep 2027', 'You have completed this course.'
       ]);
       assert.deepEqual(await page.$$eval('.training-plan-card', nodes => nodes.map(node => ({
         remarksCount: node.querySelectorAll('[data-field="remarks"]').length,

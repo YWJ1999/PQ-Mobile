@@ -61,6 +61,8 @@ const APP_ROUTES = {
   'performance': () => `modules/performance/index.html?scope=individual&theme=${getCurrentTheme()}`,
   'performance_goals': () => `modules/performance/index.html?scope=individual&theme=${getCurrentTheme()}`,
   'learning_dev': () => `modules/training-competency/index.html?scope=individual&theme=${getCurrentTheme()}`,
+  // Home reminders open their related options directly.
+  'clocking': () => `modules/attendance/options/clocking.html?theme=${getCurrentTheme()}`,
   // Notification categories open the approval view directly.
   'leave_approvals': () => `leave.html?mode=team&view=approvals&tab=leave&theme=${getCurrentTheme()}`,
   'claims_approvals': () => `modules/claims/options/pending-approval.html?theme=${getCurrentTheme()}`,
@@ -527,12 +529,28 @@ function applyForYouFilters() {
   renderForYouSheetUI();
 }
 
+// Today's sample schedule for the Home preview; replace with employee schedule data when connected.
+const HOME_REMINDER_SCHEDULE = {
+  otPlan: { hours: 2, from: '18:00', to: '20:00' },
+  training: { classes: 1, date: '2026-10-20', from: '09:00', to: '17:00' },
+  shift: { from: '09:00', to: '18:00' }
+};
+
 function renderHomeForYou(counts) {
   const summaries = [
     { status: 'pending_approval', title: 'Pending Approval', icon: 'fa-user-check', tone: 'amber',
       description: count => count ? `${count} ${count === 1 ? 'request is' : 'requests are'} waiting for your approval` : 'No requests are waiting for your approval' },
     { status: 'pending_resubmit', title: 'Pending Resubmit', icon: 'fa-rotate-right', tone: 'violet',
       description: count => count ? `${count} ${count === 1 ? 'request needs' : 'requests need'} updates before resubmission` : 'No requests need resubmission' }
+  ];
+  const { otPlan, training, shift } = HOME_REMINDER_SCHEDULE;
+  const reminders = [
+    { type: 'training', title: 'Training Reminder', icon: 'fa-graduation-cap', tone: 'rose',
+      description: `You have ${training.classes} training ${training.classes === 1 ? 'class' : 'classes'} today from ${training.from} to ${training.to}.` },
+    { type: 'clocking', title: 'Clocking Reminder', icon: 'fa-clock', tone: 'teal', route: 'clocking',
+      description: `Your current shift starts from ${shift.from} to ${shift.to} today. Please remember to clock in/out.` },
+    { type: 'ot-plan', title: 'OT Plan Reminder', icon: 'fa-business-time', tone: 'blue',
+      description: `You have planned OT of ${otPlan.hours} ${otPlan.hours === 1 ? 'hour' : 'hours'} from ${otPlan.from} to ${otPlan.to}.` }
   ];
   document.querySelectorAll('[data-home-notifications]').forEach(list => {
     list.innerHTML = summaries.map(summary => `
@@ -551,7 +569,30 @@ function renderHomeForYou(counts) {
           <i class="fa-solid fa-chevron-right"></i>
         </span>
       </button>
-    `).join('');
+    `).join('') + reminders.map(reminder => {
+      const isTraining = reminder.type === 'training';
+      const isInteractive = isTraining || Boolean(reminder.route);
+      const tag = isTraining ? 'button' : reminder.route ? 'a' : 'article';
+      const action = isTraining
+        ? `type="button" data-training-date="${training.date}" aria-haspopup="dialog" aria-controls="trainingCalendarSheet"`
+        : reminder.route ? `href="${APP_ROUTES[reminder.route]()}"` : '';
+      return `
+      <${tag} class="for-you-card for-you-reminder" data-reminder-type="${reminder.type}" ${action}>
+        <span class="fy-left">
+          <span class="fy-avatar" style="background: var(--tag-${reminder.tone}-bg); color: var(--tag-${reminder.tone}-text);">
+            <i class="fa-solid ${reminder.icon}" aria-hidden="true"></i>
+          </span>
+          <span class="fy-text">
+            <span class="fy-title">${reminder.title}</span>
+            <span class="fy-description">${reminder.description}</span>
+          </span>
+        </span>
+        ${isInteractive ? `<span class="fy-right" style="color: var(--tag-${reminder.tone}-text);" aria-hidden="true">
+          <i class="fa-solid fa-chevron-right"></i>
+        </span>` : ''}
+      </${tag}>
+    `;
+    }).join('');
   });
 }
 
@@ -926,6 +967,14 @@ function applyIndicatorFilters() {
 
 // 9. V1 Company Updates Bottom Sheet Drawer Controls
 function openUpdatesModal() {
+  const link = document.querySelector('[data-company-updates-link]');
+  if (link) {
+    const target = new URL(link.href);
+    const policy = new URLSearchParams(location.search).get('policy');
+    if (policy) target.searchParams.set('policy', policy);
+    location.assign(target.href);
+    return;
+  }
   const overlay = document.getElementById('updatesOverlay');
   if (overlay) overlay.classList.add('active');
 }
@@ -978,6 +1027,7 @@ const POLICY_DATABASE = {
       name: 'PeopleTime_UserGuide_v2.pdf',
       size: '3.91 MB',
       date: '20/12/2024',
+      coverPreview: 'modules/admin/assets/peopletime-user-guide-preview.svg',
       type: 'PDF Document'
     },
     sop: null,
@@ -1102,7 +1152,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (urlParams.get('tab') === 'team') {
     switchInsightTab('team');
   }
-  if (urlParams.get('policy')) {
+  if (urlParams.get('policy') && document.getElementById('policyDetailOverlay')) {
     setTimeout(() => openPolicyDetail(urlParams.get('policy')), 150);
   }
   if (urlParams.get('indicators') === 'team') {

@@ -45,20 +45,20 @@
     renderPerson($('trainingPlanReportingTo'), employee.reportingTo);
     $('trainingPlanTotalRecords').textContent = String(courses.length);
     $('trainingPlanCourses').replaceChildren(...courses.map((course, index) => {
-      const card = node('article', 'training-plan-card');
+      const card = node('article', 'training-plan-card history-card-item');
       card.dataset.courseId = course.id;
-      const header = node('header', 'training-plan-card-header');
-      const title = node('h2', '', display(course.title));
+      card.dataset.status = String(course.attendanceStatus || '').toLowerCase().replace(/\s+/g, '-');
+      const header = node('header', 'training-plan-card-header history-card-header');
+      const title = node('h2', 'history-card-heading', display(course.title));
       title.id = `trainingPlanCourse${index + 1}`;
       card.setAttribute('aria-labelledby', title.id);
-      header.append(title);
-      const details = node('dl', 'training-plan-card-details');
-      const status = detail('Attendance Status', course.attendanceStatus, 'attendance-status');
-      if (course.attendanceStatus === 'Completed') status.classList.add('training-plan-completed');
-      else if (course.attendanceStatus === 'Not Attended') status.classList.add('training-plan-pending');
+      const status = node('span', 'card-status-badge', display(course.attendanceStatus));
+      status.dataset.field = 'attendance-status';
+      header.append(title, status);
+      const details = node('dl', 'training-plan-card-details history-card-details');
       const remarks = detail('Remarks', course.remarks, 'remarks');
       details.append(detail('Last Attended', course.lastAttended ? dateText(course.lastAttended) : 'Not yet attended', 'last-attended'),
-        status, detail('Next Due Date', dateText(course.nextDueDate), 'next-due-date'), remarks);
+        detail('Next Due Date', dateText(course.nextDueDate), 'next-due-date'), remarks);
       card.append(header, details);
       return card;
     }));

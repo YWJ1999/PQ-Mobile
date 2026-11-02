@@ -1374,11 +1374,11 @@
 
       <!-- Attendance Card 1 (Normal) -->
       <div class="history-card-item attendance-record-card" data-exception="none" data-date="2026-09-15">
-           <div class="attendance-record-top">
+           <div class="attendance-record-top history-card-header">
               <button class="attendance-card-details-trigger" type="button" onclick="openModal('attendanceDetailsModalOverlay')" aria-label="View attendance details for 15 September 2026">
                  <span>
                     <span class="history-time-row">W01: 8.30AM – 5.30PM</span>
-                    <span class="attendance-record-reference">Date: Tue, 15 Sep 2026</span>
+                    <span class="attendance-record-reference history-card-ref">Date: Tue, 15 Sep 2026</span>
                  </span>
               </button>
               <div class="attendance-record-controls">
@@ -1386,11 +1386,11 @@
                     <span class="verify-checkbox-box" aria-hidden="true"><i class="fa-solid fa-check"></i></span>
                     <span data-verify-label>Verify</span>
                 </button>
-                <span class="attendance-exception-status"><i class="fa-solid fa-circle-check" aria-hidden="true"></i>No Exception</span>
+                <span class="card-status-badge attendance-exception-status"><i class="fa-solid fa-circle-check" aria-hidden="true"></i>No Exception</span>
               </div>
            </div>
 
-           <div class="attendance-record-summary-panel">
+           <div class="attendance-record-summary-panel history-card-details">
                <div class="attendance-record-detail">
                    <span>Times</span>
                    <strong>07:38</strong>
@@ -1405,7 +1405,7 @@
                </div>
            </div>
 
-           <div class="attendance-card-actions">
+           <div class="attendance-card-actions history-card-actions">
                <button onclick="event.stopPropagation(); openModal('shiftChangeModalOverlay')" class="card-action-btn btn-shift-change">
                  Change Shift
                </button>
@@ -1417,11 +1417,11 @@
 
       <!-- Attendance Card 2 (Exception) -->
       <div class="history-card-item attendance-record-card exception-theme" data-exception="unapproved-ot" data-date="2026-09-14">
-           <div class="attendance-record-top">
+           <div class="attendance-record-top history-card-header">
               <button class="attendance-card-details-trigger" type="button" onclick="openModal('attendanceDetailsModalOverlay')" aria-label="View attendance details for 14 September 2026">
                  <span>
                     <span class="history-time-row">W01: 8.30AM – 5.30PM</span>
-                    <span class="attendance-record-reference">Date: Mon, 14 Sep 2026</span>
+                    <span class="attendance-record-reference history-card-ref">Date: Mon, 14 Sep 2026</span>
                  </span>
               </button>
               <div class="attendance-record-controls">
@@ -1429,11 +1429,11 @@
                     <span class="verify-checkbox-box" aria-hidden="true"><i class="fa-solid fa-check"></i></span>
                     <span data-verify-label>Verify</span>
                 </button>
-                <span class="attendance-exception-status is-exception"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>Unapproved OT</span>
+                <span class="card-status-badge attendance-exception-status is-exception"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>Unapproved OT</span>
               </div>
            </div>
 
-           <div class="attendance-record-summary-panel">
+           <div class="attendance-record-summary-panel history-card-details">
                <div class="attendance-record-detail">
                    <span>Times</span>
                    <strong>08:09, 19:40</strong>
@@ -1448,7 +1448,7 @@
                </div>
            </div>
            
-           <div class="attendance-card-actions">
+           <div class="attendance-card-actions history-card-actions">
                <button onclick="event.stopPropagation(); openModal('shiftChangeModalOverlay')" class="card-action-btn btn-shift-change">
                  Change Shift
                </button>
@@ -1460,11 +1460,11 @@
 
       <!-- Attendance Card 3 (Late In Exception) -->
       <div class="history-card-item attendance-record-card late-in-theme" data-exception="late-in" data-date="2026-09-13">
-           <div class="attendance-record-top">
+           <div class="attendance-record-top history-card-header">
               <button class="attendance-card-details-trigger" type="button" onclick="openModal('attendanceDetailsModalOverlay')" aria-label="View attendance details for 13 September 2026">
                  <span>
                     <span class="history-time-row">W01: 8.30AM – 5.30PM</span>
-                    <span class="attendance-record-reference">Date: Sun, 13 Sep 2026</span>
+                    <span class="attendance-record-reference history-card-ref">Date: Sun, 13 Sep 2026</span>
                  </span>
               </button>
               <div class="attendance-record-controls">
@@ -1472,11 +1472,11 @@
                     <span class="verify-checkbox-box" aria-hidden="true"><i class="fa-solid fa-check"></i></span>
                     <span data-verify-label>Verify</span>
                 </button>
-                <span class="attendance-exception-status is-exception"><i class="fa-solid fa-clock" aria-hidden="true"></i>Late In</span>
+                <span class="card-status-badge attendance-exception-status is-exception"><i class="fa-solid fa-clock" aria-hidden="true"></i>Late In</span>
               </div>
            </div>
 
-           <div class="attendance-record-summary-panel">
+           <div class="attendance-record-summary-panel history-card-details">
                <div class="attendance-record-detail">
                    <span>Times</span>
                    <strong>08:42, 17:30</strong>
@@ -1491,7 +1491,7 @@
                </div>
            </div>
 
-           <div class="attendance-card-actions">
+           <div class="attendance-card-actions history-card-actions">
                <button onclick="event.stopPropagation(); openModal('shiftChangeModalOverlay')" class="card-action-btn btn-shift-change">
                  Change Shift
                </button>

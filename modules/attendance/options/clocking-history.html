@@ -12,6 +12,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="../../../css/theme.css">
   <link rel="stylesheet" href="../../../css/app.css">
+  <link rel="stylesheet" href="../../../css/history-cards.css">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
     body { background-color: var(--bg-page); display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 100vh; color: var(--text-primary); padding: 20px 0; }
@@ -96,73 +97,11 @@
     html[data-theme="light"] input[type="date"]::-webkit-calendar-picker-indicator { filter: none; }
     html[data-theme="dark"] input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1); }
 
-    /* History Cards */
-    .history-card-item {
-      background: linear-gradient(135deg, rgba(16,185,129,0.08) 0%, rgba(52,211,153,0.03) 100%);
-      border: 1px solid rgba(16,185,129,0.3);
-      border-radius: 18px;
-      padding: 16px;
-      margin-bottom: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      box-shadow: 0 4px 12px rgba(16,185,129,0.05);
-      text-decoration: none;
-      transition: transform 0.2s;
-    }
-    html[data-theme="dark"] .history-card-item {
-      background: linear-gradient(135deg, rgba(16,185,129,0.15) 0%, rgba(52,211,153,0.05) 100%);
-      border-color: rgba(16,185,129,0.2);
-    }
-    
-    .history-card-item.ot-theme {
-      background: linear-gradient(135deg, rgba(245,158,11,0.08) 0%, rgba(251,191,36,0.03) 100%);
-      border: 1px solid rgba(245,158,11,0.3);
-    }
-    html[data-theme="dark"] .history-card-item.ot-theme {
-      background: linear-gradient(135deg, rgba(245,158,11,0.15) 0%, rgba(251,191,36,0.05) 100%);
-      border-color: rgba(245,158,11,0.25);
-    }
-
-    .history-card-item.feedback-theme {
-      background: linear-gradient(135deg, rgba(124,58,237,0.08) 0%, rgba(167,139,250,0.03) 100%);
-      border: 1px solid rgba(124,58,237,0.3);
-    }
-    html[data-theme="dark"] .history-card-item.feedback-theme {
-      background: linear-gradient(135deg, rgba(124,58,237,0.15) 0%, rgba(167,139,250,0.05) 100%);
-      border-color: rgba(124,58,237,0.25);
-    }
-
-    .history-date-badge {
-      width: 52px; height: 56px; border-radius: 14px;
-      background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.4);
-      display: flex; flex-direction: column; align-items: center; justify-content: center; color: #059669;
-    }
-    html[data-theme="dark"] .history-date-badge { background: rgba(16, 185, 129, 0.2); border-color: rgba(16, 185, 129, 0.3); color: #34d399; }
-
-    .history-date-badge.ot-badge {
-      background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.4); color: #d97706;
-    }
-    html[data-theme="dark"] .history-date-badge.ot-badge { background: rgba(245, 158, 11, 0.2); border-color: rgba(245, 158, 11, 0.3); color: #fbbf24; }
-
-    .history-date-badge.feedback-badge {
-      background: rgba(124, 58, 237, 0.15); border: 1px solid rgba(124, 58, 237, 0.4); color: #7c3aed;
-    }
-    html[data-theme="dark"] .history-date-badge.feedback-badge { background: rgba(124, 58, 237, 0.2); border-color: rgba(124, 58, 237, 0.3); color: #a78bfa; }
-
-    .legacy-history-full-date { display: block; margin-bottom: 6px; color: var(--purple-text); font-size: 11.5px; font-weight: 800; line-height: 1.4; }
-    .history-date-month { font-size: 11px; font-weight: 800; text-transform: uppercase; line-height: 1; margin-bottom: 2px; }
-    .history-date-day { font-size: 18px; font-weight: 900; line-height: 1; margin-bottom: 2px; }
-    .history-date-year { font-size: 10px; font-weight: 700; line-height: 1; opacity: 0.9; }
-
-    .history-time-row { font-size: 14.5px; font-weight: 800; color: #059669; margin-bottom: 5px; display: flex; align-items: center; gap: 6px; }
-    html[data-theme="dark"] .history-time-row { color: #34d399; }
-
-    .history-time-row.ot-time { color: #d97706; }
-    html[data-theme="dark"] .history-time-row.ot-time { color: #fbbf24; }
-
-    .history-time-row.feedback-time { color: #7c3aed; }
-    html[data-theme="dark"] .history-time-row.feedback-time { color: #a78bfa; }
+    .clocking-history-facts { display: grid; gap: 7px; }
+    .clocking-history-facts > div { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; font-size: 11.5px; line-height: 1.5; }
+    .clocking-history-facts > div > span { color: var(--text-muted); font-weight: 600; }
+    .clocking-history-facts strong { color: var(--text-primary); min-width: 0; text-align: right; overflow-wrap: anywhere; }
+    .clocking-history-facts .employee-id-standard { display: block; margin-bottom: 4px; color: var(--text-muted); font: 700 11.5px monospace, sans-serif; opacity: .8; }
 
     /* Purple Modal Header Styling */
     .modal-header-purple {
@@ -317,146 +256,92 @@
       <div id="viewClockingHistory">
         
         <!-- 17 SEP Clock Out -->
-<a href="javascript:void(0)" onclick="openClockDetailsModal('CLK-910482', 'Clock Out', '17/09/2026 (Tue)', '17:35:12 PM', 'HQ Main Gate (GPS: 3.1390, 101.6869)', 'CC-101 HQ Ops', 'No', 'No')" class="history-card-item">
-          <div style="display: flex; gap: 14px; align-items: center; width: 100%;">
-            <div style="flex: 1;">
-<div class="history-time-row" style="color: #ef4444;">
-                Clock Out
-              </div>
-              <time class="legacy-history-full-date" datetime="2026-09-17">Thu 17 Sep 2026</time>
-              <div style="font-size: 12.5px; font-weight: 700; color: var(--text-primary); margin-bottom: 2px;">
-                Time: <span style="font-weight: 800;">17:35</span>
-              </div>
-              <div style="font-size: 12px; font-weight: 600; color: var(--text-secondary); margin-bottom: 2px;">
-                Cost Center: <span style="color: var(--text-primary); font-weight: 700;">CC-101 HQ Ops</span>
-              </div>
-              <div style="font-size: 12px; font-weight: 600; color: var(--text-secondary);">
-                Excp: <span style="color: #10b981; font-weight: 700;">Normal</span>
-              </div>
+        <a href="javascript:void(0)" onclick="openClockDetailsModal('CLK-910482', 'Clock Out', '17/09/2026 (Tue)', '17:35:12 PM', 'HQ Main Gate (GPS: 3.1390, 101.6869)', 'CC-101 HQ Ops', 'No', 'No')" data-status="normal" class="history-card-item">
+          <div class="history-card-header">
+            <div class="history-card-heading">
+              <h3 class="history-card-title">Clock Out</h3>
+              <time class="history-card-ref" datetime="2026-09-17">Thu 17 Sep 2026</time>
             </div>
-            <div style="color: rgba(16, 185, 129, 0.6); display: flex; align-items: center;">
-              <i class="fa-solid fa-chevron-right" style="font-size: 14px;"></i>
-            </div>
+            <span class="card-status-badge"><i class="fa-solid fa-check" aria-hidden="true"></i>Normal</span>
+          </div>
+          <div class="history-card-details clocking-history-facts">
+            <div><span>Time</span><strong>17:35</strong></div>
+            <div><span>Cost Center</span><strong>CC-101 HQ Ops</strong></div>
           </div>
         </a>
 
         <!-- 17 SEP Clock In -->
-<a href="javascript:void(0)" onclick="openClockDetailsModal('CLK-910481', 'Clock In', '17/09/2026 (Tue)', '08:15:04 AM', 'HQ Main Gate (GPS: 3.1390, 101.6869)', 'CC-101 HQ Ops', 'No', 'No')" class="history-card-item">
-          <div style="display: flex; gap: 14px; align-items: center; width: 100%;">
-            <div style="flex: 1;">
-<div class="history-time-row">
-                Clock In
-              </div>
-              <time class="legacy-history-full-date" datetime="2026-09-17">Thu 17 Sep 2026</time>
-              <div style="font-size: 12.5px; font-weight: 700; color: var(--text-primary); margin-bottom: 2px;">
-                Time: <span style="font-weight: 800;">08:15</span>
-              </div>
-              <div style="font-size: 12px; font-weight: 600; color: var(--text-secondary); margin-bottom: 2px;">
-                Cost Center: <span style="color: var(--text-primary); font-weight: 700;">CC-101 HQ Ops</span>
-              </div>
-              <div style="font-size: 12px; font-weight: 600; color: var(--text-secondary);">
-                Excp: <span style="color: #10b981; font-weight: 700;">Normal</span>
-              </div>
+        <a href="javascript:void(0)" onclick="openClockDetailsModal('CLK-910481', 'Clock In', '17/09/2026 (Tue)', '08:15:04 AM', 'HQ Main Gate (GPS: 3.1390, 101.6869)', 'CC-101 HQ Ops', 'No', 'No')" data-status="normal" class="history-card-item">
+          <div class="history-card-header">
+            <div class="history-card-heading">
+              <h3 class="history-card-title">Clock In</h3>
+              <time class="history-card-ref" datetime="2026-09-17">Thu 17 Sep 2026</time>
             </div>
-            <div style="color: rgba(16, 185, 129, 0.6); display: flex; align-items: center;">
-              <i class="fa-solid fa-chevron-right" style="font-size: 14px;"></i>
-            </div>
+            <span class="card-status-badge"><i class="fa-solid fa-check" aria-hidden="true"></i>Normal</span>
+          </div>
+          <div class="history-card-details clocking-history-facts">
+            <div><span>Time</span><strong>08:15</strong></div>
+            <div><span>Cost Center</span><strong>CC-101 HQ Ops</strong></div>
           </div>
         </a>
 
         <!-- 16 SEP Clock Out -->
-<a href="javascript:void(0)" onclick="openClockDetailsModal('CLK-910399', 'Clock Out', '16/09/2026 (Mon)', '19:40:55 PM', 'HQ Rear Lobby', 'CC-101 HQ Ops', 'No', 'No')" class="history-card-item">
-          <div style="display: flex; gap: 14px; align-items: center; width: 100%;">
-            <div style="flex: 1;">
-<div class="history-time-row" style="color: #f59e0b;">
-                Clock Out
-              </div>
-              <time class="legacy-history-full-date" datetime="2026-09-16">Wed 16 Sep 2026</time>
-              <div style="font-size: 12.5px; font-weight: 700; color: var(--text-primary); margin-bottom: 2px;">
-                Time: <span style="font-weight: 800;">19:40</span>
-              </div>
-              <div style="font-size: 12px; font-weight: 600; color: var(--text-secondary); margin-bottom: 2px;">
-                Cost Center: <span style="color: var(--text-primary); font-weight: 700;">CC-101 HQ Ops</span>
-              </div>
-              <div style="font-size: 12px; font-weight: 600; color: var(--text-secondary);">
-                Excp: <span style="color: #f59e0b; font-weight: 700;">Overtime (2.17 Hrs)</span>
-              </div>
+        <a href="javascript:void(0)" onclick="openClockDetailsModal('CLK-910399', 'Clock Out', '16/09/2026 (Mon)', '19:40:55 PM', 'HQ Rear Lobby', 'CC-101 HQ Ops', 'No', 'No')" data-status="overtime" class="history-card-item">
+          <div class="history-card-header">
+            <div class="history-card-heading">
+              <h3 class="history-card-title">Clock Out</h3>
+              <time class="history-card-ref" datetime="2026-09-16">Wed 16 Sep 2026</time>
             </div>
-            <div style="color: rgba(16, 185, 129, 0.6); display: flex; align-items: center;">
-              <i class="fa-solid fa-chevron-right" style="font-size: 14px;"></i>
-            </div>
+            <span class="card-status-badge"><i class="fa-solid fa-clock" aria-hidden="true"></i>Overtime (2.17 Hrs)</span>
+          </div>
+          <div class="history-card-details clocking-history-facts">
+            <div><span>Time</span><strong>19:40</strong></div>
+            <div><span>Cost Center</span><strong>CC-101 HQ Ops</strong></div>
           </div>
         </a>
 
         <!-- 16 SEP Clock In -->
-<a href="javascript:void(0)" onclick="openClockDetailsModal('CLK-910398', 'Clock In', '16/09/2026 (Mon)', '08:09:12 AM', 'HQ Main Turnstile #2', 'CC-101 HQ Ops', 'No', 'No')" class="history-card-item">
-          <div style="display: flex; gap: 14px; align-items: center; width: 100%;">
-            <div style="flex: 1;">
-<div class="history-time-row">
-                Clock In
-              </div>
-              <time class="legacy-history-full-date" datetime="2026-09-16">Wed 16 Sep 2026</time>
-              <div style="font-size: 12.5px; font-weight: 700; color: var(--text-primary); margin-bottom: 2px;">
-                Time: <span style="font-weight: 800;">08:09</span>
-              </div>
-              <div style="font-size: 12px; font-weight: 600; color: var(--text-secondary); margin-bottom: 2px;">
-                Cost Center: <span style="color: var(--text-primary); font-weight: 700;">CC-101 HQ Ops</span>
-              </div>
-              <div style="font-size: 12px; font-weight: 600; color: var(--text-secondary);">
-                Excp: <span style="color: #10b981; font-weight: 700;">Normal</span>
-              </div>
+        <a href="javascript:void(0)" onclick="openClockDetailsModal('CLK-910398', 'Clock In', '16/09/2026 (Mon)', '08:09:12 AM', 'HQ Main Turnstile #2', 'CC-101 HQ Ops', 'No', 'No')" data-status="normal" class="history-card-item">
+          <div class="history-card-header">
+            <div class="history-card-heading">
+              <h3 class="history-card-title">Clock In</h3>
+              <time class="history-card-ref" datetime="2026-09-16">Wed 16 Sep 2026</time>
             </div>
-            <div style="color: rgba(16, 185, 129, 0.6); display: flex; align-items: center;">
-              <i class="fa-solid fa-chevron-right" style="font-size: 14px;"></i>
-            </div>
+            <span class="card-status-badge"><i class="fa-solid fa-check" aria-hidden="true"></i>Normal</span>
+          </div>
+          <div class="history-card-details clocking-history-facts">
+            <div><span>Time</span><strong>08:09</strong></div>
+            <div><span>Cost Center</span><strong>CC-101 HQ Ops</strong></div>
           </div>
         </a>
 
         <!-- 13 SEP Clock Out -->
-<a href="javascript:void(0)" onclick="openClockDetailsModal('CLK-909877', 'Clock Out', '13/09/2026 (Fri)', '17:15:30 PM', 'Site Project Office (GPS: 3.129, 101.678)', 'CC-202 Tech Dept', 'No', 'No')" class="history-card-item">
-          <div style="display: flex; gap: 14px; align-items: center; width: 100%;">
-            <div style="flex: 1;">
-<div class="history-time-row" style="color: #ef4444;">
-                Clock Out
-              </div>
-              <time class="legacy-history-full-date" datetime="2026-09-13">Sun 13 Sep 2026</time>
-              <div style="font-size: 12.5px; font-weight: 700; color: var(--text-primary); margin-bottom: 2px;">
-                Time: <span style="font-weight: 800;">17:15</span>
-              </div>
-              <div style="font-size: 12px; font-weight: 600; color: var(--text-secondary); margin-bottom: 2px;">
-                Cost Center: <span style="color: var(--text-primary); font-weight: 700;">CC-202 Tech Dept</span>
-              </div>
-              <div style="font-size: 12px; font-weight: 600; color: var(--text-secondary);">
-                Excp: <span style="color: #ef4444; font-weight: 700;">Early Out (15 mins)</span>
-              </div>
+        <a href="javascript:void(0)" onclick="openClockDetailsModal('CLK-909877', 'Clock Out', '13/09/2026 (Fri)', '17:15:30 PM', 'Site Project Office (GPS: 3.129, 101.678)', 'CC-202 Tech Dept', 'No', 'No')" data-status="early-out" class="history-card-item">
+          <div class="history-card-header">
+            <div class="history-card-heading">
+              <h3 class="history-card-title">Clock Out</h3>
+              <time class="history-card-ref" datetime="2026-09-13">Sun 13 Sep 2026</time>
             </div>
-            <div style="color: rgba(16, 185, 129, 0.6); display: flex; align-items: center;">
-              <i class="fa-solid fa-chevron-right" style="font-size: 14px;"></i>
-            </div>
+            <span class="card-status-badge"><i class="fa-solid fa-clock" aria-hidden="true"></i>Early Out (15 mins)</span>
+          </div>
+          <div class="history-card-details clocking-history-facts">
+            <div><span>Time</span><strong>17:15</strong></div>
+            <div><span>Cost Center</span><strong>CC-202 Tech Dept</strong></div>
           </div>
         </a>
 
         <!-- 13 SEP Clock In -->
-<a href="javascript:void(0)" onclick="openClockDetailsModal('CLK-909876', 'Clock In', '13/09/2026 (Fri)', '08:42:10 AM', 'Site Project Office (GPS: 3.129, 101.678)', 'CC-202 Tech Dept', 'No', 'No')" class="history-card-item">
-          <div style="display: flex; gap: 14px; align-items: center; width: 100%;">
-            <div style="flex: 1;">
-<div class="history-time-row">
-                Clock In
-              </div>
-              <time class="legacy-history-full-date" datetime="2026-09-13">Sun 13 Sep 2026</time>
-              <div style="font-size: 12.5px; font-weight: 700; color: var(--text-primary); margin-bottom: 2px;">
-                Time: <span style="font-weight: 800;">08:42</span>
-              </div>
-              <div style="font-size: 12px; font-weight: 600; color: var(--text-secondary); margin-bottom: 2px;">
-                Cost Center: <span style="color: var(--text-primary); font-weight: 700;">CC-202 Tech Dept</span>
-              </div>
-              <div style="font-size: 12px; font-weight: 600; color: var(--text-secondary);">
-                Excp: <span style="color: #f59e0b; font-weight: 700;">Late In (12 mins)</span>
-              </div>
+        <a href="javascript:void(0)" onclick="openClockDetailsModal('CLK-909876', 'Clock In', '13/09/2026 (Fri)', '08:42:10 AM', 'Site Project Office (GPS: 3.129, 101.678)', 'CC-202 Tech Dept', 'No', 'No')" data-status="late-in" class="history-card-item">
+          <div class="history-card-header">
+            <div class="history-card-heading">
+              <h3 class="history-card-title">Clock In</h3>
+              <time class="history-card-ref" datetime="2026-09-13">Sun 13 Sep 2026</time>
             </div>
-            <div style="color: rgba(16, 185, 129, 0.6); display: flex; align-items: center;">
-              <i class="fa-solid fa-chevron-right" style="font-size: 14px;"></i>
-            </div>
+            <span class="card-status-badge"><i class="fa-solid fa-clock" aria-hidden="true"></i>Late In (12 mins)</span>
+          </div>
+          <div class="history-card-details clocking-history-facts">
+            <div><span>Time</span><strong>08:42</strong></div>
+            <div><span>Cost Center</span><strong>CC-202 Tech Dept</strong></div>
           </div>
         </a>
 
@@ -466,90 +351,77 @@
       <div id="viewOtHistory" style="display: none;">
         
         <!-- OT Card 1: Pending (AXT000000000101) -->
-<a href="javascript:void(0)" data-status="pending" onclick="openOtDetailsModal('AXT000000000101', 'Pending Approve', 'SP013 - Angeline loren alan', 'EBB04 - Tech Lead', '12 Jul 2024', '12/07/2024', '8.00AM-5.30PM', '0750', '06:00', '08:00', '0', '16.00', 'OT 1.5 BEFORE WORK', 'URGENT SYSTEM MIGRATION', 'Database Maintenance', 'No', 'Yes', 'Work started before normal hours', 'Please resubmit with signed supervisor logs')" class="history-card-item ot-theme">
-          <div style="display: flex; gap: 14px; align-items: center; width: 100%;">
-            <div style="flex: 1;">
-<div class="history-time-row ot-time" style="font-size: 13px; margin-bottom: 3px;">
-                Ref: <span style="font-weight: 800;">AXT000000000101</span>
-                <span style="font-size: 10.5px; font-weight: 700; background: rgba(245, 158, 11, 0.15); color: #f59e0b; padding: 2px 6px; border-radius: 6px; margin-left: 6px;">Pending Approve</span>
-              </div>
-              <time class="legacy-history-full-date" datetime="2024-07-12">Fri 12 Jul 2024</time>
-              <div style="font-size: 12px; font-weight: 700; color: var(--text-primary); margin-bottom: 2px;">
-                SP013 - Angeline loren alan • <span style="color: var(--text-primary);">OT 1.5 BEFORE WORK</span>
-              </div>
-              <div style="font-size: 11.5px; font-weight: 600; color: var(--text-secondary);">
-                Plan = <span style="font-weight: 800; color: var(--text-primary);">16.00 Hrs</span> • Actual = <span style="font-weight: 800; color: var(--text-primary);">0.00 Hrs</span>
-              </div>
+        <a href="javascript:void(0)" data-status="pending" onclick="openOtDetailsModal('AXT000000000101', 'Pending Approve', 'SP013 - Angeline loren alan', 'EBB04 - Tech Lead', '12 Jul 2024', '12/07/2024', '8.00AM-5.30PM', '0750', '06:00', '08:00', '0', '16.00', 'OT 1.5 BEFORE WORK', 'URGENT SYSTEM MIGRATION', 'Database Maintenance', 'No', 'Yes', 'Work started before normal hours', 'Please resubmit with signed supervisor logs')" class="history-card-item">
+          <div class="history-card-header">
+            <div class="history-card-heading">
+              <h3 class="history-card-title">OT Plan</h3>
+              <div class="history-card-ref">Ref: AXT000000000101</div>
             </div>
-            <div style="color: rgba(245, 158, 11, 0.6); display: flex; align-items: center;">
-              <i class="fa-solid fa-chevron-right" style="font-size: 14px;"></i>
-            </div>
+            <span class="card-status-badge"><i class="fa-solid fa-hourglass-half" aria-hidden="true"></i>Pending Approve</span>
+          </div>
+          <div class="history-card-details clocking-history-facts">
+            <div><span>OT Date</span><strong><time datetime="2024-07-12">Fri 12 Jul 2024</time></strong></div>
+            <div><span>Employee</span><strong>Angeline loren alan<span class="employee-id-standard">#SP013</span></strong></div>
+            <div><span>OT Type</span><strong>OT 1.5 BEFORE WORK</strong></div>
+            <div><span>Plan Hours</span><strong>16.00 Hrs</strong></div>
+            <div><span>Actual Hours</span><strong>0.00 Hrs</strong></div>
           </div>
         </a>
 
         <!-- OT Card 2: Pending (OTB000000001604) -->
-<a href="javascript:void(0)" data-status="pending" onclick="openOtDetailsModal('OTB000000001604', 'Pending Approve', 'SP013 - Angeline loren alan', 'EBB04', '24 Oct 2023', '24/10/2023', '8.00AM-5.30PM', '0758', '20:00', '23:00', '0', '3.00', '1.5 OT', 'MATERIAL', '- SELECT TASK -', 'No', 'Yes', 'Emergency material checking', 'asd')" class="history-card-item ot-theme">
-          <div style="display: flex; gap: 14px; align-items: center; width: 100%;">
-            <div style="flex: 1;">
-<div class="history-time-row ot-time" style="font-size: 13px; margin-bottom: 3px;">
-                Ref: <span style="font-weight: 800;">OTB000000001604</span>
-                <span style="font-size: 10.5px; font-weight: 700; background: rgba(245, 158, 11, 0.15); color: #f59e0b; padding: 2px 6px; border-radius: 6px; margin-left: 6px;">Pending Approve</span>
-              </div>
-              <time class="legacy-history-full-date" datetime="2023-10-24">Tue 24 Oct 2023</time>
-              <div style="font-size: 12px; font-weight: 700; color: var(--text-primary); margin-bottom: 2px;">
-                SP013 - Angeline loren alan • <span style="color: var(--text-primary);">1.5 OT</span>
-              </div>
-              <div style="font-size: 11.5px; font-weight: 600; color: var(--text-secondary);">
-                Plan = <span style="font-weight: 800; color: var(--text-primary);">3.00 Hrs</span> • Actual = <span style="font-weight: 800; color: var(--text-primary);">0.00 Hrs</span> • Submitted: 24/10/2023
-              </div>
+        <a href="javascript:void(0)" data-status="pending" onclick="openOtDetailsModal('OTB000000001604', 'Pending Approve', 'SP013 - Angeline loren alan', 'EBB04', '24 Oct 2023', '24/10/2023', '8.00AM-5.30PM', '0758', '20:00', '23:00', '0', '3.00', '1.5 OT', 'MATERIAL', '- SELECT TASK -', 'No', 'Yes', 'Emergency material checking', 'asd')" class="history-card-item">
+          <div class="history-card-header">
+            <div class="history-card-heading">
+              <h3 class="history-card-title">OT Plan</h3>
+              <div class="history-card-ref">Ref: OTB000000001604</div>
             </div>
-            <div style="color: rgba(245, 158, 11, 0.6); display: flex; align-items: center;">
-              <i class="fa-solid fa-chevron-right" style="font-size: 14px;"></i>
-            </div>
+            <span class="card-status-badge"><i class="fa-solid fa-hourglass-half" aria-hidden="true"></i>Pending Approve</span>
+          </div>
+          <div class="history-card-details clocking-history-facts">
+            <div><span>OT Date</span><strong><time datetime="2023-10-24">Tue 24 Oct 2023</time></strong></div>
+            <div><span>Employee</span><strong>Angeline loren alan<span class="employee-id-standard">#SP013</span></strong></div>
+            <div><span>OT Type</span><strong>1.5 OT</strong></div>
+            <div><span>Plan Hours</span><strong>3.00 Hrs</strong></div>
+            <div><span>Actual Hours</span><strong>0.00 Hrs</strong></div>
+            <div><span>Submitted Date</span><strong>24/10/2023</strong></div>
           </div>
         </a>
 
         <!-- OT Card 3: Approved (OTB000000001620) -->
-<a href="javascript:void(0)" data-status="approved" onclick="openOtDetailsModal('OTB000000001620', 'Approved', 'SP013 - Angeline loren alan', 'EBB04', '05 Sep 2026', '05/09/2026', '8.00AM-5.30PM', '0752', '18:00', '21:00', '0', '3.00', '1.5 OT', 'SYSTEM UPGRADE', 'Server Patching', 'Yes', 'No', 'Scheduled maintenance', 'Approved by Manager')" class="history-card-item ot-theme">
-          <div style="display: flex; gap: 14px; align-items: center; width: 100%;">
-            <div style="flex: 1;">
-<div class="history-time-row ot-time" style="font-size: 13px; margin-bottom: 3px;">
-                Ref: <span style="font-weight: 800;">OTB000000001620</span>
-                <span style="font-size: 10.5px; font-weight: 700; background: rgba(16, 185, 129, 0.15); color: #10b981; padding: 2px 6px; border-radius: 6px; margin-left: 6px;">Approved</span>
-              </div>
-              <time class="legacy-history-full-date" datetime="2026-09-05">Sat 5 Sep 2026</time>
-              <div style="font-size: 12px; font-weight: 700; color: var(--text-primary); margin-bottom: 2px;">
-                SP013 - Angeline loren alan • <span style="color: var(--text-primary);">1.5 OT</span>
-              </div>
-              <div style="font-size: 11.5px; font-weight: 600; color: var(--text-secondary);">
-                Plan = <span style="font-weight: 800; color: var(--text-primary);">3.00 Hrs</span> • Actual = <span style="font-weight: 800; color: var(--text-primary);">3.00 Hrs</span> • Approved: 05/09/2026
-              </div>
+        <a href="javascript:void(0)" data-status="approved" onclick="openOtDetailsModal('OTB000000001620', 'Approved', 'SP013 - Angeline loren alan', 'EBB04', '05 Sep 2026', '05/09/2026', '8.00AM-5.30PM', '0752', '18:00', '21:00', '0', '3.00', '1.5 OT', 'SYSTEM UPGRADE', 'Server Patching', 'Yes', 'No', 'Scheduled maintenance', 'Approved by Manager')" class="history-card-item">
+          <div class="history-card-header">
+            <div class="history-card-heading">
+              <h3 class="history-card-title">OT Plan</h3>
+              <div class="history-card-ref">Ref: OTB000000001620</div>
             </div>
-            <div style="color: rgba(16, 185, 129, 0.6); display: flex; align-items: center;">
-              <i class="fa-solid fa-chevron-right" style="font-size: 14px;"></i>
-            </div>
+            <span class="card-status-badge"><i class="fa-solid fa-check" aria-hidden="true"></i>Approved</span>
+          </div>
+          <div class="history-card-details clocking-history-facts">
+            <div><span>OT Date</span><strong><time datetime="2026-09-05">Sat 5 Sep 2026</time></strong></div>
+            <div><span>Employee</span><strong>Angeline loren alan<span class="employee-id-standard">#SP013</span></strong></div>
+            <div><span>OT Type</span><strong>1.5 OT</strong></div>
+            <div><span>Plan Hours</span><strong>3.00 Hrs</strong></div>
+            <div><span>Actual Hours</span><strong>3.00 Hrs</strong></div>
+            <div><span>Approved Date</span><strong>05/09/2026</strong></div>
           </div>
         </a>
 
         <!-- OT Card 4: Rejected (OTB000000001630) -->
-<a href="javascript:void(0)" data-status="rejected" onclick="openOtDetailsModal('OTB000000001630', 'Rejected', 'SP013 - Angeline loren alan', 'EBB04', '10 Aug 2026', '10/08/2026', '8.00AM-5.30PM', '0800', '18:00', '20:00', '0', '2.00', '1.5 OT', 'OTHER', 'Documentation', 'No', 'No', 'General documentation', 'Overtime budget exceeded')" class="history-card-item ot-theme">
-          <div style="display: flex; gap: 14px; align-items: center; width: 100%;">
-            <div style="flex: 1;">
-<div class="history-time-row ot-time" style="font-size: 13px; margin-bottom: 3px;">
-                Ref: <span style="font-weight: 800;">OTB000000001630</span>
-                <span style="font-size: 10.5px; font-weight: 700; background: rgba(239, 68, 68, 0.15); color: #ef4444; padding: 2px 6px; border-radius: 6px; margin-left: 6px;">Rejected</span>
-              </div>
-              <time class="legacy-history-full-date" datetime="2026-08-10">Mon 10 Aug 2026</time>
-              <div style="font-size: 12px; font-weight: 700; color: var(--text-primary); margin-bottom: 2px;">
-                SP013 - Angeline loren alan • <span style="color: var(--text-primary);">1.5 OT</span>
-              </div>
-              <div style="font-size: 11.5px; font-weight: 600; color: var(--text-secondary);">
-                Plan = <span style="font-weight: 800; color: var(--text-primary);">2.00 Hrs</span> • Actual = <span style="font-weight: 800; color: var(--text-primary);">0.00 Hrs</span> • Declined: 10/08/2026
-              </div>
+        <a href="javascript:void(0)" data-status="rejected" onclick="openOtDetailsModal('OTB000000001630', 'Rejected', 'SP013 - Angeline loren alan', 'EBB04', '10 Aug 2026', '10/08/2026', '8.00AM-5.30PM', '0800', '18:00', '20:00', '0', '2.00', '1.5 OT', 'OTHER', 'Documentation', 'No', 'No', 'General documentation', 'Overtime budget exceeded')" class="history-card-item">
+          <div class="history-card-header">
+            <div class="history-card-heading">
+              <h3 class="history-card-title">OT Plan</h3>
+              <div class="history-card-ref">Ref: OTB000000001630</div>
             </div>
-            <div style="color: rgba(239, 68, 68, 0.6); display: flex; align-items: center;">
-              <i class="fa-solid fa-chevron-right" style="font-size: 14px;"></i>
-            </div>
+            <span class="card-status-badge"><i class="fa-solid fa-circle-xmark" aria-hidden="true"></i>Rejected</span>
+          </div>
+          <div class="history-card-details clocking-history-facts">
+            <div><span>OT Date</span><strong><time datetime="2026-08-10">Mon 10 Aug 2026</time></strong></div>
+            <div><span>Employee</span><strong>Angeline loren alan<span class="employee-id-standard">#SP013</span></strong></div>
+            <div><span>OT Type</span><strong>1.5 OT</strong></div>
+            <div><span>Plan Hours</span><strong>2.00 Hrs</strong></div>
+            <div><span>Actual Hours</span><strong>0.00 Hrs</strong></div>
+            <div><span>Declined Date</span><strong>10/08/2026</strong></div>
           </div>
         </a>
 
@@ -559,106 +431,66 @@
       <div id="viewFeedbackHistory" style="display: none;">
          
         <!-- Feedback Card 1: Pending (ATT000000000432) -->
-        <a href="javascript:void(0)" data-status="pending" onclick="openFeedbackDetailsModal('ATT000000000432', 'Pending Approve', 'EBB12 - Farhan binti rahmat', 'TIMES SQUARE BRANCH', 'HUMAN RESOURCE', '31 Dec 2025', '8.00AM-5.30PM', 'EBB12 - Farhan binti rahmat', '26/02/2026', '[Comment by FARHAN BIN RAHMAT (EBB12)]\nokay')" class="history-card-item feedback-theme">
-          <div style="display: flex; gap: 14px; align-items: center; width: 100%;">
-            <div class="history-date-badge feedback-badge">
-              <div class="history-date-month">DEC</div>
-              <div class="history-date-day">31</div>
-              <div class="history-date-year">2025</div>
+        <a href="javascript:void(0)" data-status="pending" onclick="openFeedbackDetailsModal('ATT000000000432', 'Pending Approve', 'EBB12 - Farhan binti rahmat', 'TIMES SQUARE BRANCH', 'HUMAN RESOURCE', '31 Dec 2025', '8.00AM-5.30PM', 'EBB12 - Farhan binti rahmat', '26/02/2026', '[Comment by FARHAN BIN RAHMAT (EBB12)]\nokay')" class="history-card-item">
+          <div class="history-card-header">
+            <div class="history-card-heading">
+              <h3 class="history-card-title">Attendance Feedback</h3>
+              <div class="history-card-ref">Ref: ATT000000000432</div>
             </div>
-            <div style="flex: 1;">
-<div class="history-time-row feedback-time" style="font-size: 13px; margin-bottom: 3px;">
-                Ref: <span style="font-weight: 800;">ATT000000000432</span>
-                <span style="font-size: 10.5px; font-weight: 700; background: rgba(245, 158, 11, 0.15); color: #f59e0b; padding: 2px 6px; border-radius: 6px; margin-left: 6px;">Pending Approve</span>
-              </div>
-              <div style="font-size: 12px; font-weight: 700; color: var(--text-primary); margin-bottom: 2px;">
-                EBB12 - Farhan binti rahmat • <span style="color: var(--text-primary);">Attendance Advice</span>
-              </div>
-              <div style="font-size: 11.5px; font-weight: 600; color: var(--text-secondary);">
-                Submitted Date = 26/02/2026
-              </div>
-            </div>
-            <div style="color: rgba(167, 139, 250, 0.7); display: flex; align-items: center;">
-              <i class="fa-solid fa-chevron-right" style="font-size: 14px;"></i>
-            </div>
+            <span class="card-status-badge"><i class="fa-solid fa-hourglass-half" aria-hidden="true"></i>Pending Approve</span>
+          </div>
+          <div class="history-card-details clocking-history-facts">
+            <div><span>Attendance Date</span><strong>31 Dec 2025</strong></div>
+            <div><span>Employee</span><strong>Farhan binti rahmat<span class="employee-id-standard">#EBB12</span></strong></div>
+            <div><span>Submitted Date</span><strong>26/02/2026</strong></div>
           </div>
         </a>
 
         <!-- Feedback Card 2: Pending (ATT000000000435) -->
-        <a href="javascript:void(0)" data-status="pending" onclick="openFeedbackDetailsModal('ATT000000000435', 'Pending Review', 'SP013 - Angeline loren alan', 'HQ MAIN BRANCH', 'TECH DEPT', '14 Sep 2026', '8.30AM-5.30PM', 'SP013 - Angeline', '14/09/2026', 'Pending supervisor review')" class="history-card-item feedback-theme">
-          <div style="display: flex; gap: 14px; align-items: center; width: 100%;">
-            <div class="history-date-badge feedback-badge">
-              <div class="history-date-month">SEP</div>
-              <div class="history-date-day">14</div>
-              <div class="history-date-year">2026</div>
+        <a href="javascript:void(0)" data-status="pending" onclick="openFeedbackDetailsModal('ATT000000000435', 'Pending Review', 'SP013 - Angeline loren alan', 'HQ MAIN BRANCH', 'TECH DEPT', '14 Sep 2026', '8.30AM-5.30PM', 'SP013 - Angeline', '14/09/2026', 'Pending supervisor review')" class="history-card-item">
+          <div class="history-card-header">
+            <div class="history-card-heading">
+              <h3 class="history-card-title">Attendance Feedback</h3>
+              <div class="history-card-ref">Ref: ATT000000000435</div>
             </div>
-            <div style="flex: 1;">
-<div class="history-time-row feedback-time" style="font-size: 13px; margin-bottom: 3px;">
-                Ref: <span style="font-weight: 800;">ATT000000000435</span>
-                <span style="font-size: 10.5px; font-weight: 700; background: rgba(245, 158, 11, 0.15); color: #f59e0b; padding: 2px 6px; border-radius: 6px; margin-left: 6px;">Pending Approve</span>
-              </div>
-              <div style="font-size: 12px; font-weight: 700; color: var(--text-primary); margin-bottom: 2px;">
-                SP013 - Angeline loren alan • <span style="color: var(--text-primary);">Attendance Advice</span>
-              </div>
-              <div style="font-size: 11.5px; font-weight: 600; color: var(--text-secondary);">
-                Submitted Date = 14/09/2026
-              </div>
-            </div>
-            <div style="color: rgba(167, 139, 250, 0.7); display: flex; align-items: center;">
-              <i class="fa-solid fa-chevron-right" style="font-size: 14px;"></i>
-            </div>
+            <span class="card-status-badge"><i class="fa-solid fa-hourglass-half" aria-hidden="true"></i>Pending Review</span>
+          </div>
+          <div class="history-card-details clocking-history-facts">
+            <div><span>Attendance Date</span><strong>14 Sep 2026</strong></div>
+            <div><span>Employee</span><strong>Angeline loren alan<span class="employee-id-standard">#SP013</span></strong></div>
+            <div><span>Submitted Date</span><strong>14/09/2026</strong></div>
           </div>
         </a>
 
         <!-- Feedback Card 3: Approved (ATT000000000440) -->
-        <a href="javascript:void(0)" data-status="approved" onclick="openFeedbackDetailsModal('ATT000000000440', 'Approved', 'SP013 - Angeline loren alan', 'HQ MAIN BRANCH', 'TECH DEPT', '02 Sep 2026', '8.30AM-5.30PM', 'SP013 - Angeline', '02/09/2026', 'Approved by HR')" class="history-card-item feedback-theme">
-          <div style="display: flex; gap: 14px; align-items: center; width: 100%;">
-            <div class="history-date-badge feedback-badge">
-              <div class="history-date-month">SEP</div>
-              <div class="history-date-day">02</div>
-              <div class="history-date-year">2026</div>
+        <a href="javascript:void(0)" data-status="approved" onclick="openFeedbackDetailsModal('ATT000000000440', 'Approved', 'SP013 - Angeline loren alan', 'HQ MAIN BRANCH', 'TECH DEPT', '02 Sep 2026', '8.30AM-5.30PM', 'SP013 - Angeline', '02/09/2026', 'Approved by HR')" class="history-card-item">
+          <div class="history-card-header">
+            <div class="history-card-heading">
+              <h3 class="history-card-title">Attendance Feedback</h3>
+              <div class="history-card-ref">Ref: ATT000000000440</div>
             </div>
-            <div style="flex: 1;">
-<div class="history-time-row feedback-time" style="font-size: 13px; margin-bottom: 3px;">
-                Ref: <span style="font-weight: 800;">ATT000000000440</span>
-                <span style="font-size: 10.5px; font-weight: 700; background: rgba(16, 185, 129, 0.15); color: #10b981; padding: 2px 6px; border-radius: 6px; margin-left: 6px;">Approved</span>
-              </div>
-              <div style="font-size: 12px; font-weight: 700; color: var(--text-primary); margin-bottom: 2px;">
-                SP013 - Angeline loren alan • <span style="color: var(--text-primary);">Attendance Advice</span>
-              </div>
-              <div style="font-size: 11.5px; font-weight: 600; color: var(--text-secondary);">
-                Approved Date = 02/09/2026
-              </div>
-            </div>
-            <div style="color: rgba(16, 185, 129, 0.7); display: flex; align-items: center;">
-              <i class="fa-solid fa-chevron-right" style="font-size: 14px;"></i>
-            </div>
+            <span class="card-status-badge"><i class="fa-solid fa-check" aria-hidden="true"></i>Approved</span>
+          </div>
+          <div class="history-card-details clocking-history-facts">
+            <div><span>Attendance Date</span><strong>02 Sep 2026</strong></div>
+            <div><span>Employee</span><strong>Angeline loren alan<span class="employee-id-standard">#SP013</span></strong></div>
+            <div><span>Approved Date</span><strong>02/09/2026</strong></div>
           </div>
         </a>
 
         <!-- Feedback Card 4: Rejected (ATT000000000445) -->
-        <a href="javascript:void(0)" data-status="rejected" onclick="openFeedbackDetailsModal('ATT000000000445', 'Rejected', 'SP013 - Angeline loren alan', 'HQ MAIN BRANCH', 'TECH DEPT', '18 Jul 2026', '8.30AM-5.30PM', 'SP013 - Angeline', '18/07/2026', 'Invalid reason provided')" class="history-card-item feedback-theme">
-          <div style="display: flex; gap: 14px; align-items: center; width: 100%;">
-            <div class="history-date-badge feedback-badge">
-              <div class="history-date-month">JUL</div>
-              <div class="history-date-day">18</div>
-              <div class="history-date-year">2026</div>
+        <a href="javascript:void(0)" data-status="rejected" onclick="openFeedbackDetailsModal('ATT000000000445', 'Rejected', 'SP013 - Angeline loren alan', 'HQ MAIN BRANCH', 'TECH DEPT', '18 Jul 2026', '8.30AM-5.30PM', 'SP013 - Angeline', '18/07/2026', 'Invalid reason provided')" class="history-card-item">
+          <div class="history-card-header">
+            <div class="history-card-heading">
+              <h3 class="history-card-title">Attendance Feedback</h3>
+              <div class="history-card-ref">Ref: ATT000000000445</div>
             </div>
-            <div style="flex: 1;">
-<div class="history-time-row feedback-time" style="font-size: 13px; margin-bottom: 3px;">
-                Ref: <span style="font-weight: 800;">ATT000000000445</span>
-                <span style="font-size: 10.5px; font-weight: 700; background: rgba(239, 68, 68, 0.15); color: #ef4444; padding: 2px 6px; border-radius: 6px; margin-left: 6px;">Rejected</span>
-              </div>
-              <div style="font-size: 12px; font-weight: 700; color: var(--text-primary); margin-bottom: 2px;">
-                SP013 - Angeline loren alan • <span style="color: var(--text-primary);">Attendance Advice</span>
-              </div>
-              <div style="font-size: 11.5px; font-weight: 600; color: var(--text-secondary);">
-                Declined Date = 18/07/2026
-              </div>
-            </div>
-            <div style="color: rgba(239, 68, 68, 0.7); display: flex; align-items: center;">
-              <i class="fa-solid fa-chevron-right" style="font-size: 14px;"></i>
-            </div>
+            <span class="card-status-badge"><i class="fa-solid fa-circle-xmark" aria-hidden="true"></i>Rejected</span>
+          </div>
+          <div class="history-card-details clocking-history-facts">
+            <div><span>Attendance Date</span><strong>18 Jul 2026</strong></div>
+            <div><span>Employee</span><strong>Angeline loren alan<span class="employee-id-standard">#SP013</span></strong></div>
+            <div><span>Declined Date</span><strong>18/07/2026</strong></div>
           </div>
         </a>
 

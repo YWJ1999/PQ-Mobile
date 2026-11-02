@@ -259,10 +259,10 @@
       icon.setAttribute('aria-hidden', 'true');
       menu.append(icon);
       menu.addEventListener('click', () => showMenu(record, menu));
-      header.append(check, employee, menu);
+      header.append(check, employee, node('span', 'payroll-approval-status', 'Pending Approval'), menu);
       const body = node('div', 'payroll-approval-card-body');
       const status = node('div', 'payroll-approval-status-row');
-      status.append(node('span', 'payroll-approval-status', 'Pending Approval'), node('span', 'payroll-approval-date', `Submitted ${date(record.submittedAt)}`));
+      status.append(node('span', 'payroll-approval-date', `Submitted ${date(record.submittedAt)}`));
       const fields = node('div', 'payroll-approval-field-grid');
       if (record.category === 'goal-plan') {
         fields.append(field('Department', record.department), field('Session', record.session));

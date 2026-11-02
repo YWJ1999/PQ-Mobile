@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Company Updates · PeopleHCM</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="css/theme.css">
+  <link rel="stylesheet" href="css/app.css">
+  <link rel="stylesheet" href="css/company-updates.css">
+  <script src="js/components.js"></script>
+  <script src="js/app.js" defer></script>
+  <script src="js/company-updates.js" defer></script>
+</head>
+<body>
+  <div class="phone-container company-updates-page">
+    <div class="updates-screen">
+      <phone-status-bar time="9:41"></phone-status-bar>
+      <header class="updates-header">
+        <a id="updatesBack" href="homelight.html" aria-label="Back to Home"><i class="fa-solid fa-chevron-left" aria-hidden="true"></i></a>
+        <h1>Company Updates</h1>
+      </header>
+      <div class="updates-filters" role="group" aria-label="Filter updates by type">
+        <button type="button" data-type="all" aria-pressed="true">All types</button>
+        <button type="button" data-type="news" aria-pressed="false">News</button>
+        <button type="button" data-type="policy" aria-pressed="false">Policy &amp; SOP</button>
+      </div>
+      <main class="updates-content">
+        <ul id="companyUpdatesList" aria-label="Company updates"></ul>
+        <article id="companyNewsDetail" hidden>
+          <span class="updates-type">News</span>
+          <h2></h2><p class="updates-date"></p><p class="updates-article-text"></p>
+        </article>
+        <section id="companyPolicyDetail" hidden aria-labelledby="companyPolicyTitle">
+          <article>
+            <span class="updates-type">Policy &amp; SOP</span>
+            <h2 id="companyPolicyTitle"></h2>
+            <dl class="updates-policy-fields">
+              <div><dt>Reference</dt><dd id="companyPolicyRef"></dd></div>
+              <div><dt>Department</dt><dd id="companyPolicyDept"></dd></div>
+            </dl>
+          </article>
+          <h2 class="updates-documents-title" id="companyDocumentsTitle">Documents</h2>
+          <ul class="updates-documents" aria-labelledby="companyDocumentsTitle"></ul>
+          <template id="companyDocumentCard">
+            <li class="updates-document">
+              <span class="document-icon" aria-hidden="true"><i class="fa-regular fa-file-pdf"></i></span>
+              <div class="document-info">
+                <span class="document-kind"></span>
+                <h3></h3>
+                <p class="document-meta"></p>
+                <p class="document-effective"></p>
+              </div>
+            </li>
+          </template>
+        </section>
+      </main>
+    </div>
+  </div>
+</body>
+</html>
