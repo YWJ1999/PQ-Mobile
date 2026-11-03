@@ -73,9 +73,9 @@ async function openNotifications(page, url) {
       await page.click('#notificationFilterButton');
       assert.equal(await page.$eval(option('Overtime'), el => el.checked), false);
       assert.equal(await page.$eval(option('Leave Request'), el => el.checked), true);
-      await page.click('.notification-filter-options-heading button');
+      await page.click('#notificationDocumentDialog .standard-filter-reset');
       assert.equal(await groupCount(), 2, 'Reset is draft-only until Apply');
-      await page.click('#notificationDocumentDialog .sheet-close-btn');
+      await page.click('#notificationDocumentDialog .standard-filter-close');
       assert.equal(await groupCount(), 2, 'Close discards reset');
       await page.click('#notificationFilterButton');
       await page.click(option('Overtime'));
@@ -83,7 +83,7 @@ async function openNotifications(page, url) {
       assert.equal(await page.$eval('#notificationDocumentDialog', el => el.open), false, 'Backdrop dismisses');
       assert.equal(await groupCount(), 2, 'Backdrop discards draft');
       await page.click('#notificationFilterButton');
-      await page.click('.notification-filter-options-heading button');
+      await page.click('#notificationDocumentDialog .standard-filter-reset');
       await page.click('.notification-filter-apply');
       assert.equal(await groupCount(), 4, 'Apply reset restores all Pending Approval categories');
       assert.equal(await page.$eval('#notificationFilterButton', el => el.classList.contains('has-filter')), false);
@@ -95,7 +95,7 @@ async function openNotifications(page, url) {
       ]) {
         await page.click(`[data-for-you-tab="${status}"]`);
         await page.click('#notificationFilterButton');
-        await page.click('.notification-filter-options-heading button');
+        await page.click('#notificationDocumentDialog .standard-filter-reset');
         await page.click(option(type));
         await page.click('.notification-filter-apply');
         assert.deepEqual(await page.$$eval('.notif-category-card', els => els.map(el => [el.querySelector('.group-title-text').textContent, el.querySelector('.group-count-badge').textContent])), [[name, '1']]);
@@ -105,7 +105,7 @@ async function openNotifications(page, url) {
       assert.equal(await page.$eval('#forYouEmptyState', el => el.getClientRects().length > 0), true);
       await page.click('.notification-status-tabs button:first-child');
       await page.click('#notificationFilterButton');
-      await page.click('.notification-filter-options-heading button');
+      await page.click('#notificationDocumentDialog .standard-filter-reset');
       await page.click('.notification-filter-apply');
       for (const width of [320, 360, 390, 420]) {
         await page.setViewport({ width, height: 844 });

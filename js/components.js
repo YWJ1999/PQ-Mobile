@@ -331,11 +331,13 @@ class NotificationSheet extends HTMLElement {
             <h2 id="notificationDocumentTitle">Filter notifications</h2>
             <p id="notificationDocumentDescription">Choose the document types to show.</p>
           </div>
-          <button type="button" class="sheet-close-btn" onclick="closeNotificationFilter()" aria-label="Close filter"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
+          <div class="standard-filter-header-actions">
+            <button type="button" class="standard-filter-reset" onclick="resetNotificationFilter()"><i class="fa-solid fa-rotate-left" aria-hidden="true"></i><span>Reset</span></button>
+            <button type="button" class="standard-filter-close" onclick="closeNotificationFilter()" aria-label="Close filter"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
+          </div>
         </div>
         <div class="notification-filter-options-heading">
           <span id="notificationDocumentOptionsLabel">Document type</span>
-          <button type="button" onclick="resetNotificationFilter()">Reset</button>
         </div>
         <div class="notification-filter-options" role="group" aria-labelledby="notificationDocumentOptionsLabel">
           ${['all', 'Leave Request', 'Medical Claim', 'Overtime', 'Change Request', 'Tax EA Form', 'Performance Goal'].map(value => `
@@ -1433,7 +1435,7 @@ class PendingApprovalCard extends HTMLElement {
         </div>
 
         <!-- 2. Card Content Body -->
-        <div style="padding: 14px; cursor: pointer;" onclick="if (!event.target.closest('.action-btn-approve, .action-btn-reject, .action-btn-resubmit, .approval-card-checkbox, .three-dots-btn')) { window.ClaimsEngine && window.ClaimsEngine.triggerClaimViewDetails ? window.ClaimsEngine.triggerClaimViewDetails('${itemId}') : null; }">
+        <div style="padding: 14px; cursor: pointer;" onclick="if (!event.target.closest('.pending-action-grid, .approval-card-checkbox, .three-dots-btn')) { window.ClaimsEngine && window.ClaimsEngine.triggerClaimViewDetails ? window.ClaimsEngine.triggerClaimViewDetails('${itemId}') : null; }">
           <!-- Status Badge & Submit Date Row -->
           <div style="margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between;">
             <div style="font-size: 11.5px; font-weight: 700; color: var(--text-muted); display: flex; align-items: center; gap: 4px;">
@@ -1446,7 +1448,7 @@ class PendingApprovalCard extends HTMLElement {
           ${middleContentHtml}
 
           <!-- Bottom Action Buttons Grid (Approve, Resubmit, Reject) matching Attendance -->
-          <div class="pending-action-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px;">
+          <div class="pending-action-grid">
             <button type="button" class="action-btn-approve" onclick="window.ClaimsEngine ? window.ClaimsEngine.actionTeamClaim(${itemId}, 'approve', '${userName.replace(/'/g, "\\'")}', '${amount}') : null">
               <i class="fa-solid fa-check" style="font-size: 11.5px;"></i> Approve
             </button>

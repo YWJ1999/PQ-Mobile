@@ -695,15 +695,6 @@
       font-weight: 600;
     }
 
-    .unread-indicator {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      position: absolute;
-      top: 14px;
-      right: 14px;
-    }
-
     /* ========================================================
        BOTTOM NAVIGATION BAR (LIGHT MODE WITH APPS 4-DOTS)
        ======================================================== */
@@ -1429,6 +1420,8 @@
   <link rel="stylesheet" href="css/company-updates.css">
   <link rel="stylesheet" href="css/dashboard-legacy.css">
   <link rel="stylesheet" href="css/dashboard-background.css">
+  <script src="modules/admin/js/policy-data.js" defer></script>
+  <script src="js/company-updates.js" defer></script>
   <script src="js/dashboard-background.js" defer></script>
   <script src="js/mouse-swipe.js" defer></script>
 </head>
@@ -1823,35 +1816,35 @@
       </div>
 
       <div class="updates-list">
-        <div class="update-card" data-category="news" onclick="openUpdatesModal()">
-          <span class="unread-indicator" aria-hidden="true"></span>
+        <a class="update-card" data-category="news" href="company-updates.html?theme=light&amp;story=town-hall&amp;via=home&amp;from=legacy">
           <div class="update-thumb" aria-hidden="true"><i class="fa-solid fa-bullhorn"></i></div>
           <div class="update-content">
-            <span class="update-tag">News · Unread</span>
+            <span class="update-tag">News</span>
             <h4 class="update-title">Town Hall this Friday</h4>
             <span class="update-meta">Today</span>
           </div>
-        </div>
+          <span class="update-chevron" aria-hidden="true"></span>
+        </a>
 
-        <div class="update-card" data-category="policy" onclick="openUpdatesModal()">
+        <a class="update-card" data-category="policy" href="company-updates.html?theme=light&amp;via=home&amp;from=legacy">
           <div class="update-thumb" aria-hidden="true"><i class="fa-solid fa-clipboard-list"></i></div>
           <div class="update-content">
             <span class="update-tag">Policy &amp; SOP</span>
-            <h4 class="update-title">Hybrid & Remote Work Policy 2026</h4>
-            <span class="update-meta">Effective <time datetime="2026-01-15">15/01/2026</time></span>
+            <h4 class="update-title">Company policy</h4>
+            <span class="policy-summary"></span>
           </div>
-          <span style="align-self: center; color: #94a3b8; font-size: 16px;">›</span>
-        </div>
+          <span class="update-chevron" aria-hidden="true"></span>
+        </a>
 
-        <div class="update-card" data-category="news" onclick="openUpdatesModal()">
+        <a class="update-card" data-category="news" href="company-updates.html?theme=light&amp;story=industry-award&amp;via=home&amp;from=legacy">
           <div class="update-thumb" aria-hidden="true"><i class="fa-solid fa-trophy"></i></div>
           <div class="update-content">
             <span class="update-tag">News</span>
             <h4 class="update-title">PeopleQuest wins industry award</h4>
             <span class="update-meta">Yesterday</span>
           </div>
-          <span style="align-self: center; color: #94a3b8; font-size: 16px;">›</span>
-        </div>
+          <span class="update-chevron" aria-hidden="true"></span>
+        </a>
       </div>
     </div>
 

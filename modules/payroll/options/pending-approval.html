@@ -18,6 +18,7 @@
   <script src="../../../js/pending-approval-filter.js" defer></script>
   <script src="../../../js/payroll/payroll-history-data.js" defer></script>
   <script src="../../../js/payroll/payroll-pending-data.js" defer></script>
+  <script src="../../../js/pending-approval-backup.js" defer></script>
   <script src="../../../js/payroll/payroll-pending-approval.js" defer></script>
 </head>
 <body class="payroll-pending-page unified-approval-actions">
@@ -44,10 +45,10 @@
         <div id="payrollPendingQueue"></div>
       </section>
     </main>
-    <aside id="payrollPendingBulk" class="payroll-pending-bulk" aria-label="Selected requests" hidden>
-      <strong><span id="payrollPendingSelectedCount">0</span> selected</strong>
+    <aside id="payrollPendingBulk" class="payroll-pending-bulk pending-selection-bar" aria-label="Selected requests" hidden>
+      <strong aria-live="polite"><span id="payrollPendingSelectedCount">0</span> Selected</strong>
       <div class="pending-action-grid">
-        <button type="button" class="action-btn-approve" data-payroll-action="approve"><i class="fa-solid fa-check" aria-hidden="true"></i>Approve</button>
+        <button type="button" class="action-btn-approve" data-payroll-action="approve"><i class="fa-solid fa-check" aria-hidden="true"></i>Approve Selected</button>
         <button type="button" class="action-btn-resubmit" data-payroll-action="resubmit"><i class="fa-solid fa-rotate-left" aria-hidden="true"></i>Resubmit</button>
         <button type="button" class="action-btn-reject" data-payroll-action="reject"><i class="fa-solid fa-xmark" aria-hidden="true"></i>Reject</button>
       </div>

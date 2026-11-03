@@ -1017,65 +1017,7 @@ function openNewsDetail(cardEl, title) {
   showToast(`Opening: ${title || 'News'}`);
 }
 
-// 10. Policy & SOP Detail Data & Controller
-const POLICY_DATABASE = {
-  'DE001': {
-    ref: 'DE001',
-    title: 'PeopleTime User Guide v2',
-    dept: 'ADMINISTRATION',
-    policy: {
-      name: 'PeopleTime_UserGuide_v2.pdf',
-      size: '3.91 MB',
-      date: '20/12/2024',
-      coverPreview: 'modules/admin/assets/peopletime-user-guide-preview.svg',
-      type: 'PDF Document'
-    },
-    sop: null,
-    guideline: null
-  },
-  'HR004': {
-    ref: 'HR004',
-    title: 'Hybrid & Remote Work Policy 2026',
-    dept: 'ALL DEPARTMENTS',
-    policy: {
-      name: 'Remote_Work_Framework_2026.pdf',
-      size: '1.45 MB',
-      date: '15/01/2026',
-      type: 'PDF Document'
-    },
-    sop: {
-      name: 'SOP_WFH_Application_Approval.pdf',
-      size: '820 KB',
-      date: '18/01/2026',
-      type: 'PDF Document'
-    },
-    guideline: null
-  },
-  'FN012': {
-    ref: 'FN012',
-    title: 'Medical & Travel Claims SOP',
-    dept: 'FINANCE & ACCOUNTING',
-    policy: {
-      name: 'Staff_Expense_Reimbursement_Policy.pdf',
-      size: '2.10 MB',
-      date: '01/02/2026',
-      type: 'PDF Document'
-    },
-    sop: {
-      name: 'SOP_Overseas_Travel_Claims_v3.pdf',
-      size: '1.15 MB',
-      date: '05/02/2026',
-      type: 'PDF Document'
-    },
-    guideline: {
-      name: 'Mileage_Per_Diem_Rate_Card.pdf',
-      size: '450 KB',
-      date: '05/02/2026',
-      type: 'PDF Document'
-    }
-  }
-};
-
+// 10. Policy & SOP detail sheet controls
 function renderFileRow(fileObj, typeName) {
   if (!fileObj) {
     return `<div class="doc-file-empty-text">No ${typeName} document uploaded (N/A)</div>`;

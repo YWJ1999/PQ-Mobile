@@ -22,17 +22,12 @@ const puppeteer = require('puppeteer');
       assert.equal(await page.$eval('title', node => node.textContent.trim()), 'PeopleHCM - Workplace');
       assert.equal(await page.$eval('.admin-heading h1', node => node.textContent.trim()), 'Workplace');
       assert.equal((await page.$eval('body', node => node.innerText)).includes('Admin'), false);
-      assert.deepEqual(await page.$$eval('#workplaceIndividualPanel > section .admin-options > .admin-option .admin-option-title', nodes => nodes.map(n => n.textContent.trim())), ['News', 'Book Resource', 'Letter Request', 'Guest Visit', 'Inventory Request', 'View All'], 'Workplace must keep the landing grid to six quick options');
-      assert.equal(await page.$eval('[data-workplace-options-open]', node => node.tagName), 'BUTTON', 'View All must be an action instead of a dead link');
-      await page.click('[data-workplace-options-open]');
-      assert.ok(await page.$('#workplaceOptionsDialog[open]'), 'View All must open the complete options sheet');
-      assert.deepEqual(await page.$$eval('#workplaceOptionsDialog .admin-option-title', nodes => nodes.map(n => n.textContent.trim())), ['News', 'Book Resource', 'Letter Request', 'Guest Visit', 'Inventory Request', 'History']);
-      assert.equal((await page.$eval('#workplaceOptionsDialog', node => node.textContent)).includes('Policy / SOP'), false);
-      const links = await page.$$eval('#workplaceOptionsDialog .admin-option', nodes => nodes.map(n => n.href));
+      assert.deepEqual(await page.$$eval('#workplaceIndividualPanel .admin-option-title', nodes => nodes.map(n => n.textContent.trim())), ['News', 'Book Resource', 'Letter Request', 'Guest Visit', 'Inventory Request', 'History', 'Policy/SOP']);
+      const links = await page.$$eval('#workplaceIndividualPanel .admin-option', nodes => nodes.map(n => n.href));
       for (const link of links) {
         await page.goto(link, { waitUntil: 'load' });
         assert.equal(await page.$eval('html', n => n.dataset.theme), theme);
-        assert.equal((await page.$eval('body', node => node.innerText)).includes('Admin'), false);
+        assert.doesNotMatch(await page.$eval('body', node => node.innerText), /\bAdmin\b/, link);
         const formSelector = link.includes('news.html') ? '#newsList .news-card' : link.includes('book-resource.html') ? '#bookingListView' : link.includes('letter-request.html') ? '#letterRequestForm' : link.includes('guest-visit.html') ? '#guestVisitForm' : link.includes('inventory-request.html') ? '#inventoryRequestForm' : link.includes('policy-sop.html') ? '#policyList .policy-card' : link.includes('history.html') ? '#workplaceHistoryList' : '.admin-coming-card';
         assert.ok(await page.$(formSelector), `Expected ${formSelector} on ${link}`);
         if (link.includes('news.html')) {
@@ -51,7 +46,7 @@ const puppeteer = require('puppeteer');
       await page.screenshot({ path: path.join(__dirname, `workplace_${theme}.png`) });
     }
     assert.deepEqual(errors, []);
-    console.log('PASS: Workplace entry, six-option landing grid, View All sheet, six Individual option pages, return navigation, both themes and mobile widths.');
+    console.log('PASS: Workplace entry, seven Individual option pages, return navigation, both themes and mobile widths.');
   } finally {
     await browser.close();
   }

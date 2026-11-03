@@ -135,6 +135,10 @@
     const amount = node('div', 'payroll-approval-amount');
     amount.append(node('span', '', 'Amount'), node('strong', '', money(item.amount)));
     body.append(facts, amount, actionButtons(item.category));
+    PendingApprovalBackup.addButton(body.lastElementChild, {
+      scope: 'payroll', id: item.id, empNo: item.empNo,
+      isPending: () => window.PayrollPendingStore.getPending().some(row => row.id === item.id)
+    });
     body.addEventListener('click', event => { if (!event.target.closest('button')) openDetails(item.id, menu); });
     card.append(header, body);
     return card;
@@ -153,6 +157,7 @@
     }
     const bulk = byId('payrollPendingBulk').querySelector('.pending-action-grid');
     const bulkActions = actionButtons(activeTab);
+    bulkActions.querySelector('.action-btn-approve span').textContent = 'Approve Selected';
     bulk.dataset.actionCount = bulkActions.dataset.actionCount;
     bulk.replaceChildren(...bulkActions.children);
     updateSelection();
@@ -284,6 +289,8 @@
     const approvalHeading = node('div', 'payroll-approval-workflow-step-heading');
     approvalHeading.append(icon('fa-hourglass-half'), node('h4', '', 'Payroll Approval'), node('span', 'payroll-approval-workflow-badge', 'Awaiting Approval'));
     approval.append(approvalHeading, fieldGrid([['Approver', '-'], ['Action Date', '-']]));
+    const backup = PendingApprovalBackup.assigned('payroll', item.id);
+    if (backup) approval.append(field('Backup Approver', backup.name));
     byId('payrollPendingWorkflowSteps').replaceChildren(submitted, approval);
 
     const audit = node('li');

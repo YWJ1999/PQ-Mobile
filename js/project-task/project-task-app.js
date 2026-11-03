@@ -290,23 +290,9 @@
     window.history.replaceState(null, '', url);
   }
 
-  function initPendingApprovalSelection() {
-    const selectAll = document.getElementById('projectApprovalSelectAll');
-    const boxes = [...document.querySelectorAll('#projectTimesheetApprovalList .approval-card-checkbox')];
-    if (!selectAll || !boxes.length) return;
-    const syncSelectAll = () => {
-      const selected = boxes.filter(box => box.checked).length;
-      selectAll.checked = selected === boxes.length;
-      selectAll.indeterminate = selected > 0 && selected < boxes.length;
-    };
-    selectAll.addEventListener('change', () => {
-      boxes.forEach(box => { box.checked = selectAll.checked; });
-      syncSelectAll();
-    });
-    boxes.forEach(box => box.addEventListener('change', syncSelectAll));
-  }
-
   function initPendingApprovalActions() {
+    const queue = document.getElementById('projectTimesheetApprovalList');
+    if (!queue) return;
     const storageKey = 'pq_project_pending_decisions';
     const read = () => {
       try { const value = JSON.parse(localStorage.getItem(storageKey)); return Array.isArray(value) ? value : []; }
@@ -319,27 +305,46 @@
     };
     const handled = new Set(read().map(item => item.reference));
     document.querySelectorAll('#projectTimesheetApprovalList .project-approval-card').forEach(card => {
-      if (handled.has(card.dataset.reference)) card.remove();
+      const reference = card.dataset.reference;
+      if (handled.has(reference)) { card.remove(); return; }
+      PendingApprovalBackup.addButton(card.querySelector('.project-approval-actions'), {
+        scope: 'timesheet', id: reference, empNo: card.dataset.employeeId,
+        isPending: () => card.isConnected && !read().some(item => item.reference === reference)
+      });
     });
     updateCount();
+    function decide(cards, action, comments = '') {
+      const references = new Set(cards.map(card => card.dataset.reference));
+      const decisions = read().filter(item => !references.has(item.reference));
+      const decidedAt = new Date().toISOString();
+      for (const reference of references) decisions.push({ reference, action, comments, decidedAt });
+      try {
+        localStorage.setItem(storageKey, JSON.stringify(decisions));
+      } catch {
+        window.showToast?.('Unable to save the decision. Please try again.');
+        return false;
+      }
+      cards.forEach(card => card.remove());
+      updateCount();
+      const verb = { approve: 'Approved', reject: 'Rejected', resubmit: 'Sent for resubmission' }[action];
+      window.showToast?.(`${verb}: ${cards.length} request${cards.length === 1 ? '' : 's'}`);
+      return true;
+    }
+    mountPendingApprovalSelection(queue, document.getElementById('projectApprovalSelectAll'), (action, boxes) => {
+      decide(boxes.map(box => box.closest('.project-approval-card')), action);
+    });
     document.addEventListener('click', event => {
       const button = event.target.closest('[data-project-approval-action]');
       if (!button) return;
       event.preventDefault();
       event.stopPropagation();
-      const card = button.closest('.project-approval-card');
       const details = document.getElementById('projectApprovalDetails');
-      const reference = card?.dataset.reference || details?.dataset.reference;
-      if (!reference) return;
+      const inDetails = details?.contains(button);
+      const card = inDetails ? queue.querySelector(`[data-reference="${CSS.escape(details.dataset.reference)}"]`) : button.closest('.project-approval-card');
+      if (!card) return;
       const action = button.dataset.projectApprovalAction;
-      const comments = document.getElementById('projectApprovalApproverComments')?.value.trim() || '';
-      const decisions = read().filter(item => item.reference !== reference);
-      decisions.push({ reference, action, comments, decidedAt: new Date().toISOString() });
-      localStorage.setItem(storageKey, JSON.stringify(decisions));
-      document.querySelector(`[data-reference="${CSS.escape(reference)}"]`)?.remove();
-      if (details) { details.classList.remove('is-open'); details.hidden = true; }
-      updateCount();
-      window.showToast?.(`Request ${action}d`);
+      const comments = inDetails ? document.getElementById('projectApprovalApproverComments').value.trim() : '';
+      if (decide([card], action, comments) && inDetails) details.querySelector('[data-close-project-approval]').click();
     });
   }
 
@@ -412,6 +417,10 @@
       document.getElementById('projectApprovalWorkflowReference').textContent = value('reference');
       document.getElementById('projectApprovalWorkflowName').textContent = value('employeeName');
       document.getElementById('projectApprovalWorkflowEmployeeId').textContent = value('employeeId');
+      const backup = PendingApprovalBackup.assigned('timesheet', value('reference'));
+      const assignment = document.getElementById('projectApprovalWorkflowBackup');
+      assignment.hidden = !backup;
+      assignment.textContent = backup ? 'Backup approver · ' + backup.name : '';
       closeOverlay(false);
       openOverlay(workflow, currentMenuTrigger || event.currentTarget);
     });
@@ -513,7 +522,6 @@
   document.addEventListener('DOMContentLoaded', () => {
     setTheme(getCurrentTheme());
     syncThemeNavigation();
-    initPendingApprovalSelection();
     initPendingApprovalSheets();
     initPendingApprovalActions();
     initTeamProjectDetails();

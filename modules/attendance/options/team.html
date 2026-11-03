@@ -818,6 +818,7 @@
     </style>
     <link rel="stylesheet" href="../../../css/approval-actions.css">
   <script src="../../../js/pending-approval-filter.js"></script>
+  <script src="../../../js/pending-approval-selection.js"></script>
   <link rel="stylesheet" href="../../../css/pending-approval-filter.css">
 </head>
   <body class="unified-approval-actions">
@@ -1849,7 +1850,7 @@
               Pending Approvals (<span id="pendingApprovalCountBadge">5</span>)
             </div>
             <label style="display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 800; color: var(--purple-primary); cursor: pointer; user-select: none;">
-              <input type="checkbox" id="selectAllPendingCheckbox" onchange="toggleSelectAllPending(this.checked)" style="width: 17px; height: 17px; accent-color: var(--purple-primary); cursor: pointer;">
+              <input type="checkbox" id="selectAllPendingCheckbox" style="width: 17px; height: 17px; accent-color: var(--purple-primary); cursor: pointer;">
               Select All
             </label>
           </div>
@@ -3992,6 +3993,11 @@
       let currentStaffType = "scheduled";
       let currentStaffApprovalCategory = 'final_ot';
       let currentViewSection = 'main';
+      let visiblePendingRequests = [];
+      const syncPendingSelection = mountPendingApprovalSelection(
+        document.getElementById('pendingApprovalListContent'), document.getElementById('selectAllPendingCheckbox'),
+        (action, boxes) => decideAttendanceRequests(action, boxes.map(box => visiblePendingRequests[box.value]))
+      );
 
       let attendancePendingFilter = null;
       function getAttendancePendingFilter() {
@@ -4042,6 +4048,7 @@
           const container = document.querySelector(".main-content");
 
           if (secEl) secEl.style.display = "none";
+          syncPendingSelection();
           if (mainEl) mainEl.style.display = "block";
           if (titleEl) titleEl.textContent = "Attendance Dashboard";
           if (container) container.scrollTop = 0;
@@ -4092,6 +4099,7 @@
         });
 
         const badgeEl = document.getElementById("pendingApprovalCountBadge");
+        visiblePendingRequests = filtered;
         if (badgeEl) badgeEl.textContent = filtered.length;
 
         if (filtered.length === 0) {
@@ -4168,7 +4176,7 @@
               <div class="approval-record-header" style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
                 <div style="display: flex; align-items: center; gap: 12px;">
                   <div style="display: flex; align-items: center;">
-                    <input type="checkbox" class="approval-card-checkbox" style="width: 20px; height: 20px; accent-color: #ffffff; cursor: pointer; border-radius: 6px;">
+                    <input type="checkbox" class="approval-card-checkbox" value="${idx}" aria-label="Select request for ${item.name}" style="width: 20px; height: 20px; accent-color: #ffffff; cursor: pointer; border-radius: 6px;">
                   </div>
                   <div>
                     <div style="font-size: 14.5px; font-weight: 800; color: #ffffff;">${item.name}</div>
@@ -4250,13 +4258,19 @@
         }).join("");
       }
 
-      function toggleSelectAllPending(checked) {
-        const checkboxes = document.querySelectorAll("#pendingApprovalListContent .approval-card-checkbox");
-        checkboxes.forEach(cb => cb.checked = checked);
+      function decideAttendanceRequests(action, requests) {
+        const selected = new Set(requests);
+        staffDatabase.pending_approval = staffDatabase.pending_approval.filter(request => !selected.has(request));
+        renderPendingApprovalList();
+        syncAttendanceActionCounts();
+        showToast(`${action === 'approve' ? 'Approved' : 'Rejected'} ${selected.size} request${selected.size === 1 ? '' : 's'}`);
       }
 
       function handleStaffApprove(id, btn) {
         const card = btn.closest('.approval-request-card');
+        if (card?.closest('#pendingApprovalListContent')) {
+          return decideAttendanceRequests('approve', [visiblePendingRequests[card.querySelector('.approval-card-checkbox').value]]);
+        }
         if (card) {
           card.style.opacity = '0.5';
           card.style.pointerEvents = 'none';
@@ -4279,6 +4293,9 @@
 
       function handleStaffReject(id, btn) {
         const card = btn.closest('.approval-request-card');
+        if (card?.closest('#pendingApprovalListContent')) {
+          return decideAttendanceRequests('reject', [visiblePendingRequests[card.querySelector('.approval-card-checkbox').value]]);
+        }
         if (card) {
           card.style.opacity = '0.5';
           card.style.pointerEvents = 'none';

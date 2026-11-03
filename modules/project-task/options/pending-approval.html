@@ -14,6 +14,8 @@
   <link rel="stylesheet" href="../../../css/approval-actions.css">
   <script src="../../../js/components.js"></script>
   <script src="../../../js/app.js" defer></script>
+  <script src="../../../js/pending-approval-selection.js" defer></script>
+  <script src="../../../js/pending-approval-backup.js" defer></script>
   <script src="../../../js/project-task/project-task-app.js" defer></script>
 </head>
 <body class="project-task-page project-approval-page unified-approval-actions">
@@ -212,6 +214,7 @@
             <strong id="projectApprovalWorkflowName"></strong>
             <span id="projectApprovalWorkflowEmployeeId"></span>
           </div>
+          <p class="approval-backup-assignment" id="projectApprovalWorkflowBackup" hidden></p>
           <ol class="project-approval-workflow-steps" id="projectApprovalWorkflowSteps">
             <li class="project-approval-workflow-step is-complete"><i class="fa-solid fa-check" aria-hidden="true"></i><div><strong>Submitted</strong><small>Timesheet request received</small></div><span>Completed</span></li>
             <li class="project-approval-workflow-step is-active"><i class="fa-solid fa-hourglass-half" aria-hidden="true"></i><div><strong>Supervisor Approval</strong><small>Waiting for review</small></div><span>Pending</span></li>

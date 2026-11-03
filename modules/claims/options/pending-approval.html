@@ -6,6 +6,8 @@
   <title>PeopleHCM - Pending Approval</title>
   <script src="../../../js/components.js"></script>
   <script src="../../../js/claims/claims-config.js"></script>
+  <script src="../../../js/pending-approval-selection.js" defer></script>
+  <script src="../../../js/pending-approval-backup.js" defer></script>
   <script src="../../../js/claims/claims-app.js" defer></script>
   <script src="../../../js/app.js" defer></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -150,7 +152,7 @@
   <script src="../../../js/pending-approval-filter.js"></script>
   <link rel="stylesheet" href="../../../css/pending-approval-filter.css">
 </head>
-<body>
+<body class="unified-approval-actions">
   <preview-top-bar></preview-top-bar>
 
   <div class="phone-container">
@@ -207,7 +209,7 @@
           Pending Approvals (<span id="teamPendingCountBadge">0</span>)
         </div>
         <label style="display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 800; color: var(--purple-primary); cursor: pointer; user-select: none;">
-          <input type="checkbox" onchange="window.ClaimsEngine.toggleSelectAllTeamClaims(this.checked)" style="width: 17px; height: 17px; accent-color: var(--purple-primary); cursor: pointer;">
+          <input type="checkbox" id="claimsSelectAllPending" style="width: 17px; height: 17px; accent-color: var(--purple-primary); cursor: pointer;">
           Select All
         </label>
       </div>
@@ -335,7 +337,7 @@
               <span style="font-size: 10.5px; font-weight: 800; color: #10b981; background: rgba(16, 185, 129, 0.12); padding: 2px 8px; border-radius: 10px;">Active Step</span>
             </div>
             <div style="font-size: 11.5px; color: var(--text-muted); margin-bottom: 10px;">Assigned Approvers Pool: Sarah Jenkins, Farhan Rahmat, Line Manager</div>
-            <button type="button" style="background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%); color: #ffffff; border: none; padding: 6px 12px; border-radius: 12px; font-size: 11px; font-weight: 800; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
+            <button id="claimWorkflowBackup" type="button" style="background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%); color: #ffffff; border: none; padding: 6px 12px; border-radius: 12px; font-size: 11px; font-weight: 800; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
               <i class="fa-solid fa-shield-halved"></i> Assign Backup Approver
             </button>
           </div>
@@ -383,16 +385,6 @@
     <indicators-sheet></indicators-sheet>
   </div>
 
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      // Trigger initial render of pending approval queue if claims engine is ready
-      setTimeout(() => {
-        if(window.ClaimsEngine && window.ClaimsEngine.renderTeamQueue) {
-          window.ClaimsEngine.renderTeamQueue();
-        }
-      }, 100);
-    });
-  </script>
 </body>
 </html>
 

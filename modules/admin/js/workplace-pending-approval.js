@@ -135,6 +135,10 @@ document.addEventListener('DOMContentLoaded', () => {
     review.addEventListener('click', () => openDetails(item.id, review));
     review.addEventListener('keydown', event => { if (['Enter', ' '].includes(event.key)) { event.preventDefault(); openDetails(item.id, review); } });
     body.append(review, actionButtons());
+    PendingApprovalBackup.addButton(body.lastElementChild, {
+      scope: 'workplace', id: item.id, reference: item.reference, empNo: item.empNo,
+      isPending: () => store.getPending().some(row => row.id === item.id)
+    });
     card.append(header, body);
     return card;
   }
@@ -289,6 +293,8 @@ document.addEventListener('DOMContentLoaded', () => {
     request.append(node('p', 'workplace-approval-reference', item.reference), employee, fieldGrid([['Request', config.requestName], ['Submit Date', date(item.submitDate)]]));
     const steps = node('section', 'payroll-approval-workflow-step is-active');
     steps.append(node('h3', '', 'Approval Steps'), node('p', 'workplace-approval-notice', 'Submitted'), node('strong', '', 'Awaiting Approval'));
+    const backup = PendingApprovalBackup.assigned('workplace', item.id);
+    if (backup) steps.append(fieldGrid([['Backup Approver', backup.name]]));
     const audit = node('section', 'payroll-approval-workflow-audit');
     audit.append(node('h3', '', 'Audit History'));
     item.audit.forEach(event => audit.append(node('p', 'workplace-approval-comment-label', `${event.action === 'submitted' ? 'Submitted' : event.action} · ${date(event.at)}`)));
@@ -336,7 +342,9 @@ document.addEventListener('DOMContentLoaded', () => {
   });
   $('workplacePendingFilterTrigger').addEventListener('click', filter.open);
   $('workplacePendingSelectAll').addEventListener('change', event => { visible.forEach(row => { if (event.target.checked) selected.add(row.id); else selected.delete(row.id); }); render(); });
-  $('workplacePendingBulk').querySelector('[data-approval-bulk]').append(...actionButtons().children);
+  const bulkActions = actionButtons();
+  bulkActions.querySelector('.action-btn-approve span').textContent = 'Approve Selected';
+  $('workplacePendingBulk').querySelector('[data-approval-bulk]').append(...bulkActions.children);
   $('workplacePendingViewDetails').addEventListener('click', () => openDetails(currentId, opener));
   $('workplacePendingViewWorkflow').addEventListener('click', openWorkflow);
   $('workplaceApprovalReview').addEventListener('submit', event => event.preventDefault());

@@ -146,8 +146,11 @@
         <div class="cal-filter-drag-handle"></div>
 
         <div class="cal-filter-header">
-          <span class="cal-filter-title">Filter</span>
-          <button class="cal-filter-reset-btn" onclick="resetCalFilter()">Reset</button>
+          <h2 class="cal-filter-title">Filter</h2>
+          <div class="standard-filter-header-actions">
+            <button type="button" class="standard-filter-reset" onclick="resetCalFilter()"><i class="fa-solid fa-rotate-left" aria-hidden="true"></i><span>Reset</span></button>
+            <button type="button" class="standard-filter-close" onclick="closeCalFilter()" aria-label="Close filter"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
+          </div>
         </div>
 
 

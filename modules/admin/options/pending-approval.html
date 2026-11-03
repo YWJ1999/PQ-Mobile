@@ -20,6 +20,7 @@
   <script src="../js/admin-app.js" defer></script>
   <script src="../../../js/pending-approval-filter.js" defer></script>
   <script src="../js/workplace-pending-store.js" defer></script>
+  <script src="../../../js/pending-approval-backup.js" defer></script>
   <script src="../js/workplace-pending-approval.js" defer></script>
 </head>
 <body class="admin-page payroll-pending-page workplace-pending-page unified-approval-actions">
@@ -48,7 +49,7 @@
       <section id="workplacePendingQueue" role="tabpanel" aria-labelledby="workplacePendingTab-guest-visit"></section>
       <div id="workplacePendingEmpty" class="payroll-pending-empty" hidden><i class="fa-solid fa-circle-check" aria-hidden="true"></i><h3>No pending approvals</h3><p id="workplacePendingEmptyText">Guest Visit requests awaiting review will appear here.</p></div>
     </main>
-    <aside id="workplacePendingBulk" class="payroll-pending-bulk" aria-label="Selected requests" hidden><strong><span id="workplacePendingSelectedCount">0</span> selected</strong><div class="pending-action-grid" data-approval-bulk></div></aside>
+    <aside id="workplacePendingBulk" class="payroll-pending-bulk pending-selection-bar" aria-label="Selected requests" hidden><strong aria-live="polite"><span id="workplacePendingSelectedCount">0</span> Selected</strong><div class="pending-action-grid" data-approval-bulk></div></aside>
     <phone-bottom-nav active="apps"></phone-bottom-nav>
     <div id="workplaceApprovalMenu" class="payroll-approval-overlay" hidden>
       <section class="payroll-approval-panel payroll-approval-menu" role="dialog" aria-modal="true" aria-labelledby="workplaceApprovalMenuTitle">

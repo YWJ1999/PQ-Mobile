@@ -882,6 +882,11 @@
       card.setAttribute('item-id', item.id);
 
       container.appendChild(card);
+      PendingApprovalBackup.addButton(card.querySelector('.pending-action-grid'), {
+        scope: 'claims', id: item.id, empNo: item.empNo, reference: item.docRef,
+        pool: [window.CLAIM_EMPLOYEES.EBB01, window.CLAIM_EMPLOYEES.EBB12],
+        isPending: () => teamQueue.some(row => row.id === item.id)
+      });
     });
   }
 
@@ -1699,6 +1704,16 @@
 
   function triggerClaimViewWorkflow() {
     closeClaimThreeDotsMenu();
+    const record = currentSelectedClaimData;
+    const backup = document.getElementById('claimWorkflowBackup');
+    if (backup && record) {
+      const assigned = PendingApprovalBackup.assigned('claims', record.id);
+      backup.textContent = assigned ? 'Change backup · ' + assigned.name : 'Assign Backup Approver';
+      backup.onclick = () => {
+        closeClaimWorkflowModal();
+        document.getElementById('team-card-' + record.id)?.querySelector('.action-btn-backup')?.click();
+      };
+    }
     setTimeout(() => {
       const overlay = document.getElementById('claimWorkflowModalOverlay');
       if (overlay) {
@@ -1801,6 +1816,16 @@
     handleGlobalBack
   };
 
+  const selectAllPending = document.getElementById('claimsSelectAllPending');
+  if (selectAllPending) {
+    renderTeamQueue();
+    mountPendingApprovalSelection(document.getElementById('teamApprovalsQueue'), selectAllPending, (action, boxes) => {
+      const ids = new Set(boxes.map(box => box.closest('.approval-request-card').dataset.itemId));
+      teamQueue = teamQueue.filter(item => !ids.has(String(item.id)));
+      renderTeamQueue();
+      showToast(`${action === 'approve' ? 'Approved' : 'Rejected'} ${ids.size} claim${ids.size === 1 ? '' : 's'}`);
+    });
+  }
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initClaimsApp);
   } else {

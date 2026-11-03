@@ -78,8 +78,10 @@
         <div class="approval-filter-handle" aria-hidden="true"></div>
         <div class="approval-filter-header">
           <h2 id="${id}-title">Filter</h2>
-          <button type="button" data-action="reset"><i class="fa-solid fa-rotate-left" aria-hidden="true"></i> Reset</button>
-          <button type="button" data-action="close" aria-label="Close filter">&times;</button>
+          <div class="standard-filter-header-actions">
+            <button type="button" class="standard-filter-reset" data-action="reset"><i class="fa-solid fa-rotate-left" aria-hidden="true"></i><span>Reset</span></button>
+            <button type="button" class="standard-filter-close" data-action="close" aria-label="Close filter"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
+          </div>
         </div>
         <div class="approval-filter-fields">
           <label for="${id}-keyword">Search keyword</label>

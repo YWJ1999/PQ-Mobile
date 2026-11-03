@@ -1,5 +1,6 @@
 (() => {
-  const { defaults, records } = window.ADMIN_POLICY;
+  const defaults = POLICY_FILTER_DEFAULTS;
+  const records = Object.values(POLICY_DATABASE).sort((a, b) => a.title.localeCompare(b.title));
   const $ = id => document.getElementById(id);
   const form = $('policyFilterForm');
   const modal = $('policyFilterModal');
@@ -26,7 +27,8 @@
 
   function matchesDates(record, kind) {
     const from = filters[kind + 'From'], to = filters[kind + 'To'];
-    const value = record[kind + 'WEF'];
+    const file = record[kind];
+    const value = file?.name?.trim() && file.date?.split('/').reverse().join('-');
     // A missing optional document is allowed until its date range is filtered explicitly.
     if (!value) return from === defaults[kind + 'From'] && to === defaults[kind + 'To'];
     return (!from || value >= from) && (!to || value <= to);
@@ -34,9 +36,9 @@
 
   function render() {
     const rows = records.filter(record =>
-      record.reference.toLowerCase().includes(filters.reference.toLowerCase().trim()) &&
+      record.ref.toLowerCase().includes(filters.reference.toLowerCase().trim()) &&
       record.title.toLowerCase().includes(filters.title.toLowerCase().trim()) &&
-      (!filters.department || record.department === filters.department) &&
+      (!filters.department || record.dept === filters.department) &&
       ['policy', 'sop', 'guideline'].every(kind => matchesDates(record, kind))
     );
     const summary = [filters.department || 'All Departments', filters.title ? 'Title: ' + filters.title : '', filters.reference ? 'Ref: ' + filters.reference : ''];
@@ -49,16 +51,23 @@
     $('policyFilterSummary').textContent = summary.filter(Boolean).join(' / ');
     $('policyEmptyState').hidden = rows.length > 0;
     $('policyList').innerHTML = rows.map(record => {
-      const url = new URL('policy-document.html', location.href);
-      url.search = location.search;
-      url.searchParams.set('document', record.id);
-      url.searchParams.set('theme', theme());
-      return `<article class="history-card-item claim-summary-card policy-card">
-        <a class="claim-summary-card-head policy-card-title-link" href="${escape(url.href)}" aria-label="View ${escape(record.title)} policy"><div><h3 class="claim-summary-card-title">${escape(record.title)}</h3><p class="claim-summary-card-subtitle">Ref: ${escape(record.reference)}</p></div></a>
-        <div class="claim-summary-card-body policy-card-body">
-        <dl class="claim-summary-stat-grid policy-card-details"><div class="claim-summary-stat"><dt class="claim-summary-stat-label">Department</dt><dd class="claim-summary-stat-value">${escape(record.department)}</dd></div><div class="claim-summary-stat"><dt class="claim-summary-stat-label">Policy WEF</dt><dd class="claim-summary-stat-value">${date(record.policyWEF)}</dd></div><div class="claim-summary-stat"><dt class="claim-summary-stat-label">SOP WEF</dt><dd class="claim-summary-stat-value">${date(record.sopWEF)}</dd></div><div class="claim-summary-stat"><dt class="claim-summary-stat-label">Guideline WEF</dt><dd class="claim-summary-stat-value">${date(record.guidelineWEF)}</dd></div></dl>
-        </div>
-        <div class="policy-card-footer"><a class="policy-document-link" href="${escape(url.href)}" aria-label="View Policy for ${escape(record.title)}">Policy</a></div>
+      const href = escape(workplacePolicyDetailsUrl(record.ref).href);
+      const documents = policyDocuments(record);
+      return `<article class="policy-card">
+        <header class="policy-card-head">
+          <a class="policy-card-title-link" href="${href}">
+            <svg class="policy-card-file-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H5v20h15V8zM14 2v6h6M8 13h9M8 17h6"/></svg>
+            <div><h3>${escape(record.title)}</h3><p>${escape(record.ref)} · <span>${escape(record.dept.toLowerCase())}</span></p></div>
+          </a>
+          <details class="policy-card-menu" name="policy-actions">
+            <summary aria-label="Actions for ${escape(record.title)}"><span aria-hidden="true"></span></summary>
+            <a href="${href}"><i class="fa-regular fa-eye" aria-hidden="true"></i>View details</a>
+          </details>
+        </header>
+        <footer class="policy-card-footer">
+          <div class="policy-card-badges">${documents.map(({ label }) => `<span>${label}</span>`).join('')}</div>
+          <span class="policy-file-count">${policyFileCount(documents.length)}</span>
+        </footer>
       </article>`;
     }).join('');
   }
@@ -77,7 +86,11 @@
     trigger.focus();
   }
 
-  [...new Set(records.map(record => record.department))].sort().forEach(department => $('policyDepartment').add(new Option(department, department)));
+  [...new Set(records.map(record => record.dept))].sort().forEach(department => $('policyDepartment').add(new Option(department, department)));
+  document.addEventListener('click', event => {
+    const open = $('policyList').querySelector('details[open]');
+    if (open && !open.contains(event.target)) open.open = false;
+  });
   trigger.addEventListener('click', () => {
     fillForm(filters);
     modal.classList.add('is-open');
@@ -110,6 +123,11 @@
     closeFilter();
   });
   document.addEventListener('keydown', event => {
+    const open = $('policyList').querySelector('details[open]');
+    if (open && event.key === 'Escape') {
+      open.open = false;
+      open.querySelector('summary').focus();
+    }
     if (!modal.classList.contains('is-open')) return;
     if (event.key === 'Escape') closeFilter();
     if (event.key === 'Tab') {

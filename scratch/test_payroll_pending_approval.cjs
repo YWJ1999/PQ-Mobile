@@ -199,9 +199,9 @@ async function checkWorkflow(page, theme, category, references) {
       assert.equal(firstDeduction.includes('Reference #'), false, 'Deduction Request cards must not show a reference field');
       assert.equal(firstDeduction.includes('PDR000000000062'), false, 'Deduction Request cards must keep their reference internal');
       assert.equal(await page.$('.payroll-approval-reference'), null);
-      assert.deepEqual(await page.$$eval('.approval-request-card:first-child .pending-action-grid button', nodes => nodes.map(node => node.textContent.trim())), ['Approve', 'Reject']);
+      assert.deepEqual(await page.$$eval('.approval-request-card:first-child .pending-action-grid button', nodes => nodes.map(node => node.textContent.trim())), ['Approve', 'Backup', 'Reject']);
       await page.click('#payrollPendingSelectAll');
-      assert.deepEqual(await page.$$eval('#payrollPendingBulk button', nodes => nodes.map(node => node.textContent.trim())), ['Approve', 'Reject']);
+      assert.deepEqual(await page.$$eval('#payrollPendingBulk button', nodes => nodes.map(node => node.textContent.trim())), ['Approve Selected', 'Reject']);
       await page.click('#payrollPendingSelectAll');
       for (const width of [360, 390, 450]) {
         await page.setViewport({ width, height: 950 });

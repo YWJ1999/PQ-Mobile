@@ -11,6 +11,8 @@
   <link rel="stylesheet" href="css/company-updates.css">
   <script src="js/components.js"></script>
   <script src="js/app.js" defer></script>
+  <script src="js/company-policy-viewer.js" defer></script>
+  <script src="modules/admin/js/policy-data.js" defer></script>
   <script src="js/company-updates.js" defer></script>
 </head>
 <body>
@@ -52,8 +54,22 @@
                 <p class="document-meta"></p>
                 <p class="document-effective"></p>
               </div>
+              <a class="document-open" hidden><i class="fa-regular fa-file-pdf" aria-hidden="true"></i>Open PDF</a>
+              <span class="document-availability" hidden>PDF unavailable</span>
             </li>
           </template>
+        </section>
+        <section id="companyPdfViewer" class="policy-pdf-viewer" hidden aria-labelledby="pdfFilename">
+          <h2 id="pdfFilename"></h2>
+          <p id="pdfStatus" role="status"></p>
+          <iframe id="pdfNativeReader" hidden title="PDF document"></iframe>
+          <div id="pdfPageArea" hidden><canvas id="pdfPage"></canvas></div>
+          <div id="pdfControls" hidden role="group" aria-label="PDF controls">
+            <button type="button" id="pdfPrevious">Previous</button>
+            <span id="pdfPosition" aria-live="polite"></span>
+            <button type="button" id="pdfNext">Next</button>
+            <button type="button" id="pdfZoom" aria-pressed="false">Zoom in</button>
+          </div>
         </section>
       </main>
     </div>

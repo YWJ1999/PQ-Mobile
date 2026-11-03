@@ -37,7 +37,7 @@
     if (details) grid.style.setProperty('--detail-action-count', '4');
     const entries = details ? [['approve', 'Approve'], ['resubmit', 'Resubmit'], ['cancel', 'Cancel'], ['reject', 'Reject']] : Object.entries(actions);
     entries.forEach(([action, title]) => {
-      const button = node('button', `action-btn-${action}`, title);
+      const button = node('button', `action-btn-${action}`, !ids && action === 'approve' ? 'Approve Selected' : title);
       button.type = 'button';
       if (action === 'cancel') {
         button.setAttribute('data-close-approval', '');

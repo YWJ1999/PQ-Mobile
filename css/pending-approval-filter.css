@@ -26,8 +26,6 @@
 .approval-filter-handle { width: 36px; height: 4px; margin: 0 auto 18px; border-radius: 4px; background: var(--text-muted); opacity: 0.4; }
 .approval-filter-header { display: flex; align-items: center; gap: 12px; padding-bottom: 16px; border-bottom: 1px solid var(--border-subtle); }
 .approval-filter-header h2 { flex: 1; font-size: 16px; font-weight: 800; margin: 0; }
-.approval-filter-header button { border: 0; background: transparent; color: var(--purple-text, #a78bfa); font-family: inherit; font-size: 12px; font-weight: 800; cursor: pointer; padding: 8px 0; }
-.approval-filter-header [data-action="close"] { font-size: 24px; line-height: 1; padding: 4px; }
 .approval-filter-fields { padding: 18px 0; }
 .approval-filter-fields label { display: block; margin-bottom: 8px; color: var(--purple-text, #a78bfa); font-size: 12px; font-weight: 700; }
 .approval-filter-fields input,

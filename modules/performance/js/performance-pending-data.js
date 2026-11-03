@@ -2,10 +2,7 @@
 (() => {
   const key = 'performance-pending-actions-v1';
   const backupKey = 'performance-pending-backups-v1';
-  const backupApprovers = [
-    { name: 'Angeline Loren Alan', empNo: 'EBB04', role: 'HR Manager' },
-    { name: 'Jason Tan', empNo: 'EBB52', role: 'Team Lead' }
-  ];
+  const backupApprovers = PendingApprovalBackup.approvers;
   const categories = ['goal-plan', 'self-evaluation', 'self-review'];
   const people = [
     { name: 'Aina Rahman', empNo: 'EBB01', position: 'People Operations Executive', company: 'PeopleHCM Malaysia', department: 'People Operations', branch: 'Kuala Lumpur' },

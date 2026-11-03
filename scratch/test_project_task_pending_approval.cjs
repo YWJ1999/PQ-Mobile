@@ -38,9 +38,9 @@ const pageUrl = theme => pathToFileURL(
           actions: [...card.querySelectorAll('.project-approval-actions button')].map(button => button.textContent.trim())
         }))),
         [
-          { name: 'Farhan binti rahmat', employeeId: '#EBB12', status: 'Pending', date: '30 Sep 2026', normalHours: '7.50 hrs', otHours: '1.00 hrs', actions: ['Approve', 'Resubmit', 'Reject'] },
-          { name: 'Aina Rahman', employeeId: '#EBB27', status: 'Pending', date: '29 Sep 2026', normalHours: '8.00 hrs', otHours: '0.00 hrs', actions: ['Approve', 'Resubmit', 'Reject'] },
-          { name: 'Daniel Lee', employeeId: '#EBB41', status: 'Pending', date: '28 Sep 2026', normalHours: '6.50 hrs', otHours: '2.00 hrs', actions: ['Approve', 'Resubmit', 'Reject'] }
+          { name: 'Farhan binti rahmat', employeeId: '#EBB12', status: 'Pending', date: '30 Sep 2026', normalHours: '7.50 hrs', otHours: '1.00 hrs', actions: ['Approve', 'Backup', 'Resubmit', 'Reject'] },
+          { name: 'Aina Rahman', employeeId: '#EBB27', status: 'Pending', date: '29 Sep 2026', normalHours: '8.00 hrs', otHours: '0.00 hrs', actions: ['Approve', 'Backup', 'Resubmit', 'Reject'] },
+          { name: 'Daniel Lee', employeeId: '#EBB41', status: 'Pending', date: '28 Sep 2026', normalHours: '6.50 hrs', otHours: '2.00 hrs', actions: ['Approve', 'Backup', 'Resubmit', 'Reject'] }
         ]
       );
 
@@ -167,7 +167,7 @@ const pageUrl = theme => pathToFileURL(
       assert.equal(layout.overflow, 'hidden');
       assert.match(layout.bannerBackground, /linear-gradient/);
       assert.equal(layout.gridColumns, 2);
-      assert.equal(layout.actionColumns, 3);
+      assert.equal(layout.actionColumns, 4);
       assert.equal(layout.backFile, 'project-task/index.html');
       assert.equal(layout.backScope, 'team');
       assert.equal(layout.phoneOverflow, false);

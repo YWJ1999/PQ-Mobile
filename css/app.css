@@ -2112,10 +2112,6 @@ html.is-mouse-swiping * {
   color: var(--text-muted);
 }
 
-.notification-filter-heading .sheet-close-btn {
-  flex-shrink: 0;
-}
-
 .notification-filter-options-heading {
   display: flex;
   justify-content: space-between;
@@ -2124,16 +2120,6 @@ html.is-mouse-swiping * {
   font-size: 12px;
   font-weight: 800;
   flex-shrink: 0;
-}
-
-.notification-filter-options-heading button {
-  border: 0;
-  background: transparent;
-  color: var(--purple-text);
-  font-size: 11.5px;
-  font-weight: 700;
-  padding: 5px;
-  cursor: pointer;
 }
 
 .notification-filter-options {
@@ -6028,15 +6014,6 @@ select option {
   font-size: 18px;
   font-weight: 800;
   color: var(--text-primary);
-}
-
-.cal-filter-reset-btn {
-  background: none;
-  border: none;
-  color: #3b82f6;
-  font-size: 14px;
-  font-weight: 700;
-  cursor: pointer;
 }
 
 .cal-filter-section {

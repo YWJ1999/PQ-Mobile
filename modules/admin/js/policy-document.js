@@ -1,27 +1,18 @@
+// Keep saved links to the old Workplace document page working.
 (() => {
   const params = new URLSearchParams(location.search);
-  const record = window.ADMIN_POLICY.records.find(item => item.id === params.get('document'));
-  const back = document.getElementById('policyDocumentBack');
-  function updateBack() {
-    const url = new URL('policy-sop.html', location.href);
-    Object.keys(window.ADMIN_POLICY.defaults).forEach(key => { if (params.has(key)) url.searchParams.set(key, params.get(key)); });
-    url.searchParams.set('theme', document.documentElement.dataset.theme || 'dark');
-    back.href = url.href;
-  }
-  updateBack();
-  new MutationObserver(updateBack).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
-  if (!record) {
-    document.getElementById('policyDocumentUnavailable').hidden = false;
+  const documentId = params.get('document');
+  const ref = documentId === 'check-title' ? 'DE001' : documentId;
+  if (Object.hasOwn(POLICY_DATABASE, ref)) {
+    const target = workplacePolicyDetailsUrl(ref);
+    target.searchParams.set('theme', params.get('theme') || getCurrentTheme());
+    if (POLICY_DATABASE[ref].policy?.pdfUrl) target.searchParams.set('pdf', 'policy');
+    location.replace(target.href);
     return;
   }
-  document.title = 'PeopleHCM - ' + record.filename;
-  document.getElementById('policyDocumentFilename').textContent = record.filename;
-  document.getElementById('policyDocumentMeta').textContent = record.title + ' · Policy';
-  const image = document.getElementById('policyDocumentImage');
-  image.addEventListener('error', () => {
-    document.getElementById('policyDocumentPreview').hidden = true;
-    document.getElementById('policyDocumentUnavailable').hidden = false;
-  });
-  image.src = record.preview;
-  document.getElementById('policyDocumentPreview').hidden = false;
+  const back = new URL('policy-sop.html', location.href);
+  back.search = location.search;
+  back.searchParams.delete('document');
+  document.getElementById('policyDocumentBack').href = back.href;
+  document.getElementById('policyDocumentUnavailable').hidden = false;
 })();

@@ -15,8 +15,30 @@ const puppeteer = require('puppeteer');
       await page.goto(url + '?theme=' + theme, { waitUntil: 'load' });
       assert.ok(await page.$('#policyList .policy-card'), 'Policy option must display the reference document');
       assert.match(await page.$eval('#policyList', n => n.textContent), /CHECK TITLE/);
-      assert.match(await page.$eval('#policyList', n => n.textContent), /20 Dec 2024/);
+      assert.equal(await page.$eval('.policy-file-count', n => n.textContent), '1 file');
+      assert.deepEqual(await page.$$eval('.policy-card:first-child .policy-card-badges span', nodes => nodes.map(n => n.textContent)), ['Policy']);
       assert.ok(await page.$('.policy-card-title-link'), 'The policy title must open its document');
+      const catalog = await page.$$eval('.policy-card', cards => cards.map(card => [
+        new URL(card.querySelector('a').href).searchParams.get('policy'),
+        card.querySelector('h3').textContent,
+        [...card.querySelectorAll('.policy-card-badges span')].map(b => b.textContent),
+        card.querySelector('.policy-file-count').textContent
+      ]).sort());
+      await page.goto(new URL('../../../company-updates.html?type=policy&theme=' + theme, url).href);
+      const updates = await page.$$eval('.updates-entry[data-policy]', cards => cards.map(card => [
+        card.dataset.policy, card.querySelector('strong').textContent,
+        [...card.querySelectorAll('.policy-document-badge')].map(b => b.textContent),
+        card.querySelector('.policy-summary').lastElementChild.textContent.split(' · ')[0]
+      ]).sort());
+      assert.deepEqual(updates, catalog, 'Company Updates must list the same policies and attachments as Workplace');
+      await page.goto(new URL('../../../home' + theme + '.html', url).href);
+      const home = await page.$eval('.update-card[data-category="policy"]', card => [
+        new URL(card.href).searchParams.get('policy'), card.querySelector('.update-title').textContent,
+        [...card.querySelectorAll('.policy-document-badge')].map(b => b.textContent),
+        card.querySelector('.policy-summary').lastElementChild.textContent.split(' · ')[0]
+      ]);
+      assert.deepEqual(home, catalog.find(([ref]) => ref === home[0]));
+      await page.goto(url + '?theme=' + theme);
       // Wait for the shared 300ms theme transition before taking the initial screenshot.
       await page.evaluate(() => Promise.all([document.fonts.ready, new Promise(resolve => setTimeout(resolve, 350))]));
       await page.screenshot({ path: `scratch/admin_policy_${theme}.png` });
@@ -32,6 +54,7 @@ const puppeteer = require('puppeteer');
       await page.click('#applyPolicyFilter');
       assert.ok(await page.$eval('#policyFilterError', n => !n.hidden), 'Reversed date range must be rejected');
       await page.click('#resetPolicyFilter');
+      await page.type('#policyReference', 'DE001');
       await page.$eval('#sopFrom', n => { n.value = '2024-01-01'; });
       await page.click('#applyPolicyFilter');
       assert.ok(await page.$eval('#policyEmptyState', n => !n.hidden), 'A document without SOP cannot match an explicit SOP date filter');
@@ -53,33 +76,35 @@ const puppeteer = require('puppeteer');
       await page.setViewport({ width: 390, height: 950 });
       await page.screenshot({ path: `scratch/admin_policy_filtered_${theme}.png` });
       await Promise.all([page.waitForNavigation({ waitUntil: 'load' }), page.click('.policy-card-title-link')]);
-      assert.match(page.url(), /policy-document.html/);
+      assert.equal(new URL(page.url()).searchParams.get('policy'), 'DE001');
       assert.equal(await page.$eval('html', n => n.dataset.theme), theme);
-      assert.equal(await page.$eval('#policyDocumentFilename', n => n.textContent), 'PeopleTime_UserGuide_v2.pdf');
-      await page.waitForFunction(() => { const img = document.querySelector('#policyDocumentImage'); return img && img.complete && img.naturalWidth > 0; });
+      assert.equal(await page.$eval('.document-info h3', n => n.textContent), 'PeopleTime_UserGuide_v2.pdf');
+      await Promise.all([page.waitForNavigation({ waitUntil: 'load' }), page.click('.document-open')]);
+      await page.waitForSelector('#pdfNativeReader:not([hidden])');
       for (const width of [360, 390, 450]) {
         await page.setViewport({ width, height: 950 });
         assert.ok(await page.$eval('main', n => n.scrollWidth <= n.clientWidth + 1), 'PDF preview must fit mobile widths');
       }
       await page.setViewport({ width: 390, height: 950 });
       await page.screenshot({ path: `scratch/admin_policy_pdf_${theme}.png` });
-      await Promise.all([page.waitForNavigation({ waitUntil: 'load' }), page.click('#policyDocumentBack')]);
+      await Promise.all([page.waitForNavigation({ waitUntil: 'load' }), page.click('#updatesBack')]);
+      await Promise.all([page.waitForNavigation({ waitUntil: 'load' }), page.click('#updatesBack')]);
       assert.equal(await page.$eval('html', n => n.dataset.theme), theme);
       await page.click('#policyFilterTrigger');
       assert.equal(await page.$eval('#policyTitle', n => n.value), 'check', 'Returning from PDF must preserve filters');
       await page.screenshot({ path: `scratch/admin_policy_filter_${theme}.png` });
       await page.keyboard.press('Escape');
-      await Promise.all([page.waitForNavigation({ waitUntil: 'load' }), page.click('.policy-document-link')]);
-      assert.match(page.url(), /policy-document.html/, 'The Policy button must open the same document as the title');
-      await Promise.all([page.waitForNavigation({ waitUntil: 'load' }), page.click('#policyDocumentBack')]);
+      await page.click('.policy-card-menu summary');
+      await Promise.all([page.waitForNavigation({ waitUntil: 'load' }), page.click('.policy-card-menu a')]);
+      assert.equal(new URL(page.url()).searchParams.get('policy'), 'DE001', 'View details opens the same record as its title');
+      await Promise.all([page.waitForNavigation({ waitUntil: 'load' }), page.click('#updatesBack')]);
       await Promise.all([page.waitForNavigation({ waitUntil: 'load' }), page.click('[data-admin-back]')]);
       assert.match(page.url(), /admin\/index.html/);
       assert.equal(await page.$eval('html', n => n.dataset.theme), theme);
     }
     await page.goto(pathToFileURL(path.resolve('modules/admin/options/policy-document.html')).href + '?document=missing', { waitUntil: 'load' });
     assert.ok(await page.$eval('#policyDocumentUnavailable', n => !n.hidden), 'Unknown document must show an unavailable state');
-    assert.ok(await page.$eval('#policyDocumentPreview', n => n.hidden));
     assert.deepEqual(errors, []);
-    console.log('PASS: Policy reference card, filters, date validation, missing SOP, PDF image navigation, preserved filters, unavailable document, both themes and mobile widths.');
+    console.log('PASS: Policy reference card, filters, date validation, missing SOP, details and PDF navigation, preserved filters, unavailable document, both themes and mobile widths.');
   } finally { await browser.close(); }
 })().catch(error => { console.error(error); process.exitCode = 1; });

@@ -18,6 +18,8 @@
   <link rel="stylesheet" href="modules/training-competency/css/training-calendar.css">
   <script src="js/components.js"></script>
   <script src="js/app.js" defer></script>
+  <script src="modules/admin/js/policy-data.js" defer></script>
+  <script src="js/company-updates.js" defer></script>
   <script src="js/dashboard-background.js" defer></script>
   <script src="modules/training-competency/js/training-competency-data.js" defer></script>
   <script src="modules/training-competency/js/training-calendar.js" defer></script>
@@ -194,35 +196,35 @@
       </div>
 
       <div class="updates-list">
-        <div class="update-card" data-category="news" onclick="openUpdatesModal()">
-          <span class="unread-indicator" aria-hidden="true"></span>
+        <a class="update-card" data-category="news" href="company-updates.html?theme=dark&amp;story=town-hall&amp;via=home">
           <div class="update-thumb" aria-hidden="true"><i class="fa-solid fa-bullhorn"></i></div>
           <div class="update-content">
-            <span class="update-tag">News · Unread</span>
+            <span class="update-tag">News</span>
             <h4 class="update-title">Town Hall this Friday</h4>
             <span class="update-meta">Today</span>
           </div>
-        </div>
+          <span class="update-chevron" aria-hidden="true"></span>
+        </a>
 
-        <div class="update-card" data-category="policy" onclick="openUpdatesModal()">
+        <a class="update-card" data-category="policy" href="company-updates.html?theme=dark&amp;via=home">
           <div class="update-thumb" aria-hidden="true"><i class="fa-solid fa-clipboard-list"></i></div>
           <div class="update-content">
             <span class="update-tag">Policy &amp; SOP</span>
-            <h4 class="update-title">Hybrid & Remote Work Policy 2026</h4>
-            <span class="update-meta">Effective <time datetime="2026-01-15">15/01/2026</time></span>
+            <h4 class="update-title">Company policy</h4>
+            <span class="policy-summary"></span>
           </div>
-          <span style="align-self: center; color: var(--text-muted); font-size: 16px;">›</span>
-        </div>
+          <span class="update-chevron" aria-hidden="true"></span>
+        </a>
 
-        <div class="update-card" data-category="news" onclick="openUpdatesModal()">
+        <a class="update-card" data-category="news" href="company-updates.html?theme=dark&amp;story=industry-award&amp;via=home">
           <div class="update-thumb" aria-hidden="true"><i class="fa-solid fa-trophy"></i></div>
           <div class="update-content">
             <span class="update-tag">News</span>
             <h4 class="update-title">PeopleQuest wins industry award</h4>
             <span class="update-meta">Yesterday</span>
           </div>
-          <span style="align-self: center; color: var(--text-muted); font-size: 16px;">›</span>
-        </div>
+          <span class="update-chevron" aria-hidden="true"></span>
+        </a>
       </div>
     </div>
 

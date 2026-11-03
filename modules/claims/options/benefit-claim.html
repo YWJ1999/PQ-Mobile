@@ -550,10 +550,10 @@
           <div class="claim-filter-handle"></div>
           <div class="claim-filter-header">
             <h2 class="claim-filter-title">Filter</h2>
-            <button type="button" class="claim-filter-reset" onclick="resetEntitlementYearFilterModal()">
-              <i class="fa-solid fa-rotate-left"></i>
-              <span>Reset</span>
-            </button>
+            <div class="standard-filter-header-actions">
+              <button type="button" class="standard-filter-reset" onclick="resetEntitlementYearFilterModal()"><i class="fa-solid fa-rotate-left" aria-hidden="true"></i><span>Reset</span></button>
+              <button type="button" class="standard-filter-close" onclick="closeEntitlementYearFilterModal()" aria-label="Close filter"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
+            </div>
           </div>
 
           <div class="claim-filter-fields">

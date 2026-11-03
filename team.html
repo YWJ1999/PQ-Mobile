@@ -734,13 +734,14 @@
     }
   </style>
   <link rel="stylesheet" href="css/theme.css">
+  <link rel="stylesheet" href="css/approval-actions.css">
   <link rel="stylesheet" href="css/dashboard-legacy.css">
   <link rel="stylesheet" href="css/dashboard-background.css">
   <script src="js/dashboard-background.js" defer></script>
   <script src="js/mouse-swipe.js" defer></script>
 </head>
 
-<body>
+<body class="unified-approval-actions">
 
   <!-- Top Switcher: Themes & Designs -->
   <div class="theme-switch-bar">
@@ -1117,6 +1118,7 @@
     </div>
   </div>
 
+  <script src="js/pending-approval-backup.js"></script>
   <script>
     (() => {
       const key = 'pq_team_approval_decisions';
@@ -1125,7 +1127,13 @@
       document.querySelectorAll('.approval-card').forEach((card, index) => {
         const reference = 'TEAM-' + (index + 1);
         card.dataset.reference = reference;
-        if (handled.has(reference)) card.remove();
+        if (handled.has(reference)) { card.remove(); return; }
+        const employee = card.querySelector('h4').textContent.trim();
+        PendingApprovalBackup.addButton(card.querySelector('.approval-actions'), {
+          scope: 'team', id: reference, reference: employee + ' · ' + card.querySelector('.approval-tag').textContent.trim(),
+          pool: PendingApprovalBackup.approvers.filter(person => person.name !== employee),
+          isPending: () => card.isConnected && !read().some(item => item.reference === reference)
+        });
       });
       document.addEventListener('click', event => {
         const button = event.target.closest('.approval-card .btn-approve, .approval-card .btn-reject');
