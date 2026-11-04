@@ -71,12 +71,6 @@
         <form id="approvalConfirmForm"><div class="payroll-approval-details-body"><p id="approvalConfirmMessage"></p><label for="approvalComments">Approver Comments</label><textarea id="approvalComments" rows="3" maxlength="2000" placeholder="Add comments..."></textarea><p id="approvalConfirmError" class="performance-approval-error" role="alert" hidden></p></div><footer class="payroll-approval-details-footer"><button class="action-btn-cancel" type="button" data-close-approval>Cancel</button><button id="approvalConfirmSubmit" class="action-btn-approve" type="submit">Confirm</button></footer></form>
       </section>
     </div>
-    <div id="approvalBackup" class="payroll-approval-overlay" hidden>
-      <section class="payroll-approval-panel" role="dialog" aria-modal="true" aria-labelledby="approvalBackupTitle">
-        <header class="payroll-approval-details-header"><h2 id="approvalBackupTitle">Select Backup Approver</h2><button type="button" class="payroll-approval-close" data-close-approval aria-label="Close backup selection"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button></header>
-        <form id="approvalBackupForm"><div class="payroll-approval-details-body"><p id="approvalBackupMessage"></p><label for="approvalBackupApprover">Backup Approver</label><select id="approvalBackupApprover" required><option value="">Select an approver</option></select><p id="approvalBackupError" class="performance-approval-error" role="alert" hidden></p></div><footer class="payroll-approval-details-footer"><button type="button" class="action-btn-cancel" data-close-approval>Cancel</button><button id="approvalBackupSubmit" type="submit" class="action-btn-approve">Assign Backup</button></footer></form>
-      </section>
-    </div>
     <div id="performanceApprovalWorkflow" class="payroll-approval-overlay" hidden>
       <section class="payroll-approval-panel payroll-approval-workflow" role="dialog" aria-modal="true" aria-labelledby="performanceApprovalWorkflowTitle">
         <header class="payroll-approval-workflow-header"><div class="payroll-approval-handle" aria-hidden="true"></div><div class="payroll-approval-workflow-heading"><i class="fa-solid fa-diagram-project payroll-approval-workflow-icon" aria-hidden="true"></i><div><h2 id="performanceApprovalWorkflowTitle">Approval Workflow</h2><p>Approval status &amp; history</p></div><button type="button" class="payroll-approval-close" data-close-approval aria-label="Close workflow"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button></div></header>

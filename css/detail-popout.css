@@ -135,7 +135,7 @@
   pointer-events: none !important;
 }
 .detail-popout-header .detail-popout-close::before { content: none !important; }
-.detail-popout-decoration, .detail-popout-back, .detail-popout-legacy-backup { display: none !important; }
+.detail-popout-decoration, .detail-popout-back { display: none !important; }
 .detail-popout-body {
   flex: 1 1 auto !important;
   min-height: 0 !important;
@@ -281,7 +281,7 @@
   padding: 0 !important;
 }
 .detail-popout-footer.detail-popout-actions { padding: 12px !important; }
-.detail-popout-actions button:not(.detail-popout-legacy-backup) {
+.detail-popout-actions button {
   display: inline-flex !important;
   flex-direction: column !important;
   align-items: center !important;

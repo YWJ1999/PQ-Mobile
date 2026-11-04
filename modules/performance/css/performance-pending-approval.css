@@ -1,14 +1,14 @@
 /* Reuse the shared Leave/Claims approval controls and card proportions. */
 .performance-pending-page .payroll-pending-tabs { gap: 6px; }
 .performance-pending-page .payroll-pending-tabs .filter-pill { padding-inline: 7px; font-size: 11.5px; }
-.performance-pending-page .pending-action-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.performance-pending-page .pending-action-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .performance-pending-page .payroll-approval-status { background: rgba(245, 158, 11, .14); border-color: rgba(245, 158, 11, .3); color: #f59e0b; }
 .performance-pending-page .payroll-approval-card-body { cursor: default; }
 .performance-pending-page .payroll-approval-date { display: block; }
 .performance-pending-page .payroll-approval-card-header .employee-name { overflow-wrap: anywhere; }
-#approvalDetails, #approvalConfirm, #approvalBackup { align-items: center; justify-content: center; padding: 16px 16px 94px; }
+#approvalDetails, #approvalConfirm { align-items: center; justify-content: center; padding: 16px 16px 94px; }
 #approvalDetails.detail-popout-overlay { padding: 16px 16px 94px !important; }
-#approvalDetails .payroll-approval-panel, #approvalConfirm .payroll-approval-panel, #approvalBackup .payroll-approval-panel { max-width: 380px; max-height: 100%; border-bottom: 1px solid var(--border-subtle); border-radius: 18px; }
+#approvalDetails .payroll-approval-panel, #approvalConfirm .payroll-approval-panel { max-width: 380px; max-height: 100%; border-bottom: 1px solid var(--border-subtle); border-radius: 18px; }
 #approvalDetailsBody .employee-id { margin-bottom: 4px; font: 700 11.5px monospace, sans-serif; color: var(--text-muted); opacity: .8; }
 #approvalDetailsBody h3 { margin: 16px 0 8px; font-size: 12px; }
 #approvalDetailsBody .payroll-approval-table + .payroll-approval-table { margin-top: 12px; }
@@ -19,13 +19,13 @@
 #approvalDetailsBody .employee-name { display: block; }
 #approvalDetailsBody .employee-id { display: block; }
 #approvalDetailsBody .payroll-approval-file { overflow-wrap: anywhere; color: var(--purple-text); }
-#approvalConfirmForm, #approvalBackupForm { display: flex; flex-direction: column; min-height: 0; }
-#approvalConfirmForm > .payroll-approval-details-body, #approvalBackupForm > .payroll-approval-details-body { min-height: 0; overflow-y: auto; }
+#approvalConfirmForm { display: flex; flex-direction: column; min-height: 0; }
+#approvalConfirmForm > .payroll-approval-details-body { min-height: 0; overflow-y: auto; }
 #approvalConfirmMessage { margin-bottom: 16px; font-size: 13px; line-height: 1.5; }
-#approvalConfirmForm label, #approvalBackupForm label { display: block; margin-bottom: 8px; color: var(--text-muted); font-size: 12px; font-weight: 700; }
-#approvalComments, #approvalBackupApprover { width: 100%; padding: 10px; border: 1px solid var(--border-subtle); border-radius: 10px; background: var(--bg-input); color: var(--text-primary); font: inherit; font-size: 12px; resize: vertical; }
-#approvalConfirmForm .payroll-approval-details-footer, #approvalBackupForm .payroll-approval-details-footer { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-#approvalBackupMessage, .performance-approval-note { margin-bottom: 12px; color: var(--text-muted); font-size: 12px; line-height: 1.5; }
+#approvalConfirmForm label { display: block; margin-bottom: 8px; color: var(--text-muted); font-size: 12px; font-weight: 700; }
+#approvalComments { width: 100%; padding: 10px; border: 1px solid var(--border-subtle); border-radius: 10px; background: var(--bg-input); color: var(--text-primary); font: inherit; font-size: 12px; resize: vertical; }
+#approvalConfirmForm .payroll-approval-details-footer { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.performance-approval-note { margin-bottom: 12px; color: var(--text-muted); font-size: 12px; line-height: 1.5; }
 .performance-approval-error { margin-top: 12px; color: #ef4444; font-size: 12px; line-height: 1.5; }
 .performance-pending-page [hidden] { display: none !important; }
 .performance-pending-page :is(button, textarea, select, a, [tabindex="0"]):focus-visible { outline: 2px solid var(--purple-text); outline-offset: 3px; }

@@ -104,18 +104,18 @@ const url = (file, query = '') => pathToFileURL(path.resolve(__dirname, '..', fi
         await page.click('#performanceApprovalFilter [data-action="reset"]');
         await page.keyboard.press('Escape');
         assert.equal(await page.$$eval('.approval-request-card', els => els.length), 2, 'Action survives reload');
-        await page.click('.approval-request-card [data-approval-action="backup"]');
-        assert.equal(await page.$eval('#approvalBackup', el => el.hidden), false);
-        await page.select('#approvalBackupApprover', 'EBB04');
-        await page.click('#approvalBackupSubmit');
-        assert.equal(await page.$$eval('.approval-request-card', els => els.length), 2, 'Backup assignment keeps request pending');
+        assert.equal(await page.$('.action-btn-backup'), null);
+        await page.evaluate(() => {
+          const record = PerformancePendingStore.getPending()[0];
+          PerformancePendingStore.assignBackup([record.id], 'EBB04');
+        });
         await page.evaluate(() => {
           const saved = JSON.parse(sessionStorage.getItem('performance-pending-backups-v1'));
           saved[Object.keys(saved)[0]].assignedAt = '2026-10-15T16:30:00.000Z';
           sessionStorage.setItem('performance-pending-backups-v1', JSON.stringify(saved));
         });
         await page.reload();
-        assert.ok(await page.$eval('.approval-request-card', el => el.textContent.includes('Angeline Loren Alan')), 'Backup survives reload');
+        assert.ok(await page.$eval('.approval-request-card', el => el.textContent.includes('Angeline Loren Alan')), 'Existing backup history survives reload');
         await page.click('.three-dots-btn');
         await page.click('#performanceApprovalViewWorkflow');
         assert.ok(await page.$eval('#performanceApprovalWorkflowAudit li:last-child', el => el.textContent.includes('16 Oct 2026')), 'Backup audit formats the full timestamp in local time');

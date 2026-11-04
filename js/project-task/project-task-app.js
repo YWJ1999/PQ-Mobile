@@ -307,10 +307,7 @@
     document.querySelectorAll('#projectTimesheetApprovalList .project-approval-card').forEach(card => {
       const reference = card.dataset.reference;
       if (handled.has(reference)) { card.remove(); return; }
-      PendingApprovalBackup.addButton(card.querySelector('.project-approval-actions'), {
-        scope: 'timesheet', id: reference, empNo: card.dataset.employeeId,
-        isPending: () => card.isConnected && !read().some(item => item.reference === reference)
-      });
+      PendingApprovalBackup.showAssignment(card.querySelector('.project-approval-actions'), { scope: 'timesheet', id: reference });
     });
     updateCount();
     function decide(cards, action, comments = '') {

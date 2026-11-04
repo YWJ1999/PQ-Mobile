@@ -123,9 +123,7 @@
     if (footer === body) return;
     addClass(footer, 'detail-popout-footer');
     addClass(grid, 'detail-popout-actions');
-    const backup = [...grid.querySelectorAll('button')].find(button => clean(button.textContent) === 'Backup');
-    if (backup && closeFunction && typeof window[closeFunction] === 'function') {
-      addClass(backup, 'detail-popout-legacy-backup');
+    if (closeFunction && typeof window[closeFunction] === 'function') {
       if (!grid.querySelector('.detail-popout-cancel')) {
         const cancel = document.createElement('button');
         cancel.type = 'button';
@@ -136,7 +134,7 @@
         grid.insertBefore(cancel, reject || null);
       }
     }
-    const count = [...grid.querySelectorAll('button')].filter(button => !button.classList.contains('detail-popout-legacy-backup')).length;
+    const count = grid.querySelectorAll('button').length;
     if (grid.style.getPropertyValue('--detail-action-count') !== String(count)) grid.style.setProperty('--detail-action-count', String(count));
   }
 

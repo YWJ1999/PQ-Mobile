@@ -1,20 +1,5 @@
 /* Unified purple approval actions across Claims, Leave and Attendance. */
-.pending-action-grid.pending-card-backup-actions { grid-template-columns: repeat(var(--card-action-count), minmax(0, 1fr)); }
-.pending-card-backup-actions > button { min-width: 0; }
 .approval-backup-assignment { margin: 5px 0 9px; color: var(--text-secondary); font-size: 11.5px; font-weight: 650; overflow-wrap: anywhere; }
-.approval-backup-dialog { position: fixed; inset: 0; margin: auto; width: min(340px, calc(100% - 32px)); padding: 18px; background: var(--bg-phone); color: var(--text-primary); border: 1px solid var(--border-subtle); border-radius: 18px; box-shadow: var(--shadow-card); }
-.approval-backup-dialog::backdrop { background: rgba(15,23,42,.55); }
-.approval-backup-dialog h2 { font-size: 16px; }
-.approval-backup-reference { margin: 4px 0 16px; color: var(--text-secondary); font-size: 12px; overflow-wrap: anywhere; }
-.approval-backup-dialog label { display: grid; gap: 6px; font-size: 12px; font-weight: 700; }
-.approval-backup-dialog select { width: 100%; padding: 9px; border: 1px solid var(--border-subtle); border-radius: 10px; background: var(--bg-input); color: var(--text-primary); font: inherit; }
-.approval-backup-dialog footer { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; }
-.approval-backup-dialog button { min-height: 36px; padding: 7px 12px; border: 1px solid var(--border-subtle); border-radius: 10px; background: var(--bg-pill); color: var(--text-primary); font: inherit; font-size: 12px; font-weight: 700; cursor: pointer; }
-.approval-backup-dialog button[type="submit"] { background: #7c3aed; border-color: #7c3aed; color: white; }
-.approval-backup-error { margin-top: 8px; font-size: 12px; color: var(--tag-rose-text); }
-@media (max-width: 380px) {
-  .pending-action-grid.pending-card-backup-actions[data-action-count="5"] { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-}
 .pending-selection-bar {
   position: absolute;
   z-index: 40;
@@ -55,8 +40,7 @@
 .action-btn-approve,
 .action-btn-resubmit,
 .action-btn-reject,
-.action-btn-cancel,
-html .unified-approval-actions .action-btn-backup {
+.action-btn-cancel {
   min-height: 40px;
   padding: 10px 6px;
   border-radius: 12px;
@@ -79,8 +63,7 @@ html .action-btn-resubmit,
 html .action-btn-reject,
 html .action-btn-cancel,
 html[data-theme="dark"] .action-btn-resubmit,
-html[data-theme="dark"] .action-btn-reject,
-html .unified-approval-actions .action-btn-backup {
+html[data-theme="dark"] .action-btn-reject {
   background: #7c3aed;
   border-color: #8b5cf6;
   color: #ffffff;
@@ -93,8 +76,7 @@ html .unified-approval-actions .action-btn-backup {
   html .action-btn-reject:hover,
   html .action-btn-cancel:hover,
   html[data-theme="dark"] .action-btn-resubmit:hover,
-  html[data-theme="dark"] .action-btn-reject:hover,
-  html .unified-approval-actions .action-btn-backup:hover {
+  html[data-theme="dark"] .action-btn-reject:hover {
     background: #6d28d9;
     box-shadow: 0 5px 16px rgba(124, 58, 237, 0.3);
   }
@@ -103,8 +85,7 @@ html .unified-approval-actions .action-btn-backup {
 .action-btn-approve:focus-visible,
 .action-btn-resubmit:focus-visible,
 .action-btn-reject:focus-visible,
-.action-btn-cancel:focus-visible,
-html .unified-approval-actions .action-btn-backup:focus-visible {
+.action-btn-cancel:focus-visible {
   outline: 2px solid #a78bfa;
   outline-offset: 3px;
 }
@@ -112,8 +93,7 @@ html .unified-approval-actions .action-btn-backup:focus-visible {
 .action-btn-approve:active,
 .action-btn-resubmit:active,
 .action-btn-reject:active,
-.action-btn-cancel:active,
-html .unified-approval-actions .action-btn-backup:active {
+.action-btn-cancel:active {
   transform: scale(0.97);
 }
 
@@ -121,15 +101,13 @@ html .unified-approval-actions .action-btn-backup:active {
   .action-btn-approve,
   .action-btn-resubmit,
   .action-btn-reject,
-  .action-btn-cancel,
-  html .unified-approval-actions .action-btn-backup {
+  .action-btn-cancel {
     transition: none;
   }
   .action-btn-approve:active,
   .action-btn-resubmit:active,
   .action-btn-reject:active,
-  .action-btn-cancel:active,
-  html .unified-approval-actions .action-btn-backup:active {
+  .action-btn-cancel:active {
     transform: none;
   }
 }

@@ -1,7 +1,7 @@
 (() => {
   const $ = id => document.getElementById(id);
   const names = { 'goal-plan': 'Goal Plan', 'self-evaluation': 'Self Evaluation', 'self-review': 'Self Review' };
-  const actions = { approve: 'Approve', backup: 'Backup', resubmit: 'Resubmit', reject: 'Reject' };
+  const actions = { approve: 'Approve', resubmit: 'Resubmit', reject: 'Reject' };
   const store = window.PerformancePendingStore;
   let category = new URLSearchParams(location.search).get('tab');
   if (!names[category]) category = 'goal-plan';
@@ -197,15 +197,6 @@
     const available = new Set(store.getPending().map(record => record.id));
     ids = ids.filter(id => available.has(id));
     if (!ids.length) return;
-    if (action === 'backup') {
-      pendingAction = { ids, action };
-      $('approvalBackupMessage').textContent = `Assign a backup approver for ${ids.length} ${names[category]} request${ids.length === 1 ? '' : 's'}. The requests will remain pending.`;
-      const picker = $('approvalBackupApprover'); picker.replaceChildren(new Option('Select an approver', ''));
-      const employees = store.getPending().filter(record => ids.includes(record.id)).map(record => record.empNo);
-      store.getBackupApprovers().filter(person => !employees.includes(person.empNo)).forEach(person => picker.add(new Option(`${person.name} (#${person.empNo})`, person.empNo)));
-      $('approvalBackupError').hidden = true;
-      openDialog('approvalBackup', trigger); return;
-    }
     if (!['approve', 'resubmit', 'reject'].includes(action)) return;
     const fromDetails = activeDialog?.id === 'approvalDetails';
     saveCommentDraft();
@@ -336,18 +327,6 @@
     render();
     closeDialog();
     if (typeof showToast === 'function') showToast(`${{ approve: 'Approved', resubmit: 'Sent for resubmission:', reject: 'Rejected' }[action]} ${count} request${count === 1 ? '' : 's'}.`);
-  });
-  $('approvalBackupForm').addEventListener('submit', event => {
-    event.preventDefault();
-    if (pendingAction?.action !== 'backup') return;
-    try {
-      const count = store.assignBackup(pendingAction.ids, $('approvalBackupApprover').value);
-      if (!count) throw new Error('No eligible request');
-    } catch {
-      $('approvalBackupError').textContent = 'Unable to assign this backup approver. Please try again.'; $('approvalBackupError').hidden = false; return;
-    }
-    pendingAction = null; selected.clear(); render(); closeDialog();
-    if (typeof showToast === 'function') showToast('Backup approver assigned. Requests remain pending.');
   });
   document.querySelectorAll('[data-close-approval]').forEach(button => button.addEventListener('click', cancelDialog));
   document.querySelectorAll('.payroll-approval-overlay').forEach(overlay => {

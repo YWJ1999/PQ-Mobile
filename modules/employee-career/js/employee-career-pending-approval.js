@@ -1,8 +1,7 @@
 (() => {
   const $ = id => document.getElementById(id);
-  const actions = [['approve', 'Approve'], ['backup', 'Backup'], ['resubmit', 'Resubmit'], ['reject', 'Reject']];
+  const actions = [['approve', 'Approve'], ['resubmit', 'Resubmit'], ['reject', 'Reject']];
   const records = (window.EMPLOYEE_CAREER_PENDING_DATA || []).map(item => ({ ...item, status: item.status || 'pending' }));
-  const approvers = window.EMPLOYEE_CAREER_BACKUP_APPROVERS || [];
   const selected = new Set();
   let category = '';
   let visible = [];
@@ -285,17 +284,6 @@
     if (!item.audit?.length) $('careerPendingWorkflowAudit').append(node('li', 'career-pending-note', 'No audit history available.'));
     openSheet('careerPendingWorkflow');
   }
-  function openBackup() {
-    $('careerPendingBackupPeople').replaceChildren(...approvers.map((person, index) => {
-      const button = node('button', 'career-pending-backup-person');
-      button.type = 'button';
-      button.dataset.careerBackupIndex = String(index);
-      button.append(identity(person.name, person.empNo, person.role), icon('fa-chevron-right'));
-      return button;
-    }));
-    $('careerPendingBackupEmpty').hidden = approvers.length > 0;
-    openSheet('careerPendingBackup');
-  }
   function decide(action, ids) {
     const items = records.filter(item => item.status === 'pending' && ids.includes(item.id));
     if (!items.length) { showToast('Please select at least one request.'); return; }
@@ -374,23 +362,9 @@
         window.EmployeeCareerCVHistoryDetails.selectTab($('careerPendingDetails').querySelector('.payroll-approval-details-body'), cvTab.dataset.cvTab);
         return;
       }
-      const backup = event.target.closest('[data-career-backup-index]');
-      if (backup && current()) {
-        const person = approvers[Number(backup.dataset.careerBackupIndex)];
-        if (!person) return;
-        current().backupApprover = { ...person };
-        closeSheet();
-        render();
-        showToast(`Backup Approver updated to ${person.name}.`);
-        return;
-      }
       const button = event.target.closest('[data-career-approval-action]');
       if (button) {
         currentId = button.closest('[data-career-request-id]')?.dataset.careerRequestId || currentId;
-        if (button.dataset.careerApprovalAction === 'backup') {
-          openBackup();
-          return;
-        }
         const comments = button.closest('#careerPendingDetails') ? $('careerPendingComments') : null;
         if (comments && current()) current().approverRemarks = comments.value;
         decide(button.dataset.careerApprovalAction, [currentId]);

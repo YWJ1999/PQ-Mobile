@@ -9,7 +9,7 @@
   const cardMarkup = item => item.href
     ? `<a class="employee-career-option" href="${item.href}?theme=${theme()}" role="listitem" data-option-id="${item.id}">${cardContents(item)}</a>`
     : `<button type="button" class="employee-career-option" role="listitem" data-option-id="${item.id}" disabled>${cardContents(item)}</button>`;
-  const viewAllMarkup = () => `<button type="button" class="employee-career-option" data-action="view-all" role="listitem"><span class="employee-career-option-icon view-all" aria-hidden="true"><i class="fa-solid fa-grip"></i></span><span class="employee-career-option-title">View All</span></button>`;
+  const viewAllMarkup = () => `<button type="button" class="employee-career-option" data-action="view-all" role="listitem"><span class="employee-career-option-icon view-all" aria-hidden="true"><i class="fa-solid fa-ellipsis"></i></span><span class="employee-career-option-title">View All</span></button>`;
 
   function render() {
     const grid = document.getElementById('employeeCareerOptions');

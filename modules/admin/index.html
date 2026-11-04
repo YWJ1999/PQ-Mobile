@@ -17,6 +17,7 @@
   <script src="../../js/components.js"></script>
   <script src="../../js/app.js" defer></script>
   <script src="js/workplace-history-store.js" defer></script>
+  <script src="js/workplace-pending-store.js" defer></script>
   <script src="js/book-resource-store.js" defer></script>
   <script src="js/admin-app.js" defer></script>
   <script src="../../js/attendance-schedule-calendar.js" defer></script>
@@ -39,6 +40,27 @@
         <button type="button" id="workplaceTabTeam" class="workplace-scope-tab" role="tab" aria-selected="false" aria-controls="workplaceTeamPanel" tabindex="-1"><i class="fa-solid fa-users" aria-hidden="true"></i><span>Team</span></button>
       </div>
       <div id="workplaceIndividualPanel" class="workplace-scope-panel" role="tabpanel" aria-labelledby="workplaceTabIndividual">
+      <section class="team-action-required-card workplace-actions" aria-labelledby="workplaceActionTitle">
+        <div class="team-action-required-header">
+          <div class="team-action-required-heading">
+            <span class="team-action-required-icon" aria-hidden="true"><i class="fa-solid fa-bolt"></i></span>
+            <span class="team-action-required-copy">
+              <strong class="team-action-required-title" id="workplaceActionTitle">Action Required</strong>
+              <span class="team-action-required-description">Items that require your action</span>
+            </span>
+          </div>
+        </div>
+        <div class="team-action-required-items">
+          <a class="team-pending-approval-action" id="workplacePendingApprovalLink" href="options/pending-approval.html?scope=individual">
+            <span class="team-pending-approval-icon"><i class="fa-solid fa-clock-rotate-left" aria-hidden="true"></i></span>
+            <span class="team-pending-approval-copy">
+              <strong class="team-pending-approval-title">Pending Approval</strong>
+              <span class="team-pending-approval-description">Workplace requests awaiting review</span>
+            </span>
+            <span class="team-pending-approval-end"><span id="workplacePendingApprovalCount" class="team-pending-approval-count">—</span><i class="fa-solid fa-chevron-right team-pending-approval-chevron" aria-hidden="true"></i></span>
+          </a>
+        </div>
+      </section>
       <section id="workplaceDocumentStatus" class="workplace-document-status" aria-labelledby="workplaceDocumentStatusTitle">
         <h2 id="workplaceDocumentStatusTitle">My Document Status</h2>
         <div class="workplace-status-grid">
@@ -51,7 +73,7 @@
       </section>
       <section aria-labelledby="adminOptionsTitle">
         <h2 class="admin-section-title" id="adminOptionsTitle">OPTIONS</h2>
-        <div class="admin-options">
+        <div id="workplaceQuickOptions" class="admin-options">
           <a class="admin-option" data-tone="purple" href="options/news.html">
             <span class="admin-option-icon"><i class="fa-solid fa-newspaper" aria-hidden="true"></i></span>
             <span class="admin-option-title">News</span>
@@ -80,6 +102,10 @@
             <span class="admin-option-icon"><i class="fa-solid fa-file-lines" aria-hidden="true"></i></span>
             <span class="admin-option-title">Policy/SOP</span>
           </a>
+          <a class="admin-option" data-tone="purple" data-option-id="asset-highlight" href="options/asset-highlight.html?scope=individual">
+            <span class="admin-option-icon"><i class="fa-solid fa-chart-pie" aria-hidden="true"></i></span>
+            <span class="admin-option-title">Asset Highlight</span>
+          </a>
         </div>
       </section>
       <section id="workplaceCalendar" class="workplace-calendar" aria-labelledby="workplaceCalendarTitle">
@@ -101,40 +127,19 @@
         </div>
       </section>
       </div>
-      <div id="workplaceTeamPanel" class="workplace-scope-panel" role="tabpanel" aria-labelledby="workplaceTabTeam" hidden>
-        <section class="team-action-required-card workplace-team-actions" aria-labelledby="workplaceTeamActionTitle">
-          <div class="team-action-required-header">
-            <div class="team-action-required-heading">
-              <span class="team-action-required-icon" aria-hidden="true"><i class="fa-solid fa-bolt"></i></span>
-              <span class="team-action-required-copy">
-                <strong class="team-action-required-title" id="workplaceTeamActionTitle">Action Required</strong>
-                <span class="team-action-required-description">Items that require your action</span>
-              </span>
-            </div>
-          </div>
-          <div class="team-action-required-items">
-            <a class="team-pending-approval-action" id="workplaceTeamPendingApproval" href="options/pending-approval.html?scope=team">
-              <span class="team-pending-approval-icon"><i class="fa-solid fa-clock-rotate-left" aria-hidden="true"></i></span>
-              <span class="team-pending-approval-copy">
-                <strong class="team-pending-approval-title">Pending Approval</strong>
-                <span class="team-pending-approval-description">Workplace requests awaiting review</span>
-              </span>
-              <span class="team-pending-approval-end"><i class="fa-solid fa-chevron-right team-pending-approval-chevron" aria-hidden="true"></i></span>
-            </a>
-          </div>
-        </section>
-        <section aria-labelledby="workplaceTeamOptionsTitle">
-          <h2 class="admin-section-title" id="workplaceTeamOptionsTitle">OPTIONS</h2>
-          <div class="admin-options">
-            <a class="admin-option" data-tone="purple" data-option-id="asset-highlight" href="options/asset-highlight.html?scope=team">
-              <span class="admin-option-icon"><i class="fa-solid fa-chart-pie" aria-hidden="true"></i></span>
-              <span class="admin-option-title">Asset Highlight</span>
-            </a>
-          </div>
-        </section>
-      </div>
+      <div id="workplaceTeamPanel" class="workplace-scope-panel" role="tabpanel" aria-labelledby="workplaceTabTeam" hidden></div>
     </main>
     <phone-bottom-nav active="apps"></phone-bottom-nav>
+    <div id="workplaceOptionsOverlay" class="workplace-options-overlay" aria-hidden="true" hidden>
+      <section class="workplace-options-sheet" role="dialog" aria-modal="true" aria-labelledby="workplaceOptionsTitle">
+        <div class="workplace-options-handle" aria-hidden="true"></div>
+        <header class="workplace-options-heading">
+          <h2 id="workplaceOptionsTitle">All Options</h2>
+          <button id="workplaceOptionsClose" type="button" aria-label="Close All Options"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
+        </header>
+        <nav id="workplaceAllOptions" class="admin-options" aria-label="All Workplace options"></nav>
+      </section>
+    </div>
     <div id="workplaceCalendarFilterOverlay" class="workplace-calendar-filter-overlay standard-filter-sheet" hidden>
       <form id="workplaceCalendarFilterForm" class="standard-filter-panel" data-standard-filter-ready="true" role="dialog" aria-modal="true" aria-labelledby="workplaceCalendarFilterTitle">
         <div class="standard-filter-handle" aria-hidden="true"></div>

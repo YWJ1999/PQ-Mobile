@@ -5,51 +5,47 @@ const puppeteer = require('puppeteer');
 
 const queues = [
   ['modules/claims/options/pending-approval.html', '#teamApprovalsQueue .approval-request-card'],
+  ['modules/claims/options/team.html', '#teamApprovalsQueue .approval-request-card'],
   ['modules/payroll/options/pending-approval.html', '#payrollPendingQueue .approval-request-card'],
   ['modules/admin/options/pending-approval.html', '#workplacePendingQueue .approval-request-card'],
   ['modules/project-task/options/pending-approval.html', '#projectTimesheetApprovalList .project-approval-card'],
+  ['modules/employee-career/options/pending-approval.html', '#careerPendingQueue .approval-request-card'],
+  ['modules/performance/options/pending-approval.html', '#performanceApprovalQueue .approval-request-card'],
+  ['modules/attendance/options/team.html', '#pendingApprovalListContent .approval-request-card'],
+  ['leave.html', '#teamApprovalsListContainer .approval-request-card'],
   ['team.html', '.approvals-scroll .approval-card']
 ];
 
 async function verify(page, file, cards, theme) {
   await page.goto(pathToFileURL(path.resolve(__dirname, '..', file)).href + '?theme=' + theme);
-  await page.evaluate(() => localStorage.clear());
+  await page.evaluate(() => { localStorage.clear(); sessionStorage.clear(); });
   await page.reload();
-  const trigger = cards + ' .action-btn-backup';
-  const note = cards + ' .approval-backup-assignment';
-  const dialog = '.approval-backup-dialog[open]';
-  async function openPicker() {
-    await page.$eval(trigger, b => b.scrollIntoView({ block: 'center', behavior: 'instant' }));
-    await page.click(trigger);
-    await page.waitForSelector(dialog);
+  if (file === 'modules/claims/options/team.html') await page.evaluate(() => ClaimsEngine.renderTeamQueue());
+  if (file.includes('attendance/')) await page.evaluate(() => showPendingApprovalPage());
+  if (file === 'leave.html') await page.evaluate(() => showLeaveSection('viewTeamApprovals'));
+  assert.ok(await page.$(cards), file + ': seeded approvals render');
+  const backupControls = await page.$$eval('button, [role="button"], a', nodes => nodes.filter(node => /backup/i.test(node.textContent) || /backup/i.test(node.getAttribute('onclick') || '')).map(node => node.outerHTML));
+  assert.deepEqual(backupControls, [], file + ': no Backup control in cards, details or workflows');
+  assert.equal(await page.$('.action-btn-backup'), null, file);
+  const grids = await page.$$eval(cards + ' .pending-action-grid, ' + cards + ' .project-approval-actions', nodes => nodes.filter(node => node.getClientRects().length).map(node => ({
+    actions: [...node.querySelectorAll('button')].map(button => button.textContent.trim()),
+    columns: getComputedStyle(node).gridTemplateColumns.split(' ').length,
+    overflow: node.scrollWidth > node.clientWidth + 1
+  })));
+  for (const grid of grids) {
+    assert.ok(grid.actions.includes('Approve') && grid.actions.includes('Reject'), file);
+    assert.equal(grid.columns, grid.actions.length, file + ': remaining actions fill the row');
+    assert.equal(grid.overflow, false, file + ': no action overflow');
   }
-  const count = (await page.$$(cards)).length;
-  assert.ok(count > 0, file);
-  assert.equal(await page.$eval(note, el => el.hidden), true);
-  await openPicker();
-  if (file.includes('claims/')) {
-    const empNo = await page.$eval(cards, el => el.closest('pending-approval-card').getAttribute('emp-id').slice(1));
-    const eligible = await page.$$eval(dialog + ' option', options => options.map(o => o.value));
-    assert.ok(!eligible.includes(empNo));
-    assert.equal(await page.$eval('#claimDetailsModalOverlay', el => el.classList.contains('active')), false);
+  if (file.includes('/admin/')) {
+    const count = await page.$eval('#workplacePendingCount', node => node.textContent);
+    await page.evaluate(() => localStorage.setItem('peoplehcm:approval-backup:workplace:guest-visit-0013', JSON.stringify({ name: 'Existing approver', empNo: 'EBB04' })));
+    await page.reload();
+    assert.equal(await page.$eval('.approval-backup-assignment', node => node.textContent), 'Backup approver · Existing approver');
+    assert.equal(await page.$eval('#workplacePendingCount', node => node.textContent), count, 'Saved assignment history does not change pending requests');
+    assert.equal(await page.$('.action-btn-backup'), null);
   }
-  await page.keyboard.press('Escape');
-  await page.waitForSelector(dialog, { hidden: true });
-  assert.equal(await page.$eval(note, el => el.hidden), true, 'Cancel must keep the request unchanged');
-
-  await openPicker();
-  const person = await page.$eval(dialog + ' option:nth-child(2)', o => ({ id: o.value, name: o.textContent }));
-  await page.select(dialog + ' select', person.id);
-  await page.click(dialog + ' [type="submit"]');
-  await page.waitForSelector(dialog, { hidden: true });
-  assert.equal((await page.$$(cards)).length, count);
-  await page.reload();
-  assert.equal((await page.$$(cards)).length, count, 'Assigned requests must remain pending');
-  const assignments = await page.$$eval(note, notes => notes.filter(n => !n.hidden).map(n => n.textContent));
-  assert.deepEqual(assignments, ['Backup approver · ' + person.name], 'Only the target request should have the assignment');
-  await openPicker();
-  assert.equal(await page.$eval(dialog + ' select', select => select.value), person.id);
-  await page.click(dialog + ' [type="button"]');
+  console.log(`PASS: no Backup controls and complete action rows: ${file}, ${theme}`);
 }
 
 (async () => {
@@ -65,6 +61,5 @@ async function verify(page, file, cards, theme) {
       for (const [file, cards] of queues) await verify(page, file, cards, theme);
     }
     assert.deepEqual(errors, []);
-    console.log('PASS: backup selection, cancel, request isolation, persistence and pending status on all new card entry points.');
   } finally { await browser.close(); }
 })().catch(error => { console.error(error); process.exitCode = 1; });

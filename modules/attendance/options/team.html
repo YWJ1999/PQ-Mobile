@@ -385,29 +385,6 @@
         }, 200);
       }
 
-      let currentAttendanceBackupLevel = 'Level 1';
-
-      function openSelectBackupApproverModal(level) {
-        currentAttendanceBackupLevel = level || 'Level 1';
-        const levelEl = document.getElementById('attendanceBackupApproverLevel');
-        if (levelEl) levelEl.textContent = currentAttendanceBackupLevel;
-        const overlay = document.getElementById('attendanceBackupApproverModalOverlay');
-        if (overlay) { overlay.style.display = 'flex'; overlay.style.pointerEvents = 'auto'; }
-      }
-
-      function closeAttendanceBackupApproverModal(event) {
-        if (event && event.target && event.target.id !== 'attendanceBackupApproverModalOverlay' && !event.target.classList.contains('sheet-close-btn')) return;
-        const overlay = document.getElementById('attendanceBackupApproverModalOverlay');
-        if (overlay) { overlay.style.display = 'none'; overlay.style.pointerEvents = 'none'; }
-      }
-
-      function selectAttendanceBackupApprover(name, role) {
-        const assigned = document.getElementById('attendanceLevel1Approvers');
-        if (assigned) assigned.textContent = `Assigned Approvers Pool: Sarah Jenkins, Farhan Rahmat, Benjamin Lee • Backup: ${name} (${role})`;
-        closeAttendanceBackupApproverModal();
-        if (typeof showToast === 'function') showToast(`${name} assigned as ${currentAttendanceBackupLevel} backup approver`);
-      }
-
       function closeAttendanceWorkflowModal(event) {
         if (event && event.target && event.target.id !== 'attendanceWorkflowModalOverlay' && !event.target.classList.contains('sheet-close-btn')) {
           return;
@@ -784,35 +761,13 @@
       .workforce-employee-field dt { margin-bottom: 4px; color: var(--text-muted); font-size: 10px; font-weight: 700; }
       .workforce-employee-field dd { margin: 0; color: var(--text-primary); font-size: 12.5px; font-weight: 800; line-height: 1.4; overflow-wrap: anywhere; }
 
-      /* Pending Approval Action Card 4-Button System */
+      /* Pending Approval Action Cards */
       .pending-action-grid {
         display: grid;
-        grid-template-columns: repeat(4, 1fr);
+        grid-template-columns: repeat(3, 1fr);
         gap: 6px;
       }
 
-      .action-btn-backup {
-        padding: 9.5px 2px;
-        border-radius: 12px;
-        background: rgba(139, 92, 246, 0.12);
-        border: 1px solid rgba(139, 92, 246, 0.3);
-        color: #7c3aed;
-        font-weight: 800;
-        font-size: 11.5px;
-        cursor: pointer;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 4px;
-        transition: all 0.2s ease;
-      }
-      html[data-theme="dark"] .action-btn-backup,
-      [data-theme="dark"] .action-btn-backup {
-        background: rgba(139, 92, 246, 0.18);
-        border-color: rgba(167, 139, 250, 0.35);
-        color: #c4b5fd;
-      }
-      .action-btn-backup:active { transform: scale(0.95); }
 
 
     </style>
@@ -912,6 +867,7 @@
           </div>
 
           <div
+            class="attendance-team-options-grid"
             style="
               display: grid;
               grid-template-columns: repeat(3, 1fr);
@@ -2700,6 +2656,7 @@
 
         <!-- Scrollable Grid -->
         <div
+          class="attendance-team-options-grid"
           style="
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -3471,14 +3428,11 @@
 
         </div>
 
-        <!-- Executive 4 Action Buttons Footer: Approve, Backup, Resubmit, Reject -->
+        <!-- Approval detail actions -->
         <div style="padding: 12px 14px 14px; border-top: 1px solid var(--border-subtle); background: var(--bg-card); flex-shrink: 0; z-index: 10;">
           <div class="pending-action-grid">
             <button type="button" class="action-btn-approve" onclick="handleAttendanceDetailAction('Approve')">
               <i class="fa-solid fa-check" style="font-size: 11.5px;"></i> Approve
-            </button>
-            <button type="button" class="action-btn-backup" onclick="handleAttendanceDetailAction('Backup')">
-              <i class="fa-solid fa-shield-halved" style="font-size: 11px;"></i> Backup
             </button>
             <button type="button" class="action-btn-resubmit" onclick="handleAttendanceDetailAction('Resubmit')">
               <i class="fa-solid fa-rotate-left" style="font-size: 11px;"></i> Resubmit
@@ -3519,9 +3473,6 @@
               <span style="font-size: 10.5px; font-weight: 800; color: #10b981; background: rgba(16, 185, 129, 0.12); padding: 2px 8px; border-radius: 10px;">Active Step</span>
             </div>
             <div id="attendanceLevel1Approvers" style="font-size: 11.5px; color: var(--text-muted); margin-bottom: 10px;">Assigned Approvers Pool: Sarah Jenkins, Farhan Rahmat, Benjamin Lee</div>
-            <button type="button" onclick="openSelectBackupApproverModal('Level 1')" style="background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%); color: #ffffff; border: none; padding: 6px 12px; border-radius: 12px; font-size: 11px; font-weight: 800; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
-              <i class="fa-solid fa-shield-halved"></i> Assign Backup Approver
-            </button>
           </div>
 
           <!-- Level 2 Step -->
@@ -3556,18 +3507,6 @@
       </div>
     </div>
 
-    <div class="indicators-overlay" id="attendanceBackupApproverModalOverlay" onclick="closeAttendanceBackupApproverModal(event)" style="position: absolute; inset: 0; z-index: 1005; display: none; align-items: flex-end; justify-content: center; background: rgba(15, 23, 42, 0.72); backdrop-filter: blur(6px); border-radius: 44px; overflow: hidden;">
-      <div class="indicators-sheet" onclick="event.stopPropagation()" style="width: 100%; background: var(--bg-card); border-top-left-radius: 24px; border-top-right-radius: 24px; padding: 18px; box-shadow: 0 -12px 40px rgba(0,0,0,.4);">
-        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;">
-          <div><div style="font-size:16px; font-weight:800; color:var(--text-primary);">Assign Backup Approver</div><div id="attendanceBackupApproverLevel" style="font-size:11px; color:var(--text-muted); margin-top:2px;">Level 1</div></div>
-          <button type="button" class="sheet-close-btn" onclick="closeAttendanceBackupApproverModal()" style="width:30px;height:30px;border-radius:50%;border:1px solid var(--border-subtle);background:var(--bg-input);color:var(--text-muted);"><i class="fa-solid fa-xmark"></i></button>
-        </div>
-        <div style="display:flex; flex-direction:column; gap:8px;">
-          <button type="button" data-backup-name="Nur Aisyah" data-backup-role="HR Business Partner" onclick="selectAttendanceBackupApprover(this.dataset.backupName, this.dataset.backupRole)" style="padding:12px; border-radius:14px; border:1px solid var(--border-subtle); background:var(--bg-input); color:var(--text-primary); text-align:left; font-weight:800;">Nur Aisyah <span style="display:block;font-size:11px;font-weight:600;color:var(--text-muted);margin-top:3px;">HR Business Partner</span></button>
-          <button type="button" data-backup-name="Daniel Wong" data-backup-role="Operations Lead" onclick="selectAttendanceBackupApprover(this.dataset.backupName, this.dataset.backupRole)" style="padding:12px; border-radius:14px; border:1px solid var(--border-subtle); background:var(--bg-input); color:var(--text-primary); text-align:left; font-weight:800;">Daniel Wong <span style="display:block;font-size:11px;font-weight:600;color:var(--text-muted);margin-top:3px;">Operations Lead</span></button>
-        </div>
-      </div>
-    </div>
 
   </div>
 
@@ -4237,13 +4176,10 @@
                   </div>
                 </div>` : ''}
 
-                <!-- Bottom 4 Action Buttons (Approve, Backup, Resubmit, Reject) -->
+                <!-- Approval actions (Approve, Resubmit, Reject) -->
                 <div class="pending-action-grid">
                   <button type="button" class="action-btn-approve" onclick="handleStaffApprove('${item.id}', this)">
                     <i class="fa-solid fa-check" style="font-size: 11.5px;"></i> Approve
-                  </button>
-                  <button type="button" class="action-btn-backup" onclick="handleStaffBackup('${item.id}', this)">
-                    <i class="fa-solid fa-shield-halved" style="font-size: 11px;"></i> Backup
                   </button>
                   <button type="button" class="action-btn-resubmit" onclick="handleStaffResubmit('${item.id}', this)">
                     <i class="fa-solid fa-rotate-left" style="font-size: 11px;"></i> Resubmit
@@ -4276,15 +4212,6 @@
           card.style.pointerEvents = 'none';
         }
         if (typeof showToast === 'function') showToast(`Approved request for ${id}`);
-      }
-
-      function handleStaffBackup(id, btn) {
-        const card = btn.closest('.approval-request-card');
-        if (card) {
-          card.style.opacity = '0.5';
-          card.style.pointerEvents = 'none';
-        }
-        if (typeof showToast === 'function') showToast(`Approved as Backup for ${id}`);
       }
 
       function handleStaffResubmit(id, btn) {
@@ -4486,13 +4413,10 @@
                   ${requestedByHtml}
                   ${remarkHtml}
 
-                <!-- Bottom 4 Action Buttons (Approve, Backup, Resubmit, Reject) -->
+                <!-- Approval actions (Approve, Resubmit, Reject) -->
                 <div class="pending-action-grid">
                   <button type="button" class="action-btn-approve" onclick="handleStaffApprove('${item.id}', this)">
                     <i class="fa-solid fa-check" style="font-size: 11.5px;"></i> Approve
-                  </button>
-                  <button type="button" class="action-btn-backup" onclick="handleStaffBackup('${item.id}', this)">
-                    <i class="fa-solid fa-shield-halved" style="font-size: 11px;"></i> Backup
                   </button>
                   <button type="button" class="action-btn-resubmit" onclick="handleStaffResubmit('${item.id}', this)">
                     <i class="fa-solid fa-rotate-left" style="font-size: 11px;"></i> Resubmit

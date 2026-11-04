@@ -1,4 +1,6 @@
 /* Workplace Policy/SOP catalog, also used by Home and Company Updates. */
+// Shared demo attachment for catalog entries without their own sample PDF.
+const POLICY_SAMPLE_PDF_URL = 'assets/policies/Workplace_Document_sample.pdf';
 const POLICY_DATABASE = {
   'HR004': {
     ref: 'HR004',
@@ -6,17 +8,25 @@ const POLICY_DATABASE = {
     dept: 'ALL DEPARTMENTS',
     policy: {
       name: 'Remote_Work_Framework_2026.pdf',
-      size: '1.45 MB',
+      size: '2.5 KB',
       date: '15/01/2026',
-      type: 'PDF Document'
+      pdfUrl: POLICY_SAMPLE_PDF_URL,
+      type: 'Sample PDF'
     },
     sop: {
       name: 'SOP_WFH_Application_Approval.pdf',
-      size: '820 KB',
+      size: '2.5 KB',
       date: '18/01/2026',
-      type: 'PDF Document'
+      pdfUrl: POLICY_SAMPLE_PDF_URL,
+      type: 'Sample PDF'
     },
-    guideline: null
+    guideline: {
+      name: 'Remote_Work_Guideline_sample.pdf',
+      size: '2.5 KB',
+      date: '18/01/2026',
+      pdfUrl: POLICY_SAMPLE_PDF_URL,
+      type: 'Sample PDF'
+    }
   },
   'FN012': {
     ref: 'FN012',
@@ -24,21 +34,24 @@ const POLICY_DATABASE = {
     dept: 'FINANCE & ACCOUNTING',
     policy: {
       name: 'Staff_Expense_Reimbursement_Policy.pdf',
-      size: '2.10 MB',
+      size: '2.5 KB',
       date: '01/02/2026',
-      type: 'PDF Document'
+      pdfUrl: POLICY_SAMPLE_PDF_URL,
+      type: 'Sample PDF'
     },
     sop: {
       name: 'SOP_Overseas_Travel_Claims_v3.pdf',
-      size: '1.15 MB',
+      size: '2.5 KB',
       date: '05/02/2026',
-      type: 'PDF Document'
+      pdfUrl: POLICY_SAMPLE_PDF_URL,
+      type: 'Sample PDF'
     },
     guideline: {
       name: 'Mileage_Per_Diem_Rate_Card.pdf',
-      size: '450 KB',
+      size: '2.5 KB',
       date: '05/02/2026',
-      type: 'PDF Document'
+      pdfUrl: POLICY_SAMPLE_PDF_URL,
+      type: 'Sample PDF'
     }
   },
   'DE001': {
@@ -52,8 +65,20 @@ const POLICY_DATABASE = {
       pdfUrl: 'assets/policies/PeopleTime_UserGuide_v2_sample.pdf',
       type: 'Sample PDF'
     },
-    sop: null,
-    guideline: null
+    sop: {
+      name: 'PeopleTime_SOP_sample.pdf',
+      size: '2.5 KB',
+      date: '20/12/2024',
+      pdfUrl: POLICY_SAMPLE_PDF_URL,
+      type: 'Sample PDF'
+    },
+    guideline: {
+      name: 'PeopleTime_Guideline_sample.pdf',
+      size: '2.5 KB',
+      date: '20/12/2024',
+      pdfUrl: POLICY_SAMPLE_PDF_URL,
+      type: 'Sample PDF'
+    }
   }
 };
 

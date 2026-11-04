@@ -135,10 +135,7 @@
     const amount = node('div', 'payroll-approval-amount');
     amount.append(node('span', '', 'Amount'), node('strong', '', money(item.amount)));
     body.append(facts, amount, actionButtons(item.category));
-    PendingApprovalBackup.addButton(body.lastElementChild, {
-      scope: 'payroll', id: item.id, empNo: item.empNo,
-      isPending: () => window.PayrollPendingStore.getPending().some(row => row.id === item.id)
-    });
+    PendingApprovalBackup.showAssignment(body.lastElementChild, { scope: 'payroll', id: item.id });
     body.addEventListener('click', event => { if (!event.target.closest('button')) openDetails(item.id, menu); });
     card.append(header, body);
     return card;

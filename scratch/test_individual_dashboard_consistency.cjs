@@ -51,8 +51,8 @@ const dashboards = [
     statusCards: '#hubSectionIndividual .work-status-card',
     quickTitle: '.leave-dashboard-quick-title',
     quickGrid: '.leave-dashboard-quick-grid',
-    quickCards: '.leave-dashboard-quick-card',
-    quickIcons: '.leave-dashboard-quick-icon',
+    quickCards: '#hubSectionIndividual .leave-dashboard-quick-card',
+    quickIcons: '#hubSectionIndividual .leave-dashboard-quick-icon',
     quickCount: 4
   },
   {
@@ -166,15 +166,15 @@ const styleOf = (element) => {
       expect(result.quickTitle?.fontSize === 11.5, `${dashboard.name}: Quick Options heading must be 11.5px`);
       expect(result.quickTitle?.marginBottom === 10, `${dashboard.name}: Quick Options heading spacing must be 10px`);
       expect(near(result.quickGrid?.width || 0, 384), `${dashboard.name}: Quick Options grid must be 384px wide`);
-      expect(result.quickGrid?.gap === 10, `${dashboard.name}: Quick Options grid gap must be 10px`);
+      expect(result.quickGrid?.gap === 12, `${dashboard.name}: Quick Options grid gap must be 12px`);
       expect(result.quickCards.length === dashboard.quickCount, `${dashboard.name}: Quick Options count changed`);
       for (const card of result.quickCards) {
-        expect(card.height >= 90, `${dashboard.name}: Quick Options cards must be at least 90px high`);
-        expect(card.radius === 16, `${dashboard.name}: Quick Options cards must use a 16px radius`);
-        expect(card.paddingTop === 14 && card.paddingRight === 6, `${dashboard.name}: Quick Options card padding must be 14px 6px`);
+        expect(card.height >= 118, `${dashboard.name}: Quick Options cards must be at least 118px high`);
+        expect(card.radius === 18, `${dashboard.name}: Quick Options cards must use an 18px radius`);
+        expect(card.paddingTop === 16 && card.paddingRight === 6, `${dashboard.name}: Quick Options card padding must be 16px 6px`);
       }
       for (const icon of result.quickIcons) {
-        expect(near(icon.width, 38) && near(icon.height, 38), `${dashboard.name}: Quick Options icons must be 38px square`);
+        expect(near(icon.width, 44) && near(icon.height, 44), `${dashboard.name}: Quick Options icons must be 44px square`);
       }
 
       if (dashboard.name === 'Attendance') {

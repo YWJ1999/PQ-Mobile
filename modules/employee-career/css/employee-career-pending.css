@@ -1,5 +1,5 @@
 .career-pending-page .pending-action-grid {
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
 .career-pending-page .career-pending-bulk-actions {
@@ -48,31 +48,6 @@
   color: var(--text-muted);
   font-size: 11.5px;
   line-height: 1.5;
-}
-
-.career-pending-backup-people {
-  display: grid;
-  gap: 10px;
-  min-height: 0;
-  overflow-y: auto;
-}
-
-.career-pending-backup-person {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 14px;
-  border: 1px solid var(--border-subtle);
-  border-radius: 14px;
-  background: var(--bg-card);
-  color: var(--text-primary);
-  font: inherit;
-  text-align: left;
-  cursor: pointer;
-}
-
-.career-pending-backup-person .payroll-employee-copy {
-  flex: 1;
 }
 
 .career-pending-page #careerPendingDetails {
@@ -185,7 +160,7 @@
 
 .career-pending-page #careerPendingDetailsActions .pending-action-grid {
   width: 100%;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(var(--detail-action-count, 3), minmax(0, 1fr));
   gap: 7px;
 }
 

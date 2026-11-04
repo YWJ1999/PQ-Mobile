@@ -26,8 +26,9 @@ async function filter(page, values) {
       const errors = [];
       page.on('pageerror', error => errors.push(error.message));
       await page.setViewport({ width, height: 900 });
-      await page.goto(pathToFileURL(path.resolve(__dirname, '../modules/admin/index.html')).href + '?scope=team&theme=' + theme, { waitUntil: 'networkidle0' });
-      await Promise.all([page.waitForNavigation({ waitUntil: 'networkidle0' }), page.click('[data-option-id="asset-highlight"]')]);
+      await page.goto(pathToFileURL(path.resolve(__dirname, '../modules/admin/index.html')).href + '?scope=individual&theme=' + theme, { waitUntil: 'networkidle0' });
+      await page.click('[data-workplace-options-open]');
+      await Promise.all([page.waitForNavigation({ waitUntil: 'networkidle0' }), page.click('[data-option-ref="asset-highlight"]')]);
       assert.equal(new URL(page.url()).pathname, new URL(url).pathname);
       assert.equal(await page.$eval('html', node => node.dataset.theme), theme);
       assert.ok(await page.$('#assetTable'), 'Asset Highlight must contain the employee asset report');
@@ -113,7 +114,7 @@ async function filter(page, values) {
       await page.keyboard.press('Escape');
       await page.click('#assetBack');
       await page.waitForFunction(() => location.pathname.endsWith('/admin/index.html'));
-      assert.equal(new URL(page.url()).searchParams.get('scope'), 'team');
+      assert.equal(new URL(page.url()).searchParams.get('scope'), 'individual');
       assert.equal(new URL(page.url()).searchParams.get('theme'), theme);
       assert.deepEqual(errors, []);
       await page.close();

@@ -2186,35 +2186,13 @@
       background: rgba(59, 130, 246, 0.1);
       border: 1px solid rgba(59, 130, 246, 0.25);
     }
-    /* Pending Approval Action Card 4-Button System */
+    /* Pending Approval Action Cards */
     .pending-action-grid {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(3, 1fr);
       gap: 6px;
     }
 
-    .action-btn-backup {
-      padding: 9.5px 2px;
-      border-radius: 12px;
-      background: rgba(139, 92, 246, 0.12);
-      border: 1px solid rgba(139, 92, 246, 0.3);
-      color: #7c3aed;
-      font-weight: 800;
-      font-size: 11.5px;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 4px;
-      transition: all 0.2s ease;
-    }
-    html[data-theme="dark"] .action-btn-backup,
-    [data-theme="dark"] .action-btn-backup {
-      background: rgba(139, 92, 246, 0.18);
-      border-color: rgba(167, 139, 250, 0.35);
-      color: #c4b5fd;
-    }
-    .action-btn-backup:active { transform: scale(0.95); }
 
 
   [data-leave-trend-bar] {
@@ -2505,7 +2483,7 @@
               Quick Options
             </div>
 
-            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+            <div class="leave-dashboard-quick-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
               <!-- 1. Leave Highlight -->
               <div class="leave-dashboard-quick-card" onclick="showLeaveSection('viewLeaveHighlight')"
                 style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 16px; padding: 14px 4px; text-align: center; cursor: pointer; box-shadow: var(--shadow-sm); transition: transform 0.2s; display: flex; flex-direction: column; align-items: center; gap: 6px;"
@@ -5673,13 +5651,10 @@
                 </div>
               </div>
 
-              <!-- Bottom 4 Action Buttons (Approve, Backup, Resubmit, Reject) -->
+              <!-- Approval actions (Approve, Resubmit, Reject) -->
               <div class="pending-action-grid">
                 <button type="button" class="action-btn-approve" onclick="singleApproveCard('approvalCard1', 'Afifah Nasir')">
                   <i class="fa-solid fa-check" style="font-size: 11.5px;"></i> Approve
-                </button>
-                <button type="button" class="action-btn-backup" onclick="singleBackupCard('approvalCard1', 'Afifah Nasir')">
-                  <i class="fa-solid fa-shield-halved" style="font-size: 11px;"></i> Backup
                 </button>
                 <button type="button" class="action-btn-resubmit" onclick="singleResubmitCard('approvalCard1', 'Afifah Nasir')">
                   <i class="fa-solid fa-rotate-left" style="font-size: 11px;"></i> Resubmit
@@ -5768,13 +5743,10 @@
                 </div>
               </div>
 
-              <!-- Bottom 4 Action Buttons (Approve, Backup, Resubmit, Reject) -->
+              <!-- Approval actions (Approve, Resubmit, Reject) -->
               <div class="pending-action-grid">
                 <button type="button" class="action-btn-approve" onclick="singleApproveCard('approvalCard2', 'Hailizam')">
                   <i class="fa-solid fa-check" style="font-size: 11.5px;"></i> Approve
-                </button>
-                <button type="button" class="action-btn-backup" onclick="singleBackupCard('approvalCard2', 'Hailizam')">
-                  <i class="fa-solid fa-shield-halved" style="font-size: 11px;"></i> Backup
                 </button>
                 <button type="button" class="action-btn-resubmit" onclick="singleResubmitCard('approvalCard2', 'Hailizam')">
                   <i class="fa-solid fa-rotate-left" style="font-size: 11px;"></i> Resubmit
@@ -5852,13 +5824,10 @@
                 </div>
               </div>
 
-              <!-- Bottom 4 Action Buttons (Approve, Backup, Resubmit, Reject) -->
+              <!-- Approval actions (Approve, Resubmit, Reject) -->
               <div class="pending-action-grid">
                 <button type="button" class="action-btn-approve" onclick="singleApproveCard('approvalCard3', 'Nurfarhana')">
                   <i class="fa-solid fa-check" style="font-size: 11.5px;"></i> Approve
-                </button>
-                <button type="button" class="action-btn-backup" onclick="singleBackupCard('approvalCard3', 'Nurfarhana')">
-                  <i class="fa-solid fa-shield-halved" style="font-size: 11px;"></i> Backup
                 </button>
                 <button type="button" class="action-btn-resubmit" onclick="singleResubmitCard('approvalCard3', 'Nurfarhana')">
                   <i class="fa-solid fa-rotate-left" style="font-size: 11px;"></i> Resubmit
@@ -5935,13 +5904,10 @@
                 </div>
               </div>
 
-              <!-- Bottom 4 Action Buttons (Approve, Backup, Resubmit, Reject) -->
+              <!-- Approval actions (Approve, Resubmit, Reject) -->
               <div class="pending-action-grid">
                 <button type="button" class="action-btn-approve" onclick="singleApproveCard('approvalCard4', 'Alex Tan')">
                   <i class="fa-solid fa-check" style="font-size: 11.5px;"></i> Approve
-                </button>
-                <button type="button" class="action-btn-backup" onclick="singleBackupCard('approvalCard4', 'Alex Tan')">
-                  <i class="fa-solid fa-shield-halved" style="font-size: 11px;"></i> Backup
                 </button>
                 <button type="button" class="action-btn-resubmit" onclick="singleResubmitCard('approvalCard4', 'Alex Tan')">
                   <i class="fa-solid fa-rotate-left" style="font-size: 11px;"></i> Resubmit
@@ -6029,13 +5995,10 @@
                 </div>
               </div>
 
-              <!-- Bottom 4 Action Buttons (Approve, Backup, Resubmit, Reject) -->
+              <!-- Approval actions (Approve, Resubmit, Reject) -->
               <div class="pending-action-grid">
                 <button type="button" class="action-btn-approve" onclick="singleApproveCard('approvalCardCredit1', 'Farhan binti rahmat')">
                   <i class="fa-solid fa-check" style="font-size: 11.5px;"></i> Approve
-                </button>
-                <button type="button" class="action-btn-backup" onclick="singleBackupCard('approvalCardCredit1', 'Farhan binti rahmat')">
-                  <i class="fa-solid fa-shield-halved" style="font-size: 11px;"></i> Backup
                 </button>
                 <button type="button" class="action-btn-resubmit" onclick="singleResubmitCard('approvalCardCredit1', 'Farhan binti rahmat')">
                   <i class="fa-solid fa-rotate-left" style="font-size: 11px;"></i> Resubmit
@@ -6120,13 +6083,10 @@
                 </div>
               </div>
 
-              <!-- Bottom 4 Action Buttons (Approve, Backup, Resubmit, Reject) -->
+              <!-- Approval actions (Approve, Resubmit, Reject) -->
               <div class="pending-action-grid">
                 <button type="button" class="action-btn-approve" onclick="singleApproveCard('approvalCardCredit2', 'Priya Raman')">
                   <i class="fa-solid fa-check" style="font-size: 11.5px;"></i> Approve
-                </button>
-                <button type="button" class="action-btn-backup" onclick="singleBackupCard('approvalCardCredit2', 'Priya Raman')">
-                  <i class="fa-solid fa-shield-halved" style="font-size: 11px;"></i> Backup
                 </button>
                 <button type="button" class="action-btn-resubmit" onclick="singleResubmitCard('approvalCardCredit2', 'Priya Raman')">
                   <i class="fa-solid fa-rotate-left" style="font-size: 11px;"></i> Resubmit
@@ -6211,13 +6171,10 @@
                 </div>
               </div>
 
-              <!-- Bottom 4 Action Buttons (Approve, Backup, Resubmit, Reject) -->
+              <!-- Approval actions (Approve, Resubmit, Reject) -->
               <div class="pending-action-grid">
                 <button type="button" class="action-btn-approve" onclick="singleApproveCard('approvalCardOfftime1', 'Siti Nurhaliza')">
                   <i class="fa-solid fa-check" style="font-size: 11.5px;"></i> Approve
-                </button>
-                <button type="button" class="action-btn-backup" onclick="singleBackupCard('approvalCardOfftime1', 'Siti Nurhaliza')">
-                  <i class="fa-solid fa-shield-halved" style="font-size: 11px;"></i> Backup
                 </button>
                 <button type="button" class="action-btn-resubmit" onclick="singleResubmitCard('approvalCardOfftime1', 'Siti Nurhaliza')">
                   <i class="fa-solid fa-rotate-left" style="font-size: 11px;"></i> Resubmit
@@ -6299,13 +6256,10 @@
                 </div>
               </div>
 
-              <!-- Bottom 4 Action Buttons (Approve, Backup, Resubmit, Reject) -->
+              <!-- Approval actions (Approve, Resubmit, Reject) -->
               <div class="pending-action-grid">
                 <button type="button" class="action-btn-approve" onclick="singleApproveCard('approvalCardOfftime2', 'Marcus Tan')">
                   <i class="fa-solid fa-check" style="font-size: 11.5px;"></i> Approve
-                </button>
-                <button type="button" class="action-btn-backup" onclick="singleBackupCard('approvalCardOfftime2', 'Marcus Tan')">
-                  <i class="fa-solid fa-shield-halved" style="font-size: 11px;"></i> Backup
                 </button>
                 <button type="button" class="action-btn-resubmit" onclick="singleResubmitCard('approvalCardOfftime2', 'Marcus Tan')">
                   <i class="fa-solid fa-rotate-left" style="font-size: 11px;"></i> Resubmit
@@ -6387,13 +6341,10 @@
                 </div>
               </div>
 
-              <!-- Bottom 4 Action Buttons (Approve, Backup, Resubmit, Reject) -->
+              <!-- Approval actions (Approve, Resubmit, Reject) -->
               <div class="pending-action-grid">
                 <button type="button" class="action-btn-approve" onclick="singleApproveCard('approvalCardOfftime3', 'Kavitha Murugan')">
                   <i class="fa-solid fa-check" style="font-size: 11.5px;"></i> Approve
-                </button>
-                <button type="button" class="action-btn-backup" onclick="singleBackupCard('approvalCardOfftime3', 'Kavitha Murugan')">
-                  <i class="fa-solid fa-shield-halved" style="font-size: 11px;"></i> Backup
                 </button>
                 <button type="button" class="action-btn-resubmit" onclick="singleResubmitCard('approvalCardOfftime3', 'Kavitha Murugan')">
                   <i class="fa-solid fa-rotate-left" style="font-size: 11px;"></i> Resubmit
@@ -7201,9 +7152,6 @@
             <button type="button" class="action-btn-approve" onclick="handleSingleApprovalAction('Approve')">
               <i class="fa-solid fa-check" style="font-size: 11.5px;"></i> Approve
             </button>
-            <button type="button" class="action-btn-backup" onclick="handleSingleApprovalAction('Backup')">
-              <i class="fa-solid fa-shield-halved" style="font-size: 11px;"></i> Backup
-            </button>
             <button type="button" class="action-btn-resubmit" onclick="handleSingleApprovalAction('Resubmit')">
               <i class="fa-solid fa-rotate-left" style="font-size: 11px;"></i> Resubmit
             </button>
@@ -7233,7 +7181,7 @@
                   <h3 style="font-size: 17.5px; font-weight: 800; color: var(--text-primary); letter-spacing: -0.3px; margin: 0;">Workflow Information</h3>
                   <div style="display: flex; align-items: center; gap: 6px; margin-top: 2px;">
                     <span style="font-size: 10.5px; font-weight: 700; color: var(--purple-primary); background: var(--purple-subtle); padding: 1.5px 7px; border-radius: 6px; border: 1px solid var(--purple-border);">3-Level Approval</span>
-                    <span style="font-size: 11px; color: var(--text-muted);">Real-time audit history & backup access</span>
+                    <span style="font-size: 11px; color: var(--text-muted);">Real-time audit history</span>
                   </div>
                 </div>
               </div>
@@ -7275,9 +7223,6 @@
               </div>
 
               <div style="display: flex; align-items: center; gap: 6px;">
-                <button type="button" onclick="openSelectBackupApproverModal('Level 1')" style="background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%); color: #ffffff; border: none; padding: 6px 12px; border-radius: 16px; font-size: 11px; font-weight: 800; cursor: pointer; box-shadow: 0 3px 10px rgba(124, 58, 237, 0.3);">
-                  🛡️ Backup
-                </button>
                 <button type="button" id="level1ApproversToggleBtn" onclick="toggleLevelApproversList('level1Approvers')" style="background: var(--bg-input); border: 1px solid var(--border-subtle); color: var(--purple-primary); padding: 6px 10px; border-radius: 16px; font-size: 11px; font-weight: 800; cursor: pointer;">
                   ▼ Show All 5
                 </button>
@@ -7310,7 +7255,6 @@
                     <div style="font-size: 10.5px; color: var(--text-muted);">Assistant Mgr</div>
                   </div>
                 </div>
-                <button type="button" onclick="openSelectBackupApproverModal('Level 1')" style="background: rgba(124, 58, 237, 0.12); color: var(--purple-primary); border: 1px solid rgba(124, 58, 237, 0.3); padding: 2px 8px; border-radius: 6px; font-size: 10px; font-weight: 800; cursor: pointer;">🛡️ Backup</button>
               </div>
 
               <!-- Approver 3 -->
@@ -7386,9 +7330,6 @@
               </div>
 
               <div style="display: flex; align-items: center; gap: 6px;">
-                <button type="button" onclick="openSelectBackupApproverModal('Level 2')" style="background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%); color: #ffffff; border: none; padding: 6px 12px; border-radius: 16px; font-size: 11px; font-weight: 800; cursor: pointer; box-shadow: 0 3px 10px rgba(124, 58, 237, 0.3);">
-                  🛡️ Backup
-                </button>
                 <button type="button" id="level2ApproversToggleBtn" onclick="toggleLevelApproversList('level2Approvers')" style="background: var(--bg-input); border: 1px solid var(--border-subtle); color: var(--purple-primary); padding: 6px 10px; border-radius: 16px; font-size: 11px; font-weight: 800; cursor: pointer;">
                   ▼ Show All 7
                 </button>
@@ -7408,7 +7349,6 @@
                     <div style="font-size: 10.5px; color: var(--text-muted);">Head of Department</div>
                   </div>
                 </div>
-                <button type="button" onclick="openSelectBackupApproverModal('Level 2')" style="background: rgba(124, 58, 237, 0.12); color: var(--purple-primary); border: 1px solid rgba(124, 58, 237, 0.3); padding: 2px 8px; border-radius: 6px; font-size: 10px; font-weight: 800; cursor: pointer;">🛡️ Backup</button>
               </div>
 
               <!-- Approver 2 -->
@@ -7522,9 +7462,6 @@
                   </div>
                 </div>
               </div>
-              <button type="button" onclick="openSelectBackupApproverModal('Level 3')" style="background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%); color: #ffffff; border: none; padding: 8px 16px; border-radius: 20px; font-size: 11.5px; font-weight: 800; cursor: pointer; box-shadow: 0 4px 14px rgba(124, 58, 237, 0.35); flex-shrink: 0; display: flex; align-items: center; gap: 5px; transition: all 0.2s ease;">
-                <span style="font-size: 12px;">🛡️</span> Backup
-              </button>
             </div>
           </div>
 
@@ -7597,75 +7534,6 @@
       </div>
     </div>
 
-    <!-- SELECT / SWITCH BACKUP APPROVER MODAL (TABLE VIEW MATCHING USER REFERENCE & PQ THEME) -->
-    <div class="indicators-overlay" id="selectBackupApproverModalOverlay" onclick="closeSelectBackupApproverModal(event)" style="display: none;">
-      <div class="indicators-sheet" onclick="event.stopPropagation()" style="max-height: calc(100% - 24px); overflow-y: auto; padding: 0 0 20px 0; border-top-left-radius: 20px; border-top-right-radius: 20px; background: var(--bg-card); box-shadow: 0 20px 50px rgba(0,0,0,0.3); overflow: hidden;">
-        
-        <!-- Header Bar with Deep Purple Gradient (App Theme Colors) -->
-        <div style="background: linear-gradient(135deg, #4c1d95 0%, #6d28d9 50%, #4338ca 100%); padding: 14px 18px; display: flex; align-items: center; justify-content: space-between; color: #ffffff;">
-          <h3 style="font-size: 17.5px; font-weight: 800; color: #ffffff; margin: 0; letter-spacing: -0.2px;">Backup Approver</h3>
-          <button type="button" onclick="closeSelectBackupApproverModal()" style="width: 28px; height: 28px; border-radius: 50%; background: #ffffff; color: #4c1d95; border: none; font-size: 14px; font-weight: 900; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.2);">✕</button>
-        </div>
-
-        <div style="padding: 14px 16px 6px 16px;">
-          <!-- Subheader: Total Records -->
-          <div style="font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 12px; display: flex; align-items: center; gap: 4px;" class="record-summary-metric record-summary-card">
-            <span class="record-summary-label">Total Records:</span> <span id="backupTotalRecordsCount" style="color: var(--purple-primary); font-weight: 800;" class="record-summary-value">3</span>
-          </div>
-
-          <!-- Table Container with Lavender/Purple Header & Clean Rows -->
-          <div style="border: 1px solid var(--border-subtle); border-radius: 12px; overflow: hidden; background: var(--bg-card);">
-            <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 12.5px;">
-              <thead>
-                <tr style="background: var(--purple-subtle); border-bottom: 1px solid var(--purple-border);">
-                  <th style="padding: 11px 14px; font-weight: 800; color: var(--purple-primary); width: 72%;">
-                    Backup Approver
-                  </th>
-                  <th style="padding: 11px 14px; font-weight: 800; color: var(--purple-primary); text-align: right; width: 28%;">
-                    After<br>(Days)
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                <!-- Row 1: Anderson -->
-                <tr onclick="selectBackupApproverPerson('Anderson', 'Operations Lead')" style="border-bottom: 1px solid var(--border-subtle); cursor: pointer; transition: background 0.15s ease;" onmouseover="this.style.background='var(--bg-card-hover)'" onmouseout="this.style.background='transparent'">
-                  <td style="padding: 12.5px 14px; font-weight: 700; color: var(--text-primary);">
-                    Anderson
-                  </td>
-                  <td style="padding: 12.5px 14px; font-weight: 700; color: var(--text-secondary); text-align: right;">
-                    0
-                  </td>
-                </tr>
-
-                <!-- Row 2: Muhammad ali bin man -->
-                <tr onclick="selectBackupApproverPerson('Muhammad ali bin man', 'Assistant HOD')" style="border-bottom: 1px solid var(--border-subtle); background: var(--bg-input); cursor: pointer; transition: background 0.15s ease;" onmouseover="this.style.background='var(--bg-card-hover)'" onmouseout="this.style.background='var(--bg-input)'">
-                  <td style="padding: 12.5px 14px; font-weight: 700; color: var(--text-primary);">
-                    Muhammad ali bin man
-                  </td>
-                  <td style="padding: 12.5px 14px; font-weight: 700; color: var(--text-secondary); text-align: right;">
-                    0
-                  </td>
-                </tr>
-
-                <!-- Row 3: 1231234 -->
-                <tr onclick="selectBackupApproverPerson('1231234', 'System Backup')" style="cursor: pointer; transition: background 0.15s ease;" onmouseover="this.style.background='var(--bg-card-hover)'" onmouseout="this.style.background='transparent'">
-                  <td style="padding: 12.5px 14px; font-weight: 700; color: var(--text-primary);">
-                    1231234
-                  </td>
-                  <td style="padding: 12.5px 14px; font-weight: 700; color: var(--text-secondary); text-align: right;">
-                    0
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-          <button type="button" onclick="closeSelectBackupApproverModal()" style="width: 100%; padding: 12px; border-radius: 12px; background: var(--bg-input); color: var(--text-primary); font-weight: 800; font-size: 13px; border: 1px solid var(--border-subtle); cursor: pointer; margin-top: 14px;">
-            Cancel
-          </button>
-        </div>
-      </div>
-    </div>
 
     <!-- CALENDAR DATE DETAILS BOTTOM SHEET DRAWER -->
     <div class="indicators-overlay" id="calDateDetailsDrawerOverlay" onclick="closeCalDateDetailsModal(event)">
@@ -11326,17 +11194,6 @@
       }
     }
 
-    let currentLeaveBackupCardId = null;
-    let currentLeaveBackupEmployee = null;
-
-    function singleBackupCard(cardId, name) {
-      const card = document.getElementById(cardId);
-      if (!card) return;
-      currentLeaveBackupCardId = cardId;
-      currentLeaveBackupEmployee = name;
-      openSelectBackupApproverModal();
-    }
-
     function singleResubmitCard(cardId, name) {
       const card = document.getElementById(cardId);
       if (!card) return;
@@ -11709,58 +11566,6 @@
       if (overlay) {
         overlay.classList.remove('active');
         setTimeout(() => { overlay.style.display = 'none'; }, 250);
-      }
-    }
-
-    function openSelectBackupApproverModal() {
-      const overlay = document.getElementById('selectBackupApproverModalOverlay');
-      if (overlay) {
-        overlay.style.display = 'flex';
-        void overlay.offsetHeight;
-        overlay.classList.add('active');
-      }
-    }
-
-    function closeSelectBackupApproverModal(event) {
-      if (event && event.target && event.target.id !== 'selectBackupApproverModalOverlay' && !event.target.classList.contains('sheet-close-btn')) {
-        return;
-      }
-      const overlay = document.getElementById('selectBackupApproverModalOverlay');
-      if (overlay) {
-        overlay.classList.remove('active');
-        setTimeout(() => { overlay.style.display = 'none'; }, 250);
-      }
-    }
-
-    function selectBackupApproverPerson(name, role) {
-      if (currentLeaveBackupCardId) {
-        const card = document.getElementById(currentLeaveBackupCardId);
-        if (card) {
-          let assignment = card.querySelector('.approval-backup-assignment');
-          if (!assignment) {
-            assignment = document.createElement('div');
-            assignment.className = 'approval-backup-assignment';
-            assignment.style.cssText = 'margin: 0 14px 12px; padding: 9px 11px; border-radius: 12px; background: rgba(124,58,237,.1); border: 1px solid rgba(124,58,237,.25); color: var(--text-primary); font-size: 11.5px; font-weight: 700;';
-            const actions = card.querySelector('.pending-action-grid');
-            if (actions) actions.parentElement.insertBefore(assignment, actions);
-            else card.appendChild(assignment);
-          }
-          assignment.textContent = `Backup Approver: ${name} (${role})`;
-          card.dataset.backupApprover = name;
-        }
-        currentLeaveBackupCardId = null;
-        currentLeaveBackupEmployee = null;
-      }
-
-      const backupEl = document.getElementById('detailsBackupApprover');
-      if (backupEl) backupEl.innerText = `${name} (${role})`;
-
-      const labelEl = document.getElementById('activeApproverRoleLabel');
-      if (labelEl) labelEl.innerText = `Backup Approver (${name})`;
-
-      closeSelectBackupApproverModal();
-      if (typeof showToast === 'function') {
-        showToast(`Backup Approver updated to ${name} (${role})`, 'success');
       }
     }
 

@@ -577,15 +577,16 @@
     });
 
     if (shouldShowViewAll) {
-      const viewAllCard = document.createElement('div');
+      const viewAllCard = document.createElement('button');
+      viewAllCard.type = 'button';
       viewAllCard.className = 'claim-square-card';
       viewAllCard.onclick = () => openAllClaimOptionsModal();
 
       viewAllCard.innerHTML = `
-        <div class="claim-square-icon-wrap" style="background: rgba(124, 58, 237, 0.16); color: #7c3aed;">
-          <i class="fa-solid fa-grip" style="font-size: 18px;"></i>
+        <div class="claim-square-icon-wrap">
+          <i class="fa-solid fa-ellipsis" aria-hidden="true"></i>
         </div>
-        <div class="claim-square-title" style="color: var(--text-primary); font-weight: 800;">View All</div>
+        <div class="claim-square-title">View All</div>
       `;
 
       container.appendChild(viewAllCard);
@@ -627,15 +628,16 @@
     });
 
     if (shouldShowViewAll) {
-      const viewAllCard = document.createElement('div');
+      const viewAllCard = document.createElement('button');
+      viewAllCard.type = 'button';
       viewAllCard.className = 'claim-square-card';
       viewAllCard.onclick = () => openAllClaimOptionsModal();
 
       viewAllCard.innerHTML = `
-        <div class="claim-square-icon-wrap" style="background: rgba(124, 58, 237, 0.16); color: #7c3aed;">
-          <i class="fa-solid fa-grip" style="font-size: 18px;"></i>
+        <div class="claim-square-icon-wrap">
+          <i class="fa-solid fa-ellipsis" aria-hidden="true"></i>
         </div>
-        <div class="claim-square-title" style="color: var(--text-primary); font-weight: 800;">View All</div>
+        <div class="claim-square-title">View All</div>
       `;
 
       container.appendChild(viewAllCard);
@@ -882,11 +884,7 @@
       card.setAttribute('item-id', item.id);
 
       container.appendChild(card);
-      PendingApprovalBackup.addButton(card.querySelector('.pending-action-grid'), {
-        scope: 'claims', id: item.id, empNo: item.empNo, reference: item.docRef,
-        pool: [window.CLAIM_EMPLOYEES.EBB01, window.CLAIM_EMPLOYEES.EBB12],
-        isPending: () => teamQueue.some(row => row.id === item.id)
-      });
+      PendingApprovalBackup.showAssignment(card.querySelector('.pending-action-grid'), { scope: 'claims', id: item.id });
     });
   }
 
@@ -1704,16 +1702,6 @@
 
   function triggerClaimViewWorkflow() {
     closeClaimThreeDotsMenu();
-    const record = currentSelectedClaimData;
-    const backup = document.getElementById('claimWorkflowBackup');
-    if (backup && record) {
-      const assigned = PendingApprovalBackup.assigned('claims', record.id);
-      backup.textContent = assigned ? 'Change backup · ' + assigned.name : 'Assign Backup Approver';
-      backup.onclick = () => {
-        closeClaimWorkflowModal();
-        document.getElementById('team-card-' + record.id)?.querySelector('.action-btn-backup')?.click();
-      };
-    }
     setTimeout(() => {
       const overlay = document.getElementById('claimWorkflowModalOverlay');
       if (overlay) {

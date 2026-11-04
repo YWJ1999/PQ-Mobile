@@ -135,10 +135,7 @@ document.addEventListener('DOMContentLoaded', () => {
     review.addEventListener('click', () => openDetails(item.id, review));
     review.addEventListener('keydown', event => { if (['Enter', ' '].includes(event.key)) { event.preventDefault(); openDetails(item.id, review); } });
     body.append(review, actionButtons());
-    PendingApprovalBackup.addButton(body.lastElementChild, {
-      scope: 'workplace', id: item.id, reference: item.reference, empNo: item.empNo,
-      isPending: () => store.getPending().some(row => row.id === item.id)
-    });
+    PendingApprovalBackup.showAssignment(body.lastElementChild, { scope: 'workplace', id: item.id });
     card.append(header, body);
     return card;
   }

@@ -60,23 +60,21 @@
   if (article || policy) {
     filters.hidden = list.hidden = true;
     if (policy && params.has('pdf')) {
-      const detailUrl = new URL(location.href);
-      detailUrl.searchParams.delete('pdf');
-      back.href = detailUrl.href;
-      back.setAttribute('aria-label', 'Back to policy documents');
+      if (params.get('via') === 'workplace' && params.get('pdfFrom') === 'catalog') {
+        setWorkplaceBack();
+      } else {
+        const detailUrl = new URL(location.href);
+        detailUrl.searchParams.delete('pdf');
+        back.href = detailUrl.href;
+        back.setAttribute('aria-label', 'Back to policy documents');
+      }
       document.querySelector('.updates-header h1').textContent = 'PDF viewer';
       const selected = policyDocuments(policy).find(({ label }) => label.toLowerCase() === params.get('pdf'));
       showCompanyPolicyPdf(selected?.file);
       return;
     }
     if (policy && params.get('via') === 'workplace') {
-      const catalog = new URL('modules/admin/options/policy-sop.html', location.href);
-      catalog.searchParams.set('theme', theme);
-      for (const key of Object.keys(POLICY_FILTER_DEFAULTS)) {
-        if (params.has(key)) catalog.searchParams.set(key, params.get(key));
-      }
-      back.href = catalog.href;
-      back.setAttribute('aria-label', 'Back to Policy/SOP');
+      setWorkplaceBack();
     } else if (params.get('via') !== 'home') {
       const url = new URL(location.href);
       url.searchParams.delete('story');
@@ -96,6 +94,16 @@
     }
     document.title = (policy || article).title + ' · PeopleHCM';
     return;
+  }
+
+  function setWorkplaceBack() {
+    const catalog = new URL('modules/admin/options/policy-sop.html', location.href);
+    catalog.searchParams.set('theme', theme);
+    for (const key of Object.keys(POLICY_FILTER_DEFAULTS)) {
+      if (params.has(key)) catalog.searchParams.set(key, params.get(key));
+    }
+    back.href = catalog.href;
+    back.setAttribute('aria-label', 'Back to Policy/SOP');
   }
 
   function renderPolicy(record) {

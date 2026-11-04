@@ -26,13 +26,8 @@ async function check(name, fn) {
     await page.goto(url('leave.html') + '?mode=team', { waitUntil: 'domcontentloaded' });
     await page.waitForSelector('#hubSectionTeam', { visible: true });
 
-    await check('leave card Backup opens selector and writes the selected approver into the card', async () => {
-      const exists = await page.evaluate(() => typeof singleBackupCard === 'function');
-      assert.equal(exists, true);
-      await page.evaluate(() => singleBackupCard('approvalCard1', 'Afifah Nasir'));
-      assert.equal(await page.$eval('#selectBackupApproverModalOverlay', node => getComputedStyle(node).display), 'flex');
-      await page.evaluate(() => selectBackupApproverPerson('Anderson', 'Operations Lead'));
-      assert.match(await page.$eval('#approvalCard1', node => node.textContent), /Backup Approver:\s*Anderson/);
+    await check('leave approvals have no Backup controls', async () => {
+      assert.equal(await page.$('.action-btn-backup, #selectBackupApproverModalOverlay'), null);
     });
 
     await check('leave card Resubmit handles the request and synchronizes dashboard counts', async () => {
@@ -96,16 +91,8 @@ async function check(name, fn) {
     });
 
     await page.goto(url('modules/attendance/options/team.html'), { waitUntil: 'domcontentloaded' });
-    await check('attendance workflow backup selector updates the workflow visibly', async () => {
-      assert.equal(await page.evaluate(() => typeof openSelectBackupApproverModal), 'function');
-      await page.evaluate(() => {
-        const workflow = document.getElementById('attendanceWorkflowModalOverlay');
-        workflow.style.display = 'flex';
-        openSelectBackupApproverModal('Level 1');
-      });
-      assert.notEqual(await page.$eval('#attendanceBackupApproverModalOverlay', node => getComputedStyle(node).display), 'none');
-      await page.click('#attendanceBackupApproverModalOverlay [data-backup-name]');
-      assert.match(await page.$eval('#attendanceLevel1Approvers', node => node.textContent), /Backup:/);
+    await check('attendance approvals have no Backup controls', async () => {
+      assert.equal(await page.$('.action-btn-backup, #attendanceBackupApproverModalOverlay'), null);
     });
   } finally {
     await browser.close();

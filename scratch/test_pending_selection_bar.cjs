@@ -34,7 +34,7 @@ async function checkScreen(page, [file, tabs, queue, selectAll], theme) {
       for (const box of boxes) {
         const card = box.closest('.approval-request-card, .project-approval-card');
         const backup = card.querySelectorAll('.pending-action-grid .action-btn-backup');
-        if (backup.length !== 1 || !visible(backup[0]) || backup[0].disabled) throw new Error('Missing Backup in ' + (tab?.textContent || queue));
+        if (backup.length) throw new Error('Unexpected Backup in ' + (tab?.textContent || queue));
       }
       const all = document.querySelector(selectAll);
       const count = () => Number(bar.querySelector('span').textContent);

@@ -56,16 +56,27 @@
       return `<article class="policy-card">
         <header class="policy-card-head">
           <a class="policy-card-title-link" href="${href}">
-            <svg class="policy-card-file-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H5v20h15V8zM14 2v6h6M8 13h9M8 17h6"/></svg>
             <div><h3>${escape(record.title)}</h3><p>${escape(record.ref)} · <span>${escape(record.dept.toLowerCase())}</span></p></div>
           </a>
-          <details class="policy-card-menu" name="policy-actions">
-            <summary aria-label="Actions for ${escape(record.title)}"><span aria-hidden="true"></span></summary>
-            <a href="${href}"><i class="fa-regular fa-eye" aria-hidden="true"></i>View details</a>
-          </details>
         </header>
+        <div class="policy-card-documents">
+          ${['Policy', 'SOP', 'Guideline'].map(label => {
+            const kind = label.toLowerCase();
+            const file = record[kind];
+            const available = file?.name?.trim() && file.pdfUrl;
+            const effective = file?.name?.trim() && file.date ? date(file.date.split('/').reverse().join('-')) : 'N/A';
+            const target = workplacePolicyDetailsUrl(record.ref);
+            target.searchParams.set('pdf', kind);
+            target.searchParams.set('pdfFrom', 'catalog');
+            return `<div class="policy-card-document">
+              <div class="policy-card-document-copy"><h4>${label}</h4><p>Effective: ${escape(effective)}</p></div>
+              ${available
+                ? `<a class="policy-card-open" href="${escape(target.href)}" aria-label="Open ${label}: ${escape(record.title)}">Open</a>`
+                : '<span class="policy-card-unavailable">Not available</span>'}
+            </div>`;
+          }).join('')}
+        </div>
         <footer class="policy-card-footer">
-          <div class="policy-card-badges">${documents.map(({ label }) => `<span>${label}</span>`).join('')}</div>
           <span class="policy-file-count">${policyFileCount(documents.length)}</span>
         </footer>
       </article>`;
@@ -87,10 +98,6 @@
   }
 
   [...new Set(records.map(record => record.dept))].sort().forEach(department => $('policyDepartment').add(new Option(department, department)));
-  document.addEventListener('click', event => {
-    const open = $('policyList').querySelector('details[open]');
-    if (open && !open.contains(event.target)) open.open = false;
-  });
   trigger.addEventListener('click', () => {
     fillForm(filters);
     modal.classList.add('is-open');
@@ -123,11 +130,6 @@
     closeFilter();
   });
   document.addEventListener('keydown', event => {
-    const open = $('policyList').querySelector('details[open]');
-    if (open && event.key === 'Escape') {
-      open.open = false;
-      open.querySelector('summary').focus();
-    }
     if (!modal.classList.contains('is-open')) return;
     if (event.key === 'Escape') closeFilter();
     if (event.key === 'Tab') {

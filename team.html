@@ -1128,12 +1128,7 @@
         const reference = 'TEAM-' + (index + 1);
         card.dataset.reference = reference;
         if (handled.has(reference)) { card.remove(); return; }
-        const employee = card.querySelector('h4').textContent.trim();
-        PendingApprovalBackup.addButton(card.querySelector('.approval-actions'), {
-          scope: 'team', id: reference, reference: employee + ' · ' + card.querySelector('.approval-tag').textContent.trim(),
-          pool: PendingApprovalBackup.approvers.filter(person => person.name !== employee),
-          isPending: () => card.isConnected && !read().some(item => item.reference === reference)
-        });
+        PendingApprovalBackup.showAssignment(card.querySelector('.approval-actions'), { scope: 'team', id: reference });
       });
       document.addEventListener('click', event => {
         const button = event.target.closest('.approval-card .btn-approve, .approval-card .btn-reject');

@@ -108,7 +108,7 @@ document.addEventListener('DOMContentLoaded', () => {
     $('assetReport').hidden = open;
     $('assetChart').hidden = !open;
     $('assetPageTitle').textContent = open ? 'Asset Chart' : 'Asset Highlight';
-    $('assetBack').setAttribute('aria-label', open ? 'Back to Asset Highlight' : 'Back to Workplace Team');
+    $('assetBack').setAttribute('aria-label', open ? 'Back to Asset Highlight' : 'Back to Workplace Individual');
     main.scrollTop = open ? 0 : reportScroll;
     if (open) $('assetChartDimension').focus({ preventScroll: true });
     else $('assetViewChart').focus({ preventScroll: true });
