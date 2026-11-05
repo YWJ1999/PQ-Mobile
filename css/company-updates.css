@@ -87,40 +87,25 @@ a.update-card { text-decoration: none; }
 .updates-entry strong { font-size: 14px; font-weight: 800; line-height: 1.35; }
 .updates-date { color: var(--text-secondary); font-size: 11px; line-height: 1.4; }
 .updates-entry > .fa-chevron-right { flex-shrink: 0; color: var(--text-muted); font-size: 12px; }
-.updates-content article { padding: 19px; border: 1px solid var(--border-subtle); border-radius: 16px; background: var(--bg-card); }
-.updates-content article h2 { margin: 6px 0; font-size: 20px; line-height: 1.3; }
-.updates-article-text { margin: 14px 0 0; color: var(--text-primary); line-height: 1.6; font-size: 14px; }
 .company-updates-page [hidden] { display: none !important; }
 .company-updates-page :is(button, a):focus-visible { outline: 2px solid var(--border-focus); outline-offset: 1px; }
-#companyPolicyDetail .updates-type, .document-icon { color: var(--tag-blue-text); }
-.updates-policy-fields { margin-top: 14px; }
-.updates-policy-fields > div { display: grid; grid-template-columns: minmax(80px, 36%) 1fr; gap: 12px; align-items: baseline; padding: 8px 0; font-size: 12px; }
+#companyPolicyDetail .policy-card-head .updates-type { color: #ede9fe; }
+#companyPolicyTitle { margin-top: 3px; font-size: 18px; }
+.updates-policy-fields { margin: 0; padding: 4px 15px; }
+.updates-policy-fields > div { display: grid; grid-template-columns: minmax(80px, 36%) 1fr; gap: 12px; padding: 9px 0; font-size: 12px; }
 .updates-policy-fields > div + div { border-top: 1px solid var(--border-subtle); }
-.updates-policy-fields dt, .document-meta, .document-effective, .document-availability { color: var(--text-secondary); }
-.updates-policy-fields dd { margin: 0; font-weight: 700; overflow-wrap: anywhere; }
-.updates-documents-title { margin: 20px 0 10px; font-size: 16px; }
-.updates-documents { display: grid; gap: 10px; list-style: none; }
-.updates-document { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 10px 12px; padding: 15px; background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 16px; }
-.document-icon { width: 36px; height: 40px; display: grid; place-items: center; border-radius: 9px; background: var(--tag-blue-bg); font-size: 17px; }
-.document-kind { color: var(--tag-blue-text); font-size: 11px; font-weight: 700; }
-.updates-document h3 { margin: 3px 0; font-size: 14px; line-height: 1.4; overflow-wrap: anywhere; }
-.document-meta, .document-effective, .document-availability { font-size: 11.5px; line-height: 1.6; }
-.document-availability, .document-open { grid-column: 2; }
-.document-open {
-  justify-self: start;
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  min-height: 36px;
-  padding: 7px 13px;
-  border: 1px solid var(--tag-violet-border);
-  border-radius: 9px;
-  color: var(--tag-violet-text);
-  background: var(--tag-violet-bg);
-  font-size: 12px;
-  font-weight: 700;
-  text-decoration: none;
-}
+.updates-policy-fields dt { color: var(--text-secondary); }
+.updates-policy-fields dd { margin: 0; color: var(--text-primary); font-weight: 700; overflow-wrap: anywhere; }
+#companyPolicyDept { text-transform: capitalize; }
+.updates-documents-title { margin: 20px 0 10px; color: var(--text-primary); font-size: 16px; }
+.updates-documents { display: grid; gap: 10px; margin: 0; padding: 0; list-style: none; }
+.updates-document { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 10px 12px; padding: 15px; }
+.document-icon { display: grid; place-items: center; width: 36px; height: 40px; border-radius: 9px; background: var(--tag-violet-bg); color: var(--purple-text); }
+.document-kind { color: var(--purple-text); font-size: 11px; font-weight: 750; }
+.updates-document h3 { margin: 3px 0; color: var(--text-primary); font-size: 14px; line-height: 1.4; overflow-wrap: anywhere; }
+.updates-document p { color: var(--text-secondary); font-size: 11.5px; line-height: 1.5; }
+.updates-document :is(.document-open, .policy-card-unavailable) { grid-column: 2; justify-self: start; }
+.document-open { gap: 6px; }
 .updates-content:has(.policy-pdf-viewer:not([hidden])) { display: flex; overflow: hidden; padding: 0 12px 12px; }
 .policy-pdf-viewer { display: flex; flex: 1; min-width: 0; flex-direction: column; gap: 10px; }
 .policy-pdf-viewer h2 { font-size: 14px; overflow-wrap: anywhere; }

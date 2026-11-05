@@ -39,27 +39,25 @@
   const filters = document.querySelector('.updates-filters');
   const back = document.getElementById('updatesBack');
   const params = new URLSearchParams(location.search);
-  const stories = {
-    'town-hall': {
-      title: 'Town Hall this Friday',
-      date: 'Today', body: 'Join the leadership team this Friday at 3:00 PM for the quarterly company update on Q3 strategy.'
-    },
-    'industry-award': {
-      title: 'PeopleQuest wins industry award',
-      date: 'Yesterday', body: 'PeopleQuest won Best Enterprise HCM Solution 2026. This award celebrates the team behind the achievement.'
-    },
-    'mobile-launch': {
-      title: 'PeopleHCM 3.0 Mobile Launch',
-      date: '3 days ago', body: 'PeopleHCM 3.0 brings instant leave approvals and AI insights to the mobile app.'
-    }
-  };
   const theme = params.get('theme') || getCurrentTheme();
+  function newsDetailUrl(id, context) {
+    const url = new URL('modules/admin/options/news-detail.html', location.href);
+    url.searchParams.set('id', id);
+    url.searchParams.set('theme', theme);
+    url.searchParams.set('via', context.get('via') === 'home' ? 'home' : 'updates');
+    if (context.get('from') === 'legacy') url.searchParams.set('from', 'legacy');
+    if (context.has('type')) url.searchParams.set('type', context.get('type'));
+    return url.href;
+  }
   back.href = params.get('from') === 'legacy' ? 'light.html' : theme === 'dark' ? 'homedark.html' : 'homelight.html';
-  const article = Object.hasOwn(stories, params.get('story')) && stories[params.get('story')];
   const policy = Object.hasOwn(POLICY_DATABASE, params.get('policy')) && POLICY_DATABASE[params.get('policy')];
-  if (article || policy) {
+  if (!policy && params.has('story')) {
+    location.replace(newsDetailUrl(params.get('story'), params));
+    return;
+  }
+  if (policy) {
     filters.hidden = list.hidden = true;
-    if (policy && params.has('pdf')) {
+    if (params.has('pdf')) {
       if (params.get('via') === 'workplace' && params.get('pdfFrom') === 'catalog') {
         setWorkplaceBack();
       } else {
@@ -73,7 +71,7 @@
       showCompanyPolicyPdf(selected?.file);
       return;
     }
-    if (policy && params.get('via') === 'workplace') {
+    if (params.get('via') === 'workplace') {
       setWorkplaceBack();
     } else if (params.get('via') !== 'home') {
       const url = new URL(location.href);
@@ -82,24 +80,15 @@
       back.href = url.href;
       back.setAttribute('aria-label', 'Back to Company Updates');
     }
-    if (policy) {
-      document.querySelector('.updates-header h1').textContent = 'Company Policy / SOP';
-      renderPolicy(policy);
-    } else {
-      const detail = document.getElementById('companyNewsDetail');
-      detail.querySelector('h2').textContent = article.title;
-      detail.querySelector('.updates-date').textContent = article.date;
-      detail.querySelector('.updates-article-text').textContent = article.body;
-      detail.hidden = false;
-    }
-    document.title = (policy || article).title + ' · PeopleHCM';
+    renderPolicy(policy);
+    document.title = policy.title + ' · PeopleHCM';
     return;
   }
 
   function setWorkplaceBack() {
     const catalog = new URL('modules/admin/options/policy-sop.html', location.href);
     catalog.searchParams.set('theme', theme);
-    for (const key of Object.keys(POLICY_FILTER_DEFAULTS)) {
+    for (const key of ['source', 'from', 'type', ...Object.keys(POLICY_FILTER_DEFAULTS)]) {
       if (params.has(key)) catalog.searchParams.set(key, params.get(key));
     }
     back.href = catalog.href;
@@ -107,10 +96,15 @@
   }
 
   function renderPolicy(record) {
+    const screen = document.getElementById('companyPolicyScreen').content.cloneNode(true);
+    back.className = 'admin-back';
+    screen.querySelector('.admin-header-row').prepend(back);
+    document.body.classList.add('admin-page', 'policy-page');
+    document.querySelector('.company-updates-page').replaceWith(screen);
     const detail = document.getElementById('companyPolicyDetail');
     document.getElementById('companyPolicyTitle').textContent = record.title;
     document.getElementById('companyPolicyRef').textContent = record.ref;
-    document.getElementById('companyPolicyDept').textContent = record.dept;
+    document.getElementById('companyPolicyDept').textContent = record.dept.toLowerCase();
     const documents = detail.querySelector('.updates-documents');
     const template = document.getElementById('companyDocumentCard');
     for (const { label, file } of policyDocuments(record)) {
@@ -118,7 +112,7 @@
       card.querySelector('.document-kind').textContent = label;
       card.querySelector('h3').textContent = file.name;
       card.querySelector('.document-meta').textContent = [file.type, file.size].filter(Boolean).join(' · ');
-      card.querySelector('.document-effective').textContent = 'Effective ' + file.date;
+      card.querySelector('.document-effective').textContent = 'Effective: ' + policyEffectiveDate(file);
       if (file.pdfUrl) {
         const target = new URL(location.href);
         target.searchParams.set('pdf', label.toLowerCase());
@@ -127,23 +121,31 @@
         open.setAttribute('aria-label', 'Open PDF: ' + file.name);
         open.hidden = false;
       } else {
-        card.querySelector('.document-availability').hidden = false;
+        card.querySelector('.policy-card-unavailable').hidden = false;
       }
       documents.append(card);
     }
     document.getElementById('companyDocumentsTitle').textContent = 'Documents (' + documents.childElementCount + ')';
-    detail.hidden = false;
+
+    // Keep the catalog return path and PDF links in the theme chosen on this screen.
+    new MutationObserver(() => {
+      for (const link of [back, ...documents.querySelectorAll('a[href]')]) {
+        const homeReturn = link === back && params.get('via') === 'home' && params.get('from') !== 'legacy';
+        const url = new URL(homeReturn ? APP_ROUTES.home() : link.href, location.href);
+        url.searchParams.set('theme', getCurrentTheme());
+        link.href = url.href;
+      }
+    }).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
   }
 
-  function addEntry(category, id) {
+  function addEntry(category, record) {
     const isNews = category === 'news';
-    const record = isNews ? stories[id] : POLICY_DATABASE[id];
     const li = document.createElement('li');
     li.dataset.category = category;
     const entry = document.createElement('a');
     entry.className = 'updates-entry';
     entry.dataset.category = category;
-    entry.dataset[isNews ? 'story' : 'policy'] = id;
+    entry.dataset[isNews ? 'story' : 'policy'] = isNews ? record.id : record.ref;
     entry.innerHTML = `<span class="entry-icon"><i class="fa-solid ${isNews ? 'fa-bullhorn' : 'fa-clipboard-list'}" aria-hidden="true"></i></span>
       <span class="entry-copy"><span class="updates-type"></span><strong></strong><span class="${isNews ? 'updates-date' : 'policy-summary'}"></span></span>
       <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>`;
@@ -154,11 +156,11 @@
     li.append(entry);
     list.append(li);
   }
-  const [firstStory, ...otherStories] = Object.keys(stories);
-  addEntry('news', firstStory);
-  if (featuredPolicy) addEntry('policy', featuredPolicy.ref);
-  otherStories.forEach(id => addEntry('news', id));
-  otherPolicies.forEach(policy => addEntry('policy', policy.ref));
+  const [firstStory, ...otherStories] = COMPANY_NEWS;
+  if (firstStory) addEntry('news', firstStory);
+  if (featuredPolicy) addEntry('policy', featuredPolicy);
+  otherStories.forEach(story => addEntry('news', story));
+  otherPolicies.forEach(policy => addEntry('policy', policy));
   function selectType(type) {
     filters.querySelectorAll('button').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.type === type)));
     const url = new URL(location.href);
@@ -166,12 +168,17 @@
     else url.searchParams.set('type', type);
     if (url.href !== location.href) history.replaceState(history.state, '', url);
     for (const li of list.children) li.hidden = type !== 'all' && li.dataset.category !== type;
+    const detail = new URL('company-updates.html', location.href);
+    detail.searchParams.set('theme', theme);
+    if (type !== 'all') detail.searchParams.set('type', type);
+    if (params.get('from') === 'legacy') detail.searchParams.set('from', 'legacy');
     for (const link of list.querySelectorAll('a')) {
-      const target = new URL(url);
-      target.searchParams.delete('story');
-      target.searchParams.delete('policy');
-      const key = link.dataset.category === 'news' ? 'story' : 'policy';
-      target.searchParams.set(key, link.dataset[key]);
+      if (link.dataset.story) {
+        link.href = newsDetailUrl(link.dataset.story, detail.searchParams);
+        continue;
+      }
+      const target = new URL(detail);
+      target.searchParams.set('policy', link.dataset.policy);
       link.href = target.href;
     }
   }

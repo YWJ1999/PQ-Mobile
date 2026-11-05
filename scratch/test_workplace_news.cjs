@@ -6,7 +6,7 @@ const puppeteer = require('puppeteer');
 const newsUrl = pathToFileURL(path.resolve(__dirname, '../modules/admin/options/news.html')).href;
 const detailUrl = pathToFileURL(path.resolve(__dirname, '../modules/admin/options/news-detail.html')).href;
 const key = 'peoplehcm:workplace:news:v1';
-const titles = page => page.$$eval('.news-card h2', nodes => nodes.map(node => node.textContent));
+const titles = page => page.$$eval('#newsList a[data-news-id] h3', nodes => nodes.map(node => node.textContent));
 async function screenshot(page, name) {
   // Theme colors transition on load; capture the settled UI rather than an intermediate frame.
   await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 350)));
@@ -15,6 +15,33 @@ async function screenshot(page, name) {
 async function fits(page) {
   assert.ok(await page.$eval('main', node => node.scrollWidth <= node.clientWidth + 1), 'News must fit the mobile viewport');
   assert.ok(await page.$eval('.admin-heading h1', node => node.getBoundingClientRect().height < 30), 'Page header must stay on one line');
+}
+
+async function checkCompanyNews(page, theme) {
+  const updates = new URL('../../../company-updates.html?type=news&theme=' + theme, newsUrl);
+  await page.goto(updates.href);
+  const entries = await page.$$eval('.updates-entry[data-story]', links => links.map(link => [link.dataset.story, link.querySelector('strong').textContent]));
+  assert.equal(entries.length, 3);
+  const follow = selector => Promise.all([page.waitForNavigation(), page.click(selector)]);
+  for (const [id, title] of entries) {
+    await follow(`.updates-entry[data-story="${id}"]`);
+    assert.equal(await page.$eval('#newsArticleTitle', node => node.textContent), title);
+    assert.equal(await page.$eval('#newsAckStatus', node => node.textContent), 'Acknowledgement required');
+    assert.equal(await page.$eval('#newsBookmark', node => node.getAttribute('aria-pressed')), 'false');
+    await page.click('#newsBookmark');
+    await page.click('#newsAcknowledge');
+    await page.reload();
+    assert.equal(await page.$eval('#newsBookmark', node => node.getAttribute('aria-pressed')), 'true');
+    assert.equal(await page.$eval('#newsAckStatus', node => node.textContent), 'Acknowledged');
+    await follow('#newsDetailBack');
+    assert.equal(await page.$eval('.updates-filters [aria-pressed="true"]', node => node.dataset.type), 'news');
+  }
+  const home = new URL('../../../home' + theme + '.html', newsUrl);
+  await page.goto(home.href);
+  await follow('.update-card[data-category="news"]');
+  assert.equal(await page.$eval('#newsArticleTitle', node => node.textContent), 'Town Hall this Friday');
+  await follow('#newsDetailBack');
+  assert.equal(new URL(page.url()).pathname, home.pathname);
 }
 
 (async () => {
@@ -28,18 +55,35 @@ async function fits(page) {
       await page.goto(newsUrl + '?theme=' + theme + '&filter=unread', { waitUntil: 'domcontentloaded' });
       await page.evaluate(storageKey => localStorage.removeItem(storageKey), key);
       await page.reload({ waitUntil: 'domcontentloaded' });
-      assert.equal(await page.$$eval('.news-card', nodes => nodes.length), 5, 'News must replace its placeholder with the five reference announcements');
-      assert.equal(await page.$('.news-filters, [data-news-filter], .news-card-status'), null, 'News must show a simple announcement list without status tabs or badges');
-      assert.equal(await page.$('.news-search, #newsSearch'), null, 'News must not display a search bar');
+      assert.equal((await titles(page)).length, 5);
+      assert.equal(await page.$eval('.news-lead-link', node => node.dataset.newsId), 'covid-wfh');
+      assert.equal(await page.$eval('.news-lead-heading .news-read-state', node => node.textContent), 'Read');
+      assert.equal(await page.$$eval('.news-update-row', nodes => nodes.length), 4);
+      assert.equal(await page.$('.news-filters, [data-news-filter], #newsList [role="tab"]'), null);
+      assert.equal(await page.$eval('#newsSearchPanel', node => node.hidden), true);
       await fits(page);
       await screenshot(page, `workplace-news-${theme}-${width}.png`);
 
+      await page.click('#newsSearchToggle');
+      await page.type('#newsSearch', 'no matching announcement');
+      assert.equal(await page.$eval('#newsEmpty', node => node.hidden), false);
+      await page.$eval('#newsSearch', node => { node.value = 'lockdown'; node.dispatchEvent(new Event('input')); });
+      assert.deepEqual(await titles(page), ['LOCKDOWN 3.0']);
+      const readLabel = '[data-news-id="lockdown-3"] .news-read-state';
+      assert.equal(await page.$eval(readLabel, node => node.textContent), 'Unread');
       await Promise.all([page.waitForNavigation({ waitUntil: 'domcontentloaded' }), page.click('[data-news-id="lockdown-3"]')]);
       assert.equal(new URL(page.url()).searchParams.get('theme'), theme);
       assert.equal(await page.$eval('#newsArticleTitle', node => node.textContent), 'LOCKDOWN 3.0');
       assert.equal(await page.$eval('#newsAcknowledged', node => node.hidden), true, 'Opening a news item must not acknowledge it');
       assert.ok((await page.$eval('#newsDetailActions', node => node.textContent)).includes('this device'), 'Local acknowledgement must not imply it was delivered to a server');
       assert.equal(await page.$eval('#newsAcknowledge', node => node.hidden), false);
+      await Promise.all([page.waitForNavigation(), page.click('#newsDetailBack')]);
+      assert.equal(await page.$eval('#newsSearch', node => node.value), 'lockdown');
+      assert.equal(await page.$eval(readLabel, node => node.textContent), 'Read');
+      await page.focus('#newsSearch');
+      await page.keyboard.press('Escape');
+      assert.equal(await page.$eval('#newsSearchPanel', node => node.hidden), true);
+      await Promise.all([page.waitForNavigation(), page.click('[data-news-id="lockdown-3"]')]);
       await page.click('#newsAcknowledge');
       assert.equal(await page.$eval('#newsAcknowledged', node => node.hidden), false);
       const acknowledgedTime = await page.$eval('#newsAcknowledged time', node => node.dateTime);
@@ -50,7 +94,7 @@ async function fits(page) {
       await Promise.all([page.waitForNavigation({ waitUntil: 'domcontentloaded' }), page.click('[data-news-id="return-to-work"]')]);
       await Promise.all([page.waitForNavigation({ waitUntil: 'domcontentloaded' }), page.click('#newsDetailBack')]);
       assert.equal((await titles(page)).length, 5, 'Viewing an announcement must not change which announcements are shown');
-      assert.equal(await page.$('.news-card-status'), null);
+      assert.equal(await page.$eval('[data-news-id="return-to-work"] .news-read-state', node => node.textContent), 'Read');
 
       await Promise.all([page.waitForNavigation({ waitUntil: 'domcontentloaded' }), page.click('[data-news-id="covid-wfh"]')]);
       assert.ok((await page.$eval('#newsArticleBody', node => node.textContent)).includes('Attached is a memo of our new working procedures.'));
@@ -109,6 +153,7 @@ async function fits(page) {
       assert.ok(await page.$eval('#newsFeedbackDialog', node => node.scrollWidth <= node.clientWidth + 1), 'Feedback must fit a short mobile viewport');
       await page.keyboard.press('Escape');
       await fits(page);
+      if (width === 420) await checkCompanyNews(page, theme);
       assert.deepEqual(errors, []);
       console.log(`PASS: Simple News cards, navigation, explicit acknowledgement, safe persisted feedback, unavailable states, ${theme}, ${width}px`);
       await page.close();

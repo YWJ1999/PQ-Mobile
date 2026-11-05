@@ -1003,6 +1003,8 @@
       cursor: pointer;
     }
 
+    a.sheet-item-card { color: inherit; text-decoration: none; }
+
     .sheet-item-card:hover {
       border-color: #cbd5e1;
       transform: translateY(-1px);
@@ -1816,7 +1818,7 @@
       </div>
 
       <div class="updates-list">
-        <a class="update-card" data-category="news" href="company-updates.html?theme=light&amp;story=town-hall&amp;via=home&amp;from=legacy">
+        <a class="update-card" data-category="news" href="modules/admin/options/news-detail.html?theme=light&amp;id=town-hall&amp;via=home&amp;from=legacy">
           <div class="update-thumb" aria-hidden="true"><i class="fa-solid fa-bullhorn"></i></div>
           <div class="update-content">
             <span class="update-tag">News</span>
@@ -1836,7 +1838,7 @@
           <span class="update-chevron" aria-hidden="true"></span>
         </a>
 
-        <a class="update-card" data-category="news" href="company-updates.html?theme=light&amp;story=industry-award&amp;via=home&amp;from=legacy">
+        <a class="update-card" data-category="news" href="modules/admin/options/news-detail.html?theme=light&amp;id=industry-award&amp;via=home&amp;from=legacy">
           <div class="update-thumb" aria-hidden="true"><i class="fa-solid fa-trophy"></i></div>
           <div class="update-content">
             <span class="update-tag">News</span>
@@ -2395,7 +2397,7 @@
         <!-- List -->
         <div class="sheet-list-scroll">
           <!-- 1. NEWS (Red = Unread) -->
-          <div class="sheet-item-card" data-update="news" onclick="openNewsDetail(this, 'Town Hall')">
+          <a class="sheet-item-card" data-update="news" href="modules/admin/options/news-detail.html?id=town-hall&amp;theme=light&amp;via=legacy-drawer">
             <div class="item-left-box">
               <div class="item-icon-box" style="background: #f3e8ff; color: #7c3aed;" title="Company Uploaded Cover">
                 <img src="https://images.unsplash.com/photo-1517048676732-d65bc937f952?w=100&auto=format&fit=crop&q=80" alt="Town Hall" class="item-thumb-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
@@ -2409,10 +2411,10 @@
             <div class="item-right-box">
               <span class="sheet-tag-badge red">Unread</span>
             </div>
-          </div>
+          </a>
 
           <!-- 2. NEWS (Green = Read / News) -->
-          <div class="sheet-item-card" data-update="news" onclick="openNewsDetail(this, 'Industry Award')">
+          <a class="sheet-item-card" data-update="news" href="modules/admin/options/news-detail.html?id=industry-award&amp;theme=light&amp;via=legacy-drawer">
             <div class="item-left-box">
               <div class="item-icon-box" style="background: linear-gradient(135deg, #7c3aed, #4f46e5); color: #ffffff;" title="Company/Dept Monogram">
                 <span class="dept-badge" style="font-weight: 800; font-size: 13px;">PQ</span>
@@ -2425,10 +2427,10 @@
             <div class="item-right-box">
               <span class="sheet-tag-badge green">News</span>
             </div>
-          </div>
+          </a>
 
           <!-- 3. NEWS (Green = Read / News, changed from grey) -->
-          <div class="sheet-item-card" data-update="news" onclick="openNewsDetail(this, 'PeopleHCM 3.0')">
+          <a class="sheet-item-card" data-update="news" href="modules/admin/options/news-detail.html?id=mobile-launch&amp;theme=light&amp;via=legacy-drawer">
             <div class="item-left-box">
               <div class="item-icon-box" style="background: #e0f2fe; color: #0284c7;" title="Smart Category Icon">
                 <i class="fa-solid fa-bullhorn"></i>
@@ -2441,7 +2443,7 @@
             <div class="item-right-box">
               <span class="sheet-tag-badge green">News</span>
             </div>
-          </div>
+          </a>
 
           <!-- 4. POLICY & SOP (DE001: PeopleTime User Guide v2) -->
           <div class="sheet-item-card" data-update="policy" onclick="openPolicyDetail('DE001')">
@@ -2913,16 +2915,6 @@
           card.style.display = 'none';
         }
       });
-    }
-
-    function openNewsDetail(cardEl, title) {
-      if (!cardEl) return;
-      const badge = cardEl.querySelector('.sheet-tag-badge');
-      if (badge && badge.classList.contains('red')) {
-        badge.classList.remove('red');
-        badge.classList.add('green');
-        badge.textContent = 'News';
-      }
     }
 
     document.addEventListener('DOMContentLoaded', () => {

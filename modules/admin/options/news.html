@@ -15,6 +15,7 @@
   <script src="../../../js/components.js"></script>
   <script src="../../../js/app.js" defer></script>
   <script src="../js/admin-app.js" defer></script>
+  <script src="../../../js/company-news-data.js" defer></script>
   <script src="../js/workplace-news.js" defer></script>
 </head>
 <body class="admin-page news-page">
@@ -25,11 +26,14 @@
       <div class="admin-header-row">
         <a class="admin-back" data-admin-back href="../index.html" aria-label="Back to Workplace"><i class="fa-solid fa-chevron-left" aria-hidden="true"></i></a>
         <div class="admin-heading"><h1>News</h1></div>
-        <span aria-hidden="true"></span>
+        <button id="newsSearchToggle" type="button" class="news-header-search" aria-label="Search news" aria-controls="newsSearchPanel" aria-expanded="false"><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i></button>
       </div>
     </header>
     <main class="main-content admin-content news-list-content">
-      <p id="newsResultCount" class="news-result-count" role="status" aria-live="polite"></p>
+      <div id="newsSearchPanel" role="search" hidden>
+        <input id="newsSearch" type="search" placeholder="Search news" aria-label="Search announcements" autocomplete="off">
+        <p id="newsResultCount" role="status"></p>
+      </div>
       <section id="newsList" class="news-list" aria-label="News"></section>
       <section id="newsEmpty" class="news-empty" hidden>
         <span class="news-empty-icon"><i class="fa-regular fa-newspaper" aria-hidden="true"></i></span>

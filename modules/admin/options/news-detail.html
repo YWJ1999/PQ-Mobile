@@ -14,6 +14,7 @@
   <link rel="stylesheet" href="../css/workplace-news.css">
   <script src="../../../js/components.js"></script>
   <script src="../../../js/app.js" defer></script>
+  <script src="../../../js/company-news-data.js" defer></script>
   <script src="../js/workplace-news.js" defer></script>
 </head>
 <body class="admin-page news-page news-detail-page">
@@ -23,14 +24,14 @@
       <phone-status-bar time="9:41"></phone-status-bar>
       <div class="admin-header-row">
         <a id="newsDetailBack" class="admin-back" href="news.html" aria-label="Back to News"><i class="fa-solid fa-chevron-left" aria-hidden="true"></i></a>
-        <div class="admin-heading"><h1>News Details</h1></div>
-        <span aria-hidden="true"></span>
+        <div class="admin-heading"><h1>News details</h1></div>
+        <button id="newsBookmark" class="news-bookmark" type="button" aria-label="Bookmark announcement" aria-pressed="false" hidden><i class="fa-regular fa-bookmark" aria-hidden="true"></i></button>
       </div>
     </header>
     <main class="main-content admin-content news-detail-content">
       <article id="newsArticle" aria-labelledby="newsArticleTitle" hidden>
         <h2 id="newsArticleTitle" class="news-article-title"></h2>
-        <p class="news-publisher"><i class="fa-regular fa-building" aria-hidden="true"></i><span>Management</span></p>
+        <div class="news-status"><span><i class="fa-solid fa-check" aria-hidden="true"></i> Read</span><span id="newsAckStatus" class="news-ack-status"></span><span id="newsDate"></span></div>
         <div id="newsArticleBody" class="news-article-body"></div>
         <section id="newsMedia" class="news-media" hidden aria-label="Video attachment"></section>
         <section id="newsAttachmentSection" class="news-attachment-section" aria-labelledby="newsAttachmentTitle" hidden>
@@ -56,11 +57,14 @@
       <noscript><p class="news-empty">Enable JavaScript to read this announcement.</p></noscript>
     </main>
     <footer id="newsDetailActions" class="news-detail-actions" hidden>
-      <button id="newsAcknowledge" class="news-primary-button" type="button"><i class="fa-solid fa-check" aria-hidden="true"></i><span>Acknowledge</span></button>
-      <button id="newsFeedbackTrigger" class="news-primary-button" type="button" aria-haspopup="dialog"><i class="fa-regular fa-comment" aria-hidden="true"></i><span>Give feedback</span></button>
-      <p class="news-local-status-hint">Acknowledgement is saved on this device.</p>
-      <span class="news-home-indicator" aria-hidden="true"></span>
+      <p id="newsActionHint" class="news-local-status-hint"></p>
+      <div class="news-action-buttons">
+        <button id="newsFeedbackTrigger" class="news-primary-button news-secondary-button" type="button" aria-haspopup="dialog"><span>Feedback</span></button>
+        <button id="newsAcknowledge" class="news-primary-button" type="button">Acknowledge</button>
+      </div>
     </footer>
+    <phone-bottom-nav active="apps"></phone-bottom-nav>
+    <notification-sheet></notification-sheet>
     <dialog id="newsFeedbackDialog" class="news-feedback-dialog" aria-labelledby="newsFeedbackTitle" aria-describedby="newsFeedbackHint">
       <form id="newsFeedbackForm">
         <div class="news-dialog-header">

@@ -92,6 +92,14 @@ function policyFileCount(count) {
   return count + (count === 1 ? ' file' : ' files');
 }
 
+function formatPolicyDate(isoDate) {
+  return new Date(isoDate + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+}
+
+function policyEffectiveDate(file) {
+  return file?.name?.trim() && file.date ? formatPolicyDate(file.date.split('/').reverse().join('-')) : 'N/A';
+}
+
 const POLICY_FILTER_DEFAULTS = {
   reference: '', title: '', department: '',
   policyFrom: '2016-09-01', policyTo: '2100-12-31',

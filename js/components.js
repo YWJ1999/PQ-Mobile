@@ -68,6 +68,9 @@ window.PeopleHcmRecordSummary = (() => {
     presentation.src = new URL('detail-popout.js', source).href;
     presentation.defer = true;
     document.head.append(presentation);
+    const recordLegend = document.createElement('script');
+    recordLegend.src = new URL('record-colour-legend.js', source).href;
+    document.head.append(recordLegend);
   }
 }
 class PreviewTopBar extends HTMLElement {

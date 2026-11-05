@@ -8,11 +8,14 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="css/theme.css">
   <link rel="stylesheet" href="css/app.css">
+  <link rel="stylesheet" href="modules/admin/css/admin.css">
+  <link rel="stylesheet" href="modules/admin/css/policy-sop.css">
   <link rel="stylesheet" href="css/company-updates.css">
   <script src="js/components.js"></script>
   <script src="js/app.js" defer></script>
   <script src="js/company-policy-viewer.js" defer></script>
   <script src="modules/admin/js/policy-data.js" defer></script>
+  <script src="js/company-news-data.js" defer></script>
   <script src="js/company-updates.js" defer></script>
 </head>
 <body>
@@ -30,35 +33,6 @@
       </div>
       <main class="updates-content">
         <ul id="companyUpdatesList" aria-label="Company updates"></ul>
-        <article id="companyNewsDetail" hidden>
-          <span class="updates-type">News</span>
-          <h2></h2><p class="updates-date"></p><p class="updates-article-text"></p>
-        </article>
-        <section id="companyPolicyDetail" hidden aria-labelledby="companyPolicyTitle">
-          <article>
-            <span class="updates-type">Policy &amp; SOP</span>
-            <h2 id="companyPolicyTitle"></h2>
-            <dl class="updates-policy-fields">
-              <div><dt>Reference</dt><dd id="companyPolicyRef"></dd></div>
-              <div><dt>Department</dt><dd id="companyPolicyDept"></dd></div>
-            </dl>
-          </article>
-          <h2 class="updates-documents-title" id="companyDocumentsTitle">Documents</h2>
-          <ul class="updates-documents" aria-labelledby="companyDocumentsTitle"></ul>
-          <template id="companyDocumentCard">
-            <li class="updates-document">
-              <span class="document-icon" aria-hidden="true"><i class="fa-regular fa-file-pdf"></i></span>
-              <div class="document-info">
-                <span class="document-kind"></span>
-                <h3></h3>
-                <p class="document-meta"></p>
-                <p class="document-effective"></p>
-              </div>
-              <a class="document-open" hidden><i class="fa-regular fa-file-pdf" aria-hidden="true"></i>Open PDF</a>
-              <span class="document-availability" hidden>PDF unavailable</span>
-            </li>
-          </template>
-        </section>
         <section id="companyPdfViewer" class="policy-pdf-viewer" hidden aria-labelledby="pdfFilename">
           <h2 id="pdfFilename"></h2>
           <p id="pdfStatus" role="status"></p>
@@ -74,5 +48,50 @@
       </main>
     </div>
   </div>
+  <template id="companyPolicyScreen">
+    <preview-top-bar active-page="workplace"></preview-top-bar>
+    <div class="phone-container">
+      <header class="admin-header">
+        <phone-status-bar time="9:41"></phone-status-bar>
+        <div class="admin-header-row">
+          <div class="admin-heading"><h1>Company Policy / SOP</h1></div>
+          <span aria-hidden="true"></span>
+        </div>
+      </header>
+      <main class="main-content admin-content">
+        <section id="companyPolicyDetail" aria-labelledby="companyPolicyTitle">
+          <article class="policy-card">
+            <header class="policy-card-head">
+              <div>
+                <span class="updates-type">Policy &amp; SOP</span>
+                <h2 id="companyPolicyTitle"></h2>
+              </div>
+            </header>
+            <dl class="updates-policy-fields">
+              <div><dt>Reference</dt><dd id="companyPolicyRef"></dd></div>
+              <div><dt>Department</dt><dd id="companyPolicyDept"></dd></div>
+            </dl>
+          </article>
+          <h2 class="updates-documents-title" id="companyDocumentsTitle">Documents</h2>
+          <ul class="updates-documents" aria-labelledby="companyDocumentsTitle"></ul>
+        </section>
+      </main>
+      <phone-bottom-nav active="apps"></phone-bottom-nav>
+      <notification-sheet></notification-sheet>
+    </div>
+  </template>
+  <template id="companyDocumentCard">
+    <li class="policy-card updates-document">
+      <span class="document-icon" aria-hidden="true"><i class="fa-regular fa-file-pdf"></i></span>
+      <div class="policy-card-document-copy document-info">
+        <span class="document-kind"></span>
+        <h3></h3>
+        <p class="document-meta"></p>
+        <p class="document-effective"></p>
+      </div>
+      <a class="policy-card-open document-open" hidden><i class="fa-regular fa-file-pdf" aria-hidden="true"></i>Open PDF</a>
+      <span class="policy-card-unavailable" hidden>PDF unavailable</span>
+    </li>
+  </template>
 </body>
 </html>

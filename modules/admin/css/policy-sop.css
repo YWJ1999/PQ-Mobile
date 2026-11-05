@@ -21,15 +21,15 @@
   color: #fff;
 }
 .policy-card-title-link { display: flex; align-items: center; gap: 9px; min-width: 0; flex: 1; color: inherit; text-decoration: none; }
-.policy-card-title-link h3 { font-size: 13px; font-weight: 750; letter-spacing: -.15px; line-height: 1.4; overflow-wrap: anywhere; }
-.policy-card-title-link p { margin-top: 2px; color: #ede9fe; font-size: 11px; line-height: 1.4; overflow-wrap: anywhere; }
-.policy-card-title-link p span { text-transform: capitalize; }
+.policy-card-head :is(h2, h3) { font-size: 13px; font-weight: 750; letter-spacing: -.15px; line-height: 1.4; overflow-wrap: anywhere; }
+.policy-card-head p { margin-top: 2px; color: #ede9fe; font-size: 11px; line-height: 1.4; overflow-wrap: anywhere; }
+.policy-card-head p span { text-transform: capitalize; }
 .policy-card-title-link:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
 .policy-card-documents { padding: 0 12px; }
 .policy-card-document { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 48px; padding: 7px 0; }
 .policy-card-document + .policy-card-document { border-top: 1px solid var(--border-subtle); }
 .policy-card-document-copy { min-width: 0; }
-.policy-card-document h4 { color: var(--text-primary); font-size: 12px; font-weight: 750; line-height: 1.4; }
+.policy-card-document :is(h3, h4) { color: var(--text-primary); font-size: 12px; font-weight: 750; line-height: 1.4; overflow-wrap: anywhere; }
 .policy-card-document p { color: var(--text-secondary); font-size: 10.5px; line-height: 1.5; }
 .policy-card-open {
   display: inline-flex;

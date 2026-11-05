@@ -215,3 +215,49 @@ html body :is(.approval-request-card, .project-approval-card) :is(.approval-reco
 html body .approval-record-header:has([data-approval-status="resubmitted"], [data-approval-status="draft" i]) {
   background: var(--record-draft-surface);
 }
+
+button.record-key-trigger {
+  position: relative;
+  flex: 0 0 36px;
+  margin-inline-start: auto;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 1px solid rgba(255,255,255,.28);
+  border-radius: 12px;
+  background: rgba(255,255,255,.14);
+  color: #fff;
+  font: inherit;
+  font-size: 14px;
+  line-height: 1;
+  font-weight: 800;
+  cursor: pointer;
+}
+button.record-key-trigger[hidden] { display: none; }
+.record-key-trigger::before { content: ''; position: absolute; inset: 7px; border: 1.5px solid currentColor; border-radius: 50%; }
+.record-key-trigger:hover { background: rgba(255,255,255,.15); }
+.record-key-trigger:focus-visible { outline: 2px solid #fff; outline-offset: -2px; }
+.record-key-dialog {
+  width: min(370px, calc(100% - 32px)); max-height: min(85dvh, 720px);
+  margin: auto; padding: 0; border: 1px solid var(--border-subtle); border-radius: 18px;
+  background: var(--bg-card); color: var(--text-primary); box-shadow: var(--shadow-card);
+}
+.record-key-dialog::backdrop { background: rgba(15,23,42,.6); }
+.record-key-dialog header { position: sticky; top: 0; display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; color: #fff; background: var(--card-header-purple-background); }
+.record-key-dialog h2 { margin: 0; font-size: 16px; }
+.record-key-dialog header button { width: 36px; height: 36px; border: 1px solid rgba(255,255,255,.4); border-radius: 10px; background: transparent; color: inherit; font-size: 22px; cursor: pointer; }
+.record-key-body { padding: 16px; }
+.record-key-body h3, .record-key-body summary { color: var(--text-primary); font-size: 13px; font-weight: 800; }
+.record-key-body summary { cursor: pointer; }
+.record-key-body details { margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--border-subtle); }
+.record-key-body details h3 { margin: 15px 0 0; }
+.record-key-list { list-style: none; margin: 8px 0 0; padding: 0; }
+.record-key-list li { display: flex; align-items: center; gap: 10px; padding: 4px 0; color: var(--text-secondary); font-size: 12px; line-height: 1.5; }
+.record-key-list li > span { flex: none; width: 23px; height: 14px; border-radius: 4px; border: 1px solid var(--border-subtle); }
+.record-key-days li > span { width: 16px; height: 16px; border-radius: 2px; }
+.record-key-days li:last-child > span { border: 2px solid #fff0ab; }
+.record-key-dots li > span { width: 10px; height: 10px; border-radius: 50%; }
+.record-key-dialog :focus-visible { outline: 2px solid var(--purple-text); outline-offset: 2px; }
+.record-key-dialog header button:focus-visible { outline-color: #fff; }

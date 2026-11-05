@@ -6,7 +6,6 @@
   const modal = $('policyFilterModal');
   const trigger = $('policyFilterTrigger');
   const escape = value => String(value).replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]));
-  const date = value => value ? new Date(value + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : '\u2014';
   const theme = () => document.documentElement.dataset.theme || 'dark';
   const readURL = () => {
     const params = new URLSearchParams(location.search);
@@ -35,6 +34,21 @@
   }
 
   function render() {
+    const params = new URLSearchParams(location.search);
+    const source = params.get('source');
+    if (source === 'updates' || source === 'home') {
+      const legacy = params.get('from') === 'legacy';
+      const home = legacy ? 'light.html' : APP_ROUTES.home();
+      const back = document.querySelector('[data-admin-back]');
+      const url = new URL('../../../' + (source === 'updates' ? 'company-updates.html' : home), location.href);
+      url.searchParams.set('theme', theme());
+      if (source === 'updates') {
+        if (params.has('type')) url.searchParams.set('type', params.get('type'));
+        if (legacy) url.searchParams.set('from', 'legacy');
+      }
+      back.href = url.href;
+      back.setAttribute('aria-label', source === 'updates' ? 'Back to Company Updates' : 'Back to Home');
+    }
     const rows = records.filter(record =>
       record.ref.toLowerCase().includes(filters.reference.toLowerCase().trim()) &&
       record.title.toLowerCase().includes(filters.title.toLowerCase().trim()) &&
@@ -44,7 +58,7 @@
     const summary = [filters.department || 'All Departments', filters.title ? 'Title: ' + filters.title : '', filters.reference ? 'Ref: ' + filters.reference : ''];
     ['policy', 'sop', 'guideline'].forEach(kind => {
       if (filters[kind + 'From'] !== defaults[kind + 'From'] || filters[kind + 'To'] !== defaults[kind + 'To']) {
-        summary.push((kind === 'sop' ? 'SOP' : kind[0].toUpperCase() + kind.slice(1)) + ' WEF: ' + (filters[kind + 'From'] ? date(filters[kind + 'From']) : 'Any') + ' – ' + (filters[kind + 'To'] ? date(filters[kind + 'To']) : 'Any'));
+        summary.push((kind === 'sop' ? 'SOP' : kind[0].toUpperCase() + kind.slice(1)) + ' WEF: ' + (filters[kind + 'From'] ? formatPolicyDate(filters[kind + 'From']) : 'Any') + ' – ' + (filters[kind + 'To'] ? formatPolicyDate(filters[kind + 'To']) : 'Any'));
       }
     });
     if (summary.filter(Boolean).length === 1) summary.push('All Documents');
@@ -64,7 +78,7 @@
             const kind = label.toLowerCase();
             const file = record[kind];
             const available = file?.name?.trim() && file.pdfUrl;
-            const effective = file?.name?.trim() && file.date ? date(file.date.split('/').reverse().join('-')) : 'N/A';
+            const effective = policyEffectiveDate(file);
             const target = workplacePolicyDetailsUrl(record.ref);
             target.searchParams.set('pdf', kind);
             target.searchParams.set('pdfFrom', 'catalog');

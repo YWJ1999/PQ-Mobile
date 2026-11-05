@@ -31,13 +31,30 @@ const puppeteer = require('puppeteer');
         card.querySelector('.policy-summary').lastElementChild.textContent.split(' · ')[0]
       ]).sort());
       assert.deepEqual(updates, catalog, 'Company Updates must list the same policies and attachments as Workplace');
+      const follow = selector => Promise.all([page.waitForNavigation(), page.click(selector)]);
+      for (const [ref, title] of updates) {
+        const files = await page.evaluate(ref => policyDocuments(POLICY_DATABASE[ref]).map(({ file }) => file.name), ref);
+        await follow(`.updates-entry[data-policy="${ref}"] .policy-document-badge::-p-text(SOP)`);
+        assert.equal(new URL(page.url()).searchParams.get('policy'), ref);
+        assert.equal(await page.$eval('#companyPolicyTitle', n => n.textContent), title);
+        assert.equal(await page.$eval('#companyPolicyRef', n => n.textContent), ref);
+        assert.deepEqual(await page.$$eval('.document-info h3', nodes => nodes.map(n => n.textContent)), files);
+        await follow('#updatesBack');
+        assert.equal(await page.$eval('.updates-filters [aria-pressed="true"]', n => n.dataset.type), 'policy');
+      }
       await page.goto(new URL('../../../home' + theme + '.html', url).href);
       const home = await page.$eval('.update-card[data-category="policy"]', card => [
-        new URL(card.href).searchParams.get('policy'), card.querySelector('.update-title').textContent,
+        card.querySelector('.update-title').textContent,
         [...card.querySelectorAll('.policy-document-badge')].map(b => b.textContent),
         card.querySelector('.policy-summary').lastElementChild.textContent.split(' · ')[0]
       ]);
-      assert.deepEqual(home, catalog.find(([ref]) => ref === home[0]));
+      assert.ok(catalog.some(([, title]) => title === home[0]));
+      assert.deepEqual(home, catalog.find(([, title]) => title === home[0]).slice(1));
+      await follow('.update-card[data-category="policy"]');
+      assert.equal(await page.$eval('#companyPolicyTitle', n => n.textContent), home[0]);
+      assert.equal(await page.$eval('html', n => n.dataset.theme), theme);
+      await follow('#updatesBack');
+      assert.ok(new URL(page.url()).pathname.endsWith('/home' + theme + '.html'));
       await page.goto(url + '?theme=' + theme);
       // Wait for the shared 300ms theme transition before taking the initial screenshot.
       await page.evaluate(() => Promise.all([document.fonts.ready, new Promise(resolve => setTimeout(resolve, 350))]));
