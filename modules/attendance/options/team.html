@@ -36,8 +36,7 @@
           const subEl = card.querySelector('div[style*="font-size: 11px"]');
           if (subEl) dept = subEl.textContent.trim();
 
-          const typeEls = card.querySelectorAll('div[style*="font-size: 13.5px"]');
-          if (typeEls && typeEls.length > 0) type = typeEls[0].textContent.trim();
+          type = card.dataset.type || card.dataset.otType || type;
 
           const customOtType = card.getAttribute('data-ot-type');
           if (customOtType) {
@@ -50,8 +49,8 @@
             otType = type;
           }
 
-          const remarkEl = card.querySelector('div[style*="background: var(--bg-input)"]');
-          if (remarkEl) remark = remarkEl.textContent.trim();
+          const remarkRow = [...card.querySelectorAll('.approval-card-details dt')].find(term => /^Remarks?$/.test(term.textContent));
+          if (remarkRow) remark = remarkRow.nextElementSibling.textContent.trim();
         }
 
         currentAttendanceSelectedData = selectedRecord ? {
@@ -4066,7 +4065,7 @@
           const primaryLabel = isFeedback ? 'Amended Shift' : 'Type';
           const primaryValue = isFeedback ? (item.amendedShift || item.shift || '—') : typeStr;
 
-          let hoursGridHtml = '';
+          const fields = [['Date', startDateStr], [primaryLabel, primaryValue], ['Reason', reasonStr]];
           if (isOtPlan) {
             let planHoursStr = item.planHours || '2.0 Hours';
             let otTimeStr = item.otTime || '18:00 – 20:00';
@@ -4075,38 +4074,13 @@
               planHoursStr = parts[0].trim();
               otTimeStr = parts[1].replace(')', '').trim();
             }
-            hoursGridHtml = `
-                <!-- 3 & 4: OT Time & Plan Hours -->
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; background: var(--bg-input); padding: 10px 12px; border-radius: 12px; border: 1px solid var(--border-subtle);">
-                  <div>
-                    <div style="font-size: 10.5px; font-weight: 700; color: var(--text-muted); margin-bottom: 2px;">OT Time</div>
-                    <div style="font-size: 13.5px; font-weight: 900; color: var(--text-primary);">${otTimeStr}</div>
-                  </div>
-                  <div>
-                    <div style="font-size: 10.5px; font-weight: 700; color: var(--text-muted); margin-bottom: 2px;">Plan Hours</div>
-                    <div style="font-size: 13.5px; font-weight: 900; color: var(--purple-primary);">${planHoursStr}</div>
-                  </div>
-                </div>`;
-          } else if (isFeedback) {
-            hoursGridHtml = '';
-          } else {
-            hoursGridHtml = `
-                <!-- Claim Hours, Actual Hours & Approved Hours -->
-                <div class="final-ot-hours-grid" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin-bottom: 10px; background: var(--bg-input); padding: 10px 12px; border-radius: 12px; border: 1px solid var(--border-subtle);">
-                  <div>
-                    <div style="font-size: 10.5px; font-weight: 700; color: var(--text-muted); margin-bottom: 2px;">Claim Hours</div>
-                    <div style="font-size: 13.5px; font-weight: 900; color: var(--text-primary);">${claimHoursStr}</div>
-                  </div>
-                  <div>
-                    <div style="font-size: 10.5px; font-weight: 700; color: var(--text-muted); margin-bottom: 2px;">Actual Hours</div>
-                    <div style="font-size: 13.5px; font-weight: 900; color: var(--text-primary);">${actualHoursStr}</div>
-                  </div>
-                  <div>
-                    <div style="font-size: 10.5px; font-weight: 700; color: var(--text-muted); margin-bottom: 2px;">Approved Hours</div>
-                    <div style="font-size: 13.5px; font-weight: 900; color: var(--purple-primary);">${approvedHoursStr}</div>
-                  </div>
-                </div>`;
+            fields.push(['OT Time', otTimeStr], ['Plan Hours', planHoursStr]);
+          } else if (!isFeedback) {
+            fields.push(['Claim Hours', claimHoursStr], ['Actual Hours', actualHoursStr], ['Approved Hours', approvedHoursStr]);
           }
+          fields.push(['Clock Time', clockingStr]);
+          if (!isFeedback) fields.push(['Shift', shiftStr]);
+          if (remarkText) fields.push(['Remarks', remarkText]);
 
           return `
             <div class="approval-request-card" id="pendingCard_${idx}" data-category="${item.category || ''}" data-type="${typeStr}" data-ot-type="${typeStr}" style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 20px; overflow: hidden; box-shadow: var(--shadow-card); transition: all 0.2s ease; text-align: left;">
@@ -4132,49 +4106,8 @@
                 </div>
               </div>
 
-              <!-- 2. Card Content Body -->
-              <div style="padding: 14px;">
-                <!-- Document Status Badge & Date -->
-                <div style="margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between;">
-                  <div style="font-size: 11.5px; font-weight: 700; color: var(--text-muted);">
-                    <i class="fa-regular fa-calendar" style="color: var(--purple-primary);"></i> ${startDateStr}
-                  </div>
-                </div>
-
-                <!-- Primary request field and reason -->
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
-                  <div class="pending-request-primary-field">
-                    <div style="font-size: 10.5px; font-weight: 700; color: var(--text-muted); margin-bottom: 2px;">${primaryLabel}</div>
-                    <div style="font-size: 13px; font-weight: 800; color: var(--text-primary);">${primaryValue}</div>
-                  </div>
-                  <div>
-                    <div style="font-size: 10.5px; font-weight: 700; color: var(--text-muted); margin-bottom: 2px;">Reason</div>
-                    <div style="font-size: 13px; font-weight: 800; color: var(--text-primary);">${reasonStr}</div>
-                  </div>
-                </div>
-
-                ${hoursGridHtml}
-
-                <!-- 5 & 6: Clocking & Shift Box -->
-                <div style="background: var(--bg-input); border-radius: 12px; padding: 10px 12px; margin-bottom: 12px; border: 1px solid var(--border-subtle); display: flex; flex-direction: column; gap: 6px;">
-                  <div style="display: flex; justify-content: space-between; font-size: 11.5px; align-items: center;">
-                    <span style="color: var(--text-muted); font-weight: 700;">Clock Time:</span>
-                    <strong style="color: var(--text-primary); font-family: monospace, sans-serif; font-size: 12px; font-weight: 700;">${clockingStr}</strong>
-                  </div>
-                  ${!isFeedback ? `<div style="display: flex; justify-content: space-between; font-size: 11.5px; border-top: 1px dashed var(--border-subtle); padding-top: 6px; align-items: center;">
-                    <span style="color: var(--text-muted); font-weight: 700;">Shift:</span>
-                    <strong style="color: var(--text-primary); font-family: monospace, sans-serif; font-size: 12px; font-weight: 700;">${shiftStr}</strong>
-                  </div>` : ''}
-                </div>
-
-                <!-- 7: Remarks -->
-                ${remarkText ? `
-                <div style="margin-bottom: 14px;">
-                  <div style="font-size: 10.5px; font-weight: 700; color: var(--text-muted); margin-bottom: 4px;">Remarks</div>
-                  <div style="background: var(--bg-input); border-radius: 10px; padding: 8px 10px; font-size: 11.5px; color: var(--text-primary); opacity: 0.9; border: 1px solid var(--border-subtle);">
-                    ${remarkText}
-                  </div>
-                </div>` : ''}
+              <div class="approval-card-body">
+                ${createApprovalCardDetails(fields).outerHTML}
 
                 <!-- Approval actions (Approve, Resubmit, Reject) -->
                 <div class="pending-action-grid">
@@ -4324,25 +4257,12 @@
             const docStatusStr = item.docStatus || item.statusText || 'Submitted';
             const isDraft = docStatusStr.toLowerCase().includes('draft');
             const statusIcon = isDraft ? '<i class="fa-solid fa-file-pen"></i>' : '<i class="fa-solid fa-hourglass-half"></i>';
-            const isUnplanned = item.isUnplanned ? '<div style="font-size: 11px; font-weight: 800; color: #ef4444; margin-top: 1px;">(Unplanned)</div>' : '';
-            const requestedByHtml = item.requestedBy ? `
-              <div style="margin-bottom: 12px;">
-                <div style="font-size: 10.5px; font-weight: 700; color: var(--text-muted); margin-bottom: 6px;">Requested On Behalf By</div>
-                <div style="display: flex; align-items: center; gap: 8px; background: rgba(124, 58, 237, 0.05); border: 1px solid var(--border-subtle); border-radius: 12px; padding: 8px 10px;">
-                  <div style="font-size: 13px; color: var(--purple-primary);"><i class="fa-solid fa-user"></i></div>
-                  <div>
-                    <div style="font-size: 12px; font-weight: 800; color: var(--text-primary);">${item.requestedBy.name}</div>
-                    <div style="font-size: 10.5px; font-weight: 600; color: var(--text-muted);">${item.requestedBy.title}</div>
-                  </div>
-                </div>
-              </div>` : '';
-            const remarkHtml = item.remark ? `
-              <div style="margin-bottom: 14px;">
-                <div style="font-size: 10.5px; font-weight: 700; color: var(--text-muted); margin-bottom: 4px;">Remark</div>
-                <div style="background: var(--bg-input); border-radius: 10px; padding: 8px 10px; font-size: 11.5px; color: var(--text-primary); opacity: 0.9; border: 1px solid var(--border-subtle);">
-                  ${item.remark}
-                </div>
-              </div>` : '';
+            const fields = [
+              ['Type', typeStr + (item.isUnplanned ? ' (Unplanned)' : '')], ['Reason', reasonStr],
+              ['Date Start', startDateStr], ['Date End', endDateStr], ['Duration', durationStr]
+            ];
+            if (item.requestedBy) fields.push(['Requested On Behalf By', [item.requestedBy.name, item.requestedBy.title].filter(Boolean).join('\n')]);
+            if (item.remark) fields.push(['Remark', item.remark]);
 
             return `
               <div class="approval-request-card" id="staffApprovalCard_${idx}" data-ot-type="${typeStr}" style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 20px; overflow: hidden; box-shadow: var(--shadow-card); transition: all 0.2s ease; margin-bottom: 14px; text-align: left;">
@@ -4365,53 +4285,12 @@
                     <button type="button" onclick="openAttendanceThreeDotsMenu(this, '${item.id}')" title="Options" style="width: 26px; height: 26px; border-radius: 50%; background: rgba(255, 255, 255, 0.2); border: 1px solid rgba(255, 255, 255, 0.35); color: #ffffff; display: flex; align-items: center; justify-content: center; cursor: pointer; backdrop-filter: blur(4px);">
                       <i class="fa-solid fa-ellipsis-vertical" style="font-size: 13px;"></i>
                     </button>
-                    <span style="background: #ffffff; color: #7c3aed; font-weight: 800; font-size: 11px; padding: 3px 11px; border-radius: 16px; box-shadow: 0 2px 6px rgba(0,0,0,0.1);">${docStatusStr}</span>
+
                   </div>
                 </div>
 
-                <!-- 2. Card Content Body -->
-                <div style="padding: 14px;">
-
-                  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px;">
-                    <div>
-                      <div style="font-size: 10.5px; font-weight: 700; color: var(--text-muted); margin-bottom: 3px;">Type</div>
-                      <div style="font-size: 13.5px; font-weight: 800; color: var(--text-primary);">${typeStr}</div>
-                      ${isUnplanned}
-                    </div>
-                    <div>
-                      <div style="font-size: 10.5px; font-weight: 700; color: var(--text-muted); margin-bottom: 3px;">Reason</div>
-                      <div style="font-size: 13px; font-weight: 800; color: var(--text-primary);">${reasonStr}</div>
-                    </div>
-                  </div>
-
-                  <!-- Date Timeline Section -->
-                  <div style="background: var(--bg-input); border-radius: 14px; padding: 12px; margin-bottom: 14px; border: 1px solid var(--border-subtle);">
-                    <div style="display: flex; justify-content: space-between; font-size: 10.5px; font-weight: 700; color: var(--text-muted); margin-bottom: 6px;">
-                      <span>Date Start</span>
-                      <span>Date End</span>
-                    </div>
-                    <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
-                      <div style="display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 800; color: var(--text-primary);">
-                        <span>${startDateStr}</span>
-                        <i class="fa-solid fa-circle" style="color: var(--purple-primary); font-size: 7px;"></i>
-                      </div>
-
-                      <div style="flex: 1; display: flex; flex-direction: column; align-items: center;">
-                        <span style="font-size: 10.5px; font-weight: 800; color: var(--purple-primary); margin-bottom: -2px;">${durationStr}</span>
-                        <div style="width: 100%; height: 2px; background: var(--purple-primary); position: relative;">
-                          <div style="position: absolute; right: 0; top: -3px; width: 0; height: 0; border-top: 4px solid transparent; border-bottom: 4px solid transparent; border-left: 6px solid var(--purple-primary);"></div>
-                        </div>
-                      </div>
-
-                      <div style="display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 800; color: var(--text-primary);">
-                        <i class="fa-solid fa-circle" style="color: var(--purple-primary); font-size: 7px;"></i>
-                        <span>${endDateStr}</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  ${requestedByHtml}
-                  ${remarkHtml}
+                <div class="approval-card-body">
+                  ${createApprovalCardDetails(fields).outerHTML}
 
                 <!-- Approval actions (Approve, Resubmit, Reject) -->
                 <div class="pending-action-grid">

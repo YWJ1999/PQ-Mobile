@@ -884,14 +884,14 @@
               </div>
               <div style="display: flex; align-items: center; gap: 8px;">
                 <div style="font-size: 15px; font-weight: 800; color: var(--text-primary);">RM ${(item.localAmount || 0).toFixed(2)}</div>
-                <i class="fa-solid fa-chevron-down toggle-icon" style="color: var(--text-muted); font-size: 13px; padding: 4px; cursor: pointer; transition: transform 0.25s ease;" onclick="event.stopPropagation(); toggleItemCard('${cardId}')"></i>
+                <button type="button" class="form-record-toggle" aria-label="Details for item ${idx + 1}" aria-controls="${cardId}-details" aria-expanded="false"><i class="fa-solid fa-chevron-down toggle-icon" aria-hidden="true"></i></button>
                 <i class="fa-solid fa-pen-to-square" style="color: var(--purple-primary); font-size: 14px; padding: 4px; cursor: pointer;" onclick="event.stopPropagation(); openEntryForm('edit', ${idx})" title="Edit Item"></i>
                 <i class="fa-solid fa-trash-can" style="color: #ef4444; font-size: 14px; padding: 4px; cursor: pointer;" onclick="event.stopPropagation(); deleteSubItem(${idx})" title="Delete Item"></i>
               </div>
             </div>
 
             <!-- Expandable Detailed View -->
-            <div class="item-details-body" style="display: none; padding-top: 14px; margin-top: 12px; border-top: 1px dashed var(--border-subtle);">
+            <div id="${cardId}-details" class="item-details-body" hidden style="padding-top: 14px; margin-top: 12px; border-top: 1px dashed var(--border-subtle);">
               <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 11.5px;">
                 <div>
                   <span style="color: var(--text-muted); font-weight: 600;">Expense:</span>
@@ -1007,12 +1007,12 @@
               </div>
               <div style="display: flex; align-items: center; gap: 6px; flex-shrink: 0;">
                 <span style="font-size: 13px; font-weight: 800; color: var(--text-primary);">RM ${(item.localAmount ?? 0).toFixed(2)}</span>
-                <i class="fa-solid fa-chevron-down toggle-icon" style="color: var(--text-muted); font-size: 13px; padding: 4px; transition: transform 0.25s ease;" onclick="event.stopPropagation(); toggleItemCard('${cardId}')"></i>
+                <button type="button" class="form-record-toggle" aria-label="Details for item ${idx + 1}" aria-controls="${cardId}-details" aria-expanded="false"><i class="fa-solid fa-chevron-down toggle-icon" aria-hidden="true"></i></button>
                 <i class="fa-solid fa-pen-to-square" style="color: var(--purple-primary); font-size: 14px; padding: 4px;" onclick="event.stopPropagation(); openEntryForm('edit', ${idx})" title="Edit"></i>
                 <i class="fa-solid fa-trash-can" style="color: #ef4444; font-size: 14px; padding: 4px;" onclick="event.stopPropagation(); deleteSubItem(${idx})" title="Delete"></i>
               </div>
             </div>
-            <div class="item-details-body" style="display: none; padding-top: 10px; margin-top: 12px; border-top: 1px dashed var(--border-subtle);">
+            <div id="${cardId}-details" class="item-details-body" hidden style="padding-top: 10px; margin-top: 12px; border-top: 1px dashed var(--border-subtle);">
               ${renderDetailRows(item)}
             </div>
           </div>`;
@@ -1020,17 +1020,7 @@
     }
 
     function toggleItemCard(cardId) {
-      const cardEl = document.getElementById(cardId);
-      if (!cardEl) return;
-      const bodyEl = cardEl.querySelector('.item-details-body');
-      const iconEl = cardEl.querySelector('.toggle-icon');
-      if (bodyEl) {
-        const isHidden = bodyEl.style.display === 'none' || !bodyEl.style.display;
-        bodyEl.style.display = isHidden ? 'block' : 'none';
-        if (iconEl) {
-          iconEl.style.transform = isHidden ? 'rotate(180deg)' : 'rotate(0deg)';
-        }
-      }
+      toggleFormRecordDetails(document.getElementById(cardId)?.querySelector('.form-record-toggle'));
     }
 
     function deleteSubItem(idx) {

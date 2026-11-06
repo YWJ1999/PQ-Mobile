@@ -93,8 +93,8 @@ const url = (file = 'skill-expiry.html', query = '') => pathToFileURL(path.join(
       await page.goto(url('skill-expiry.html', `?theme=${theme}`), { waitUntil: 'domcontentloaded' });
       const capture = async name => {
         assert.equal(await page.$eval('.main-content', node => node.scrollWidth <= node.clientWidth + 1), true, `${name} ${theme} ${width}: no page overflow`);
-        assert.equal(await page.$eval('#csViewChart', node => node.textContent.trim()), 'View Chart');
-        assert.ok(await page.$('#csViewChart .fa-chart-pie'));
+        assert.equal(await page.$eval('#csViewChart', node => node.textContent.trim()), 'Chart');
+        assert.ok(await page.$('#csViewChart .fa-chart-simple'));
         assert.equal(await page.$eval('#csViewChart', node => getComputedStyle(node).whiteSpace), 'nowrap');
         await page.screenshot({ path: path.join(__dirname, `skill-expiry-${name}-${theme}-${width}.png`) });
       };

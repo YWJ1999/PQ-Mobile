@@ -515,7 +515,6 @@
     .item-details-body {
       padding: 16px;
       background: var(--bg-card);
-      display: none;
       border-top: 1px dashed var(--border-subtle);
     }
     .ot-data-list {
@@ -1143,15 +1142,7 @@
     }
     
     function toggleItemCard(idx) {
-        const bodyEl = document.getElementById(`ot-item-body-${idx}`);
-        const arrowEl = document.getElementById(`ot-item-arrow-${idx}`);
-        if (bodyEl.style.display === 'block') {
-            bodyEl.style.display = 'none';
-            if (arrowEl) arrowEl.style.transform = 'rotate(0deg)';
-        } else {
-            bodyEl.style.display = 'block';
-            if (arrowEl) arrowEl.style.transform = 'rotate(180deg)';
-        }
+      toggleFormRecordDetails(document.getElementById(`ot-item-arrow-${idx}`));
     }
 
     function renderOTEntries() {
@@ -1194,14 +1185,14 @@
                 <div style="font-size: 15px; font-weight: 800; color: var(--purple-primary);">
                   ${item.hours} hrs
                 </div>
-                <i class="fa-solid fa-chevron-down" id="ot-item-arrow-${idx}" style="color: var(--text-muted); font-size: 13px; padding: 4px; cursor: pointer; transition: transform 0.25s ease;" onclick="event.stopPropagation(); toggleItemCard(${idx})"></i>
+                <button type="button" class="form-record-toggle" id="ot-item-arrow-${idx}" aria-label="Details for item ${idx + 1}" aria-controls="ot-item-body-${idx}" aria-expanded="false"><i class="fa-solid fa-chevron-down toggle-icon" aria-hidden="true"></i></button>
                 <i class="fa-solid fa-pen-to-square" style="color: var(--purple-primary); font-size: 14px; padding: 4px; cursor: pointer;" onclick="event.stopPropagation(); openEntryForm('edit', ${idx})" title="Edit Item"></i>
                 <i class="fa-solid fa-trash-can" style="color: #ef4444; font-size: 14px; padding: 4px; cursor: pointer;" onclick="event.stopPropagation(); deleteSubItem(${idx}, event)" title="Delete Item"></i>
               </div>
             </div>
 
             <!-- EXPANDABLE BODY -->
-            <div id="ot-item-body-${idx}" class="item-details-body">
+            <div id="ot-item-body-${idx}" class="item-details-body" hidden>
               <div class="ot-data-list">
                 <div class="ot-data-row">
                   <span class="ot-data-label">Date</span>

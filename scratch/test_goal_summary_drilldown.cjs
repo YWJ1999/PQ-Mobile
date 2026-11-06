@@ -38,7 +38,7 @@ const file=pathToFileURL(path.resolve(__dirname,'../modules/performance/options/
       ]);
       assert.ok(await page.$eval('.goal-summary-employee-card',node=>parseFloat(getComputedStyle(node).borderTopLeftRadius)===20&&parseFloat(getComputedStyle(node).borderLeftWidth)===5));
       assert.ok(await page.$eval('.goal-summary-employee-id',node=>getComputedStyle(node).fontSize==='11.5px'&&getComputedStyle(node).opacity==='0.8'));
-      assert.deepEqual(await page.$eval('#goalSummaryEmployeeViewChart',node=>({text:node.textContent.trim(),pie:!!node.querySelector('.fa-chart-pie')})),{text:'View Chart',pie:true});
+      assert.deepEqual(await page.$eval('#goalSummaryEmployeeViewChart',node=>({text:node.textContent.trim(),barIcon:!!node.querySelector('.fa-chart-simple')})),{text:'Chart',barIcon:true});
       await page.screenshot({path:path.join(__dirname,`goal-summary-employee-cards-${theme}-${width}.png`)});
       await page.click('#goalSummaryEmployeeViewChart');assert.equal(await page.$eval('#goalSummaryChartTotal',node=>node.textContent.trim()),'3');
       assert.equal(await page.$$eval('#goalSummaryChartLegend [data-count]',nodes=>nodes.reduce((sum,node)=>sum+Number(node.dataset.count),0)),3);

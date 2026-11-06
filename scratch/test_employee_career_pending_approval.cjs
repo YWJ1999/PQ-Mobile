@@ -30,14 +30,14 @@ const url = file => pathToFileURL(path.resolve(__dirname, '..', file)).href;
       const card = await page.$eval('.approval-request-card', n => ({
         text: n.textContent.replace(/\s+/g, ' ').trim(),
         idBelowName: n.querySelector('.employee-name').nextElementSibling?.classList.contains('employee-id'),
-        details: [...n.querySelectorAll('.career-pending-review .payroll-approval-field')].map(field => ({
-          label: field.querySelector('small')?.textContent.trim(),
-          value: field.querySelector('strong')?.textContent.trim()
+        details: [...n.querySelectorAll('.career-pending-review .approval-card-details > div')].map(field => ({
+          label: field.querySelector('dt')?.textContent.trim(),
+          value: field.querySelector('dd')?.textContent.trim()
         })),
         hasStatusRow: Boolean(n.querySelector('.career-pending-review .payroll-approval-status-row')),
         hasBackupAssignment: Boolean(n.querySelector('.career-pending-backup-assignment')),
         actions: [...n.querySelectorAll('[data-career-approval-action]')].map(b => b.textContent.trim()),
-        actionColumns: getComputedStyle(n.querySelector('.pending-action-grid')).gridTemplateColumns.split(' ').length,
+        actionRows: new Set([...n.querySelectorAll('[data-career-approval-action]')].map(button => button.offsetTop)).size,
         icons: n.querySelectorAll('[data-career-approval-action] i, [data-career-approval-action] svg, [data-career-approval-action] img').length,
         colours: [...n.querySelectorAll('[data-career-approval-action]')].map(b => getComputedStyle(b).backgroundColor)
       }));
@@ -53,7 +53,7 @@ const url = file => pathToFileURL(path.resolve(__dirname, '..', file)).href;
       assert.equal(card.hasBackupAssignment, false, 'The card details stay limited to the two requested fields');
       assert.equal((card.text.match(/13\/10\/2026/g) || []).length, 1);
       assert.deepEqual(card.actions, ['Approve', 'Resubmit', 'Reject']);
-      assert.equal(card.actionColumns, 3, 'The remaining approval actions share one row');
+      assert.equal(card.actionRows, 1, 'The remaining approval actions share one row');
       assert.equal(card.icons, 0);
       assert.ok(card.colours.every(colour => colour === 'rgb(124, 58, 237)'));
       assert.equal(await page.$('.action-btn-backup'), null);

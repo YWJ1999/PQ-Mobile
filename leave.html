@@ -16,85 +16,6 @@
   <link rel="stylesheet" href="css/app.css">
   <link rel="stylesheet" href="css/work-status.css">
   <style>
-    #viewTeamApprovals .approval-date-range {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) clamp(48px, 16vw, 64px) minmax(0, 1fr);
-      align-items: center;
-      gap: 8px;
-      padding: 12px;
-      margin-bottom: 14px;
-      border: 1px solid var(--border-subtle);
-      border-radius: 14px;
-      background: var(--bg-input);
-    }
-
-    #viewTeamApprovals .approval-date-endpoint {
-      min-width: 0;
-    }
-
-    #viewTeamApprovals .approval-date-endpoint:last-child {
-      text-align: right;
-    }
-
-    #viewTeamApprovals .approval-date-label {
-      display: block;
-      margin-bottom: 6px;
-      font-size: 10.5px;
-      font-weight: 700;
-      color: var(--text-muted);
-    }
-
-    #viewTeamApprovals .approval-date-endpoint time {
-      display: flex;
-      flex-direction: column;
-      gap: 3px;
-    }
-
-    #viewTeamApprovals .approval-date-weekday {
-      font-size: 10.5px;
-      font-weight: 700;
-      color: var(--text-muted);
-    }
-
-    #viewTeamApprovals .approval-date-value {
-      font-size: 12px;
-      font-weight: 800;
-      font-variant-numeric: tabular-nums;
-      white-space: nowrap;
-      color: var(--text-primary);
-    }
-
-    #viewTeamApprovals .approval-date-duration {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 5px;
-      padding-top: 14px;
-      color: var(--purple-text);
-      font-size: 10.5px;
-      font-weight: 800;
-      text-align: center;
-      white-space: nowrap;
-    }
-
-    #viewTeamApprovals .approval-date-duration > span {
-      padding: 3px 7px;
-      border-radius: 999px;
-      background: var(--tag-violet-bg);
-      line-height: 1.2;
-    }
-
-    #viewTeamApprovals .approval-date-arrow {
-      display: block;
-      width: 100%;
-      height: 16px;
-      fill: none;
-      stroke: currentColor;
-      stroke-width: 2;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-    }
-
     /* Staff Leave Entitlement follows the Staff Benefit Entitlement reference. */
     #viewStaffEntitlement .entitlement-staff-header {
       display: flex;
@@ -4751,14 +4672,11 @@
         <!-- Action Summary Bar -->
         <div class="action-summary-bar record-summary-card" style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px; background: linear-gradient(135deg, rgba(124, 58, 237, 0.05), rgba(99, 102, 241, 0.05)); border: 1px solid var(--border-subtle); border-radius: 18px; padding: 16px;">
           <div class="action-summary-row" style="display: flex; justify-content: space-between; align-items: center;">
-            <div class="record-summary-metric">
-              <div class="summary-label record-summary-label" style="font-size: 13px; font-weight: 700; color: var(--text-muted);">Total Records</div>
-              <div class="summary-value record-summary-value" style="color: var(--purple-primary); font-size: 18px; font-weight: 800;">127</div>
-            </div>
+            <record-chart-count><div class="summary-value record-summary-value">127</div> <div class="summary-label record-summary-label">Records</div></record-chart-count>
             <div class="action-icons" style="display: flex; gap: 12px;">
-              <button type="button" class="view-chart-btn" title="View Chart" onclick="showLeaveSection('viewLeaveHighlightChart')" style="padding: 7px 13px; border-radius: 12px; background: rgba(245, 158, 11, 0.14); border: 1px solid rgba(245, 158, 11, 0.3); color: #f59e0b; font-size: 12px; font-weight: 800; display: inline-flex; align-items: center; justify-content: center; gap: 6px; white-space: nowrap; cursor: pointer; box-shadow: var(--shadow-sm); transition: transform 0.2s ease;">
-                <i class="fa-solid fa-chart-pie" style="font-size: 13px;"></i>
-                <span>View Chart</span>
+              <button type="button" class="view-chart-btn record-chart-button" title="Chart" onclick="showLeaveSection('viewLeaveHighlightChart')">
+                <i class="fa-solid fa-chart-simple" aria-hidden="true"></i>
+                <span>Chart</span>
               </button>
             </div>
           </div>
@@ -5606,52 +5524,15 @@
             </div>
 
             <!-- 2. Card Content Body -->
-<div style="padding: 14px;">
-              
-              <!-- Type & Reason (2 Column Layout) -->
-              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px;">
-                <div>
-                  <div style="font-size: 10.5px; font-weight: 700; color: var(--text-muted); margin-bottom: 3px;">Type</div>
-                  <div style="font-size: 13.5px; font-weight: 800; color: var(--text-primary);">Annual Leave</div>
-                  <div style="font-size: 11px; font-weight: 800; color: #ef4444; margin-top: 1px;">(Unplanned)</div>
-                </div>
-                <div>
-                  <div style="font-size: 10.5px; font-weight: 700; color: var(--text-muted); margin-bottom: 3px;">Reason</div>
-                  <div style="font-size: 13px; font-weight: 800; color: var(--text-primary);">Personnel Issues</div>
-                </div>
-              </div>
-
-              <!-- Date Timeline Section -->
-              <div class="approval-date-range">
-                <div class="approval-date-endpoint">
-                  <span class="approval-date-label">Date Start</span>
-                  <time datetime="2026-02-23">
-                    <span class="approval-date-weekday">Tue,</span>
-                    <span class="approval-date-value">23/02/2026</span>
-                  </time>
-                </div>
-                <div class="approval-date-duration">
-                  <span>3 Days</span>
-                  <svg class="approval-date-arrow" viewBox="0 0 64 16" aria-hidden="true" focusable="false"><path d="M4 8H60M54 2L60 8L54 14"/></svg>
-                </div>
-                <div class="approval-date-endpoint">
-                  <span class="approval-date-label">Date End</span>
-                  <time datetime="2026-02-25">
-                    <span class="approval-date-weekday">Thu,</span>
-                    <span class="approval-date-value">25/02/2026</span>
-                  </time>
-                </div>
-              </div>
-
-              <!-- Remark Section -->
-              <div style="margin-bottom: 14px;">
-                <div style="font-size: 10.5px; font-weight: 700; color: var(--text-muted); margin-bottom: 4px;">Remark</div>
-                <div style="background: var(--bg-input); border-radius: 10px; padding: 8px 10px; font-size: 11.5px; color: var(--text-primary); opacity: 0.9; border: 1px solid var(--border-subtle);">
-                  Urgent personnel emergency leave for home repair & family assistance.
-                </div>
-              </div>
-
-              <!-- Approval actions (Approve, Resubmit, Reject) -->
+            <div class="approval-card-body">
+              <dl class="approval-card-details">
+                <div><dt>Type</dt> <dd>Annual Leave (Unplanned)</dd></div>
+                <div><dt>Reason</dt> <dd>Personnel Issues</dd></div>
+                <div><dt>Date Start</dt> <dd><time datetime="2026-02-23">Tue, 23/02/2026</time></dd></div>
+                <div><dt>Date End</dt> <dd><time datetime="2026-02-25">Thu, 25/02/2026</time></dd></div>
+                <div><dt>Duration</dt> <dd>3 Days</dd></div>
+                <div><dt>Remark</dt> <dd>Urgent personnel emergency leave for home repair &amp; family assistance.</dd></div>
+              </dl>
               <div class="pending-action-grid">
                 <button type="button" class="action-btn-approve" onclick="singleApproveCard('approvalCard1', 'Afifah Nasir')">
                   <i class="fa-solid fa-check" style="font-size: 11.5px;"></i> Approve
@@ -5698,52 +5579,15 @@
             </div>
 
             <!-- 2. Card Content Body -->
-<div style="padding: 14px;">
-              
-              <!-- Type & Reason (2 Column Layout) -->
-              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px;">
-                <div>
-                  <div style="font-size: 10.5px; font-weight: 700; color: var(--text-muted); margin-bottom: 3px;">Type</div>
-                  <div style="font-size: 13.5px; font-weight: 800; color: var(--text-primary);">Medical Leave</div>
-                  <div style="font-size: 11px; font-weight: 800; color: #3b82f6; margin-top: 1px;">(MC Verified)</div>
-                </div>
-                <div>
-                  <div style="font-size: 10.5px; font-weight: 700; color: var(--text-muted); margin-bottom: 3px;">Reason</div>
-                  <div style="font-size: 13px; font-weight: 800; color: var(--text-primary);">Medical Checkup</div>
-                </div>
-              </div>
-
-              <!-- Date Timeline Section -->
-              <div class="approval-date-range">
-                <div class="approval-date-endpoint">
-                  <span class="approval-date-label">Date Start</span>
-                  <time datetime="2026-09-12">
-                    <span class="approval-date-weekday">Sat,</span>
-                    <span class="approval-date-value">12/09/2026</span>
-                  </time>
-                </div>
-                <div class="approval-date-duration">
-                  <span>1 Day</span>
-                  <svg class="approval-date-arrow" viewBox="0 0 64 16" aria-hidden="true" focusable="false"><path d="M4 8H60M54 2L60 8L54 14"/></svg>
-                </div>
-                <div class="approval-date-endpoint">
-                  <span class="approval-date-label">Date End</span>
-                  <time datetime="2026-09-12">
-                    <span class="approval-date-weekday">Sat,</span>
-                    <span class="approval-date-value">12/09/2026</span>
-                  </time>
-                </div>
-              </div>
-
-              <!-- Remark Section -->
-              <div style="margin-bottom: 14px;">
-                <div style="font-size: 10.5px; font-weight: 700; color: var(--text-muted); margin-bottom: 4px;">Remark</div>
-                <div style="background: var(--bg-input); border-radius: 10px; padding: 8px 10px; font-size: 11.5px; color: var(--text-primary); opacity: 0.9; border: 1px solid var(--border-subtle);">
-                  Routine hospital specialist appointment & panel clinic receipt attached.
-                </div>
-              </div>
-
-              <!-- Approval actions (Approve, Resubmit, Reject) -->
+            <div class="approval-card-body">
+              <dl class="approval-card-details">
+                <div><dt>Type</dt> <dd>Medical Leave (MC Verified)</dd></div>
+                <div><dt>Reason</dt> <dd>Medical Checkup</dd></div>
+                <div><dt>Date Start</dt> <dd><time datetime="2026-09-12">Sat, 12/09/2026</time></dd></div>
+                <div><dt>Date End</dt> <dd><time datetime="2026-09-12">Sat, 12/09/2026</time></dd></div>
+                <div><dt>Duration</dt> <dd>1 Day</dd></div>
+                <div><dt>Remark</dt> <dd>Routine hospital specialist appointment &amp; panel clinic receipt attached.</dd></div>
+              </dl>
               <div class="pending-action-grid">
                 <button type="button" class="action-btn-approve" onclick="singleApproveCard('approvalCard2', 'Hailizam')">
                   <i class="fa-solid fa-check" style="font-size: 11.5px;"></i> Approve
@@ -5783,48 +5627,15 @@
               </div>
             </div>
 
-<div style="padding: 14px;">
-              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px;">
-                <div>
-                  <div style="font-size: 10.5px; font-weight: 700; color: var(--text-muted); margin-bottom: 3px;">Type</div>
-                  <div style="font-size: 13.5px; font-weight: 800; color: var(--text-primary);">Annual Leave</div>
-                  <div style="font-size: 11px; font-weight: 800; color: #10b981; margin-top: 1px;">(Planned)</div>
-                </div>
-                <div>
-                  <div style="font-size: 10.5px; font-weight: 700; color: var(--text-muted); margin-bottom: 3px;">Reason</div>
-                  <div style="font-size: 13px; font-weight: 800; color: var(--text-primary);">Family Vacation</div>
-                </div>
-              </div>
-
-              <div class="approval-date-range">
-                <div class="approval-date-endpoint">
-                  <span class="approval-date-label">Date Start</span>
-                  <time datetime="2026-09-15">
-                    <span class="approval-date-weekday">Tue,</span>
-                    <span class="approval-date-value">15/09/2026</span>
-                  </time>
-                </div>
-                <div class="approval-date-duration">
-                  <span>2 Days</span>
-                  <svg class="approval-date-arrow" viewBox="0 0 64 16" aria-hidden="true" focusable="false"><path d="M4 8H60M54 2L60 8L54 14"/></svg>
-                </div>
-                <div class="approval-date-endpoint">
-                  <span class="approval-date-label">Date End</span>
-                  <time datetime="2026-09-16">
-                    <span class="approval-date-weekday">Wed,</span>
-                    <span class="approval-date-value">16/09/2026</span>
-                  </time>
-                </div>
-              </div>
-
-              <div style="margin-bottom: 14px;">
-                <div style="font-size: 10.5px; font-weight: 700; color: var(--text-muted); margin-bottom: 4px;">Remark</div>
-                <div style="background: var(--bg-input); border-radius: 10px; padding: 8px 10px; font-size: 11.5px; color: var(--text-primary); opacity: 0.9; border: 1px solid var(--border-subtle);">
-                  Scheduled family vacation trip to Penang with flight tickets attached.
-                </div>
-              </div>
-
-              <!-- Approval actions (Approve, Resubmit, Reject) -->
+            <div class="approval-card-body">
+              <dl class="approval-card-details">
+                <div><dt>Type</dt> <dd>Annual Leave (Planned)</dd></div>
+                <div><dt>Reason</dt> <dd>Family Vacation</dd></div>
+                <div><dt>Date Start</dt> <dd><time datetime="2026-09-15">Tue, 15/09/2026</time></dd></div>
+                <div><dt>Date End</dt> <dd><time datetime="2026-09-16">Wed, 16/09/2026</time></dd></div>
+                <div><dt>Duration</dt> <dd>2 Days</dd></div>
+                <div><dt>Remark</dt> <dd>Scheduled family vacation trip to Penang with flight tickets attached.</dd></div>
+              </dl>
               <div class="pending-action-grid">
                 <button type="button" class="action-btn-approve" onclick="singleApproveCard('approvalCard3', 'Nurfarhana')">
                   <i class="fa-solid fa-check" style="font-size: 11.5px;"></i> Approve
@@ -5863,48 +5674,15 @@
               </div>
             </div>
 
-<div style="padding: 14px;">
-              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px;">
-                <div>
-                  <div style="font-size: 10.5px; font-weight: 700; color: var(--text-muted); margin-bottom: 3px;">Type</div>
-                  <div style="font-size: 13.5px; font-weight: 800; color: var(--text-primary);">Emergency Leave</div>
-                  <div style="font-size: 11px; font-weight: 800; color: #f59e0b; margin-top: 1px;">(Urgent)</div>
-                </div>
-                <div>
-                  <div style="font-size: 10.5px; font-weight: 700; color: var(--text-muted); margin-bottom: 3px;">Reason</div>
-                  <div style="font-size: 13px; font-weight: 800; color: var(--text-primary);">Urgent Home Repair</div>
-                </div>
-              </div>
-
-              <div class="approval-date-range">
-                <div class="approval-date-endpoint">
-                  <span class="approval-date-label">Date Start</span>
-                  <time datetime="2026-09-29">
-                    <span class="approval-date-weekday">Tue,</span>
-                    <span class="approval-date-value">29/09/2026</span>
-                  </time>
-                </div>
-                <div class="approval-date-duration">
-                  <span>1 Day</span>
-                  <svg class="approval-date-arrow" viewBox="0 0 64 16" aria-hidden="true" focusable="false"><path d="M4 8H60M54 2L60 8L54 14"/></svg>
-                </div>
-                <div class="approval-date-endpoint">
-                  <span class="approval-date-label">Date End</span>
-                  <time datetime="2026-09-29">
-                    <span class="approval-date-weekday">Tue,</span>
-                    <span class="approval-date-value">29/09/2026</span>
-                  </time>
-                </div>
-              </div>
-
-              <div style="margin-bottom: 14px;">
-                <div style="font-size: 10.5px; font-weight: 700; color: var(--text-muted); margin-bottom: 4px;">Remark</div>
-                <div style="background: var(--bg-input); border-radius: 10px; padding: 8px 10px; font-size: 11.5px; color: var(--text-primary); opacity: 0.9; border: 1px solid var(--border-subtle);">
-                  Sudden water pipe burst at apartment requiring urgent repair.
-                </div>
-              </div>
-
-              <!-- Approval actions (Approve, Resubmit, Reject) -->
+            <div class="approval-card-body">
+              <dl class="approval-card-details">
+                <div><dt>Type</dt> <dd>Emergency Leave (Urgent)</dd></div>
+                <div><dt>Reason</dt> <dd>Urgent Home Repair</dd></div>
+                <div><dt>Date Start</dt> <dd><time datetime="2026-09-29">Tue, 29/09/2026</time></dd></div>
+                <div><dt>Date End</dt> <dd><time datetime="2026-09-29">Tue, 29/09/2026</time></dd></div>
+                <div><dt>Duration</dt> <dd>1 Day</dd></div>
+                <div><dt>Remark</dt> <dd>Sudden water pipe burst at apartment requiring urgent repair.</dd></div>
+              </dl>
               <div class="pending-action-grid">
                 <button type="button" class="action-btn-approve" onclick="singleApproveCard('approvalCard4', 'Alex Tan')">
                   <i class="fa-solid fa-check" style="font-size: 11.5px;"></i> Approve
@@ -5946,56 +5724,16 @@
               </div>
             </div>
 
-<div style="padding: 14px;">
-              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px;">
-                <div>
-                  <div style="font-size: 10.5px; font-weight: 700; color: var(--text-muted); margin-bottom: 3px;">Credit Type</div>
-                  <div style="font-size: 13.5px; font-weight: 800; color: var(--text-primary);">Working on Public Holiday</div>
-                  <div data-credit-leave-summary style="margin-top: 10px;">
-                    <div data-credit-leave-label style="font-size: 10.5px; font-weight: 700; color: var(--text-muted); margin-bottom: 3px;">Credit Leave</div>
-                    <div data-credit-leave-value style="font-size: 13.5px; font-weight: 800; color: var(--text-primary); line-height: 1.2;">Replacement Leave</div>
-                  </div>
-                </div>
-                <div>
-                  <div style="font-size: 10.5px; font-weight: 700; color: var(--text-muted); margin-bottom: 3px;">Reason</div>
-                  <div style="font-size: 13px; font-weight: 800; color: var(--text-primary);">OTHERS</div>
-                </div>
-              </div>
-
-              <!-- Credit Timeline Info Box -->
-              <div style="background: var(--bg-input); border-radius: 14px; padding: 12px; margin-bottom: 14px; border: 1px solid var(--border-subtle);">
-                <div style="display: flex; justify-content: space-between; font-size: 10.5px; font-weight: 700; color: var(--text-muted); margin-bottom: 6px;">
-                  <span>Earned Date</span>
-                  <span>Effective Date</span>
-                </div>
-                <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
-                  <div style="display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 800; color: var(--text-primary);">
-                    <span>3 Jul 2024</span>
-                    <span style="color: var(--purple-primary); font-size: 13px;">🟣</span>
-                  </div>
-
-                  <div style="flex: 1; display: flex; flex-direction: column; align-items: center;">
-                    <span style="font-size: 10.5px; font-weight: 800; color: var(--purple-primary); margin-bottom: -2px;">+1.000 Day</span>
-                    <div style="width: 100%; height: 2px; background: var(--purple-primary); position: relative;">
-                      <div style="position: absolute; right: 0; top: -3px; width: 0; height: 0; border-top: 4px solid transparent; border-bottom: 4px solid transparent; border-left: 6px solid var(--purple-primary);"></div>
-                    </div>
-                  </div>
-
-                  <div style="display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 800; color: var(--text-primary);">
-                    <span style="color: var(--purple-primary); font-size: 13px;">🟣</span>
-                    <span>4 Jul 2024</span>
-                  </div>
-                </div>
-              </div>
-
-              <div style="margin-bottom: 14px;">
-                <div style="font-size: 10.5px; font-weight: 700; color: var(--text-muted); margin-bottom: 4px;">Remark</div>
-                <div style="background: var(--bg-input); border-radius: 10px; padding: 8px 10px; font-size: 11.5px; color: var(--text-primary); opacity: 0.9; border: 1px solid var(--border-subtle);">
-                  Worked Overtime for adhoc request
-                </div>
-              </div>
-
-              <!-- Approval actions (Approve, Resubmit, Reject) -->
+            <div class="approval-card-body">
+              <dl class="approval-card-details">
+                <div><dt>Credit Type</dt> <dd>Working on Public Holiday</dd></div>
+                <div data-credit-leave-summary><dt data-credit-leave-label>Credit Leave</dt> <dd data-credit-leave-value>Replacement Leave</dd></div>
+                <div><dt>Reason</dt> <dd>OTHERS</dd></div>
+                <div><dt>Earned Date</dt> <dd>3 Jul 2024</dd></div>
+                <div><dt>Effective Date</dt> <dd>4 Jul 2024</dd></div>
+                <div><dt>Credit</dt> <dd>+1.000 Day</dd></div>
+                <div><dt>Remark</dt> <dd>Worked Overtime for adhoc request</dd></div>
+              </dl>
               <div class="pending-action-grid">
                 <button type="button" class="action-btn-approve" onclick="singleApproveCard('approvalCardCredit1', 'Farhan binti rahmat')">
                   <i class="fa-solid fa-check" style="font-size: 11.5px;"></i> Approve
@@ -6034,56 +5772,16 @@
               </div>
             </div>
 
-<div style="padding: 14px;">
-              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px;">
-                <div>
-                  <div style="font-size: 10.5px; font-weight: 700; color: var(--text-muted); margin-bottom: 3px;">Credit Type</div>
-                  <div style="font-size: 13.5px; font-weight: 800; color: var(--text-primary);">Holiday Standby Credit</div>
-                  <div data-credit-leave-summary style="margin-top: 10px;">
-                    <div data-credit-leave-label style="font-size: 10.5px; font-weight: 700; color: var(--text-muted); margin-bottom: 3px;">Credit Leave</div>
-                    <div data-credit-leave-value style="font-size: 13.5px; font-weight: 800; color: var(--text-primary); line-height: 1.2;">Replacement Leave</div>
-                  </div>
-                </div>
-                <div>
-                  <div style="font-size: 10.5px; font-weight: 700; color: var(--text-muted); margin-bottom: 3px;">Reason</div>
-                  <div style="font-size: 13px; font-weight: 800; color: var(--text-primary);">Holiday Cloud Standby</div>
-                </div>
-              </div>
-
-              <!-- Credit Timeline Info Box -->
-              <div style="background: var(--bg-input); border-radius: 14px; padding: 12px; margin-bottom: 14px; border: 1px solid var(--border-subtle);">
-                <div style="display: flex; justify-content: space-between; font-size: 10.5px; font-weight: 700; color: var(--text-muted); margin-bottom: 6px;">
-                  <span>Standby Date</span>
-                  <span>Credit Expiry</span>
-                </div>
-                <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
-                  <div style="display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 800; color: var(--text-primary);">
-                    <span>Fri, 01/05/2026</span>
-                    <span style="color: var(--purple-primary); font-size: 13px;">🟣</span>
-                  </div>
-
-                  <div style="flex: 1; display: flex; flex-direction: column; align-items: center;">
-                    <span style="font-size: 10.5px; font-weight: 800; color: var(--purple-primary); margin-bottom: -2px;">+8.0 Hours</span>
-                    <div style="width: 100%; height: 2px; background: var(--purple-primary); position: relative;">
-                      <div style="position: absolute; right: 0; top: -3px; width: 0; height: 0; border-top: 4px solid transparent; border-bottom: 4px solid transparent; border-left: 6px solid var(--purple-primary);"></div>
-                    </div>
-                  </div>
-
-                  <div style="display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 800; color: var(--text-primary);">
-                    <span style="color: var(--purple-primary); font-size: 13px;">🟣</span>
-                    <span>Thu, 31/12/2026</span>
-                  </div>
-                </div>
-              </div>
-
-              <div style="margin-bottom: 14px;">
-                <div style="font-size: 10.5px; font-weight: 700; color: var(--text-muted); margin-bottom: 4px;">Remark</div>
-                <div style="background: var(--bg-input); border-radius: 10px; padding: 8px 10px; font-size: 11.5px; color: var(--text-primary); opacity: 0.9; border: 1px solid var(--border-subtle);">
-                  Labor Day holiday standby and emergency cluster failover monitoring.
-                </div>
-              </div>
-
-              <!-- Approval actions (Approve, Resubmit, Reject) -->
+            <div class="approval-card-body">
+              <dl class="approval-card-details">
+                <div><dt>Credit Type</dt> <dd>Holiday Standby Credit</dd></div>
+                <div data-credit-leave-summary><dt data-credit-leave-label>Credit Leave</dt> <dd data-credit-leave-value>Replacement Leave</dd></div>
+                <div><dt>Reason</dt> <dd>Holiday Cloud Standby</dd></div>
+                <div><dt>Standby Date</dt> <dd>Fri, 01/05/2026</dd></div>
+                <div><dt>Credit Expiry</dt> <dd>Thu, 31/12/2026</dd></div>
+                <div><dt>Credit</dt> <dd>+8.0 Hours</dd></div>
+                <div><dt>Remark</dt> <dd>Labor Day holiday standby and emergency cluster failover monitoring.</dd></div>
+              </dl>
               <div class="pending-action-grid">
                 <button type="button" class="action-btn-approve" onclick="singleApproveCard('approvalCardCredit2', 'Priya Raman')">
                   <i class="fa-solid fa-check" style="font-size: 11.5px;"></i> Approve
@@ -6125,53 +5823,15 @@
               </div>
             </div>
 
-<div style="padding: 14px;">
-              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px;">
-                <div>
-                  <div style="font-size: 10.5px; font-weight: 700; color: var(--text-muted); margin-bottom: 3px;">Type</div>
-                  <div style="font-size: 13.5px; font-weight: 800; color: var(--text-primary);">Personal Time Off</div>
-                  <div style="font-size: 11px; font-weight: 800; color: #f59e0b; margin-top: 1px;">(2.5 Hours)</div>
-                </div>
-                <div>
-                  <div style="font-size: 10.5px; font-weight: 700; color: var(--text-muted); margin-bottom: 3px;">Reason</div>
-                  <div style="font-size: 13px; font-weight: 800; color: var(--text-primary);">Urgent Family Care</div>
-                </div>
-              </div>
-
-              <!-- Time Off Timeline Section -->
-              <div style="background: var(--bg-input); border-radius: 14px; padding: 12px; margin-bottom: 14px; border: 1px solid var(--border-subtle);">
-                <div style="display: flex; justify-content: space-between; font-size: 10.5px; font-weight: 700; color: var(--text-muted); margin-bottom: 6px;">
-                  <span>Date: Wed, 23/09/2026</span>
-                  <span>Time Off</span>
-                </div>
-                <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
-                  <div style="display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 800; color: var(--text-primary);">
-                    <span>14:30</span>
-                    <span style="color: var(--purple-primary); font-size: 13px;">🟣</span>
-                  </div>
-
-                  <div style="flex: 1; display: flex; flex-direction: column; align-items: center;">
-                    <span style="font-size: 10.5px; font-weight: 800; color: var(--purple-primary); margin-bottom: -2px;">2.5 Hours</span>
-                    <div style="width: 100%; height: 2px; background: var(--purple-primary); position: relative;">
-                      <div style="position: absolute; right: 0; top: -3px; width: 0; height: 0; border-top: 4px solid transparent; border-bottom: 4px solid transparent; border-left: 6px solid var(--purple-primary);"></div>
-                    </div>
-                  </div>
-
-                  <div style="display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 800; color: var(--text-primary);">
-                    <span style="color: var(--purple-primary); font-size: 13px;">🟣</span>
-                    <span>17:00</span>
-                  </div>
-                </div>
-              </div>
-
-              <div style="margin-bottom: 14px;">
-                <div style="font-size: 10.5px; font-weight: 700; color: var(--text-muted); margin-bottom: 4px;">Remark</div>
-                <div style="background: var(--bg-input); border-radius: 10px; padding: 8px 10px; font-size: 11.5px; color: var(--text-primary); opacity: 0.9; border: 1px solid var(--border-subtle);">
-                  Emergency visit to school clinic for child health concern.
-                </div>
-              </div>
-
-              <!-- Approval actions (Approve, Resubmit, Reject) -->
+            <div class="approval-card-body">
+              <dl class="approval-card-details">
+                <div><dt>Type</dt> <dd>Personal Time Off</dd></div>
+                <div><dt>Reason</dt> <dd>Urgent Family Care</dd></div>
+                <div><dt>Date</dt> <dd>Wed, 23/09/2026</dd></div>
+                <div><dt>Time Off</dt> <dd>14:30 – 17:00</dd></div>
+                <div><dt>Duration</dt> <dd>2.5 Hours</dd></div>
+                <div><dt>Remark</dt> <dd>Emergency visit to school clinic for child health concern.</dd></div>
+              </dl>
               <div class="pending-action-grid">
                 <button type="button" class="action-btn-approve" onclick="singleApproveCard('approvalCardOfftime1', 'Siti Nurhaliza')">
                   <i class="fa-solid fa-check" style="font-size: 11.5px;"></i> Approve
@@ -6210,53 +5870,15 @@
               </div>
             </div>
 
-<div style="padding: 14px;">
-              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px;">
-                <div>
-                  <div style="font-size: 10.5px; font-weight: 700; color: var(--text-muted); margin-bottom: 3px;">Type</div>
-                  <div style="font-size: 13.5px; font-weight: 800; color: var(--text-primary);">Medical Time Off</div>
-                  <div style="font-size: 11px; font-weight: 800; color: #3b82f6; margin-top: 1px;">(2.0 Hours)</div>
-                </div>
-                <div>
-                  <div style="font-size: 10.5px; font-weight: 700; color: var(--text-muted); margin-bottom: 3px;">Reason</div>
-                  <div style="font-size: 13px; font-weight: 800; color: var(--text-primary);">Dental Checkup</div>
-                </div>
-              </div>
-
-              <!-- Time Off Timeline Section -->
-              <div style="background: var(--bg-input); border-radius: 14px; padding: 12px; margin-bottom: 14px; border: 1px solid var(--border-subtle);">
-                <div style="display: flex; justify-content: space-between; font-size: 10.5px; font-weight: 700; color: var(--text-muted); margin-bottom: 6px;">
-                  <span>Date: Thu, 24/09/2026</span>
-                  <span>Time Off</span>
-                </div>
-                <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
-                  <div style="display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 800; color: var(--text-primary);">
-                    <span>10:00</span>
-                    <span style="color: var(--purple-primary); font-size: 13px;">🟣</span>
-                  </div>
-
-                  <div style="flex: 1; display: flex; flex-direction: column; align-items: center;">
-                    <span style="font-size: 10.5px; font-weight: 800; color: var(--purple-primary); margin-bottom: -2px;">2.0 Hours</span>
-                    <div style="width: 100%; height: 2px; background: var(--purple-primary); position: relative;">
-                      <div style="position: absolute; right: 0; top: -3px; width: 0; height: 0; border-top: 4px solid transparent; border-bottom: 4px solid transparent; border-left: 6px solid var(--purple-primary);"></div>
-                    </div>
-                  </div>
-
-                  <div style="display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 800; color: var(--text-primary);">
-                    <span style="color: var(--purple-primary); font-size: 13px;">🟣</span>
-                    <span>12:00</span>
-                  </div>
-                </div>
-              </div>
-
-              <div style="margin-bottom: 14px;">
-                <div style="font-size: 10.5px; font-weight: 700; color: var(--text-muted); margin-bottom: 4px;">Remark</div>
-                <div style="background: var(--bg-input); border-radius: 10px; padding: 8px 10px; font-size: 11.5px; color: var(--text-primary); opacity: 0.9; border: 1px solid var(--border-subtle);">
-                  Scheduled orthodontic checkup at specialist dental clinic.
-                </div>
-              </div>
-
-              <!-- Approval actions (Approve, Resubmit, Reject) -->
+            <div class="approval-card-body">
+              <dl class="approval-card-details">
+                <div><dt>Type</dt> <dd>Medical Time Off</dd></div>
+                <div><dt>Reason</dt> <dd>Dental Checkup</dd></div>
+                <div><dt>Date</dt> <dd>Thu, 24/09/2026</dd></div>
+                <div><dt>Time Off</dt> <dd>10:00 – 12:00</dd></div>
+                <div><dt>Duration</dt> <dd>2.0 Hours</dd></div>
+                <div><dt>Remark</dt> <dd>Scheduled orthodontic checkup at specialist dental clinic.</dd></div>
+              </dl>
               <div class="pending-action-grid">
                 <button type="button" class="action-btn-approve" onclick="singleApproveCard('approvalCardOfftime2', 'Marcus Tan')">
                   <i class="fa-solid fa-check" style="font-size: 11.5px;"></i> Approve
@@ -6295,53 +5917,15 @@
               </div>
             </div>
 
-<div style="padding: 14px;">
-              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px;">
-                <div>
-                  <div style="font-size: 10.5px; font-weight: 700; color: var(--text-muted); margin-bottom: 3px;">Type</div>
-                  <div style="font-size: 13.5px; font-weight: 800; color: var(--text-primary);">Official Affairs</div>
-                  <div style="font-size: 11px; font-weight: 800; color: #10b981; margin-top: 1px;">(1.5 Hours)</div>
-                </div>
-                <div>
-                  <div style="font-size: 10.5px; font-weight: 700; color: var(--text-muted); margin-bottom: 3px;">Reason</div>
-                  <div style="font-size: 13px; font-weight: 800; color: var(--text-primary);">SSM Submission</div>
-                </div>
-              </div>
-
-              <!-- Time Off Timeline Section -->
-              <div style="background: var(--bg-input); border-radius: 14px; padding: 12px; margin-bottom: 14px; border: 1px solid var(--border-subtle);">
-                <div style="display: flex; justify-content: space-between; font-size: 10.5px; font-weight: 700; color: var(--text-muted); margin-bottom: 6px;">
-                  <span>Date: Fri, 25/09/2026</span>
-                  <span>Time Off</span>
-                </div>
-                <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
-                  <div style="display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 800; color: var(--text-primary);">
-                    <span>15:30</span>
-                    <span style="color: var(--purple-primary); font-size: 13px;">🟣</span>
-                  </div>
-
-                  <div style="flex: 1; display: flex; flex-direction: column; align-items: center;">
-                    <span style="font-size: 10.5px; font-weight: 800; color: var(--purple-primary); margin-bottom: -2px;">1.5 Hours</span>
-                    <div style="width: 100%; height: 2px; background: var(--purple-primary); position: relative;">
-                      <div style="position: absolute; right: 0; top: -3px; width: 0; height: 0; border-top: 4px solid transparent; border-bottom: 4px solid transparent; border-left: 6px solid var(--purple-primary);"></div>
-                    </div>
-                  </div>
-
-                  <div style="display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 800; color: var(--text-primary);">
-                    <span style="color: var(--purple-primary); font-size: 13px;">🟣</span>
-                    <span>17:00</span>
-                  </div>
-                </div>
-              </div>
-
-              <div style="margin-bottom: 14px;">
-                <div style="font-size: 10.5px; font-weight: 700; color: var(--text-muted); margin-bottom: 4px;">Remark</div>
-                <div style="background: var(--bg-input); border-radius: 10px; padding: 8px 10px; font-size: 11.5px; color: var(--text-primary); opacity: 0.9; border: 1px solid var(--border-subtle);">
-                  Urgent physical submission of statutory compliance documents at SSM office.
-                </div>
-              </div>
-
-              <!-- Approval actions (Approve, Resubmit, Reject) -->
+            <div class="approval-card-body">
+              <dl class="approval-card-details">
+                <div><dt>Type</dt> <dd>Official Affairs</dd></div>
+                <div><dt>Reason</dt> <dd>SSM Submission</dd></div>
+                <div><dt>Date</dt> <dd>Fri, 25/09/2026</dd></div>
+                <div><dt>Time Off</dt> <dd>15:30 – 17:00</dd></div>
+                <div><dt>Duration</dt> <dd>1.5 Hours</dd></div>
+                <div><dt>Remark</dt> <dd>Urgent physical submission of statutory compliance documents at SSM office.</dd></div>
+              </dl>
               <div class="pending-action-grid">
                 <button type="button" class="action-btn-approve" onclick="singleApproveCard('approvalCardOfftime3', 'Kavitha Murugan')">
                   <i class="fa-solid fa-check" style="font-size: 11.5px;"></i> Approve

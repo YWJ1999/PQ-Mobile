@@ -24,7 +24,7 @@ const puppeteer = require('puppeteer');
       totalLabel: overview.querySelector('#staff-list-total-label').textContent.trim(),
       total: overview.querySelector('#staff-list-total-value').textContent.trim(),
       chart: overview.querySelector('.view-chart-btn').textContent.trim()
-    })), { records: '8', totalLabel: 'Total Scheduled Days', total: '168.00', chart: 'View Chart' });
+    })), { records: '8', totalLabel: 'Total Scheduled Days', total: '168.00', chart: 'Chart' });
 
     const employeeCards = await page.$$eval('#details-list-container .summary-history-card', cards => cards.map(card => ({
       name: card.querySelector('.staff-name-text').textContent.trim(),
@@ -44,7 +44,7 @@ const puppeteer = require('puppeteer');
       records: overview.querySelector('#daily-record-count').textContent.trim(),
       total: overview.querySelector('#daily-total-hours').textContent.trim(),
       chart: overview.querySelector('.view-chart-btn').textContent.trim()
-    })), { records: '22', total: '176.00', chart: 'View Chart' });
+    })), { records: '22', total: '176.00', chart: 'Chart' });
     assert.equal(await page.$$eval('#daily-list-container .summary-history-card', cards => cards.length), 22);
     assert.equal(await page.$$eval('#daily-list-container .summary-history-card .fa-chevron-right', icons => icons.length), 0);
     assert.deepEqual(await page.$eval('#daily-list-container .summary-history-card', card => ({

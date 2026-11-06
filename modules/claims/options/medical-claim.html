@@ -739,7 +739,7 @@
             </div>
             <div>
               <div style="font-size: 14px; font-weight: 800; color: var(--text-primary);">Details</div>
-              <div id="catExpenseSubtitle" style="font-size: 11.5px; font-weight: 600; color: var(--text-muted); margin-top: 2px;" data-record-summary-count></div>
+              <div id="catExpenseSubtitle" class="form-list-caption"></div>
             </div>
           </div>
           <div style="display: flex; align-items: center; gap: 10px;">
@@ -778,7 +778,7 @@
               </div>
               <div>
                 <h2 class="form-section-heading" id="v3CategoryTitleText" style="font-size: 15px; font-weight: 800; color: var(--text-primary); margin: 0;">Details</h2>
-                <span id="v3CategoryItemsCount" style="font-size: 11.5px; font-weight: 600; color: var(--text-muted);" data-record-summary-count>Total Records: 0</span>
+                <span id="v3CategoryItemsCount" class="form-list-caption">Total Records: 0</span>
               </div>
             </div>
             <button type="button" id="v3AddItemButton" class="btn-submit-primary btn-add-item-icon" aria-label="Add Item" title="Add Item" style="width: 40px; height: 40px; padding: 0; border-radius: 12px; font-size: 15px; display: inline-flex; align-items: center; justify-content: center; box-shadow: 0 4px 14px rgba(124, 58, 237, 0.35);" onclick="openEntryForm('add')">
@@ -1119,14 +1119,14 @@
                   <div style="font-size: 14px; font-weight: 800; color: var(--text-primary);">${item.patientName || 'Employee'} (${item.patientType || 'Self'})</div>
                 </div>
                 <div style="display: flex; align-items: center; gap: 8px;">
-                  <i class="fa-solid fa-chevron-down toggle-icon" style="color: var(--text-muted); font-size: 13px; padding: 4px; cursor: pointer; transition: transform 0.25s ease;" onclick="event.stopPropagation(); toggleItemCard('${cardId}')"></i>
+                  <button type="button" class="form-record-toggle" aria-label="Details for item ${idx + 1}" aria-controls="${cardId}-details" aria-expanded="false"><i class="fa-solid fa-chevron-down toggle-icon" aria-hidden="true"></i></button>
                   <i class="fa-solid fa-pen-to-square" style="color: var(--purple-primary); font-size: 14px; padding: 4px; cursor: pointer;" onclick="event.stopPropagation(); openEntryForm('edit', ${idx})" title="Edit Record"></i>
                   <i class="fa-solid fa-trash-can" style="color: #ef4444; font-size: 14px; padding: 4px; cursor: pointer;" onclick="event.stopPropagation(); deleteSubItem(${idx})" title="Delete Record"></i>
                 </div>
               </div>
 
               <!-- Expandable Detailed View -->
-              <div class="item-details-body" style="display: none; padding-top: 14px; margin-top: 12px; border-top: 1px dashed var(--border-subtle);">
+              <div id="${cardId}-details" class="item-details-body" hidden style="padding-top: 14px; margin-top: 12px; border-top: 1px dashed var(--border-subtle);">
                 <div class="medical-data-list">
                   <div class="medical-data-row">
                     <span class="medical-data-label">Patient Type</span>
@@ -1180,14 +1180,14 @@
                 </div>
                 <div style="display: flex; align-items: center; gap: 8px;">
                   <div style="font-size: 15px; font-weight: 800; color: var(--text-primary);">RM ${item.localAmount ? item.localAmount.toFixed(2) : '0.00'}</div>
-                  <i class="fa-solid fa-chevron-down toggle-icon" style="color: var(--text-muted); font-size: 13px; padding: 4px; cursor: pointer; transition: transform 0.25s ease;" onclick="event.stopPropagation(); toggleItemCard('${cardId}')"></i>
+                  <button type="button" class="form-record-toggle" aria-label="Details for item ${idx + 1}" aria-controls="${cardId}-details" aria-expanded="false"><i class="fa-solid fa-chevron-down toggle-icon" aria-hidden="true"></i></button>
                   <i class="fa-solid fa-pen-to-square" style="color: var(--purple-primary); font-size: 14px; padding: 4px; cursor: pointer;" onclick="event.stopPropagation(); openEntryForm('edit', ${idx})" title="Edit Item"></i>
                   <i class="fa-solid fa-trash-can" style="color: #ef4444; font-size: 14px; padding: 4px; cursor: pointer;" onclick="event.stopPropagation(); deleteSubItem(${idx})" title="Delete Item"></i>
                 </div>
               </div>
 
               <!-- Expandable Detailed View -->
-              <div class="item-details-body" style="display: none; padding-top: 14px; margin-top: 12px; border-top: 1px dashed var(--border-subtle);">
+              <div id="${cardId}-details" class="item-details-body" hidden style="padding-top: 14px; margin-top: 12px; border-top: 1px dashed var(--border-subtle);">
                 <div class="medical-data-list">
                   <div class="medical-data-row">
                     <span class="medical-data-label">Receipt No.</span>
@@ -1235,17 +1235,7 @@
     }
 
     function toggleItemCard(cardId) {
-      const cardEl = document.getElementById(cardId);
-      if (!cardEl) return;
-      const bodyEl = cardEl.querySelector('.item-details-body');
-      const iconEl = cardEl.querySelector('.toggle-icon');
-      if (bodyEl) {
-        const isHidden = bodyEl.style.display === 'none' || !bodyEl.style.display;
-        bodyEl.style.display = isHidden ? 'block' : 'none';
-        if (iconEl) {
-          iconEl.style.transform = isHidden ? 'rotate(180deg)' : 'rotate(0deg)';
-        }
-      }
+      toggleFormRecordDetails(document.getElementById(cardId)?.querySelector('.form-record-toggle'));
     }
 
     function deleteSubItem(idx) {
@@ -1386,7 +1376,7 @@
               </div>
               <div>
                 <div style="font-size: 11px; font-weight: 800; color: var(--purple-primary); text-transform: uppercase; letter-spacing: 0.5px;">DETAILS</div>
-                <div id="v2DetailsCount" style="font-size: 11.5px; font-weight: 600; color: var(--text-muted); margin-top: 1px;" data-record-summary-count>0 item(s) added</div>
+                <div id="v2DetailsCount" class="form-list-caption">0 item(s) added</div>
               </div>
             </div>
             <div style="display: flex; align-items: center; gap: 6px; background: rgba(124, 58, 237, 0.2); border: 1px solid rgba(124, 58, 237, 0.4); padding: 8px 14px; border-radius: 14px; color: var(--purple-primary); font-size: 12.5px; font-weight: 800;">

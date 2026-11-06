@@ -12,7 +12,6 @@
   --record-rejected-accent: #dc2626;
   --record-cancelled-surface: linear-gradient(105deg, #394b66, #596c87);
   --record-cancelled-accent: #596c87;
-  --record-action-fill: var(--card-header-purple-background);
   --record-action-ink: #fff;
 }
 
@@ -177,8 +176,13 @@ html body :is(.history-card-item:has(.history-card-header, .summary-history-card
 }
 html body :is(.history-card-item:has(.history-card-header, .summary-history-card-header), .history-item-card:has(.record-card-header), .project-history-card)
 :is(.history-card-actions, .record-card-actions, .project-history-card-actions)
-:is(.history-submit-btn, .history-card-action-primary, .project-history-card-action-primary, .record-card-apply) {
-  background: var(--record-action-fill) !important;
+:is(
+  .history-submit-btn, .history-cancel-btn,
+  .history-card-action-primary, .history-card-action-danger,
+  .project-history-card-action-primary, .project-history-card-action-danger,
+  .record-card-apply, .record-card-cancel
+) {
+  background: var(--primary-action-background) !important;
   border-color: transparent !important;
   color: var(--record-action-ink) !important;
 }

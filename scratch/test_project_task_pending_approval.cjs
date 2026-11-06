@@ -32,9 +32,9 @@ const pageUrl = theme => pathToFileURL(
           name: card.querySelector('.project-approval-employee-name').textContent.trim(),
           employeeId: card.querySelector('.project-approval-employee-name + .project-approval-employee-id').textContent.trim(),
           status: card.querySelector('.project-approval-status').textContent.trim(),
-          date: card.querySelector('[data-field="date"] strong').textContent.trim(),
-          normalHours: card.querySelector('[data-field="normal-hours"] strong').textContent.trim(),
-          otHours: card.querySelector('[data-field="ot-hours"] strong').textContent.trim(),
+          date: card.querySelector('[data-field="date"] dd').textContent.trim(),
+          normalHours: card.querySelector('[data-field="normal-hours"] dd').textContent.trim(),
+          otHours: card.querySelector('[data-field="ot-hours"] dd').textContent.trim(),
           actions: [...card.querySelectorAll('.project-approval-actions button')].map(button => button.textContent.trim())
         }))),
         [
@@ -51,8 +51,8 @@ const pageUrl = theme => pathToFileURL(
         minHeight: getComputedStyle(button).minHeight
       })));
       assert.equal(new Set(actionStyles.map(style => style.background)).size, 1);
-      assert.deepEqual([...new Set(actionStyles.map(style => style.radius))], ['12px']);
-      assert.deepEqual([...new Set(actionStyles.map(style => style.minHeight))], ['40px']);
+      assert.deepEqual([...new Set(actionStyles.map(style => style.radius))], ['8px']);
+      assert.deepEqual([...new Set(actionStyles.map(style => style.minHeight))], ['44px']);
       await page.click('#projectApprovalSelectAll');
       assert.equal(await page.$$eval('.project-approval-card-banner .approval-card-checkbox', boxes => boxes.every(box => box.checked)), true);
       await page.click('#projectApprovalSelectAll');
@@ -155,19 +155,19 @@ const pageUrl = theme => pathToFileURL(
           leftBorder: getComputedStyle(card).borderLeftWidth,
           overflow: getComputedStyle(card).overflow,
           bannerBackground: getComputedStyle(card.querySelector('.project-approval-card-banner')).backgroundImage,
-          gridColumns: getComputedStyle(card.querySelector('.project-approval-metrics')).gridTemplateColumns.split(' ').length,
-          actionColumns: getComputedStyle(card.querySelector('.project-approval-actions')).gridTemplateColumns.split(' ').length,
+          gridColumns: getComputedStyle(card.querySelector('.approval-card-details > div')).gridTemplateColumns.split(' ').length,
+          actionAlignment: getComputedStyle(card.querySelector('.project-approval-actions')).justifyContent,
           backFile: new URL(document.querySelector('.project-back').href).pathname.split('/').slice(-2).join('/'),
           backScope: new URL(document.querySelector('.project-back').href).searchParams.get('scope'),
           phoneOverflow: document.querySelector('.phone-container').scrollWidth > document.querySelector('.phone-container').clientWidth + 1
         };
       });
-      assert.equal(layout.radius, '20px');
+      assert.equal(layout.radius, '18px');
       assert.equal(layout.leftBorder, '1px');
       assert.equal(layout.overflow, 'hidden');
       assert.match(layout.bannerBackground, /linear-gradient/);
       assert.equal(layout.gridColumns, 2);
-      assert.equal(layout.actionColumns, 4);
+      assert.equal(layout.actionAlignment, 'center');
       assert.equal(layout.backFile, 'project-task/index.html');
       assert.equal(layout.backScope, 'team');
       assert.equal(layout.phoneOverflow, false);

@@ -45,6 +45,40 @@ window.PeopleHcmRecordSummary = (() => {
   return { enhance };
 })();
 
+// Editable form rows keep their disclosure separate from Edit and Remove.
+function toggleFormRecordDetails(button) {
+  if (!button) return;
+  const details = document.getElementById(button.getAttribute('aria-controls'));
+  if (!details) return;
+  details.hidden = !details.hidden;
+  button.setAttribute('aria-expanded', String(!details.hidden));
+}
+
+// Reports update the numeric field when filtering or opening a drill-down.
+class RecordChartCount extends HTMLElement {
+  connectedCallback() {
+    this.observer = new MutationObserver(() => this.updateLabel());
+    this.observer.observe(this, {
+      childList: true, subtree: true, characterData: true, attributeFilter: ['unit']
+    });
+    this.updateLabel();
+  }
+
+  disconnectedCallback() {
+    this.observer.disconnect();
+  }
+
+  updateLabel() {
+    const value = this.querySelector('.record-summary-value');
+    const label = this.querySelector('.record-summary-label');
+    if (!value || !label) return;
+    const unit = this.getAttribute('unit') || 'Record';
+    const text = value.textContent.trim() === '1' ? unit : unit + 's';
+    if (label.textContent !== text) label.textContent = text;
+  }
+}
+customElements.define('record-chart-count', RecordChartCount);
+
 // 1. Desktop Preview Top Bar Component (Only Dark Mode & Light Mode buttons outside the phone)
 // Resolve shared detail assets from this script so nested module pages and file:// previews work alike.
 {
@@ -1307,6 +1341,21 @@ class PolicyDetailSheet extends HTMLElement {
 }
 customElements.define('policy-detail-sheet', PolicyDetailSheet);
 
+function createApprovalCardDetails(fields) {
+  const details = document.createElement('dl');
+  details.className = 'approval-card-details';
+  for (const [label, value] of fields) {
+    const row = document.createElement('div');
+    const term = document.createElement('dt');
+    term.textContent = label;
+    const description = document.createElement('dd');
+    description.textContent = value == null || value === '' ? '-' : value;
+    row.append(term, description);
+    details.append(row);
+  }
+  return details;
+}
+
 // 19. Pending Approval Card Component
 class PendingApprovalCard extends HTMLElement {
   connectedCallback() {
@@ -1384,35 +1433,13 @@ class PendingApprovalCard extends HTMLElement {
     const recordStatus = docStatus.toLowerCase().includes('draft') ? 'draft' : 'submitted';
     const icon = '<i class="fa-solid fa-paper-plane"></i>';
 
-    // 2-Column Grid: Benefit Type & Claim Date, followed by Period (non-benefit/medical) & Amount / Hour for cards
-    const middleContentHtml = `
-      <!-- 2-Column Grid: Benefit Type & Claim Date -->
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 14px; padding: 10px 12px;">
-        <div>
-          <div style="font-size: 10.5px; font-weight: 700; color: var(--text-muted); margin-bottom: 3px;">${typeTitle}</div>
-          <div style="font-size: 12.5px; font-weight: 800; color: var(--text-primary); line-height: 1.3;">${benefitTypeVal}</div>
-        </div>
-        <div>
-          <div style="font-size: 10.5px; font-weight: 700; color: var(--text-muted); margin-bottom: 3px;">Claim Date</div>
-          <div style="font-size: 12.5px; font-weight: 800; color: var(--purple-primary); line-height: 1.3; font-family: monospace, sans-serif;">
-            <i class="fa-regular fa-calendar" style="font-size: 11px; margin-right: 3px;"></i>${claimDate}
-          </div>
-        </div>
-      </div>
-
-      <!-- Period & Amount / Hour Structured Box -->
-      <div style="background: var(--bg-input); border-radius: 14px; padding: 10px 12px; margin-bottom: 14px; border: 1px solid var(--border-subtle); display: flex; flex-direction: column; gap: 6px;">
-        ${showPeriod ? `
-        <div style="display: flex; justify-content: space-between; font-size: 11.5px; align-items: center;">
-          <span style="color: var(--text-muted); font-weight: 700;">Period:</span>
-          <strong style="color: var(--text-primary); font-family: monospace, sans-serif; font-size: 12px; font-weight: 800;">${period}</strong>
-        </div>` : ''}
-        <div style="display: flex; justify-content: space-between; font-size: 11.5px; ${showPeriod ? 'border-top: 1px dashed var(--border-subtle); padding-top: 6px;' : ''} align-items: center;">
-          <span style="color: var(--text-muted); font-weight: 700;">Amount / Hour:</span>
-          <strong style="color: var(--purple-primary); font-family: monospace, sans-serif; font-size: 14.5px; font-weight: 900;">${amountHourDisplay}</strong>
-        </div>
-      </div>
-    `;
+    const fields = [
+      ['Submit Date', submitDate],
+      [typeTitle, benefitTypeVal],
+      ['Claim Date', claimDate]
+    ];
+    if (showPeriod) fields.push(['Period', period]);
+    fields.push(['Amount / Hour', amountHourDisplay]);
 
     this.innerHTML = `
       <div class="approval-request-card" data-item-id="${itemId}" style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 20px; overflow: hidden; box-shadow: var(--shadow-card); transition: all 0.2s ease; text-align: left; margin-bottom: 14px;">
@@ -1438,17 +1465,8 @@ class PendingApprovalCard extends HTMLElement {
         </div>
 
         <!-- 2. Card Content Body -->
-        <div style="padding: 14px; cursor: pointer;" onclick="if (!event.target.closest('.pending-action-grid, .approval-card-checkbox, .three-dots-btn')) { window.ClaimsEngine && window.ClaimsEngine.triggerClaimViewDetails ? window.ClaimsEngine.triggerClaimViewDetails('${itemId}') : null; }">
-          <!-- Status Badge & Submit Date Row -->
-          <div style="margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between;">
-            <div style="font-size: 11.5px; font-weight: 700; color: var(--text-muted); display: flex; align-items: center; gap: 4px;">
-              <i class="fa-regular fa-calendar-check" style="color: var(--purple-primary);"></i>
-              <span>Submit Date: <strong style="color: var(--text-primary); font-family: monospace, sans-serif;">${submitDate}</strong></span>
-            </div>
-          </div>
-
-          <!-- Dynamic Middle Content (Benefit/Medical Grid vs Other Claims Box) -->
-          ${middleContentHtml}
+        <div class="approval-card-body" style="cursor: pointer;" onclick="if (!event.target.closest('.pending-action-grid, .approval-card-checkbox, .three-dots-btn')) { window.ClaimsEngine && window.ClaimsEngine.triggerClaimViewDetails ? window.ClaimsEngine.triggerClaimViewDetails('${itemId}') : null; }">
+          ${createApprovalCardDetails(fields).outerHTML}
 
           <!-- Bottom Action Buttons Grid (Approve, Resubmit, Reject) matching Attendance -->
           <div class="pending-action-grid">

@@ -51,28 +51,30 @@ const puppeteer = require('puppeteer');
       await page.evaluate(() => { closeStaffListModal(); showPendingApprovalPage('final_ot'); });
       const hours = await page.evaluate(() => {
         const records = staffDatabase.pending_approval.filter(item => item.category === 'final_ot');
-        return [...document.querySelectorAll('.final-ot-hours-grid')].map((grid, index) => ({
-          labels: [...grid.children].map(field => field.firstElementChild.textContent),
-          values: [...grid.children].map(field => field.lastElementChild.textContent),
-          original: [records[index].claimHours ?? records[index].duration, records[index].actualHours, records[index].approvedHours],
-          sameRow: [...grid.children].every(field => field.getBoundingClientRect().top === grid.firstElementChild.getBoundingClientRect().top),
-          overflow: grid.scrollWidth > grid.clientWidth
-        }));
+        return [...document.querySelectorAll('#pendingApprovalListContent .approval-card-details')].map((list, index) => {
+          const fields = [...list.children].filter(row => row.querySelector('dt').textContent.endsWith('Hours'));
+          return {
+            labels: fields.map(row => row.querySelector('dt').textContent),
+            values: fields.map(row => row.querySelector('dd').textContent),
+            original: [records[index].claimHours ?? records[index].duration, records[index].actualHours, records[index].approvedHours],
+            separateRows: new Set(fields.map(row => row.offsetTop)).size === fields.length,
+            overflow: list.scrollWidth > list.clientWidth
+          };
+        });
       });
       assert.equal(hours.length, 5);
       for (const row of hours) {
         assert.deepEqual(row.labels, ['Claim Hours', 'Actual Hours', 'Approved Hours']);
         assert.deepEqual(row.values, row.original);
-        assert.ok(row.sameRow && !row.overflow);
+        assert.ok(row.separateRows && !row.overflow);
       }
       await page.screenshot({ path: path.resolve(__dirname, `final-ot-claim-hours-${theme}-${width}.png`) });
       for (const tab of ['ot_plan', 'feedback']) {
         await page.evaluate(tab => switchStaffApprovalTab(tab), tab);
-        assert.equal(await page.$('.final-ot-hours-grid'), null);
         const primary = await page.evaluate(() => [...document.querySelectorAll('#pendingApprovalListContent .approval-request-card')].map(card => ({
-          label: card.querySelector('.pending-request-primary-field').firstElementChild.textContent,
-          value: card.querySelector('.pending-request-primary-field').lastElementChild.textContent,
-          labels: [...card.querySelectorAll('div, span')].filter(node => node.children.length === 0).map(node => node.textContent.trim()),
+          label: card.querySelector('.approval-card-details > div:nth-child(2) dt').textContent,
+          value: card.querySelector('.approval-card-details > div:nth-child(2) dd').textContent,
+          labels: [...card.querySelectorAll('.approval-card-details dt')].map(node => node.textContent.trim()),
           overflow: card.scrollWidth > card.clientWidth
         })));
         const expected = await page.evaluate(tab => staffDatabase.pending_approval.filter(item => item.category === tab).map(item => tab === 'feedback' ? item.amendedShift : item.type), tab);
@@ -82,9 +84,9 @@ const puppeteer = require('puppeteer');
           assert.equal(field.overflow, false);
           if (tab === 'feedback') {
             assert.equal(field.labels.filter(label => label === 'Amended Shift').length, 1);
-            assert.equal(field.labels.includes('Shift:'), false);
+            assert.equal(field.labels.includes('Shift'), false);
             assert.equal(field.labels.includes('Type'), false);
-            assert.ok(field.labels.includes('Clock Time:'));
+            assert.ok(field.labels.includes('Clock Time'));
           }
         }
         if (tab === 'feedback') {

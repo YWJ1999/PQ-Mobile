@@ -57,13 +57,13 @@ const detailUrl = pathToFileURL(path.resolve(__dirname, '../modules/attendance/o
         assert.doesNotMatch(approvedCost, /\b(?:MYR|RM)\b/);
         assert.deepEqual(await page.$eval('.view-chart-btn', node => ({
           text: node.textContent.trim(),
-          icon: node.querySelector('i')?.classList.contains('fa-chart-pie'),
+          icon: node.querySelector('i')?.classList.contains('fa-chart-simple'),
           color: getComputedStyle(node).color,
           whiteSpace: getComputedStyle(node).whiteSpace
         })), {
-          text: 'View Chart',
+          text: 'Chart',
           icon: true,
-          color: 'rgb(245, 158, 11)',
+          color: 'rgb(255, 255, 255)',
           whiteSpace: 'nowrap'
         });
 

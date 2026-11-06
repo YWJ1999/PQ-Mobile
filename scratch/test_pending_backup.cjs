@@ -29,12 +29,12 @@ async function verify(page, file, cards, theme) {
   assert.equal(await page.$('.action-btn-backup'), null, file);
   const grids = await page.$$eval(cards + ' .pending-action-grid, ' + cards + ' .project-approval-actions', nodes => nodes.filter(node => node.getClientRects().length).map(node => ({
     actions: [...node.querySelectorAll('button')].map(button => button.textContent.trim()),
-    columns: getComputedStyle(node).gridTemplateColumns.split(' ').length,
+    alignment: getComputedStyle(node).justifyContent,
     overflow: node.scrollWidth > node.clientWidth + 1
   })));
   for (const grid of grids) {
-    assert.ok(grid.actions.includes('Approve') && grid.actions.includes('Reject'), file);
-    assert.equal(grid.columns, grid.actions.length, file + ': remaining actions fill the row');
+    assert.ok(grid.actions.includes('Approve') && grid.actions.includes(file === 'team.html' ? 'Review' : 'Reject'), file);
+    assert.equal(grid.alignment, 'center', file + ': actions are centered');
     assert.equal(grid.overflow, false, file + ': no action overflow');
   }
   if (file.includes('/admin/')) {

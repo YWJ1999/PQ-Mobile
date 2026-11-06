@@ -123,7 +123,7 @@
     const chartOpen = params.get('hubChart') === '1' && active !== 'assessment';
     $('competencyHubChart').hidden = !chartOpen;
     $('competencyHubViewChart').setAttribute('aria-expanded', String(chartOpen));
-    $('competencyHubViewChart').querySelector('span').textContent = chartOpen ? 'Hide Chart' : 'View Chart';
+    $('competencyHubViewChart').querySelector('span').textContent = chartOpen ? 'Hide Chart' : 'Chart';
     const breakdown = active === 'gap' ? groups.map(group => ({ title: group.title, count: group.count }))
       : source.definitions.map(skill => ({ title: skill.title, count: rows.filter(row => row.competency === skill.id).length })).filter(item => item.count);
     $('competencyHubChartTitle').textContent = active === 'gap' ? 'Employees by competency' : 'Records by competency';
@@ -159,14 +159,14 @@
     if (active === 'assessment') {
       $('competencyHubHeading').textContent = 'Competency Assessment';
       $('competencyHubDescription').textContent = 'Find employees to assess by skill group and time since their last assessment.';
-      $('competencyHubCountLabel').textContent = 'Total Employees';
+      $('competencyHubCount').parentElement.setAttribute('unit', 'Employee');
       $('competencyHubCount').textContent = rows.length;
       $('competencyHubCountNote').textContent = 'Each employee is counted once. Employees not yet assessed are included.';
       children = rows.map(row => employeeCard(row, true));
     } else if (active === 'search') {
       $('competencyHubHeading').textContent = 'Competency Search';
       $('competencyHubDescription').textContent = 'Find employees by competency, level, age or years of service.';
-      $('competencyHubCountLabel').textContent = 'Total Records';
+      $('competencyHubCount').parentElement.removeAttribute('unit');
       $('competencyHubCount').textContent = rows.length;
       $('competencyHubCountNote').textContent = `${new Set(rows.map(row => row.empNo)).size} employees · An employee can have multiple competency records.`;
       children = rows.map(row => employeeCard(row));
@@ -176,7 +176,7 @@
       const matching = selected ? group?.rows || [] : groups.flatMap(item => item.rows);
       $('competencyHubHeading').textContent = selected ? selection?.title || 'Competency unavailable' : `${sign === 'positive' ? 'Positive' : 'Negative'} Gap Summary`;
       $('competencyHubDescription').textContent = sign === 'positive' ? 'Current levels above the required level.' : 'Current levels below the required level.';
-      $('competencyHubCountLabel').textContent = selected ? 'Total Employees' : 'Gap Records';
+      $('competencyHubCount').parentElement.setAttribute('unit', selected ? 'Employee' : 'Gap Record');
       $('competencyHubCount').textContent = matching.length;
       $('competencyHubCountNote').textContent = selected ? 'Gap = Current Level − Required Level.'
         : `${new Set(matching.map(row => row.empNo)).size} employees across ${groups.length} competencies · Select a competency to view employees.`;

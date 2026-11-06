@@ -31,7 +31,7 @@ function compactText(value) {
       return {
         title: document.getElementById('headerTitleText').textContent.trim(),
         viewChartText: viewChart ? viewChart.textContent.replace(/\s+/g, ' ').trim() : '',
-        viewChartHasPieIcon: Boolean(viewChart && viewChart.querySelector('.fa-chart-pie')),
+        viewChartHasBarIcon: Boolean(viewChart && viewChart.querySelector('.fa-chart-simple')),
         viewChartWhiteSpace: viewChart ? getComputedStyle(viewChart).whiteSpace : '',
         listHeading: [...view.children]
           .find(element => /Employee Leave Highlights Table/.test(element.textContent || ''))
@@ -111,8 +111,8 @@ function compactText(value) {
     const result = { main, chart, trend, pageErrors };
     result.passed =
       main.title === 'Leave Highlights' &&
-      main.viewChartText === 'View Chart' &&
-      main.viewChartHasPieIcon &&
+      main.viewChartText === 'Chart' &&
+      main.viewChartHasBarIcon &&
       main.viewChartWhiteSpace === 'nowrap' &&
       !main.listHeading &&
       JSON.stringify(main.columns) === JSON.stringify([

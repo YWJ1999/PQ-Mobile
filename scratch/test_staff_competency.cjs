@@ -33,9 +33,9 @@ async function totals(page) {
       assert.equal(await page.$eval('h1', node => node.textContent), 'Staff Competency');
       assert.deepEqual(await totals(page), ['6', '67.50%']);
       assert.deepEqual(await page.$$eval('#staffCompetencyTable th', nodes => nodes.map(node => node.textContent)), ['Emp #', 'Name', 'Match %', 'Branch', 'Department', 'Position']);
-      assert.ok(await page.$('.record-summary-card .record-summary-metric .record-summary-value'));
-      assert.equal(await page.$eval('#staffCompetencyViewChart', node => node.textContent.trim()), 'View Chart');
-      assert.ok(await page.$('#staffCompetencyViewChart .fa-chart-pie'));
+      assert.ok(await page.$('.record-summary-card record-chart-count .record-summary-value'));
+      assert.equal(await page.$eval('#staffCompetencyViewChart', node => node.textContent.trim()), 'Chart');
+      assert.ok(await page.$('#staffCompetencyViewChart .fa-chart-simple'));
       assert.equal(await page.$eval('#staffCompetencyViewChart', node => getComputedStyle(node).whiteSpace), 'nowrap');
       assert.ok(await page.$('#staffCompetencyExportPdf .fa-file-pdf'));
       assert.ok(await page.$('#staffCompetencyExportExcel .fa-file-excel'));

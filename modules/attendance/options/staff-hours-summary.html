@@ -1001,12 +1001,9 @@
         <span id="list-title" hidden>Details</span>
         <div id="staff-list-overview" class="summary-list-overview record-summary-card" aria-label="Staff summary totals">
           <div class="summary-list-row">
-            <div class="summary-list-stat record-summary-metric">
-              <span class="record-summary-label">Total Records</span>
-              <strong id="list-record-count" class="record-summary-value">0</strong>
-            </div>
-            <button class="view-chart-btn" type="button" onclick="openChart('staff')">
-              <i class="fa-solid fa-chart-pie" aria-hidden="true"></i><span>View Chart</span>
+            <record-chart-count><strong id="list-record-count" class="record-summary-value">0</strong> <span class="record-summary-label">Records</span></record-chart-count>
+            <button class="view-chart-btn record-chart-button" type="button" onclick="openChart('staff')">
+              <i class="fa-solid fa-chart-simple" aria-hidden="true"></i><span>Chart</span>
             </button>
           </div>
           <div class="summary-list-divider" aria-hidden="true"></div>
@@ -1027,12 +1024,9 @@
       <div id="view-daily-list" style="display: none; padding-top: 10px;">
         <div id="daily-list-overview" class="summary-list-overview record-summary-card" aria-label="Employee daily totals">
           <div class="summary-list-row">
-            <div class="summary-list-stat record-summary-metric">
-              <span class="record-summary-label">Total Records</span>
-              <strong id="daily-record-count" class="record-summary-value">0</strong>
-            </div>
-            <button class="view-chart-btn" type="button" onclick="openChart('daily')">
-              <i class="fa-solid fa-chart-pie" aria-hidden="true"></i><span>View Chart</span>
+            <record-chart-count><strong id="daily-record-count" class="record-summary-value">0</strong> <span class="record-summary-label">Records</span></record-chart-count>
+            <button class="view-chart-btn record-chart-button" type="button" onclick="openChart('daily')">
+              <i class="fa-solid fa-chart-simple" aria-hidden="true"></i><span>Chart</span>
             </button>
           </div>
           <div class="summary-list-divider" aria-hidden="true"></div>

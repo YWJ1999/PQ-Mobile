@@ -29,7 +29,7 @@ const puppeteer = require('puppeteer');
       assert.equal(await total(), 48);
       assert.deepEqual(await page.$$eval('#orgStatisticsCards h2', nodes => nodes.slice(0, 2).map(node => node.textContent)), ['ACCOUNTS', 'AUDIT']);
       assert.deepEqual(await page.$$eval('#orgStatisticsCards .org-statistics-card:first-child dt', nodes => nodes.map(node => node.textContent)), ['Period', 'Measure', 'Total Value', 'Average Value', 'Company Average']);
-      assert.deepEqual(await page.$eval('#orgStatisticsViewChart', node => ({ text: node.textContent.trim(), icon: !!node.querySelector('.fa-chart-pie'), nowrap: getComputedStyle(node).whiteSpace })), { text: 'View Chart', icon: true, nowrap: 'nowrap' });
+      assert.deepEqual(await page.$eval('#orgStatisticsViewChart', node => ({ text: node.textContent.trim(), icon: !!node.querySelector('.fa-chart-simple'), nowrap: getComputedStyle(node).whiteSpace })), { text: 'Chart', icon: true, nowrap: 'nowrap' });
       await page.click('#orgStatisticsFilterTrigger');
       assert.equal(await page.$$eval('#orgStatisticsFilterForm [name]', nodes => nodes.length), 9, 'Seven filters, with two controls in each period');
       assert.deepEqual(await page.$$eval('#orgStatisticsSummaryType option', nodes => nodes.map(node => node.textContent)), ['Month', 'Quarter', 'Year']);

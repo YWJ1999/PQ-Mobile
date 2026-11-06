@@ -87,11 +87,11 @@ async function inspect(browser, theme, width) {
       exportPillsMatchChart: [pdf, excel].every(button => ['borderRadius', 'padding', 'fontSize', 'fontWeight', 'whiteSpace'].every(key => getComputedStyle(button)[key] === getComputedStyle(chart)[key]))
     };
   }), {
-    labels: ['View Chart', 'View PDF', 'View Excel'],
+    labels: ['Chart', 'View PDF', 'View Excel'],
     display: 'flex',
     toolbarRadius: '18px',
     toolbarBorder: '1px',
-    firstRowLabel: 'Total Records',
+    firstRowLabel: 'Records',
     chartBesideTotal: true,
     exportsShareRow: true,
     chartAboveExports: true,

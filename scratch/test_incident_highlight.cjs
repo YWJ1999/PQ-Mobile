@@ -24,7 +24,7 @@ const labels=['Employee #','Name','Incident Date','Created Date','Incident Type'
       const total=()=>page.$eval('#incidentHighlightTotalPoints',node=>node.textContent.trim());
       assert.equal(await count(),'3');assert.equal(await total(),'5');
       assert.deepEqual(await page.$eval('#incidentHighlightTable thead th',node=>({bg:getComputedStyle(node).backgroundColor,color:getComputedStyle(node).color})),{bg:'rgb(124, 58, 237)',color:'rgb(255, 255, 255)'});
-      assert.deepEqual(await page.$eval('#incidentHighlightViewChart',node=>({text:node.textContent.trim(),pie:!!node.querySelector('.fa-chart-pie'),nowrap:getComputedStyle(node).whiteSpace})),{text:'View Chart',pie:true,nowrap:'nowrap'});
+      assert.deepEqual(await page.$eval('#incidentHighlightViewChart',node=>({text:node.textContent.trim(),barIcon:!!node.querySelector('.fa-chart-simple'),nowrap:getComputedStyle(node).whiteSpace})),{text:'Chart',barIcon:true,nowrap:'nowrap'});
       await page.screenshot({path:path.join(__dirname,`incident-highlight-table-${theme}-${width}.png`)});
       const trigger='[data-incident-employee="EBB01"]';
       await page.click(trigger);

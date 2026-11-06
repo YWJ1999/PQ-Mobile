@@ -125,7 +125,7 @@ document.addEventListener('DOMContentLoaded', () => {
         row(details, 'Booking Date', formatDate(record.date));
         row(details, 'Time', `${record.startTime} – ${record.endTime}`);
         row(details, 'Task', store.tasks.find(task => task.id === record.task).name);
-        row(details, 'Purpose', record.purpose);
+        row(details, 'Purpose', record.purpose.trim() || '-');
         row(details, 'Remarks', record.remarks);
         summary.append(header, details);
         const actions = node('div', 'history-card-actions');

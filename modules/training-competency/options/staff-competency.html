@@ -50,8 +50,8 @@
         </div>
         <section class="attendance-report-summary record-summary-card" aria-label="Staff competency totals" aria-live="polite">
           <div class="attendance-report-summary-row">
-            <div class="record-summary-metric"><span class="record-summary-label">Total Employees</span><strong id="staffCompetencyTotalRecords" class="record-summary-value">0</strong></div>
-            <button id="staffCompetencyViewChart" class="view-chart-btn" type="button"><i class="fa-solid fa-chart-pie" aria-hidden="true"></i><span>View Chart</span></button>
+            <record-chart-count unit="Employee"><strong id="staffCompetencyTotalRecords" class="record-summary-value">0</strong> <span class="record-summary-label">Employees</span></record-chart-count>
+            <button id="staffCompetencyViewChart" class="view-chart-btn record-chart-button" type="button"><i class="fa-solid fa-chart-simple" aria-hidden="true"></i><span>Chart</span></button>
           </div>
           <div class="attendance-report-summary-row">
             <div><span class="attendance-report-summary-label">Average Match</span><strong id="staffCompetencyAverageMatch" class="performance-highlight-average">—</strong></div>
@@ -88,8 +88,8 @@
         <p id="competencyHubDataNote" class="sch-data-note" hidden></p>
         <section class="attendance-report-summary record-summary-card" aria-label="Competency results" aria-live="polite">
           <div class="attendance-report-summary-row">
-            <div class="record-summary-metric"><span id="competencyHubCountLabel" class="record-summary-label">Total Employees</span><strong id="competencyHubCount" class="record-summary-value">0</strong></div>
-            <button id="competencyHubViewChart" class="view-chart-btn" type="button" aria-expanded="false" aria-controls="competencyHubChart" hidden><i class="fa-solid fa-chart-pie" aria-hidden="true"></i><span>View Chart</span></button>
+            <record-chart-count unit="Employee"><strong id="competencyHubCount" class="record-summary-value">0</strong> <span id="competencyHubCountLabel" class="record-summary-label">Employees</span></record-chart-count>
+            <button id="competencyHubViewChart" class="view-chart-btn record-chart-button" type="button" aria-expanded="false" aria-controls="competencyHubChart" hidden><i class="fa-solid fa-chart-simple" aria-hidden="true"></i><span>Chart</span></button>
           </div>
           <p id="competencyHubCountNote" class="sch-count-note"></p>
         </section>

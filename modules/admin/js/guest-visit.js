@@ -198,38 +198,34 @@ document.addEventListener('DOMContentLoaded', () => {
     $('visitAttendeeCategoryCount').textContent = String(attendeeIds.length);
     $('visitOtherCategoryCount').textContent = String(form.querySelectorAll('[data-other-request]:checked').length);
   }
-  function addRecordDetails(record, title, subtitle, values, index, category, employeeId, alwaysVisible = false) {
+  function addRecordDetails(record, title, subtitle, values, index, category, employeeId) {
     const header = node('div', 'visit-record-header');
     const copy = node('div', 'visit-record-copy');
     copy.append(node('h3', 'visit-record-name', title));
     if (employeeId) copy.append(node('span', 'visit-employee-id', '#' + employeeId));
     if (subtitle) copy.append(node('p', 'visit-record-subtitle', subtitle));
-    header.append(copy);
     const details = node('div', 'visit-record-details');
-    if (!alwaysVisible) {
-      const toggle = node('button', 'visit-record-toggle');
-      toggle.type = 'button';
-      toggle.dataset.toggleRecord = '';
-      toggle.setAttribute('aria-expanded', 'false');
-      toggle.setAttribute('aria-controls', 'visitRecord-' + category + '-' + index);
-      toggle.setAttribute('aria-label', 'Details for ' + title);
-      const icon = node('i', 'fa-solid fa-chevron-down');
-      icon.setAttribute('aria-hidden', 'true');
-      toggle.append(icon);
-      header.append(toggle);
-      details.id = toggle.getAttribute('aria-controls');
-      details.hidden = true;
-    }
+    details.id = 'visitRecord-' + category + '-' + index;
+    details.hidden = true;
     details.append(detailRows(values));
+    const toggle = node('button', 'form-record-toggle');
+    toggle.type = 'button';
+    toggle.dataset.toggleRecord = '';
+    toggle.setAttribute('aria-label', 'Details for ' + title);
+    toggle.setAttribute('aria-expanded', 'false');
+    toggle.setAttribute('aria-controls', details.id);
+    const icon = node('i', 'fa-solid fa-chevron-down');
+    icon.setAttribute('aria-hidden', 'true');
+    toggle.append(icon);
+    const actions = node('div', 'visit-record-actions');
+    actions.append(toggle, recordButton('Edit', 'data-edit-' + category, index, title), recordButton('Remove', 'data-remove-' + category, index, title));
+    header.append(copy, actions);
     record.append(header, details);
   }
   function toggleRecord(event) {
     const toggle = event.target.closest('[data-toggle-record]') ||
       (!event.target.closest('button') && event.target.closest('.visit-record-header')?.querySelector('[data-toggle-record]'));
-    if (!toggle) return;
-    const expanded = toggle.getAttribute('aria-expanded') !== 'true';
-    toggle.setAttribute('aria-expanded', String(expanded));
-    $(toggle.getAttribute('aria-controls')).hidden = !expanded;
+    toggleFormRecordDetails(toggle);
   }
   function renderGuests() {
     const list = $('visitGuestList');
@@ -238,9 +234,6 @@ document.addEventListener('DOMContentLoaded', () => {
     guests.forEach((guest, index) => {
       const record = node('article', 'visit-record');
       addRecordDetails(record, guest.name, guest.company, [['Company', guest.company], ['Relation', guest.relation], ['Position', guest.position]], index, 'guest');
-      const actions = node('div', 'visit-record-actions');
-      actions.append(record.querySelector('.visit-record-toggle'), recordButton('Edit', 'data-edit-guest', index, guest.name), recordButton('Remove', 'data-remove-guest', index, guest.name));
-      record.querySelector('.visit-record-header').append(actions);
       list.append(record);
     });
     updateSummaries();
@@ -315,10 +308,7 @@ document.addEventListener('DOMContentLoaded', () => {
     attendeeIds.forEach((id, index) => {
       const employee = employees[id];
       const record = node('article', 'visit-record visit-attendee-record');
-      addRecordDetails(record, employee.name, '', [['Department', employee.department], ['Position', employee.position]], index, 'attendee', id, true);
-      const actions = node('div', 'visit-record-actions');
-      actions.append(recordButton('Edit', 'data-edit-attendee', index, employee.name), recordButton('Remove', 'data-remove-attendee', index, employee.name));
-      record.querySelector('.visit-record-header').append(actions);
+      addRecordDetails(record, employee.name, '', [['Department', employee.department], ['Position', employee.position]], index, 'attendee', id);
       list.append(record);
     });
     updateSummaries();
@@ -351,6 +341,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   $('visitAttendeeCancelEdit').addEventListener('click', cancelAttendeeEntry);
   $('visitAttendeeList').addEventListener('click', event => {
+    toggleRecord(event);
     const edit = event.target.closest('[data-edit-attendee]');
     if (edit) {
       editingAttendee = Number(edit.dataset.editAttendee);

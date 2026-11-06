@@ -921,7 +921,7 @@
               </div>
               <div>
                 <h2 class="form-section-heading" id="v3CategoryTitleText" style="font-size: 15px; font-weight: 800; color: var(--text-primary); margin: 0;">Detail</h2>
-                <span id="v3CategoryItemsCount" style="font-size: 11.5px; font-weight: 600; color: var(--text-muted);" data-record-summary-count>Total Amount: RM 0.00</span>
+                <span id="v3CategoryItemsCount" class="form-list-caption">Total Amount: RM 0.00</span>
               </div>
             </div>
             <button type="button" class="btn-submit-primary btn-add-item-icon" aria-label="Add Item" title="Add Item" style="width: 40px; height: 40px; padding: 0; border-radius: 12px; font-size: 15px; display: inline-flex; align-items: center; justify-content: center; box-shadow: 0 4px 14px rgba(124, 58, 237, 0.35);" onclick="openEntryForm('add')">
@@ -1153,17 +1153,7 @@
     }
 
     function toggleItemCard(cardId) {
-      const card = document.getElementById(cardId);
-      if (!card) return;
-      const body = card.querySelector('.item-details-body');
-      const icon = card.querySelector('.toggle-icon');
-      if (!body) return;
-
-      const isHidden = body.style.display === 'none';
-      body.style.display = isHidden ? 'block' : 'none';
-      if (icon) {
-        icon.style.transform = isHidden ? 'rotate(180deg)' : 'rotate(0deg)';
-      }
+      toggleFormRecordDetails(document.getElementById(cardId)?.querySelector('.form-record-toggle'));
     }
 
     function renderLegacyView3List() {
@@ -1224,14 +1214,14 @@
                 </div>
                 <div style="display: flex; align-items: center; gap: 8px;">
                 <div style="font-size: 15px; font-weight: 800; color: var(--text-primary);">RM ${(item.localAmount || item.amt || 0).toFixed(2)}</div>
-                  <i class="fa-solid fa-chevron-down toggle-icon" style="color: var(--text-muted); font-size: 13px; padding: 4px; cursor: pointer; transition: transform 0.25s ease;" onclick="event.stopPropagation(); toggleItemCard('${cardId}')"></i>
+                  <button type="button" class="form-record-toggle" aria-label="Details for item ${idx + 1}" aria-controls="${cardId}-details" aria-expanded="false"><i class="fa-solid fa-chevron-down toggle-icon" aria-hidden="true"></i></button>
                   <i class="fa-solid fa-pen-to-square" style="color: var(--purple-primary); font-size: 14px; padding: 4px; cursor: pointer;" onclick="event.stopPropagation(); openEntryForm('edit', ${idx})" title="Edit Item"></i>
                   <i class="fa-solid fa-trash-can" style="color: #ef4444; font-size: 14px; padding: 4px; cursor: pointer;" onclick="event.stopPropagation(); deleteSubItem(${idx})" title="Delete Item"></i>
                 </div>
               </div>
 
               <!-- Expandable Detailed View -->
-              <div class="item-details-body" style="display: none; padding-top: 14px; margin-top: 12px; border-top: 1px dashed var(--border-subtle);">
+              <div id="${cardId}-details" class="item-details-body" hidden style="padding-top: 14px; margin-top: 12px; border-top: 1px dashed var(--border-subtle);">
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 11.5px;">
                   <div>
                     <span style="color: var(--text-muted); font-weight: 600;">Expense Category:</span>
@@ -1303,14 +1293,14 @@
                   </div>
                 </div>
                 <div style="display: flex; align-items: center; gap: 8px;">
-                  <i class="fa-solid fa-chevron-down toggle-icon" style="color: var(--text-muted); font-size: 13px; padding: 4px; cursor: pointer; transition: transform 0.25s ease;" onclick="event.stopPropagation(); toggleItemCard('${cardId}')"></i>
+                  <button type="button" class="form-record-toggle" aria-label="Details for item ${idx + 1}" aria-controls="${cardId}-details" aria-expanded="false"><i class="fa-solid fa-chevron-down toggle-icon" aria-hidden="true"></i></button>
                   <i class="fa-solid fa-pen-to-square" style="color: var(--purple-primary); font-size: 14px; padding: 4px; cursor: pointer;" onclick="event.stopPropagation(); openEntryForm('edit', ${idx})" title="Edit Employee"></i>
                   <i class="fa-solid fa-trash-can" style="color: #ef4444; font-size: 14px; padding: 4px; cursor: pointer;" onclick="event.stopPropagation(); deleteSubItem(${idx})" title="Delete Employee"></i>
                 </div>
               </div>
 
               <!-- Expandable Detailed View -->
-              <div class="item-details-body" style="display: none; padding-top: 14px; margin-top: 12px; border-top: 1px dashed var(--border-subtle);">
+              <div id="${cardId}-details" class="item-details-body" hidden style="padding-top: 14px; margin-top: 12px; border-top: 1px dashed var(--border-subtle);">
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 11.5px;">
                   <div>
                     <span style="color: var(--text-muted); font-weight: 600;">Employee Name:</span>
@@ -1350,14 +1340,14 @@
                   </div>
                 </div>
                 <div style="display: flex; align-items: center; gap: 8px;">
-                  <i class="fa-solid fa-chevron-down toggle-icon" style="color: var(--text-muted); font-size: 13px; padding: 4px; cursor: pointer; transition: transform 0.25s ease;" onclick="event.stopPropagation(); toggleItemCard('${cardId}')"></i>
+                  <button type="button" class="form-record-toggle" aria-label="Details for item ${idx + 1}" aria-controls="${cardId}-details" aria-expanded="false"><i class="fa-solid fa-chevron-down toggle-icon" aria-hidden="true"></i></button>
                   <i class="fa-solid fa-pen-to-square" style="color: var(--purple-primary); font-size: 14px; padding: 4px; cursor: pointer;" onclick="event.stopPropagation(); openEntryForm('edit', ${idx})" title="Edit Guest"></i>
                   <i class="fa-solid fa-trash-can" style="color: #ef4444; font-size: 14px; padding: 4px; cursor: pointer;" onclick="event.stopPropagation(); deleteSubItem(${idx})" title="Delete Guest"></i>
                 </div>
               </div>
 
               <!-- Expandable Detailed View -->
-              <div class="item-details-body" style="display: none; padding-top: 14px; margin-top: 12px; border-top: 1px dashed var(--border-subtle);">
+              <div id="${cardId}-details" class="item-details-body" hidden style="padding-top: 14px; margin-top: 12px; border-top: 1px dashed var(--border-subtle);">
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 11.5px;">
                   <div>
                     <span style="color: var(--text-muted); font-weight: 600;">Guest Name:</span>
@@ -1491,12 +1481,12 @@
               </div>
               <div style="display: flex; align-items: center; gap: 6px; flex-shrink: 0;">
                 ${amount ? `<span style="font-size: 13px; font-weight: 800; color: var(--text-primary);">${amount}</span>` : ''}
-                <i class="fa-solid fa-chevron-down toggle-icon" style="color: var(--text-muted); font-size: 13px; padding: 4px; transition: transform 0.25s ease;" onclick="event.stopPropagation(); toggleItemCard('${cardId}')"></i>
+                <button type="button" class="form-record-toggle" aria-label="Details for item ${idx + 1}" aria-controls="${cardId}-details" aria-expanded="false"><i class="fa-solid fa-chevron-down toggle-icon" aria-hidden="true"></i></button>
                 <i class="fa-solid fa-pen-to-square" style="color: var(--purple-primary); font-size: 14px; padding: 4px;" onclick="event.stopPropagation(); openEntryForm('edit', ${idx})" title="Edit"></i>
                 <i class="fa-solid fa-trash-can" style="color: #ef4444; font-size: 14px; padding: 4px;" onclick="event.stopPropagation(); deleteSubItem(${idx})" title="Delete"></i>
               </div>
             </div>
-            <div class="item-details-body" style="display: none; padding-top: 10px; margin-top: 12px; border-top: 1px dashed var(--border-subtle);">
+            <div id="${cardId}-details" class="item-details-body" hidden style="padding-top: 10px; margin-top: 12px; border-top: 1px dashed var(--border-subtle);">
               ${renderDetailRows(rows, attachments)}
             </div>
           </div>`;

@@ -23,7 +23,7 @@ const puppeteer = require('puppeteer');
 
       showLeaveSection('viewLeaveHighlight');
       const viewChartButton = [...document.querySelectorAll('#viewLeaveHighlight button')]
-        .find(button => button.textContent.replace(/\s+/g, ' ').trim() === 'View Chart');
+        .find(button => button.textContent.replace(/\s+/g, ' ').trim() === 'Chart');
       viewChartButton?.click();
       const chartStep = {
         visible: visible('viewLeaveHighlightChart'),

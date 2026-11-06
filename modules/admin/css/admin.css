@@ -45,14 +45,7 @@
   text-decoration: none;
 }
 .admin-page .admin-content { flex: 1; min-height: 0; overflow-y: auto; padding: 20px 16px 106px; }
-.workplace-scope { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); padding: 4px; border: 1px solid var(--border-subtle); border-radius: 20px; background: var(--bg-card); box-shadow: var(--shadow-card); }
-.workplace-scope-tab { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 37px; padding: 10px 14px; border: 0; border-radius: 16px; background: transparent; color: var(--text-muted); font: inherit; font-size: 13px; font-weight: 700; line-height: 17px; cursor: pointer; transition: background .2s ease, color .2s ease; }
-.workplace-scope-tab.active { color: #fff; background: linear-gradient(135deg,#7c3aed 0%,#6d28d9 100%); box-shadow: 0 4px 14px rgba(124,58,237,.4); }
-.workplace-scope-tab:focus-visible { outline: 3px solid rgba(124,58,237,.32); outline-offset: 2px; }
-.workplace-scope-panel { margin-top: 16px; }
-.workplace-scope-panel[hidden] { display: none !important; }
 .workplace-actions { margin-bottom: 20px; }
-@media (prefers-reduced-motion: reduce) { .workplace-scope-tab { transition: none; } }
 .admin-section-title { margin-bottom: 12px; font-size: 11px; font-weight: 800; letter-spacing: 1.2px; color: var(--text-muted); }
 .workplace-document-status { margin-bottom: 18px; }
 .workplace-document-status h2 { margin: 0 0 8px; color: var(--text-muted); font-size: 11.5px; font-weight: 800; text-transform: uppercase; letter-spacing: .02em; }

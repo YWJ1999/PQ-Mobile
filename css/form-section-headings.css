@@ -1,4 +1,29 @@
 /* Shared purple accent for business form sections and item editors. */
+.form-list-caption {
+  display: block;
+  margin-top: 2px;
+  color: var(--text-muted);
+  font-size: 11.5px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+.form-record-toggle {
+  display: inline-grid;
+  place-items: center;
+  flex: 0 0 auto;
+  padding: 4px;
+  min-width: 26px;
+  min-height: 26px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 13px;
+  cursor: pointer;
+}
+.form-record-toggle[aria-expanded="true"] > i { transform: rotate(180deg); }
+.form-record-toggle:focus-visible { outline: 2px solid var(--purple-primary); outline-offset: 2px; }
+
 .form-section-heading {
   /* Several existing upload headings set display: block inline. */
   display: flex !important;

@@ -40,7 +40,6 @@ const scopeCases = [
   ['leave.html', '#tabHubTeam', '#headerTitleText', 'Leave Dashboard'],
   ['modules/claims/index.html', '#tabClaimTeam', '#globalTopTitle', 'Claims & Expenses'],
   ['modules/payroll/index.html', '#tabPayrollTeam', '#globalTopTitle', 'Payroll'],
-  ['modules/admin/index.html', '#workplaceTabTeam', '.admin-heading h1', 'Workplace'],
   ['modules/project-task/index.html', '#projectTab-team', '.project-header-title h1', 'Project & Task Dashboard'],
   ['modules/employee-career/index.html', '#employeeCareerTabTeam', '.employee-career-heading h1', 'Employee & Career']
 ];

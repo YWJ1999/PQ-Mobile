@@ -251,25 +251,17 @@
       menu.append(icon);
       menu.addEventListener('click', () => showMenu(record, menu));
       header.append(check, employee, node('span', 'payroll-approval-status', 'Pending Approval'), menu);
-      const body = node('div', 'payroll-approval-card-body');
-      const status = node('div', 'payroll-approval-status-row');
-      status.append(node('span', 'payroll-approval-date', `Submitted ${date(record.submittedAt)}`));
-      const fields = node('div', 'payroll-approval-field-grid');
+      const body = node('div', 'approval-card-body payroll-approval-card-body');
+      const fields = [['Submitted', date(record.submittedAt)], ['Department', record.department]];
       if (record.category === 'goal-plan') {
-        fields.append(field('Department', record.department), field('Session', record.session));
-        body.append(status, fields, actionButtons(record.id));
+        fields.push(['Session', record.session]);
       } else {
-        fields.append(field('Department', record.department), field('Period', record.period));
-        if (record.category === 'self-review') {
-          fields.append(field('Appraisal Type', record.appraisalType), field('Section', record.section));
-        }
-        const facts = node('div', 'payroll-approval-facts');
-        const scores = node('div', 'payroll-approval-field-grid');
-        scores.append(field('Overall Score', record.overallScore), field('Score Grade', record.scoreGrade));
-        facts.append(scores);
-        body.append(status, fields, facts, actionButtons(record.id));
+        fields.push(['Period', record.period]);
+        if (record.category === 'self-review') fields.push(['Appraisal Type', record.appraisalType], ['Section', record.section]);
+        fields.push(['Overall Score', record.overallScore], ['Score Grade', record.scoreGrade]);
       }
-      if (record.backupApprover) body.insertBefore(field('Backup Approver', record.backupApprover.name), body.lastElementChild);
+      if (record.backupApprover) fields.push(['Backup Approver', record.backupApprover.name]);
+      body.append(createApprovalCardDetails(fields), actionButtons(record.id));
       card.append(header, body);
       queue.append(card);
     });

@@ -1599,12 +1599,9 @@
         <span id="list-title" hidden>Details</span>
         <div class="summary-list-overview record-summary-card" aria-label="Summary totals">
           <div class="summary-list-row">
-            <div class="summary-list-stat record-summary-metric">
-              <span class="record-summary-label">Total Records</span>
-              <strong id="list-record-count" class="record-summary-value">22</strong>
-            </div>
-            <button id="btn-chart-toggle" class="view-chart-btn" type="button" onclick="setView('chart')" style="display: none;">
-              <i class="fa-solid fa-chart-pie" aria-hidden="true"></i><span>View Chart</span>
+            <record-chart-count><strong id="list-record-count" class="record-summary-value">22</strong> <span class="record-summary-label">Records</span></record-chart-count>
+            <button id="btn-chart-toggle" class="view-chart-btn record-chart-button" type="button" onclick="setView('chart')" style="display: none;">
+              <i class="fa-solid fa-chart-simple" aria-hidden="true"></i><span>Chart</span>
             </button>
           </div>
           <div class="summary-list-divider" aria-hidden="true"></div>

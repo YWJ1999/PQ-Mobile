@@ -49,7 +49,7 @@ const file = pathToFileURL(path.resolve(__dirname, '../modules/employee-career/o
       assert.equal(await page.$eval('#careerPendingCount', node => node.textContent), '1');
       assert.deepEqual(await page.$$eval('#careerPendingQueue .employee-name', nodes => nodes.map(node => node.textContent)), ['Aina Rahman']);
       assert.ok(await page.$eval('#careerPendingQueue .employee-name', node => node.nextElementSibling.textContent === '#EBB01'));
-      assert.deepEqual(await page.$$eval('#careerPendingQueue .payroll-approval-field', nodes => nodes.map(node => [node.querySelector('small').textContent, node.querySelector('strong').textContent])), [['Interview Date', '12/10/2026'], ['Position', 'People Operations Executive']], 'Engagement cards show interview date and position');
+      assert.deepEqual(await page.$$eval('#careerPendingQueue .approval-card-details > div', nodes => nodes.map(node => [node.querySelector('dt').textContent, node.querySelector('dd').textContent])), [['Interview Date', '12/10/2026'], ['Position', 'People Operations Executive']], 'Engagement cards show interview date and position');
       assert.equal(await page.$('#careerPendingQueue .payroll-approval-card-header .career-pending-note'), null, 'Position appears once in the card body');
       assert.ok(await page.$eval('#careerPendingPanel', node => node.getAttribute('aria-labelledby') === document.querySelector('#careerPendingTabs [aria-selected="true"]').id));
       await page.screenshot({ path: path.join(__dirname, `employee-career-pending-engagement-${theme}-${width}.png`) });

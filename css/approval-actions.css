@@ -1,4 +1,101 @@
-/* Unified purple approval actions across Claims, Leave and Attendance. */
+/* Approval list cards follow the Book Resource card's field and action layout. */
+.team-approval-preview {
+  overflow: hidden;
+  border: 1px solid var(--border-subtle);
+  border-radius: 18px;
+  background: var(--bg-card);
+}
+.team-approval-preview > header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 75px;
+  padding: 14px 18px;
+  background: var(--record-submitted-surface, linear-gradient(105deg, #7e3005, #b85e0e));
+  color: #fff;
+}
+.team-approval-preview > header img {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+.team-approval-preview > header h4 { font-size: 14.5px; }
+.team-approval-preview > header p { margin-top: 2px; font-size: 11px; }
+.team-approval-preview > header > span { margin-left: auto; font-size: 10.5px; font-weight: 700; }
+.approval-card-body {
+  container: approval-card / inline-size;
+  padding: 14px 18px 18px;
+}
+.approval-card-details {
+  display: grid;
+  gap: 7px;
+  margin: 0;
+  text-align: left;
+  font-size: 11.5px;
+  line-height: 1.55;
+}
+.approval-card-details > div {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+  gap: 10px;
+  align-items: baseline;
+  overflow-wrap: anywhere;
+}
+.approval-card-details dt {
+  color: var(--text-muted);
+  font-weight: 600;
+}
+.approval-card-details dd {
+  margin: 0;
+  color: var(--text-primary);
+  text-align: right;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  white-space: pre-line;
+}
+.phone-container .approval-card-body > .pending-action-grid:not([hidden]) {
+  display: grid;
+  grid-template-columns: none;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 112px);
+  justify-content: center;
+  align-items: stretch;
+  gap: 8px;
+  margin-top: 16px;
+}
+@container approval-card (max-width: 291px) {
+  html .phone-container .approval-card-body > .pending-action-grid:has(> button:nth-of-type(4)) {
+    grid-template-columns: repeat(2, minmax(0, 112px));
+    grid-auto-flow: row;
+  }
+}
+.phone-container .approval-card-body > .pending-action-grid > button:not([hidden]) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  justify-self: stretch;
+  box-sizing: border-box;
+  min-width: 0;
+  width: auto;
+  min-height: 44px;
+  padding: 8px 4px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: #7c3aed var(--card-header-purple-background);
+  color: #fff;
+  box-shadow: none;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.35;
+  text-align: center;
+  white-space: normal;
+  overflow-wrap: normal;
+  cursor: pointer;
+}
+.phone-container .approval-card-body > .pending-action-grid > button:hover {
+  filter: brightness(1.08);
+}
 .approval-backup-assignment { margin: 5px 0 9px; color: var(--text-secondary); font-size: 11.5px; font-weight: 650; overflow-wrap: anywhere; }
 .pending-selection-bar {
   position: absolute;

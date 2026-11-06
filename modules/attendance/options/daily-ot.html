@@ -657,15 +657,12 @@
         <!-- Top: Total Records & View Chart Button -->
         <div style="display: flex; justify-content: space-between; align-items: center;">
           <div style="display: flex; align-items: center; gap: 10px;">
-            <div class="record-summary-metric">
-              <div style="font-size: 10.5px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px;" class="record-summary-label">Total Records</div>
-              <div style="font-size: 20px; font-weight: 900; color: var(--text-primary); line-height: 1.1;" id="kpiTotalRecordsText" class="record-summary-value">130</div>
-            </div>
+            <record-chart-count><div id="kpiTotalRecordsText" class="record-summary-value">130</div> <div class="record-summary-label">Records</div></record-chart-count>
           </div>
 
-          <button type="button" class="view-chart-btn" onclick="showDailyOtView('chart')">
-            <i class="fa-solid fa-chart-pie" aria-hidden="true"></i>
-            <span>View Chart</span>
+          <button type="button" class="view-chart-btn record-chart-button" onclick="showDailyOtView('chart')">
+            <i class="fa-solid fa-chart-simple" aria-hidden="true"></i>
+            <span>Chart</span>
           </button>
         </div>
 

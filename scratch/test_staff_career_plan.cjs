@@ -58,9 +58,9 @@ const pageUrl = theme => pathToFileURL(path.join(root, 'modules/employee-career/
 
       assert.deepEqual(await page.$eval('#staffCareerPlanViewChart', button => ({
         text: button.textContent.trim(),
-        pieIcon: button.querySelector('i')?.classList.contains('fa-chart-pie'),
+        barIcon: button.querySelector('i')?.classList.contains('fa-chart-simple'),
         nowrap: getComputedStyle(button).whiteSpace
-      })), { text: 'View Chart', pieIcon: true, nowrap: 'nowrap' });
+      })), { text: 'Chart', barIcon: true, nowrap: 'nowrap' });
 
       await page.click('#staffCareerPlanViewChart');
       assert.equal(await page.$eval('#staffCareerPlanTitle', node => node.textContent.trim()), 'Staff Career Plan Analysis');

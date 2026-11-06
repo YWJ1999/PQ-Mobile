@@ -34,13 +34,13 @@ async function filter(page, values) {
       assert.ok(await page.$('#assetTable'), 'Asset Highlight must contain the employee asset report');
       assert.deepEqual(await page.$$eval('#assetTable th', nodes => nodes.map(node => node.textContent)), ['Emp#', 'Name', 'Count', 'Value']);
       assert.equal((await rows(page)).length, 8);
-      assert.equal(await page.$eval('#assetTotalRecords', node => node.textContent), '8');
+      assert.equal(await page.$eval('record-chart-count', node => node.textContent.trim()), '8 Records');
       assert.deepEqual((await rows(page)).find(row => row[0] === '#EBB01'), ['#EBB01', 'Muhammad ali bin man', '3', '5,170.00']);
       assert.equal(await page.$('#assetTotalCount'), null, 'Summary must omit Total Count');
       assert.equal(await page.$('#assetTotalValue'), null, 'Summary must omit Total Value');
       assert.deepEqual(await tableTotals(page), { count: 12, valueCents: 2967000 });
-      assert.equal(await page.$eval('#assetViewChart', node => node.textContent.trim()), 'View Chart');
-      assert.ok(await page.$('#assetViewChart .fa-chart-pie'));
+      assert.equal(await page.$eval('#assetViewChart', node => node.textContent.trim()), 'Chart');
+      assert.ok(await page.$('#assetViewChart .fa-chart-simple'));
       assert.equal(await page.$eval('#assetViewChart', node => getComputedStyle(node).whiteSpace), 'nowrap');
       assert.ok(!(await page.$eval('body', node => node.textContent)).includes('View Trending'));
       assert.ok(await page.$eval('main', node => node.scrollWidth <= node.clientWidth));
@@ -56,6 +56,7 @@ async function filter(page, values) {
 
       await filter(page, { keyword: '#EBB01' });
       assert.equal((await rows(page)).length, 1);
+      assert.equal(await page.$eval('record-chart-count', node => node.textContent.trim()), '1 Record');
       assert.equal((await tableTotals(page)).count, 3);
       await filter(page, { description: 'MONITOR' });
       assert.equal((await rows(page)).length, 3);
@@ -92,6 +93,7 @@ async function filter(page, values) {
       await page.click('#assetBack');
       await filter(page, { keyword: '<script>no employee</script>' });
       assert.equal((await rows(page)).length, 0);
+      assert.equal(await page.$eval('record-chart-count', node => node.textContent.trim()), '0 Records');
       assert.equal(await page.$eval('#assetEmpty', node => node.hidden), false);
       await page.click('#assetViewChart');
       assert.equal(await page.$eval('#assetChartTotal', node => node.textContent), '0');

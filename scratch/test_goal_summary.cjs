@@ -18,7 +18,7 @@ const url=(file,theme)=>pathToFileURL(path.resolve(__dirname,'../modules/perform
       assert.deepEqual(await page.$$eval('#goalSummaryTable thead th',nodes=>nodes.map(node=>node.textContent.trim())),['Goal Type','Count','Achieve%']);
       assert.deepEqual(await rows(),[['Financial','2','90.00%'],['Customer','2','70.00%'],['Process','2','70.00%'],['Learning & Growth','1','75.00%'],['People','3','90.00%']]);
       assert.deepEqual(await page.$eval('#goalSummaryTable thead th',node=>({bg:getComputedStyle(node).backgroundColor,color:getComputedStyle(node).color})),{bg:'rgb(124, 58, 237)',color:'rgb(255, 255, 255)'});
-      assert.deepEqual(await page.$eval('#goalSummaryViewChart',node=>({text:node.textContent.trim(),icon:!!node.querySelector('.fa-chart-pie'),nowrap:getComputedStyle(node).whiteSpace})),{text:'View Chart',icon:true,nowrap:'nowrap'});
+      assert.deepEqual(await page.$eval('#goalSummaryViewChart',node=>({text:node.textContent.trim(),icon:!!node.querySelector('.fa-chart-simple'),nowrap:getComputedStyle(node).whiteSpace})),{text:'Chart',icon:true,nowrap:'nowrap'});
       const original=await page.evaluate(()=>JSON.stringify(window.PERFORMANCE_GOAL_SUMMARY_DATA));
       await page.screenshot({path:path.join(__dirname,`goal-summary-table-${theme}-${width}.png`)});
       await page.click('#goalSummaryFilterTrigger');

@@ -17,8 +17,8 @@
       <button type="button" id="staffFeedbackFilterTrigger" aria-label="Open Data Filter" aria-haspopup="dialog" aria-controls="staffFeedbackFilterOverlay"><i class="fa-solid fa-sliders" aria-hidden="true"></i></button>
     </div>
     <section class="staff-feedback-overview record-summary-card" aria-label="Feedback summary">
-      <div class="record-summary-metric"><span class="record-summary-label">Total Records</span><strong id="staffFeedbackTotal" aria-live="polite" class="record-summary-value">60</strong></div>
-      <button type="button" id="staffFeedbackViewChart" class="staff-feedback-chart-button"><i class="fa-solid fa-chart-pie" aria-hidden="true"></i><span>View Chart</span></button>
+      <record-chart-count><strong id="staffFeedbackTotal" aria-live="polite" class="record-summary-value">60</strong> <span class="record-summary-label">Records</span></record-chart-count>
+      <button type="button" id="staffFeedbackViewChart" class="staff-feedback-chart-button record-chart-button"><i class="fa-solid fa-chart-simple" aria-hidden="true"></i><span>Chart</span></button>
     </section>
     <div id="staffFeedbackRecords" class="staff-feedback-records"></div>
     <div id="staffFeedbackEmpty" class="staff-feedback-empty" hidden><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i><h2>No feedback found</h2><p>Try another keyword or adjust your filters.</p></div>

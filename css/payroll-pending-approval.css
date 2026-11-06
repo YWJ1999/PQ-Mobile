@@ -29,25 +29,12 @@
 .payroll-pending-page .approval-card-checkbox:checked { background: #fff; border-color: #fff; }
 .payroll-pending-page .approval-card-checkbox:checked::after { content: '\f00c'; font: 900 12px 'Font Awesome 6 Free'; color: #7c3aed; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
 .payroll-pending-page .three-dots-btn { display: grid; place-items: center; width: 28px; height: 28px; flex-shrink: 0; border-radius: 50%; border: 1px solid rgba(255, 255, 255, 0.35); background: rgba(255, 255, 255, 0.2); color: #fff; font-size: 13px; cursor: pointer; }
-.payroll-approval-card-body { padding: 14px; cursor: pointer; }
-.payroll-approval-status-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 12px; }
+.payroll-approval-card-body { cursor: pointer; }
 .payroll-approval-status { display: inline-flex; align-items: center; gap: 6px; padding: 4.5px 10px; border: 1px solid var(--purple-border); border-radius: 12px; background: var(--purple-subtle); color: var(--purple-text); font-size: 11.5px; font-weight: 800; white-space: nowrap; }
-.payroll-approval-date { display: flex; align-items: center; justify-content: flex-end; gap: 4px; font-size: 10.5px; font-weight: 700; color: var(--text-muted); text-align: right; }
-.payroll-approval-date > i { color: var(--purple-text); }
-.payroll-approval-date span { line-height: 1.4; }
-.payroll-approval-date strong { display: inline-block; color: var(--text-primary); font: 700 11px monospace, sans-serif; white-space: nowrap; }
 .payroll-approval-field-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-bottom: 12px; }
 .payroll-approval-field { min-width: 0; }
 .payroll-approval-field small { display: block; margin-bottom: 3px; font-size: 10.5px; font-weight: 700; color: var(--text-muted); }
 .payroll-approval-field strong { display: block; font-size: 12.5px; font-weight: 800; line-height: 1.4; overflow-wrap: anywhere; }
-.payroll-approval-facts { padding: 10px 12px; margin-bottom: 12px; border: 1px solid var(--border-subtle); border-radius: 12px; background: var(--bg-input); }
-.payroll-approval-facts .payroll-approval-field-grid { margin-bottom: 0; }
-.payroll-approval-facts .payroll-approval-triple { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
-.payroll-approval-facts .payroll-approval-field-grid + .payroll-approval-field-grid { border-top: 1px dashed var(--border-subtle); margin-top: 8px; padding-top: 8px; }
-.payroll-approval-facts .payroll-approval-field strong { font-size: 11.5px; }
-.payroll-approval-amount { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 12px; margin-bottom: 14px; border: 1px solid var(--border-subtle); border-radius: 12px; background: var(--bg-input); }
-.payroll-approval-amount span { color: var(--text-muted); font-size: 11.5px; font-weight: 700; }
-.payroll-approval-amount strong { color: var(--purple-text); font: 800 14px monospace, sans-serif; }
 .payroll-pending-page .pending-action-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
 .payroll-pending-empty { padding: 32px 16px; text-align: center; border: 1px solid var(--border-subtle); border-radius: 20px; background: var(--bg-card); }
 .payroll-pending-empty > i { font-size: 28px; color: var(--purple-text); margin-bottom: 12px; }
@@ -127,7 +114,6 @@
 @media (max-width: 380px) {
   .payroll-pending-tabs .filter-pill { font-size: 11.5px; padding-inline: 10px; }
   .payroll-approval-card-header { gap: 10px; }
-  .payroll-approval-date { font-size: 10px; }
   .payroll-approval-field strong { font-size: 12px; }
   .payroll-approval-details-header { padding: 14px 12px; }
   .payroll-approval-details-header h2 { font-size: 14px; }

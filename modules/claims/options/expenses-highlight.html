@@ -288,14 +288,11 @@
           
           <!-- Row 1: Total Records + View Chart Button -->
           <div class="action-summary-row" style="display: flex; justify-content: space-between; align-items: center;">
-            <div class="record-summary-metric">
-              <div class="summary-label record-summary-label" style="font-size: 13px; font-weight: 700; color: var(--text-muted);">Total Records</div>
-              <div id="highlightTotalRecords" class="summary-value record-summary-value" style="color: var(--purple-primary); font-size: 19px; font-weight: 800; margin-top: 1px;">142</div>
-            </div>
+            <record-chart-count><div id="highlightTotalRecords" class="summary-value record-summary-value">142</div> <div class="summary-label record-summary-label">Records</div></record-chart-count>
             <div class="action-icons" style="display: flex; gap: 12px;">
-              <button type="button" class="view-chart-btn" title="View Chart" onclick="showExpensesSection('chart')" style="padding: 7px 13px; border-radius: 12px; background: rgba(245, 158, 11, 0.14); border: 1px solid rgba(245, 158, 11, 0.3); color: #f59e0b; font-size: 12px; font-weight: 800; display: inline-flex; align-items: center; justify-content: center; gap: 6px; white-space: nowrap; cursor: pointer; box-shadow: var(--shadow-sm); transition: transform 0.2s ease;">
-                <i class="fa-solid fa-chart-pie" style="font-size: 13px;"></i>
-                <span>View Chart</span>
+              <button type="button" class="view-chart-btn record-chart-button" title="Chart" onclick="showExpensesSection('chart')">
+                <i class="fa-solid fa-chart-simple" aria-hidden="true"></i>
+                <span>Chart</span>
               </button>
             </div>
           </div>

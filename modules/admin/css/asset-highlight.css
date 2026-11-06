@@ -8,8 +8,6 @@
 .asset-filter-summary small { display: block; margin-bottom: 3px; color: var(--text-muted); font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .4px; }
 .asset-filter-summary strong { display: block; font-size: 12.5px; font-weight: 800; line-height: 1.45; overflow-wrap: anywhere; }
 .asset-filter-summary button { width: 44px; height: 44px; flex-shrink: 0; display: grid; place-items: center; border: 1px solid var(--border-subtle); border-radius: 14px; background: var(--bg-input); color: var(--purple-text); font-size: 16px; }
-.asset-records { display: block; color: var(--purple-text); font-size: 19px; font-weight: 800; }
-.asset-view-chart { display: inline-flex; align-items: center; justify-content: center; gap: 6px; flex-shrink: 0; padding: 7px 13px; border: 1px solid rgba(245,158,11,.3); border-radius: 12px; background: rgba(245,158,11,.14); color: #f59e0b; font-size: 12px; font-weight: 800; white-space: nowrap; }
 .asset-table-card { border: 1px solid var(--border-subtle); border-radius: 20px; background: var(--bg-card); box-shadow: var(--shadow-card); overflow: hidden; }
 .asset-table-scroll { overflow-x: auto; }
 #assetTable { width: 100%; border-collapse: collapse; table-layout: fixed; font-size: 12px; }

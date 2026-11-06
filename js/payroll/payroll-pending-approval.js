@@ -110,31 +110,22 @@
     header.append(checkbox, employee, menu);
     header.addEventListener('click', event => { if (!event.target.closest('input, button')) openDetails(item.id, menu); });
 
-    const body = node('div', 'payroll-approval-card-body');
-    const statusRow = node('div', 'payroll-approval-status-row');
+    const body = node('div', 'approval-card-body payroll-approval-card-body');
     const status = node('span', 'payroll-approval-status');
     status.append(icon('fa-hourglass-half'), node('span', '', item.status));
-    const submitted = node('div', 'payroll-approval-date');
-    const dateCopy = node('span');
-    dateCopy.append(document.createTextNode(item.category === 'tax' ? 'Submit Date: ' : 'Request Date: '), node('strong', '', date(item.submitDate || item.requestDate)));
-    submitted.append(icon('fa-calendar-check'), dateCopy);
     header.insertBefore(status, menu);
-    statusRow.append(submitted);
-    body.append(statusRow);
-    const facts = node('div', 'payroll-approval-facts');
-    if (item.category === 'tax') {
-      body.append(fieldGrid([['Tax Relief Item', `${item.rebateCode} - ${item.rebateItem}`], ['Description', item.description || '-']]));
-      facts.append(fieldGrid([['Txn. Date', date(item.transactionDate)], ['Process', item.process ? 'Yes' : 'No']]));
-    } else {
-      body.append(fieldGrid([['Deduction Type', item.deductionType], ['Request Type', item.requestType]]));
-      facts.append(fieldGrid([['Date From', date(item.dateFrom)], ['Date To', date(item.dateTo)]]));
-      const payroll = fieldGrid([['Days', item.days.toFixed(2)], ['Period', item.period], ['Cycle', item.cycle]]);
-      payroll.classList.add('payroll-approval-triple');
-      facts.append(payroll);
-    }
-    const amount = node('div', 'payroll-approval-amount');
-    amount.append(node('span', '', 'Amount'), node('strong', '', money(item.amount)));
-    body.append(facts, amount, actionButtons(item.category));
+    const fields = item.category === 'tax'
+      ? [
+          ['Submit Date', date(item.submitDate || item.requestDate)], ['Tax Relief Item', item.rebateCode + ' - ' + item.rebateItem],
+          ['Description', item.description], ['Txn. Date', date(item.transactionDate)], ['Process', item.process ? 'Yes' : 'No']
+        ]
+      : [
+          ['Request Date', date(item.submitDate || item.requestDate)], ['Deduction Type', item.deductionType], ['Request Type', item.requestType],
+          ['Date From', date(item.dateFrom)], ['Date To', date(item.dateTo)], ['Days', item.days.toFixed(2)],
+          ['Period', item.period], ['Cycle', item.cycle]
+        ];
+    fields.push(['Amount', money(item.amount)]);
+    body.append(createApprovalCardDetails(fields), actionButtons(item.category));
     PendingApprovalBackup.showAssignment(body.lastElementChild, { scope: 'payroll', id: item.id });
     body.addEventListener('click', event => { if (!event.target.closest('button')) openDetails(item.id, menu); });
     card.append(header, body);

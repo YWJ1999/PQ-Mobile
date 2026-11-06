@@ -8,9 +8,8 @@ const root = path.resolve(__dirname, '..');
 const output = process.env.OPTION_PREVIEW_DIR;
 const pages = [
   { name: 'workplace', file: 'modules/admin/index.html', views: [
-    { name: 'individual', grid: '#workplaceQuickOptions', count: 6 },
-    { name: 'all', clicks: ['[data-workplace-options-open]'], grid: '#workplaceAllOptions', count: 8 },
-    { name: 'team', clicks: ['#workplaceTabTeam'], empty: '#workplaceTeamPanel' }
+    { name: 'options', grid: '#workplaceQuickOptions', count: 6 },
+    { name: 'all', clicks: ['[data-workplace-options-open]'], grid: '#workplaceAllOptions', count: 8 }
   ] },
   { name: 'employee-career', file: 'modules/employee-career/index.html', views: [
     { name: 'individual', grid: '#employeeCareerOptions', count: 5 },
@@ -115,11 +114,6 @@ async function inspect(page, selector) {
         for (const selector of view.clicks || []) await page.click(selector);
         await page.mouse.move(0, 0);
         await page.evaluate(() => Promise.all([document.fonts.ready, new Promise(resolve => setTimeout(resolve, 350))]));
-        if (view.empty) {
-          assert.equal(await page.$eval(view.empty, node => node.childElementCount), 0, `${target.name}/${view.name}: empty panel`);
-          assert.equal(await page.$eval(view.empty, node => node.hidden), false);
-          continue;
-        }
         for (const width of [320, 390, 420]) {
           await page.setViewport({ width, height: 950 });
           const context = `${target.name}/${view.name} ${theme} ${width}px`;

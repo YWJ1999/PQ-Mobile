@@ -113,25 +113,20 @@ document.addEventListener('DOMContentLoaded', () => {
     menu.append(icon('fa-ellipsis-vertical'));
     menu.addEventListener('click', () => { currentId = item.id; openSheet('workplaceApprovalMenu', menu); });
     header.append(checkbox, identity(item.employeeName, item.empNo), menu);
-    const body = node('div', 'payroll-approval-card-body');
+    const body = node('div', 'approval-card-body payroll-approval-card-body');
     const review = node('div', 'workplace-approval-review');
     review.tabIndex = 0;
     review.setAttribute('role', 'button');
     review.setAttribute('aria-label', 'View details for ' + item.reference);
-    const statusRow = node('div', 'payroll-approval-status-row');
     const status = node('span', 'payroll-approval-status');
     status.append(icon('fa-hourglass-half'), node('span', '', 'Submitted'));
-    const submitted = node('span', 'payroll-approval-date', 'Submit Date: ' + date(item.submitDate));
     header.insertBefore(status, menu);
-    statusRow.append(submitted);
     const reference = node('p', 'workplace-approval-reference', 'Ref: ' + item.reference);
-    const facts = node('div', 'payroll-approval-facts');
     const rows = item.kind === 'inventory-request'
       ? [['Quantity', String(item.quantity)], ['Request Item', item.requestItem], ['Reason', item.reason]]
       : [['Visit Date', date(item.visitDate)], ['Visit Time', `${item.startTime} – ${item.endTime}`], ['Total Guest', String(item.totalGuest)]];
-    facts.append(fieldGrid(rows));
     header.querySelector('.payroll-employee-copy').append(reference);
-    review.append(statusRow, facts);
+    review.append(createApprovalCardDetails([['Submit Date', date(item.submitDate)], ...rows]));
     review.addEventListener('click', () => openDetails(item.id, review));
     review.addEventListener('keydown', event => { if (['Enter', ' '].includes(event.key)) { event.preventDefault(); openDetails(item.id, review); } });
     body.append(review, actionButtons());

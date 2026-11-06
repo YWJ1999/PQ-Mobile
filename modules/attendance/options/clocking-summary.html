@@ -625,13 +625,10 @@
 
         <div class="attendance-report-summary highlight-summary-card record-summary-card">
           <div class="attendance-report-summary-row">
-            <div class="record-summary-metric">
-              <span class="attendance-report-summary-label record-summary-label">Total Records</span>
-              <strong id="totalRecordsVal" class="attendance-report-summary-value record-summary-value">2</strong>
-            </div>
-            <button type="button" class="view-chart-btn" onclick="openSummaryChart()" title="View Chart">
-              <i class="fa-solid fa-chart-pie" aria-hidden="true"></i>
-              <span>View Chart</span>
+            <record-chart-count><strong id="totalRecordsVal" class="attendance-report-summary-value record-summary-value">2</strong> <span class="attendance-report-summary-label record-summary-label">Records</span></record-chart-count>
+            <button type="button" class="view-chart-btn record-chart-button" onclick="openSummaryChart()" title="Chart">
+              <i class="fa-solid fa-chart-simple" aria-hidden="true"></i>
+              <span>Chart</span>
             </button>
           </div>
           <div class="attendance-report-summary-row">
@@ -709,8 +706,8 @@
         <section class="clocking-details-page">
           <div class="clocking-details-toolbar attendance-report-summary highlight-summary-card record-summary-card">
             <div class="attendance-report-summary-row">
-              <div class="record-summary-metric"><span class="attendance-report-summary-label record-summary-label">Total Records</span><strong id="detailsRecordCount" class="attendance-report-summary-value record-summary-value">0</strong></div>
-              <button type="button" class="view-chart-btn" onclick="openDetailsChart()"><i class="fa-solid fa-chart-pie" aria-hidden="true"></i><span>View Chart</span></button>
+              <record-chart-count><strong id="detailsRecordCount" class="attendance-report-summary-value record-summary-value">0</strong> <span class="attendance-report-summary-label record-summary-label">Records</span></record-chart-count>
+              <button type="button" class="view-chart-btn record-chart-button" onclick="openDetailsChart()"><i class="fa-solid fa-chart-simple" aria-hidden="true"></i><span>Chart</span></button>
             </div>
             <div class="attendance-report-summary-row">
               <div class="clocking-details-actions" aria-label="Clocking exports">

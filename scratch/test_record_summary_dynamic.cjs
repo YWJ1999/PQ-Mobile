@@ -11,9 +11,8 @@ const puppeteer = require('puppeteer');
     await page.goto(pathToFileURL(path.resolve(__dirname, '../modules/admin/options/guest-visit.html')).href, { waitUntil: 'load' });
     for (const caption of ['Total Records: 0', 'Total Records: 12', 'Total Records: 1,024']) {
       await page.$eval('#visitGuestListCount', (node, text) => { node.innerText = text; }, caption);
-      await page.waitForFunction(text => document.querySelector('#visitGuestListCount .record-summary-value')?.textContent === text.split(': ')[1], {}, caption);
-      assert.equal(await page.$eval('#visitGuestListCount', node => node.textContent), caption, 'Formatting preserves the exact count caption');
-      assert.equal(await page.$$eval('#visitGuestListCount .record-summary-value', nodes => nodes.length), 1, 'Repeated updates do not duplicate counts');
+      assert.equal(await page.$eval('#visitGuestListCount', node => node.textContent), caption);
+      assert.equal(await page.$eval('#visitGuestListCount', node => node.matches('.record-summary-card') || node.childElementCount > 0), false, 'Editable list headers keep one plain subtitle');
     }
     await page.$eval('#visitGuestListCount', node => { node.textContent = 'Total Amount: RM 12.50'; });
     await page.waitForFunction(() => !document.querySelector('#visitGuestListCount').classList.contains('record-summary-card'));

@@ -81,9 +81,9 @@ async function inspectPage(browser, config, theme, width) {
   }
   assert.deepEqual(await page.$eval('.view-chart-btn', button => ({
     text: button.textContent.replace(/\s+/g, ' ').trim(),
-    icon: button.querySelector('i')?.classList.contains('fa-chart-pie'),
+    icon: button.querySelector('i')?.classList.contains('fa-chart-simple'),
     whiteSpace: getComputedStyle(button).whiteSpace
-  })), { text: 'View Chart', icon: true, whiteSpace: 'nowrap' });
+  })), { text: 'Chart', icon: true, whiteSpace: 'nowrap' });
 
   const summary = await page.evaluate(config.readSummary);
   assert.deepEqual(summary, config.expectedSummary);

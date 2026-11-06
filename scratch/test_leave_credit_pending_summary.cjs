@@ -34,8 +34,8 @@ const puppeteer = require('puppeteer');
           creditLeaveValueColor: card?.querySelector('[data-credit-leave-value]')
             ? getComputedStyle(card.querySelector('[data-credit-leave-value]')).color
             : '',
-          creditTypeValueColor: card?.querySelector('[data-credit-leave-summary]')?.previousElementSibling
-            ? getComputedStyle(card.querySelector('[data-credit-leave-summary]').previousElementSibling).color
+          creditTypeValueColor: card?.querySelector('[data-credit-leave-summary]')?.previousElementSibling?.querySelector('dd')
+            ? getComputedStyle(card.querySelector('[data-credit-leave-summary]').previousElementSibling.querySelector('dd')).color
             : ''
         };
       };

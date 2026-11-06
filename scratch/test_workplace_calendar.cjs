@@ -80,13 +80,8 @@ async function screenshot(page, name) {
       await page.keyboard.press('Escape');
       await page.waitForFunction(() => !document.getElementById('attendanceScheduleInfo').open);
       assert.equal(await page.evaluate(() => document.activeElement.id), 'workplaceCalendarInfo');
-      await page.click('#workplaceTabTeam');
-      assert.equal(await page.$eval('#workplaceCalendar', node => node.getClientRects().length), 0, 'Calendar must not appear on the Team dashboard');
-      assert.equal(await page.$eval('#workplaceCalendarMonth', node => node.textContent), 'January 2024');
       await page.click(`[data-set-theme="${theme === 'light' ? 'dark' : 'light'}"]`);
-      assert.equal(await page.$eval('#workplaceCalendarMonth', node => node.textContent), 'January 2024', 'Theme and scope switching must preserve calendar navigation');
-      await page.click('#workplaceTabIndividual');
-      assert.ok(await page.$eval('#workplaceCalendar', node => node.getClientRects().length > 0), 'Individual dashboard retains the calendar');
+      assert.equal(await page.$eval('#workplaceCalendarMonth', node => node.textContent), 'January 2024', 'Theme switching must preserve calendar navigation');
       await page.setViewport({ width, height: 640 });
       await page.click('#workplaceCalendarGrid [data-date="2024-01-01"]');
       for (let index = 0; index < 4; index++) await page.keyboard.press('ArrowDown');
@@ -99,8 +94,6 @@ async function screenshot(page, name) {
       await page.click('#workplaceCalendarInfo');
       assert.ok(await page.$eval('.attendance-schedule-info-panel', node => node.scrollWidth <= node.clientWidth), 'Info sheet fits short mobile viewports');
       await page.goto(url + '?scope=team&theme=' + theme, { waitUntil: 'domcontentloaded' });
-      assert.equal(await page.$eval('#workplaceCalendar', node => node.getClientRects().length), 0, 'Opening Team directly must hide the calendar');
-      await page.click('#workplaceTabIndividual');
       assert.ok(await page.$eval('#workplaceCalendar', node => node.getClientRects().length > 0));
       assert.deepEqual(errors, []);
       console.log(`PASS: Leave-style Workplace calendar, real month grid, year rollover, leap years, selection, keyboard navigation, Info, scope and theme, ${theme}, ${width}px`);

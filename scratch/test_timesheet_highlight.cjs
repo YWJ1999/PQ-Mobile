@@ -59,7 +59,7 @@ async function checkChart(page, prefix, expected) {
       assert.equal(await page.$$eval('#timesheetHighlightTable tbody button', nodes => nodes.length), 0);
       assert.equal(await page.$$eval('#timesheetHighlightTable tbody [data-employee-hours]', nodes => nodes.every(node => node.tagName === 'SPAN')), true);
       assert.equal(await page.$('#timesheetEmployeeDetails'), null);
-      assert.equal(await page.$eval('#timesheetViewChart', node => Boolean(node.querySelector('.fa-chart-pie')) && node.textContent.trim() === 'View Chart'), true);
+      assert.equal(await page.$eval('#timesheetViewChart', node => Boolean(node.querySelector('.fa-chart-simple')) && node.textContent.trim() === 'Chart'), true);
       for (const width of [360, 390, 450]) {
         await page.setViewport({ width, height: 950 });
         assert.equal(await page.$eval('.phone-container', node => node.scrollWidth > node.clientWidth + 1), false);

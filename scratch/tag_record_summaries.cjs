@@ -39,6 +39,7 @@ for (const relative of files) {
   const allText = node => (node.text || '') + node.children.map(allText).join('');
   const cards = new Set();
   for (const node of nodes) {
+    if (node.classes.has('form-list-caption')) continue;
     const own = (node.text || '').trim();
     if (inlineIds.has(node.attrs.id) || /^total\s+records?(?:\s+found)?\s*:\s*[\d,]+$/i.test(own)) {
       node.extra.add('data-record-summary-count');

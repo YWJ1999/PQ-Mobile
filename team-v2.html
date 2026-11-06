@@ -410,10 +410,6 @@
 
     /* 2. Urgent Pending Approvals (High-Density Action Stack) */
     .approvals-stack-card {
-      background: #ffffff;
-      border: 1.5px solid rgba(192, 132, 252, 0.4);
-      border-radius: 22px;
-      padding: 16px;
       margin-bottom: 22px;
       box-shadow: 0 8px 24px rgba(124, 58, 237, 0.08), 0 2px 8px rgba(0, 0, 0, 0.03);
     }
@@ -447,90 +443,6 @@
       display: flex;
       flex-direction: column;
       gap: 10px;
-    }
-
-    .stack-item {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 10px 12px;
-      background: #f8faff;
-      border: 1px solid #eef2ff;
-      border-radius: 14px;
-      transition: background 0.15s ease;
-    }
-
-    .stack-item:hover {
-      background: #f1f5f9;
-    }
-
-    .stack-user-box {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .stack-avatar {
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      object-fit: cover;
-    }
-
-    .stack-details h4 {
-      font-size: 13px;
-      font-weight: 700;
-      color: #0f172a;
-      line-height: 1.2;
-    }
-
-    .stack-details p {
-      font-size: 11px;
-      color: #64748b;
-      font-weight: 500;
-      margin-top: 1px;
-    }
-
-    .stack-btn-group {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .icon-btn-approve {
-      width: 32px;
-      height: 32px;
-      border-radius: 10px;
-      background: #10b981;
-      color: #ffffff;
-      border: none;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      transition: transform 0.15s ease, background 0.15s ease;
-    }
-
-    .icon-btn-approve:hover {
-      background: #059669;
-      transform: scale(1.05);
-    }
-
-    .icon-btn-review {
-      padding: 6px 10px;
-      border-radius: 10px;
-      background: #f1f5f9;
-      color: #475569;
-      border: 1px solid #cbd5e1;
-      font-size: 11px;
-      font-weight: 700;
-      cursor: pointer;
-    }
-
-    .icon-btn-review:hover {
-      background: #fee2e2;
-      color: #dc2626;
-      border-color: #fca5a5;
     }
 
     /* 3. Interactive Team Attendance Matrix (Filterable Grid) */
@@ -779,6 +691,7 @@
     }
   </style>
   <link rel="stylesheet" href="css/theme.css">
+  <link rel="stylesheet" href="css/approval-actions.css">
   <link rel="stylesheet" href="css/dashboard-legacy.css">
   <link rel="stylesheet" href="css/dashboard-background.css">
   <script src="js/dashboard-background.js" defer></script>
@@ -933,55 +846,70 @@
 
         <div class="stack-list">
           <!-- Item 1: Alex Tan -->
-          <div class="stack-item">
-            <div class="stack-user-box">
-              <img class="stack-avatar" src="https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=100&auto=format&fit=crop&q=80" alt="Alex Tan">
-              <div class="stack-details">
+          <article class="approval-card team-approval-preview">
+            <header>
+              <img src="https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=100&auto=format&fit=crop&q=80" alt="Alex Tan">
+              <div>
                 <h4>Alex Tan</h4>
-                <p>🌴 Annual Leave • Oct 12–13 (2 Days)</p>
+              </div>
+              <span>Pending</span>
+            </header>
+            <div class="approval-card-body">
+              <dl class="approval-card-details">
+                <div><dt>Request</dt> <dd>Annual Leave</dd></div>
+                <div><dt>Dates</dt> <dd>Oct 12 – 13</dd></div>
+                <div><dt>Duration</dt> <dd>2 Days</dd></div>
+              </dl>
+              <div class="approval-actions pending-action-grid">
+                <button type="button" class="icon-btn-review">Review</button>
+                <button type="button" class="icon-btn-approve">Approve</button>
               </div>
             </div>
-            <div class="stack-btn-group">
-              <button class="icon-btn-review">Review</button>
-              <button class="icon-btn-approve" aria-label="Approve">
-                <i class="fa-solid fa-check"></i>
-              </button>
-            </div>
-          </div>
+          </article>
 
           <!-- Item 2: Emily Wong -->
-          <div class="stack-item">
-            <div class="stack-user-box">
-              <img class="stack-avatar" src="https://images.unsplash.com/photo-1517841905240-472988babdf9?w=100&auto=format&fit=crop&q=80" alt="Emily Wong">
-              <div class="stack-details">
+          <article class="approval-card team-approval-preview">
+            <header>
+              <img src="https://images.unsplash.com/photo-1517841905240-472988babdf9?w=100&auto=format&fit=crop&q=80" alt="Emily Wong">
+              <div>
                 <h4>Emily Wong</h4>
-                <p>🧾 Medical Claim • $85.50 (Clinic)</p>
+              </div>
+              <span>Pending</span>
+            </header>
+            <div class="approval-card-body">
+              <dl class="approval-card-details">
+                <div><dt>Request</dt> <dd>Medical Claim</dd></div>
+                <div><dt>Amount</dt> <dd>$85.50</dd></div>
+                <div><dt>Type</dt> <dd>Clinic</dd></div>
+              </dl>
+              <div class="approval-actions pending-action-grid">
+                <button type="button" class="icon-btn-review">Review</button>
+                <button type="button" class="icon-btn-approve">Approve</button>
               </div>
             </div>
-            <div class="stack-btn-group">
-              <button class="icon-btn-review">Review</button>
-              <button class="icon-btn-approve" aria-label="Approve">
-                <i class="fa-solid fa-check"></i>
-              </button>
-            </div>
-          </div>
+          </article>
 
           <!-- Item 3: Marcus Lee -->
-          <div class="stack-item">
-            <div class="stack-user-box">
-              <img class="stack-avatar" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&auto=format&fit=crop&q=80" alt="Marcus Lee">
-              <div class="stack-details">
+          <article class="approval-card team-approval-preview">
+            <header>
+              <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&auto=format&fit=crop&q=80" alt="Marcus Lee">
+              <div>
                 <h4>Marcus Lee</h4>
-                <p>⏱️ Overtime • 3.5 Hours (Oct 10)</p>
+              </div>
+              <span>Pending</span>
+            </header>
+            <div class="approval-card-body">
+              <dl class="approval-card-details">
+                <div><dt>Request</dt> <dd>Overtime</dd></div>
+                <div><dt>Date</dt> <dd>Oct 10</dd></div>
+                <div><dt>Duration</dt> <dd>3.5 Hours</dd></div>
+              </dl>
+              <div class="approval-actions pending-action-grid">
+                <button type="button" class="icon-btn-review">Review</button>
+                <button type="button" class="icon-btn-approve">Approve</button>
               </div>
             </div>
-            <div class="stack-btn-group">
-              <button class="icon-btn-review">Review</button>
-              <button class="icon-btn-approve" aria-label="Approve">
-                <i class="fa-solid fa-check"></i>
-              </button>
-            </div>
-          </div>
+          </article>
         </div>
       </div>
 

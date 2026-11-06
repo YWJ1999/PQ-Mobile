@@ -39,10 +39,10 @@
       dialog.className = 'record-key-dialog';
       dialog.id = 'recordColourLegend';
       dialog.setAttribute('aria-labelledby', 'recordKeyTitle');
-      dialog.innerHTML = `<header><h2 id="recordKeyTitle">Colour legend</h2>
-        <form method="dialog"><button aria-label="Close colour legend" autofocus>×</button></form></header>
+      dialog.innerHTML = `<header><h2 id="recordKeyTitle">Info</h2>
+        <form method="dialog"><button aria-label="Close Info" autofocus>×</button></form></header>
         <div class="record-key-body">
-        <h3>Card header colours</h3>${legendList(cardKey, 'record-key-headers')}
+        <h3>Status</h3>${legendList(cardKey, 'record-key-headers')}
         ${document.getElementById('leaveCalendarInfo') ? `<details open><summary>Leave calendar legend</summary>
           <h3>Day types</h3>${legendList(dayKey, 'record-key-days')}
           <h3>Leave status dots</h3>${legendList(leaveKey, 'record-key-dots')}</details>` : ''}
@@ -68,8 +68,8 @@
     button.hidden = true;
     button.className = 'record-key-trigger';
     button.textContent = '!';
-    button.title = 'View colour legend';
-    button.setAttribute('aria-label', 'View colour legend');
+    button.title = 'View Info';
+    button.setAttribute('aria-label', 'View Info');
     button.setAttribute('aria-haspopup', 'dialog');
     button.addEventListener('click', openLegend);
 

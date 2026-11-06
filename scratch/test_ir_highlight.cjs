@@ -34,9 +34,9 @@ const pageUrl = theme => pathToFileURL(path.join(root, 'modules/employee-career/
 
       assert.deepEqual(await page.$eval('#irHighlightViewChart', button => ({
         text: button.textContent.trim(),
-        pieIcon: button.querySelector('i')?.classList.contains('fa-chart-pie'),
+        barIcon: button.querySelector('i')?.classList.contains('fa-chart-simple'),
         nowrap: getComputedStyle(button).whiteSpace
-      })), { text: 'View Chart', pieIcon: true, nowrap: 'nowrap' });
+      })), { text: 'Chart', barIcon: true, nowrap: 'nowrap' });
 
       await page.click('#irHighlightTable tbody tr .ir-highlight-cases-button');
       assert.equal(await page.$eval('#irHighlightDetailsOverlay', node => node.hidden), false);

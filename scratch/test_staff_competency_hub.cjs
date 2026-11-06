@@ -93,7 +93,7 @@ const url = query => pathToFileURL(path.join(__dirname, '../modules/training-com
         if (['search', 'gap'].includes(name)) {
           await click('#competencyHubViewChart');
           assert.equal(await page.$eval('#competencyHubChart', node => node.hidden), false);
-          assert.ok(await page.$('#competencyHubViewChart .fa-chart-pie'));
+          assert.ok(await page.$('#competencyHubViewChart .fa-chart-simple'));
           await click('#staffCompetencyBack');
         }
         if (name !== 'staff') {

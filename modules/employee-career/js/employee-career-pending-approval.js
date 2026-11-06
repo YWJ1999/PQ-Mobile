@@ -76,17 +76,15 @@
     menu.addEventListener('click', () => { currentId = item.id; openSheet('careerPendingMenu', menu); });
     header.append(checkbox, identity(item.employeeName, item.empNo, isEngagement ? null : item.position),
       node('span', 'payroll-approval-status', 'Pending Approval'), menu);
-    const body = node('div', 'payroll-approval-card-body');
+    const body = node('div', 'approval-card-body payroll-approval-card-body');
     const review = node('div', 'career-pending-review');
     review.tabIndex = 0;
     review.setAttribute('role', 'button');
     review.setAttribute('aria-label', `View ${item.type || 'request'} details for ${item.employeeName}`);
-    const fields = node('div', 'payroll-approval-field-grid');
     const summary = isEngagement
       ? [['Interview Date', date(item.interviewDate)], ['Position', item.position]]
       : [['Submitted Date', date(item.submitDate)], ['Reference #', item.reference || item.id]];
-    summary.forEach(([label, value]) => fields.append(field(label, value)));
-    review.append(fields);
+    review.append(createApprovalCardDetails(summary));
     review.addEventListener('click', () => openDetails(item.id, review));
     review.addEventListener('keydown', event => { if (['Enter', ' '].includes(event.key)) { event.preventDefault(); openDetails(item.id, review); } });
     body.append(review);

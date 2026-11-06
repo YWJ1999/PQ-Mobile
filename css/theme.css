@@ -5,6 +5,7 @@
 :root {
   /* One title-bar gradient for every module, in both themes. */
   --module-header-background: linear-gradient(135deg, #4c1d95 0%, #6d28d9 50%, #7c3aed 100%);
+  --primary-action-background: linear-gradient(135deg, #7c3aed, #6d28d9);
   /* Shared by insight metrics and record cards in both themes. */
   --card-header-purple-background: linear-gradient(105deg, #592398, #7e2be5);
   --card-header-blue-background: linear-gradient(105deg, #254f88, #2e6dca);
@@ -413,6 +414,38 @@ table th[scope="col"] *,
   letter-spacing: normal !important;
   font-variant-numeric: tabular-nums;
 }
+
+/* A chart summary keeps its count and action on the same line. */
+[data-theme="light"] .record-summary-card:has(.record-chart-button) {
+  --record-summary-background: var(--bg-card);
+}
+.record-summary-card record-chart-count {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 5px;
+  white-space: nowrap;
+}
+.record-summary-card button.record-chart-button:not([hidden]) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  gap: 6px;
+  padding: 7px 13px;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  background: #6f21ee;
+  color: #fff;
+  box-shadow: none;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 800;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.record-summary-card .record-chart-button:not(:disabled):hover { filter: brightness(.94); }
+.record-summary-card .record-chart-button:focus-visible { outline: 2px solid var(--purple-text); outline-offset: 3px; }
+.record-summary-card .record-chart-button:disabled { opacity: .55; cursor: default; }
 
 /* Multi-KPI layouts use a single card: record count first, other metrics below. */
 .record-summary-grid {

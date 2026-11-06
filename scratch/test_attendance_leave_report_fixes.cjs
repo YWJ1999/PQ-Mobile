@@ -378,14 +378,14 @@ async function check(name, fn) {
         const rect = node.getBoundingClientRect();
         return {
           text: node.textContent.replace(/\s+/g, ' ').trim(),
-          hasPie: Boolean(node.querySelector('.fa-chart-pie')),
+          hasBarIcon: Boolean(node.querySelector('.fa-chart-simple')),
           whiteSpace: getComputedStyle(node).whiteSpace,
           width: rect.width,
           height: rect.height
         };
       });
-      assert.equal(button.text, 'View Chart');
-      assert.equal(button.hasPie, true);
+      assert.equal(button.text, 'Chart');
+      assert.equal(button.hasBarIcon, true);
       assert.equal(button.whiteSpace, 'nowrap');
       assert.ok(button.width > button.height);
     });

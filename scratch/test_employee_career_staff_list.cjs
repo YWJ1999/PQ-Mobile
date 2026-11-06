@@ -31,11 +31,11 @@ const puppeteer = require('puppeteer');
         assert.ok(await page.$eval('main', node => node.scrollWidth <= node.clientWidth + 1), 'The page must not overflow');
         assert.ok(await page.$eval('.staff-list-table-scroll', node => node.scrollWidth > node.clientWidth), 'Seven columns scroll within the table');
         const button = await page.$eval('#staffListViewChart', node => ({
-          text: node.textContent.trim(), icon: !!node.querySelector('.fa-solid.fa-chart-pie'),
-          nowrap: getComputedStyle(node).whiteSpace, width: node.getBoundingClientRect().width
+          text: node.textContent.trim(), icon: !!node.querySelector('.fa-solid.fa-chart-simple'),
+          nowrap: getComputedStyle(node).whiteSpace, isPill: node.offsetWidth > node.offsetHeight
         }));
-        assert.equal(button.text, 'View Chart');
-        assert.ok(button.icon && button.nowrap === 'nowrap' && button.width > 80);
+        assert.equal(button.text, 'Chart');
+        assert.ok(button.icon && button.nowrap === 'nowrap' && button.isPill);
         if (width === 390) await page.screenshot({ path: path.join(__dirname, `employee_career_staff_list_${theme}.png`) });
         await page.click('#staffListViewChart');
         assert.equal(await page.$eval('#staffListChartView', node => node.hidden), false);

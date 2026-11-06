@@ -34,8 +34,8 @@ async function totals(page) {
       assert.deepEqual(await totals(page), ['4', '12.00']);
       assert.deepEqual(await page.$$eval('#trainingHighlightTable th', nodes => nodes.map(node => node.textContent)), ['Emp #', 'Name', 'Days', 'Branch', 'Department', 'Position']);
       assert.deepEqual(await page.$$eval('#trainingHighlightTable tbody tr:first-child td', nodes => nodes.map(node => node.textContent)), ['#EBB12', 'Farhan Binti Rahmat', '4.00', 'Kuala Lumpur', 'Human Resource', 'Group HR Manager']);
-      assert.ok(await page.$('#trainingHighlightViewChart .fa-chart-pie'));
-      assert.equal(await page.$eval('#trainingHighlightViewChart', node => node.textContent.trim()), 'View Chart');
+      assert.ok(await page.$('#trainingHighlightViewChart .fa-chart-simple'));
+      assert.equal(await page.$eval('#trainingHighlightViewChart', node => node.textContent.trim()), 'Chart');
       assert.ok(await page.$('.record-summary-card .record-summary-value'));
       await page.screenshot({ path: path.join(__dirname, `training-highlight-report-${theme}-${width}.png`) });
       const reportUrl = page.url();
