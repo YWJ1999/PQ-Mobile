@@ -92,7 +92,9 @@
     $(container).replaceChildren(...rows.map(([label, value, field]) => {
       const row = node('div', 'ld-summary-field');
       row.dataset.field = field;
-      row.append(node('span', '', label), node('strong', '', value));
+      const isRecordCount = field === 'total-records';
+      row.classList.toggle('record-summary-metric', isRecordCount);
+      row.append(node('span', isRecordCount ? 'record-summary-label' : '', label), node('strong', isRecordCount ? 'record-summary-value' : '', value));
       return row;
     }));
   }

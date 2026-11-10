@@ -175,6 +175,69 @@ html body .history-card-item:has(.history-card-header) :is(.history-card-main, .
   padding: 0 !important;
   border-radius: 0;
 }
+
+/* Record details follow the approval-card grid: two fields per row,
+   with each label above its value inside the single inset panel. */
+html .phone-container :is(.history-card-details, .summary-history-details, .card-details-box, .project-history-card-details, .incident-history-details, .manpower-employee-card-details) {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  align-items: start;
+  gap: 10px 12px !important;
+  text-align: left;
+}
+
+/* Older History renderers wrap their fields in an extra group. */
+html .phone-container .history-card-details > :is(.history-card-fields, .attendance-history-facts, .tax-relief-stat-grid) {
+  display: contents !important;
+}
+
+html .phone-container :is(.history-card-details, .summary-history-details, .card-details-box, .project-history-card-details, .incident-history-details, .manpower-employee-card-details) > :is(div, span):not(.history-card-fields, .tax-relief-stat-grid, .record-detail-note),
+html .phone-container .history-card-details > :is(.history-card-fields, .attendance-history-facts, .tax-relief-stat-grid) > :is(div, span) {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  justify-content: flex-start !important;
+  gap: 2px !important;
+  min-width: 0;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  text-align: left !important;
+  overflow-wrap: anywhere;
+}
+
+html .phone-container :is(.history-card-details, .summary-history-details, .card-details-box, .project-history-card-details, .incident-history-details, .manpower-employee-card-details) > :is(div, span):not(.history-card-fields, .tax-relief-stat-grid, .record-detail-note) > :first-child,
+html .phone-container .history-card-details > :is(.history-card-fields, .attendance-history-facts, .tax-relief-stat-grid) > :is(div, span) > :first-child {
+  min-width: 0;
+  margin: 0 !important;
+  color: var(--text-muted);
+  font-size: 10.5px !important;
+  font-weight: 700 !important;
+  line-height: 1.4 !important;
+  text-align: left !important;
+  white-space: normal !important;
+}
+
+html .phone-container :is(.history-card-details, .summary-history-details, .card-details-box, .project-history-card-details, .incident-history-details, .manpower-employee-card-details) > :is(div, span):not(.history-card-fields, .tax-relief-stat-grid, .record-detail-note) > :last-child,
+html .phone-container .history-card-details > :is(.history-card-fields, .attendance-history-facts, .tax-relief-stat-grid) > :is(div, span) > :last-child {
+  min-width: 0;
+  max-width: 100%;
+  margin: 0 !important;
+  font-size: 11.5px !important;
+  font-weight: 800;
+  line-height: 1.4 !important;
+  text-align: left !important;
+  white-space: pre-line !important;
+  overflow-wrap: anywhere;
+  font-variant-numeric: tabular-nums;
+}
+
+html .phone-container :is(.record-detail-note, .training-feedback-card-detail:only-child) {
+  grid-column: 1 / -1;
+}
+
 html body .history-card-item:has(.history-card-header) .history-card-actions {
   margin-top: 16px;
   padding: 0 !important;

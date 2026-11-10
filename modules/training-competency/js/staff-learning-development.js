@@ -95,7 +95,9 @@
     $(containerId).replaceChildren(...rows.map(([label, value, field]) => {
       const row = node('div', 'ld-summary-field');
       row.dataset.field = field;
-      const strong = node('strong');
+      const isRecordCount = field === 'total-records';
+      row.classList.toggle('record-summary-metric', isRecordCount);
+      const strong = node('strong', isRecordCount ? 'record-summary-value' : '');
       if (field === 'employee') {
         strong.append(
           node('span', 'sld-employee-name', value.name),
@@ -104,7 +106,7 @@
       } else {
         strong.textContent = value;
       }
-      row.append(node('span', '', label), strong);
+      row.append(node('span', isRecordCount ? 'record-summary-label' : '', label), strong);
       return row;
     }));
   }

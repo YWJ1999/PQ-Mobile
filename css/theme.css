@@ -381,12 +381,13 @@ table th[scope="col"] *,
   box-shadow: none !important;
 }
 
-.record-summary-metric {
+.record-summary-metric,
+.record-summary-card:has(> .record-summary-label):has(> .record-summary-value) {
   display: flex !important;
-  flex-direction: column !important;
-  align-items: flex-start !important;
-  justify-content: center;
-  gap: 2px !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 6px !important;
   color: var(--text-muted) !important;
   font-size: 13px !important;
   font-weight: 700 !important;
@@ -415,13 +416,14 @@ table th[scope="col"] *,
   font-variant-numeric: tabular-nums;
 }
 
-/* A chart summary keeps its count and action on the same line. */
-[data-theme="light"] .record-summary-card:has(.record-chart-button) {
-  --record-summary-background: var(--bg-card);
+/* All light-mode record totals use the same white surface. */
+[data-theme="light"] .record-summary-card {
+  --record-summary-background: #fff;
 }
+/* A chart summary keeps its count and action on the same line. */
 .record-summary-card record-chart-count {
   display: inline-flex;
-  align-items: baseline;
+  align-items: center;
   gap: 5px;
   white-space: nowrap;
 }

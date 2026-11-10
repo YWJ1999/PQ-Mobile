@@ -42,7 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const f = filters[kind];
     const rows = records.filter(row => row.kind === kind && (!f.from || row.date >= f.from) && (!f.to || row.date <= f.to) && (!f.status || row.status === f.status));
     $('historyCategoryTitle').textContent = labels[kind] + ' History';
-    $('historyRecordCount').textContent = rows.length + (rows.length === 1 ? ' Record' : ' Records');
+    $('historyRecordCount').textContent = String(rows.length);
     const summary = [f.from ? 'From ' + date(f.from) : '', f.to ? 'To ' + date(f.to) : '', f.status ? statuses[f.status][0] : ''].filter(Boolean);
     $('historyFilterSummary').textContent = summary.join(' / ') || 'All ' + labels[kind];
     $('historyEmptyState').hidden = !!rows.length || !$('historyLoadError').hidden;

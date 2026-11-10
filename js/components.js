@@ -3,8 +3,7 @@
    Zero build tool required. 100% offline & file:// compatible.
    ======================================================== */
 
-// Presentation for legacy count captions. The source text and numeric value stay
-// intact when forms refresh a caption with textContent or innerText.
+// Keep legacy count captions consistent when their numeric value refreshes.
 window.PeopleHcmRecordSummary = (() => {
   const registered = new WeakSet();
   function enhance(element) {
@@ -13,17 +12,17 @@ window.PeopleHcmRecordSummary = (() => {
     const observer = new MutationObserver(render);
     function render() {
       observer.disconnect();
-      const match = element.textContent.trim().match(/^(Total\s+Records?(?:\s+Found)?\s*:\s*)([\d,]+)$/i);
+      const match = element.textContent.trim().match(/^Total\s+Records?(?:\s+Found)?\s*:?\s*([\d,]+)$/i);
       element.classList.toggle('record-summary-card', !!match);
       element.classList.toggle('record-summary-metric', !!match);
       if (match) {
         const label = document.createElement('span');
         label.className = 'record-summary-label';
-        label.textContent = match[1];
+        label.textContent = 'Total Records';
         const value = document.createElement('strong');
         value.className = 'record-summary-value';
-        value.textContent = match[2];
-        element.replaceChildren(label, value);
+        value.textContent = match[1];
+        element.replaceChildren(label, document.createTextNode(' '), value);
       }
       observer.observe(element, { childList: true, characterData: true, subtree: true });
     }

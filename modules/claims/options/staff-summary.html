@@ -45,18 +45,19 @@
     .staff-employee-id { display: block; font-size: 11.5px; font-weight: 700; color: rgba(255,255,255,.72); opacity: .9; font-family: monospace, sans-serif; margin-bottom: 4px; line-height: 1.5; }
     .staff-role { color: rgba(255,255,255,.78); font-size: 11px; font-weight: 600; }
     .staff-card-chevron { color: rgba(255,255,255,.82); font-size: 11px; padding-top: 12px; }
-    .staff-summary-card-body { margin: 14px 16px 16px; padding: 10px 12px; border: 1px solid var(--border-subtle); border-radius: 12px; background: var(--bg-input); }
-    .staff-current-row { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
-    .staff-current-label { color: var(--text-muted); font-size: 11.5px; font-weight: 700; }
-    .staff-current-value { color: var(--text-primary); font-size: 21px; font-weight: 900; letter-spacing: -.6px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .staff-summary-card-body { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 10px 12px; margin: 14px 16px 16px; padding: 10px 12px; border: 1px solid var(--border-subtle); border-radius: 12px; background: var(--bg-input); }
+    .staff-current-row { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; min-width: 0; }
+    .staff-current-label { color: var(--text-muted); font-size: 10.5px; font-weight: 700; }
+    .staff-current-value { color: var(--text-primary); font-size: 12.5px; font-weight: 800; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
     .staff-stat-grid { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 10px 12px; }
+    .staff-summary-card-body > .staff-stat-grid { display: contents; }
     .staff-stat { min-width: 0; }
     .staff-stat-label { display: block; margin-bottom: 4px; color: var(--text-muted); font-size: 10px; font-weight: 700; }
     .staff-stat-value { display: block; color: var(--text-primary); font-size: 12.5px; font-weight: 800; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
     .staff-stat-value.increase { color: #ef4444; }
     .staff-stat-value.decrease { color: #10b981; }
     .staff-stat-value.neutral { color: var(--text-muted); }
-    .staff-record-count { margin-top: 11px; color: var(--text-muted); font-size: 11px; font-weight: 600; }
+    .staff-record-count { grid-column: 1 / -1; color: var(--text-muted); font-size: 11px; font-weight: 600; }
     .staff-empty { padding: 28px 16px; border: 1px dashed var(--border-subtle); border-radius: 18px; color: var(--text-secondary); font-size: 13px; text-align: center; line-height: 1.6; }
     .staff-data-note { color: var(--text-secondary); font-size: 11.5px; line-height: 1.6; margin: 0 0 14px; }
     #staffFilterModal .claim-filter-panel { display: flex; flex-direction: column; overflow: hidden; background: var(--bg-sheet); }
@@ -119,7 +120,7 @@
       </button>
       <dl class="staff-kpis record-summary-grid record-summary-card">
         <div class="staff-kpi"><dt>Total Claim Amount</dt><dd id="staffTotalAmount">RM 0.00</dd></div>
-        <div class="staff-kpi record-summary-metric"><dt class="record-summary-label">Total Records Found</dt><dd id="staffTotalRecords" class="record-summary-value">0</dd></div>
+        <div class="staff-kpi record-summary-metric"><dt class="record-summary-label">Total Records</dt><dd id="staffTotalRecords" class="record-summary-value">0</dd></div>
       </dl>
       <p class="staff-data-note" id="staffStatusNote" hidden>Records without an approval status are excluded.</p>
       <div id="staffCardsContainer" aria-live="polite"></div>

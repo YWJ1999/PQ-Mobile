@@ -965,7 +965,7 @@
           const timeDisplay = item.otTime || item.time || '18:00 - 00:00';
           const hoursDisplay = `${item.quantity || item.hours || '6.0'} Hours`;
           detailsBlock = `
-            <div style="display: flex; flex-direction: column; gap: 6px; font-size: 12.5px; margin-top: 6px;">
+            <div class="history-card-fields">
               <div style="display: flex; justify-content: space-between; align-items: center;">
                 <span style="color: var(--text-muted); font-weight: 600;">Time :</span>
                 <span style="color: var(--text-primary); font-weight: 700;">${timeDisplay}</span>
@@ -980,7 +980,7 @@
         } else if (activeTabKey === 'travelRequest') {
           const submitDateDisplay = item.submitDate || item.submittedDate || datesDisplay;
           detailsBlock = `
-            <div style="display: flex; flex-direction: column; gap: 6px; font-size: 12.5px; margin-top: 6px;">
+            <div class="history-card-fields">
               <div style="display: flex; justify-content: space-between; align-items: center; gap: 12px;">
                 <span style="color: var(--text-muted); font-weight: 600;">Period :</span>
                 <span style="color: var(--text-primary); font-weight: 700; font-family: monospace, sans-serif;">${periodDisplay}</span>
@@ -997,7 +997,7 @@
           `;
         } else if (activeTabKey === 'travel' || activeTabKey === 'entertainment') {
           detailsBlock = `
-            <div style="display: flex; flex-direction: column; gap: 6px; font-size: 12.5px; margin-top: 6px;">
+            <div class="history-card-fields">
               <div style="display: flex; justify-content: space-between; align-items: center;">
                 <span style="color: var(--text-muted); font-weight: 600;">Period :</span>
                 <span style="color: var(--text-primary); font-weight: 700; font-family: monospace, sans-serif;">${periodDisplay}</span>
@@ -1015,7 +1015,7 @@
           `;
         } else if (activeTabKey === 'advance') {
           detailsBlock = `
-            <div style="display: flex; flex-direction: column; gap: 6px; font-size: 12.5px; margin-top: 6px;">
+            <div class="history-card-fields">
               <div style="display: flex; justify-content: space-between; align-items: center;">
                 <span style="color: var(--text-muted); font-weight: 600;">Date Claim :</span>
                 <span style="color: var(--text-primary); font-weight: 700;">${datesDisplay}</span>
@@ -1029,7 +1029,7 @@
           `;
         } else if (activeTabKey === 'expense' || activeTabKey === 'benefit' || activeTabKey === 'medical') {
           detailsBlock = `
-            <div style="display: flex; flex-direction: column; gap: 6px; font-size: 12.5px; margin-top: 6px;">
+            <div class="history-card-fields">
               <div style="display: flex; justify-content: space-between; align-items: center;">
                 <span style="color: var(--text-muted); font-weight: 600;">Claim Period :</span>
                 <span style="color: var(--text-primary); font-weight: 700; font-family: monospace, sans-serif;">${periodDisplay}</span>
