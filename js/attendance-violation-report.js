@@ -80,14 +80,12 @@ function createViolationCard(record) {
   card.dataset.department = record.department;
   card.dataset.position = record.jobTitle;
   card.setAttribute('aria-label', `View details for ${record.name}, #${record.empNo}, ${violationTypeLabel(record.type)}, ${violationPeriod(record)}`);
-  card.innerHTML = '<span class="history-time-row"><strong class="violation-card-name"></strong><span class="attendance-report-emp"></span></span><span class="violation-card-content"><span class="violation-card-period" data-period></span><span class="violation-card-fields"><span class="violation-card-field"><small>Department</small><strong data-department></strong></span><span class="violation-card-field"><small>Job Title</small><strong data-job></strong></span></span><span class="violation-card-footer"><span data-type></span></span></span>';
+  card.innerHTML = '<span class="history-time-row"><strong class="violation-card-name"></strong><span class="attendance-report-emp"></span></span><span class="violation-card-content"><span class="violation-card-details"><span class="violation-card-period" data-period></span><span class="violation-card-fields"><span class="violation-card-field"><small>Department</small><strong data-department></strong></span><span class="violation-card-field"><small>Job Title</small><strong data-job></strong></span></span><span class="violation-card-footer"><span data-type></span></span></span></span>';
   if (record.type === 'continuous' && record.startDate) {
     card.querySelector('[data-period]').remove();
-    card.querySelector('.violation-card-footer').classList.add('violation-card-field');
     card.querySelector('[data-type]').textContent = `Continuous Work between ${formatViolationDate(record.startDate)} and ${formatViolationDate(record.date)}`;
   } else if (record.type === 'rest') {
     card.querySelector('[data-period]').remove();
-    card.querySelector('.violation-card-footer').classList.add('violation-card-field');
     const [year, month, day] = record.date.split('-');
     card.querySelector('[data-type]').textContent = `Below 30 rest hours at ${day}/${month}/${year}`;
   } else {

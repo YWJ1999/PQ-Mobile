@@ -538,9 +538,9 @@ const HOME_REMINDER_SCHEDULE = {
 
 function renderHomeForYou(counts) {
   const summaries = [
-    { status: 'pending_approval', title: 'Pending Approval', icon: 'fa-user-check', tone: 'amber',
+    { status: 'pending_approval', title: 'Pending Approval', icon: 'fa-user-check',
       description: count => count ? `${count} ${count === 1 ? 'request is' : 'requests are'} waiting for your approval` : 'No requests are waiting for your approval' },
-    { status: 'pending_resubmit', title: 'Pending Resubmit', icon: 'fa-rotate-right', tone: 'violet',
+    { status: 'pending_resubmit', title: 'Pending Resubmit', icon: 'fa-rotate-right',
       description: count => count ? `${count} ${count === 1 ? 'request needs' : 'requests need'} updates before resubmission` : 'No requests need resubmission' }
   ];
   const { otPlan, training, shift } = HOME_REMINDER_SCHEDULE;
@@ -557,7 +557,7 @@ function renderHomeForYou(counts) {
       <button type="button" class="for-you-card" data-pending-status="${summary.status}"
         onclick="openForYouModal('${summary.status}')" aria-haspopup="dialog" aria-controls="forYouOverlay">
         <span class="fy-left">
-          <span class="fy-avatar" style="background: var(--tag-${summary.tone}-bg); color: var(--tag-${summary.tone}-text);">
+          <span class="fy-avatar" style="background: var(--purple-subtle); color: var(--purple-text);">
             <i class="fa-solid ${summary.icon}" aria-hidden="true"></i>
           </span>
           <span class="fy-text">
@@ -565,7 +565,7 @@ function renderHomeForYou(counts) {
             <span class="fy-description">${summary.description(counts[summary.status])}</span>
           </span>
         </span>
-        <span class="fy-right" style="color: var(--tag-${summary.tone}-text);" aria-hidden="true">
+        <span class="fy-right" style="color: var(--purple-text);" aria-hidden="true">
           <i class="fa-solid fa-chevron-right"></i>
         </span>
       </button>

@@ -576,11 +576,12 @@
     .manpower-group-card.history-card-item { padding: 0; border: 1px solid var(--border-subtle); border-radius: 18px; overflow: hidden; background: var(--bg-card); }
     .manpower-company-header { margin: 0; padding: 12px 14px; background: linear-gradient(110deg,#5b21b6,#7c3aed); color: #fff; font-size: 14px; font-weight: 800; line-height: 1.4; overflow-wrap: anywhere; }
     .manpower-group-content { padding: 12px 14px; }
-    .manpower-group-fields { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 8px; margin-bottom: 10px; }
-    .manpower-group-field { display: flex; flex-direction: column; gap: 4px; padding: 10px; border: 1px solid var(--border-subtle); border-radius: 13px; background: var(--bg-input); }
-    .manpower-group-field small { color: var(--text-muted); font-size: 10px; font-weight: 700; }
+    .manpower-group-details { padding: 10px 12px; border: 1px solid var(--border-subtle); border-radius: 12px; background: var(--bg-input); }
+    .manpower-group-fields { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 10px 12px; margin-bottom: 10px; }
+    .manpower-group-field { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+    .manpower-group-field small { color: var(--text-muted); font-size: 10.5px; font-weight: 700; line-height: 1.4; }
     .manpower-group-field strong { color: var(--text-primary); font-size: 11.5px; font-weight: 800; line-height: 1.4; overflow-wrap: anywhere; }
-    .manpower-group-actions { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); padding: 10px 0; border: 1px solid var(--border-subtle); border-radius: 13px; background: var(--bg-input); }
+    .manpower-group-actions { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); padding: 10px 0 0; border-top: 1px solid var(--border-subtle); }
     .manpower-group-actions button { display: flex; flex-direction: column; align-items: center; gap: 6px; min-width: 0; padding: 3px; border: 0; background: transparent; color: var(--text-muted); font-size: 10.5px; font-weight: 700; line-height: 1.4; white-space: nowrap; }
     .manpower-group-actions button + button { border-left: 1px solid var(--border-subtle); }
     .manpower-group-actions button:hover { background: var(--purple-subtle); color: var(--purple-text); }

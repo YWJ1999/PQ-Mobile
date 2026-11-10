@@ -248,19 +248,10 @@
          </div>
 
          <!-- Pending Attendance Feedback Card -->
-         <a href="modules/attendance/options/feedback-history.html" class="card" style="display: flex; align-items: center; justify-content: space-between; text-decoration: none; padding: 16px 18px; margin-bottom: 20px;">
-            <div style="display: flex; align-items: center; gap: 14px;">
-               <div style="width: 42px; height: 42px; border-radius: 12px; background: rgba(245, 158, 11, 0.15); color: #f59e0b; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0;">
-                  <i class="fa-solid fa-clock-rotate-left"></i>
-               </div>
-               <div>
-                  <div style="font-size: 15px; font-weight: 800; color: var(--text-primary); line-height: 1.2;">Pending Attendance Feedback</div>
-               </div>
-            </div>
-            <div style="display: flex; align-items: center; gap: 8px;">
-               <span style="font-size: 12.5px; font-weight: 800; color: #f59e0b; background: rgba(245, 158, 11, 0.15); padding: 4px 10px; border-radius: 12px;">2</span>
-               <i class="fa-solid fa-chevron-right" style="font-size: 13px; color: var(--text-caption);"></i>
-            </div>
+         <a href="modules/attendance/options/feedback-history.html" class="team-pending-approval-action" style="margin-bottom: 20px;">
+           <span class="team-pending-approval-icon" aria-hidden="true"><i class="fa-solid fa-clock-rotate-left"></i></span>
+           <span class="team-pending-approval-copy"><span class="team-pending-approval-title">Pending Attendance Feedback</span></span>
+           <span class="team-pending-approval-end"><span class="team-pending-approval-count">2</span><i class="fa-solid fa-chevron-right team-pending-approval-chevron" aria-hidden="true"></i></span>
          </a>
 
          <h2 style="font-size: 20px; font-weight: 800; color: var(--text-primary); margin-bottom: 16px; padding: 0 4px;">September 2026</h2>
@@ -510,7 +501,7 @@
           <div class="card">
              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
                 <div style="display: flex; align-items: center; gap: 8px;">
-                   <div style="width: 32px; height: 32px; border-radius: 10px; background: rgba(245, 158, 11, 0.15); display: flex; align-items: center; justify-content: center; color: #f59e0b;">
+                   <div style="width: 32px; height: 32px; border-radius: 10px; background: var(--purple-subtle); display: flex; align-items: center; justify-content: center; color: var(--purple-text);">
                       <i class="fa-solid fa-bolt" style="font-size: 16px;"></i>
                    </div>
                    <div>
@@ -518,25 +509,15 @@
                       <p style="font-size: 11.5px; font-weight: 600; color: var(--text-muted); margin-top: 2px;">Items needing your review</p>
                    </div>
                 </div>
-                <span style="font-size: 11.5px; font-weight: 800; padding: 3px 10px; border-radius: 12px; background: rgba(245, 158, 11, 0.15); color: #f59e0b;">26 Tasks</span>
+                <span style="font-size: 11.5px; font-weight: 800; padding: 3px 10px; border-radius: 12px; background: var(--purple-subtle); color: var(--purple-text);">26 Tasks</span>
              </div>
              
              <!-- 1. Pending Approval Banner -->
-             <div onclick="window.location.href='modules/attendance/options/team.html?view=approvals'" style="background: linear-gradient(135deg, rgba(245, 158, 11, 0.12) 0%, rgba(245, 158, 11, 0.05) 100%); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 16px; padding: 12px 14px; margin-top: 10px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; transition: transform 0.15s;" onmousedown="this.style.transform='scale(0.98)'" onmouseup="this.style.transform='scale(1)'">
-                <div style="display: flex; align-items: center; gap: 12px;">
-                   <div style="width: 36px; height: 36px; border-radius: 10px; background: #f59e0b; color: #ffffff; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(245, 158, 11, 0.3);">
-                      <i class="fa-solid fa-clock-rotate-left" style="font-size: 18px;"></i>
-                   </div>
-                   <div>
-                      <div style="font-size: 14px; font-weight: 800; color: var(--text-primary); line-height: 1.2;">Pending Approval</div>
-                      <div style="font-size: 11.5px; font-weight: 600; color: var(--text-muted); margin-top: 2px;">Leave & OT requests awaiting review</div>
-                   </div>
-                </div>
-                <div style="display: flex; align-items: center; gap: 8px;">
-                   <span style="font-size: 13px; font-weight: 900; color: #ffffff; background: #f59e0b; padding: 3px 10px; border-radius: 10px; box-shadow: 0 2px 6px rgba(245, 158, 11, 0.4);">17</span>
-                   <i class="fa-solid fa-chevron-right" style="font-size: 13px; color: var(--text-caption);"></i>
-                </div>
-             </div>
+             <a class="team-pending-approval-action" href="modules/attendance/options/team.html?view=approvals" style="margin-top: 10px;">
+                <span class="team-pending-approval-icon" aria-hidden="true"><i class="fa-solid fa-clock-rotate-left"></i></span>
+                <span class="team-pending-approval-copy"><span class="team-pending-approval-title">Pending Approval</span><span class="team-pending-approval-description">Leave &amp; OT requests awaiting review</span></span>
+                <span class="team-pending-approval-end"><span class="team-pending-approval-count">17</span><i class="fa-solid fa-chevron-right team-pending-approval-chevron" aria-hidden="true"></i></span>
+             </a>
 
              <!-- 2. Attendance Verification -->
              <div onclick="window.location.href='modules/attendance/options/team.html?view=verification'" style="background: var(--bg-input); border: 1px solid var(--border-subtle); border-radius: 16px; padding: 12px 14px; margin-top: 10px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; transition: transform 0.15s;" onmousedown="this.style.transform='scale(0.98)'" onmouseup="this.style.transform='scale(1)'">

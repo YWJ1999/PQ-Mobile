@@ -18,10 +18,10 @@
 .goal-progress-card-header small { display: block; margin-bottom: 5px; color: rgba(255,255,255,.72); font-size: 9px; font-weight: 800; letter-spacing: .04em; }
 .goal-progress-card-title { margin: 0; color: #fff; font-size: 15px; font-weight: 800; line-height: 1.35; letter-spacing: -.18px; text-wrap: balance; }
 .goal-progress-card-context { display: block; margin-top: 7px; color: rgba(255,255,255,.8); font-size: 9.5px; font-weight: 700; line-height: 1.4; }
-.goal-progress-card-body { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin: 0; padding: 14px; }
-.goal-progress-detail { min-width: 0; padding: 9px 10px; border: 1px solid var(--border-subtle); border-radius: 13px; background: var(--bg-input); }
+.goal-progress-card-body { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 12px; margin: 14px; padding: 10px 12px; border: 1px solid var(--border-subtle); border-radius: 12px; background: var(--bg-input); }
+.goal-progress-detail { min-width: 0; }
 .goal-progress-detail:nth-child(-n+2) { grid-column: 1 / -1; }
-.goal-progress-detail dt { margin: 0 0 4px; color: var(--text-muted); font-size: 9.5px; font-weight: 800; line-height: 1.25; }
+.goal-progress-detail dt { margin: 0 0 2px; color: var(--text-muted); font-size: 10.5px; font-weight: 800; line-height: 1.4; }
 .goal-progress-detail dd { margin: 0; color: var(--text-primary); font-size: 11.5px; font-weight: 800; line-height: 1.35; overflow-wrap: anywhere; }
 .goal-progress-detail:nth-last-child(-n+2) dd { color: var(--purple-text); font-weight: 800; font-variant-numeric: tabular-nums; }
 .goal-progress-card-footer { display: flex; align-items: center; justify-content: flex-end; padding: 0 14px 14px; }

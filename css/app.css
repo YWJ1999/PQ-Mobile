@@ -10553,8 +10553,8 @@ select.modal-input-field option {
   display: grid;
   place-items: center;
   border-radius: 10px;
-  background: rgba(245, 158, 11, 0.15);
-  color: #f59e0b;
+  background: var(--purple-subtle);
+  color: var(--purple-text);
   font-size: 16px;
 }
 
@@ -10586,8 +10586,8 @@ select.modal-input-field option {
   flex: 0 0 auto;
   padding: 3px 10px;
   border-radius: 12px;
-  background: rgba(245, 158, 11, 0.15);
-  color: #f59e0b;
+  background: var(--purple-subtle);
+  color: var(--purple-text);
   font-size: 11.5px;
   font-weight: 800;
   line-height: 1.35;
@@ -10608,9 +10608,9 @@ select.modal-input-field option {
   align-items: center;
   gap: 12px;
   padding: 14px 16px;
-  border: 1px solid rgba(245, 158, 11, 0.3);
+  border: 1px solid var(--purple-border);
   border-radius: 16px;
-  background: linear-gradient(135deg, rgba(245, 158, 11, 0.12) 0%, rgba(245, 158, 11, 0.05) 100%);
+  background: linear-gradient(135deg, rgba(124, 58, 237, .12) 0%, rgba(124, 58, 237, .05) 100%);
   color: var(--text-primary);
   text-decoration: none;
   cursor: pointer;
@@ -10621,7 +10621,7 @@ select.modal-input-field option {
 }
 
 .team-pending-approval-action:focus-visible {
-  outline: 2px solid #f59e0b;
+  outline: 2px solid var(--purple-text);
   outline-offset: 3px;
 }
 
@@ -10632,10 +10632,10 @@ select.modal-input-field option {
   display: grid;
   place-items: center;
   border-radius: 12px;
-  background: #f59e0b;
+  background: var(--primary-action-background);
   color: #ffffff;
   font-size: 18px;
-  box-shadow: 0 4px 10px rgba(245, 158, 11, 0.3);
+  box-shadow: 0 4px 10px rgba(124, 58, 237, .3);
 }
 
 .team-pending-approval-copy {
@@ -10674,14 +10674,14 @@ select.modal-input-field option {
   min-width: 30px;
   padding: 4px 10px;
   border-radius: 12px;
-  background: #f59e0b;
+  background: var(--primary-action-background);
   color: #ffffff;
   font-size: 13px;
   font-weight: 900;
   line-height: 1.2;
   text-align: center;
   font-variant-numeric: tabular-nums;
-  box-shadow: 0 2px 6px rgba(245, 158, 11, 0.4);
+  box-shadow: 0 2px 6px rgba(124, 58, 237, .4);
 }
 
 .team-pending-approval-chevron {

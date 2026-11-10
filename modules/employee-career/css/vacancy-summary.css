@@ -12,10 +12,10 @@ a.recruitment-card:hover { border-color: var(--purple-primary); }
 a.recruitment-card:active { transform: scale(.985); }
 .recruitment-card-strip { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 13px; background: linear-gradient(100deg, #5920ad, #7c3aed); color: #fff; }
 .recruitment-card-strip h2 { min-width: 0; margin: 0; font-size: 12px; font-weight: 800; line-height: 1.5; overflow-wrap: anywhere; }
-.recruitment-card-details { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin: 0; padding: 12px 13px; }
-.recruitment-card-field { min-width: 0; padding: 10px 11px; border: 1px solid var(--border-subtle); border-radius: 12px; background: var(--bg-input); }
+.recruitment-card-details { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 12px; margin: 12px 13px; padding: 10px 12px; border: 1px solid var(--border-subtle); border-radius: 12px; background: var(--bg-input); }
+.recruitment-card-field { min-width: 0; }
 .recruitment-card-field.wide { grid-column: 1 / -1; }
-.recruitment-card-field dt { margin: 0 0 4px; color: var(--text-muted); font-size: 10px; font-weight: 700; line-height: 1.4; }
+.recruitment-card-field dt { margin: 0 0 2px; color: var(--text-muted); font-size: 10.5px; font-weight: 700; line-height: 1.4; }
 .recruitment-card-field dd { margin: 0; color: var(--text-primary); font-size: 12px; font-weight: 800; line-height: 1.4; overflow-wrap: anywhere; font-variant-numeric: tabular-nums; }
 .recruitment-card-field dd.status-hired { color: var(--status-ready-text); }
 .recruitment-card-field dd.status-rejected { color: var(--status-action-text); }

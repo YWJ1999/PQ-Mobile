@@ -135,10 +135,7 @@
   transition: transform .18s ease, border-color .18s ease;
 }
 
-.training-competency-status-card[data-status="submitted"] { --training-status-color: #f59e0b; }
-.training-competency-status-card[data-status="resubmit"] { --training-status-color: #3b82f6; }
-.training-competency-status-card[data-status="approved"] { --training-status-color: #10b981; }
-.training-competency-status-card[data-status="rejected"] { --training-status-color: #ef4444; }
+.training-competency-status-card { --training-status-color: var(--purple-text); }
 
 .training-competency-status-card strong {
   margin-bottom: 3px;

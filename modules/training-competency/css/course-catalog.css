@@ -111,16 +111,16 @@
 .course-catalog-details {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 8px;
-  padding: 12px;
+  gap: 10px 12px;
+  margin: 12px;
+  padding: 10px 12px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  background: var(--bg-input);
 }
 
 .course-catalog-detail {
   min-width: 0;
-  padding: 10px;
-  border: 1px solid var(--border-subtle);
-  border-radius: 13px;
-  background: var(--bg-input);
 }
 
 .course-catalog-detail span {
@@ -329,15 +329,6 @@
 @media (max-width: 375px) {
   .course-catalog-content {
     padding-inline: 14px;
-  }
-
-  .course-catalog-details {
-    gap: 7px;
-    padding: 10px;
-  }
-
-  .course-catalog-detail {
-    padding: 9px;
   }
 }
 

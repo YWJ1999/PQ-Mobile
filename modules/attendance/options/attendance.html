@@ -18,7 +18,9 @@
     body { background-color: var(--bg-page); display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 100vh; color: var(--text-primary); padding: 20px 0; }
     .phone-container { width: 100%; max-width: 420px; height: 900px; background: var(--bg-phone); border-radius: 44px; overflow: hidden; box-shadow: var(--shadow-phone); position: relative; display: flex; flex-direction: column; }
     .attendance-list-view { display: flex; flex-direction: column; flex: 1; min-height: 0; position: relative; overflow: hidden; margin-bottom: 78px; }
-    .attendance-list-view > .cal-top-header { flex-shrink: 0; }
+    .attendance-list-view > .cal-top-header { flex-shrink: 0; padding: 12px 20px 16px; }
+    .attendance-header-row { display: flex; align-items: center; gap: 12px; min-height: 36px; margin-top: 4px; }
+    .attendance-header-row > .header-btn { flex: 0 0 36px; }
     .main-content { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; scroll-padding-top: 96px; margin-bottom: 0; padding: 0 16px 16px; position: relative; z-index: 10; scrollbar-width: none; }
     .attendance-list-view.has-pending-update .main-content { margin-bottom: 80px; }
     .main-content::-webkit-scrollbar { display: none; }
@@ -442,44 +444,9 @@
     .attendance-record-card:active { transform: scale(0.985); }
     .attendance-record-top {
       display: grid;
-      grid-template-columns: minmax(0, 1fr) auto;
-      gap: 12px;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      gap: 10px;
       align-items: center;
-    }
-    .attendance-record-controls {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-end;
-      gap: 9px;
-    }
-    .attendance-exception-status {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      padding: 5px 10px;
-      border: 1px solid rgba(16, 185, 129, 0.34);
-      border-radius: 10px;
-      background: rgba(16, 185, 129, 0.12);
-      color: #059669;
-      font-size: 10.5px;
-      font-weight: 800;
-      line-height: 1;
-      white-space: nowrap;
-    }
-    .attendance-exception-status.is-exception {
-      border-color: rgba(245, 158, 11, 0.36);
-      background: rgba(245, 158, 11, 0.14);
-      color: #d97706;
-    }
-    html[data-theme="dark"] .attendance-exception-status { color: #34d399; }
-    html[data-theme="dark"] .attendance-exception-status.is-exception { color: #fbbf24; }
-    .late-in-theme .attendance-exception-status.is-exception {
-      border-color: rgba(124, 58, 237, 0.38);
-      background: rgba(124, 58, 237, 0.14);
-      color: #6d28d9;
-    }
-    html[data-theme="dark"] .late-in-theme .attendance-exception-status.is-exception {
-      color: #c4b5fd;
     }
     .attendance-card-details-trigger {
       min-width: 0;
@@ -524,22 +491,11 @@
     }
     .attendance-verify-button {
       display: flex;
-      flex-direction: column;
       align-items: center;
-      gap: 4px;
+      justify-content: center;
       cursor: pointer;
       user-select: none;
     }
-    .attendance-verify-button [data-verify-label] {
-      color: var(--text-muted);
-      font-size: 9px;
-      font-weight: 800;
-      letter-spacing: 0.45px;
-      line-height: 1;
-      text-transform: uppercase;
-      white-space: nowrap;
-    }
-    .attendance-verify-button[aria-pressed="true"] [data-verify-label] { color: var(--purple-primary); }
     .attendance-card-details-trigger:focus-visible,
     .attendance-verify-button:focus-visible,
     .verify-btn-all:focus-visible {
@@ -1308,14 +1264,11 @@
     <div class="attendance-list-view">
     <div class="cal-top-header">
       <phone-status-bar time="12:36" style="color: #ffffff;"></phone-status-bar>
-      <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 4px;">
-        <div style="display: flex; align-items: center; gap: 12px;">
-          <a href="../index.html" class="header-btn" aria-label="Back" style="background: rgba(255, 255, 255, 0.18); border: 1px solid rgba(255, 255, 255, 0.25); width: 36px; height: 36px; border-radius: 12px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #ffffff; text-decoration: none;">
-            <i class="fa-solid fa-chevron-left" style="font-size: 16px;"></i>
-          </a>
-          <h1 style="font-size: 19px; font-weight: 800; color: #ffffff; margin: 0;">Attendance</h1>
-        </div>
-
+      <div class="attendance-header-row">
+        <a href="../index.html" class="header-btn" aria-label="Back" style="background: rgba(255, 255, 255, 0.18); border: 1px solid rgba(255, 255, 255, 0.25); width: 36px; height: 36px; border-radius: 12px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #ffffff; text-decoration: none;">
+          <i class="fa-solid fa-chevron-left" style="font-size: 16px;"></i>
+        </a>
+        <h1 style="font-size: 19px; font-weight: 800; color: #ffffff; margin: 0;">Attendance</h1>
       </div>
     </div>
     
@@ -1375,19 +1328,16 @@
       <!-- Attendance Card 1 (Normal) -->
       <div class="history-card-item attendance-record-card" data-exception="none" data-date="2026-09-15">
            <div class="attendance-record-top history-card-header">
+              <button class="attendance-verify-button" type="button" onclick="toggleSingleVerify(this)" title="Verify this record" aria-label="Verify attendance for 15 September 2026" aria-pressed="false">
+                    <span class="verify-checkbox-box" aria-hidden="true"><i class="fa-solid fa-check"></i></span>
+                </button>
               <button class="attendance-card-details-trigger" type="button" onclick="openModal('attendanceDetailsModalOverlay')" aria-label="View attendance details for 15 September 2026">
                  <span>
                     <span class="history-time-row">W01: 8.30AM – 5.30PM</span>
                     <span class="attendance-record-reference history-card-ref">Date: Tue, 15 Sep 2026</span>
                  </span>
               </button>
-              <div class="attendance-record-controls">
-                <button class="attendance-verify-button" type="button" onclick="toggleSingleVerify(this)" title="Verify this record" aria-pressed="false">
-                    <span class="verify-checkbox-box" aria-hidden="true"><i class="fa-solid fa-check"></i></span>
-                    <span data-verify-label>Verify</span>
-                </button>
-                <span class="card-status-badge attendance-exception-status"><i class="fa-solid fa-circle-check" aria-hidden="true"></i>No Exception</span>
-              </div>
+              <span class="card-status-badge attendance-exception-status"><i class="fa-solid fa-circle-check" aria-hidden="true"></i>No Exception</span>
            </div>
 
            <div class="attendance-record-summary-panel history-card-details">
@@ -1418,19 +1368,16 @@
       <!-- Attendance Card 2 (Exception) -->
       <div class="history-card-item attendance-record-card exception-theme" data-exception="unapproved-ot" data-date="2026-09-14">
            <div class="attendance-record-top history-card-header">
+              <button class="attendance-verify-button" type="button" onclick="toggleSingleVerify(this)" title="Verify this record" aria-label="Verify attendance for 14 September 2026" aria-pressed="false">
+                    <span class="verify-checkbox-box" aria-hidden="true"><i class="fa-solid fa-check"></i></span>
+                </button>
               <button class="attendance-card-details-trigger" type="button" onclick="openModal('attendanceDetailsModalOverlay')" aria-label="View attendance details for 14 September 2026">
                  <span>
                     <span class="history-time-row">W01: 8.30AM – 5.30PM</span>
                     <span class="attendance-record-reference history-card-ref">Date: Mon, 14 Sep 2026</span>
                  </span>
               </button>
-              <div class="attendance-record-controls">
-                <button class="attendance-verify-button" type="button" onclick="toggleSingleVerify(this)" title="Verify this record" aria-pressed="false">
-                    <span class="verify-checkbox-box" aria-hidden="true"><i class="fa-solid fa-check"></i></span>
-                    <span data-verify-label>Verify</span>
-                </button>
-                <span class="card-status-badge attendance-exception-status is-exception"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>Unapproved OT</span>
-              </div>
+              <span class="card-status-badge attendance-exception-status is-exception"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>Unapproved OT</span>
            </div>
 
            <div class="attendance-record-summary-panel history-card-details">
@@ -1461,19 +1408,16 @@
       <!-- Attendance Card 3 (Late In Exception) -->
       <div class="history-card-item attendance-record-card late-in-theme" data-exception="late-in" data-date="2026-09-13">
            <div class="attendance-record-top history-card-header">
+              <button class="attendance-verify-button" type="button" onclick="toggleSingleVerify(this)" title="Verify this record" aria-label="Verify attendance for 13 September 2026" aria-pressed="false">
+                    <span class="verify-checkbox-box" aria-hidden="true"><i class="fa-solid fa-check"></i></span>
+                </button>
               <button class="attendance-card-details-trigger" type="button" onclick="openModal('attendanceDetailsModalOverlay')" aria-label="View attendance details for 13 September 2026">
                  <span>
                     <span class="history-time-row">W01: 8.30AM – 5.30PM</span>
                     <span class="attendance-record-reference history-card-ref">Date: Sun, 13 Sep 2026</span>
                  </span>
               </button>
-              <div class="attendance-record-controls">
-                <button class="attendance-verify-button" type="button" onclick="toggleSingleVerify(this)" title="Verify this record" aria-pressed="false">
-                    <span class="verify-checkbox-box" aria-hidden="true"><i class="fa-solid fa-check"></i></span>
-                    <span data-verify-label>Verify</span>
-                </button>
-                <span class="card-status-badge attendance-exception-status is-exception"><i class="fa-solid fa-clock" aria-hidden="true"></i>Late In</span>
-              </div>
+              <span class="card-status-badge attendance-exception-status is-exception"><i class="fa-solid fa-clock" aria-hidden="true"></i>Late In</span>
            </div>
 
            <div class="attendance-record-summary-panel history-card-details">
@@ -2116,10 +2060,8 @@
     function setAttendanceVerifyState(button, isVerified) {
       button.setAttribute('aria-pressed', String(isVerified));
       button.classList.toggle('checked', isVerified);
-      const label = button.querySelector('[data-verify-label]');
       const checkbox = button.querySelector('.verify-checkbox-box');
       if (checkbox) checkbox.classList.toggle('checked', isVerified);
-      if (label) label.textContent = isVerified ? 'Verified' : 'Verify';
     }
 
     const attendanceSavedVerification = new Map(Array.from(document.querySelectorAll('.attendance-verify-button'), button => [button, button.getAttribute('aria-pressed') === 'true']));

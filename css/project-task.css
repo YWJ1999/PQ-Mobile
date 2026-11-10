@@ -607,14 +607,8 @@
   font-weight: 600;
   line-height: 1.2;
 }
-.project-dashboard-status-card[data-tone="submitted"] strong,
-.project-dashboard-status-card[data-tone="submitted"] small { color: #f59e0b; }
-.project-dashboard-status-card[data-tone="draft"] strong,
-.project-dashboard-status-card[data-tone="draft"] small { color: #a855f7; }
-.project-dashboard-status-card[data-tone="resubmit"] strong,
-.project-dashboard-status-card[data-tone="resubmit"] small { color: #3b82f6; }
-.project-dashboard-status-card[data-tone="overdue"] strong,
-.project-dashboard-status-card[data-tone="overdue"] small { color: #ef4444; }
+.project-dashboard-status-card strong,
+.project-dashboard-status-card small { color: var(--purple-text); }
 .project-dashboard-quick-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -848,7 +842,7 @@
   border: 1px solid rgba(124, 58, 237, 0.24);
   border-radius: 18px;
   overflow: hidden;
-  background: var(--bg-input);
+  background: var(--bg-card);
   box-shadow: 0 10px 24px rgba(76, 29, 149, 0.12);
 }
 .project-calendar-details-heading {
@@ -891,16 +885,17 @@
 .project-calendar-detail-metrics {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 8px;
+  gap: 10px 12px;
+  padding: 10px 12px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  background: var(--bg-input);
 }
 .project-calendar-detail-metric {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  padding: 10px 11px;
-  border: 1px solid var(--border-subtle);
-  border-radius: 12px;
-  background: var(--bg-card);
+  min-width: 0;
 }
 .project-calendar-detail-metric-head {
   display: flex;

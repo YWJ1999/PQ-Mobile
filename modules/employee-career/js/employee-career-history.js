@@ -94,7 +94,7 @@
       const title = kind === 'feedback' ? row.title : row.description;
       const details = kind === 'feedback'
         ? summaryRow('Feedback Date',date(row.feedbackDate1)) + summaryRow('Submit Date',date(row.submitDate)) + summaryRow('Type',row.type) + summaryRow('Category',row.category)
-        : kind === 'whereabout' ? summaryRow('Date',date(row.date)) + summaryRow('Time',`${row.startTime} - ${row.endTime}`) + summaryRow('Task',row.task)
+        : kind === 'whereabout' ? summaryRow('Date',date(row.date)) + summaryRow('Time',`${row.startTime} - ${row.endTime}`) + summaryRow('Project',row.project) + summaryRow('Task',row.task)
         : kind === 'career-plan' ? summaryRow('Career Path',row.careerPath) + summaryRow('Next Position',row.nextPosition) + summaryRow('Target Date',date(row.targetDate)) + summaryRow('Submit Date',date(row.submitDate))
         : summaryRow('Submitted Date',date(recordDate(row)));
       const reference = kind === 'cv-change-request' ? '' : row.reference;

@@ -939,7 +939,7 @@
         const card = document.createElement('article');
         card.className = `history-card-item staff-card-item${hasException ? ' exception-theme' : ''}`;
         card.dataset.empNo = item.cleanEmpNo;
-        card.innerHTML = '<div class="attendance-record-top history-card-header"><button type="button" class="staff-card-details-trigger"><span class="staff-hdr-name"></span><span class="staff-hdr-empno"></span><span class="history-time-row"></span><span class="attendance-record-reference history-card-ref"></span></button><div class="attendance-record-controls"><label class="staff-verify-control"><input type="checkbox" class="staff-verify-checkbox"><span class="staff-verify-box" aria-hidden="true"><i class="fa-solid fa-check"></i></span><span class="staff-verify-label">Verify</span></label><span class="attendance-exception-status card-status-badge"></span></div></div><div class="attendance-record-summary-panel history-card-details"></div><div class="staff-card-actions history-card-actions"><button type="button" class="btn-action-feedback">Feedback</button></div>';
+        card.innerHTML = '<div class="attendance-record-top history-card-header"><label class="staff-verify-control"><input type="checkbox" class="staff-verify-checkbox"><span class="staff-verify-box" aria-hidden="true"><i class="fa-solid fa-check"></i></span></label><button type="button" class="staff-card-details-trigger"><span class="staff-hdr-name"></span><span class="staff-hdr-empno"></span><span class="history-time-row"></span><span class="attendance-record-reference history-card-ref"></span></button><span class="attendance-exception-status card-status-badge"></span></div><div class="attendance-record-summary-panel history-card-details"></div><div class="staff-card-actions history-card-actions"><button type="button" class="btn-action-feedback">Feedback</button></div>';
         card.querySelector('.staff-hdr-name').textContent = item.name;
         card.querySelector('.staff-hdr-empno').textContent = `#${item.empNo.replace(/^#/, '')}`;
         card.querySelector('.history-time-row').textContent = `Shift: ${item.shift}`;
@@ -949,12 +949,16 @@
         details.addEventListener('click', () => openDetailsModal(item.cleanEmpNo));
         const verify = card.querySelector('.staff-verify-checkbox');
         verify.checked = item.verified;
-        card.querySelector('.staff-verify-label').textContent = item.verified ? 'Verified' : 'Verify';
         verify.setAttribute('aria-label', `Verify attendance for ${item.name}, ${item.date}`);
         verify.addEventListener('change', () => toggleSingleVerify(item.cleanEmpNo));
         const status = card.querySelector('.attendance-exception-status');
         status.classList.toggle('is-exception', hasException);
-        status.textContent = hasException ? item.exception : 'No Exception';
+        const statusIcon = document.createElement('i');
+        statusIcon.className = 'fa-solid ' + (!hasException ? 'fa-circle-check' : item.exception === 'Late In' ? 'fa-clock' : 'fa-triangle-exclamation');
+        statusIcon.setAttribute('aria-hidden', 'true');
+        const statusLabel = document.createElement('span');
+        statusLabel.textContent = hasException ? item.exception : 'No Exception';
+        status.append(statusIcon, statusLabel);
         const panel = card.querySelector('.attendance-record-summary-panel');
         for (const [label, value] of [['Times', item.times], ['Normal Hours', item.normalHours], ['OT Hours', item.otHours]]) {
           const row = document.createElement('div');

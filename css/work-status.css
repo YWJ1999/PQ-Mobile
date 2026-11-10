@@ -34,17 +34,13 @@
   border: 1px solid var(--border-subtle);
   border-radius: 16px;
   background: var(--bg-card);
-  color: #f59e0b;
+  color: var(--purple-text);
   text-align: center;
   text-decoration: none;
   cursor: pointer;
   box-shadow: var(--shadow-sm);
   transition: transform 0.2s ease;
 }
-
-.work-status-card[data-status="approved"] { color: #10b981; }
-.work-status-card[data-status="resubmit"] { color: #3b82f6; }
-.work-status-card[data-status="rejected"] { color: #ef4444; }
 
 .work-status-card > strong {
   flex-shrink: 0;

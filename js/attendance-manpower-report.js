@@ -14,7 +14,7 @@ function renderManpowerCards(container, records) {
     const card = document.createElement('section');
     card.className = 'history-card-item manpower-group-card';
     card.dataset.groupId = record.id;
-    card.innerHTML = '<h2 class="manpower-company-header"></h2><div class="manpower-group-content"><div class="manpower-group-fields"><div class="manpower-group-field"><small>Section</small><strong data-section></strong></div><div class="manpower-group-field"><small>Cost Center</small><strong data-cost-center></strong></div></div><div class="manpower-group-actions" role="group"></div></div>';
+    card.innerHTML = '<h2 class="manpower-company-header"></h2><div class="manpower-group-content"><div class="manpower-group-details"><div class="manpower-group-fields"><div class="manpower-group-field"><small>Section</small><strong data-section></strong></div><div class="manpower-group-field"><small>Cost Center</small><strong data-cost-center></strong></div></div><div class="manpower-group-actions" role="group"></div></div></div>';
     card.querySelector('.manpower-company-header').textContent = record.company;
     card.querySelector('[data-section]').textContent = record.section;
     card.querySelector('[data-cost-center]').textContent = record.costCenter;

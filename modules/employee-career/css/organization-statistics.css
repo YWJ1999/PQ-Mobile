@@ -8,10 +8,10 @@
 .org-statistics-cards { display: grid; gap: 14px; }
 .org-statistics-card { overflow: hidden; border: 1px solid var(--border-subtle); border-radius: 18px; background: var(--bg-card); }
 .org-statistics-card h2 { margin: 0; padding: 11px 14px; background: linear-gradient(100deg,#5920ad,#7c3aed); color: #fff; font-size: 12px; font-weight: 800; line-height: 1.5; overflow-wrap: anywhere; }
-.org-statistics-card dl { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 8px; margin: 0; padding: 12px 13px; }
-.org-statistics-card dl > div { min-width: 0; padding: 10px 11px; border: 1px solid var(--border-subtle); border-radius: 12px; background: var(--bg-input); }
+.org-statistics-card dl { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 10px 12px; margin: 12px 13px; padding: 10px 12px; border: 1px solid var(--border-subtle); border-radius: 12px; background: var(--bg-input); }
+.org-statistics-card dl > div { min-width: 0; }
 .org-statistics-card dl > div:last-child { grid-column: 1 / -1; }
-.org-statistics-card dt { margin: 0 0 4px; color: var(--text-muted); font-size: 10px; font-weight: 700; line-height: 1.4; }
+.org-statistics-card dt { margin: 0 0 2px; color: var(--text-muted); font-size: 10.5px; font-weight: 700; line-height: 1.4; }
 .org-statistics-card dd { margin: 0; color: var(--text-primary); font-size: 12px; font-weight: 800; line-height: 1.5; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
 .org-statistics-empty { margin: 0; padding: 32px 20px; border: 1px dashed var(--border-subtle); border-radius: 18px; color: var(--text-muted); font-size: 12px; line-height: 1.5; text-align: center; }
 .org-statistics-chart-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }

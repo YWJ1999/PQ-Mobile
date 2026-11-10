@@ -1342,18 +1342,29 @@ class PolicyDetailSheet extends HTMLElement {
 customElements.define('policy-detail-sheet', PolicyDetailSheet);
 
 function createApprovalCardDetails(fields) {
+  const summary = document.createElement('div');
+  summary.className = 'approval-card-summary';
   const details = document.createElement('dl');
   details.className = 'approval-card-details';
   for (const [label, value] of fields) {
+    const text = value == null || value === '' ? '-' : value;
+    if (/^(Submit Date|Submitted Date|Submitted)$/.test(label)) {
+      const submitted = document.createElement('p');
+      submitted.className = 'approval-card-submitted';
+      submitted.textContent = `${label}: ${text}`;
+      summary.append(submitted);
+      continue;
+    }
     const row = document.createElement('div');
     const term = document.createElement('dt');
     term.textContent = label;
     const description = document.createElement('dd');
-    description.textContent = value == null || value === '' ? '-' : value;
+    description.textContent = text;
     row.append(term, description);
     details.append(row);
   }
-  return details;
+  summary.append(details);
+  return summary;
 }
 
 // 19. Pending Approval Card Component

@@ -27,8 +27,8 @@
 .cs-employee-header { --text-muted: rgba(255,255,255,.86); display: flex; flex-direction: column; padding: 14px 16px 10px; background: linear-gradient(135deg,#7c3aed 0%,#6d28d9 100%); }
 .cs-employee-name { color: #fff; font-size: 14px; font-weight: 800; line-height: 1.4; overflow-wrap: anywhere; }
 .cs-employee-id { display: block; margin: 3px 0 4px; color: var(--text-muted); font: 700 11.5px/1.3 monospace,sans-serif; opacity: .8; }
-.cs-employee-details { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 8px; margin: 0; padding: 12px; }
-.cs-employee-detail { min-width: 0; padding: 10px 11px; border: 1px solid var(--border-subtle); border-radius: 13px; background: var(--bg-input); }
+.cs-employee-details { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 10px 12px; margin: 12px; padding: 10px 12px; border: 1px solid var(--border-subtle); border-radius: 12px; background: var(--bg-input); }
+.cs-employee-detail { min-width: 0; }
 .cs-employee-detail:first-child { grid-column: 1 / -1; }
 .cs-employee-detail dt { margin-bottom: 4px; color: var(--text-muted); font-size: 10px; font-weight: 800; line-height: 1.35; }
 .cs-employee-detail dd { margin: 0; color: var(--text-primary); font-size: 11.5px; font-weight: 800; line-height: 1.5; overflow-wrap: anywhere; }
