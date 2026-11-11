@@ -32,19 +32,19 @@
     field.append(node('small', '', label), node('strong', '', value));
     return field;
   }
-  function actionButtons(ids, details = false) {
-    const grid = node('div', details ? 'pending-action-grid detail-popout-actions' : 'pending-action-grid');
-    if (details) grid.style.setProperty('--detail-action-count', '4');
-    const entries = details ? [['approve', 'Approve'], ['resubmit', 'Resubmit'], ['cancel', 'Cancel'], ['reject', 'Reject']] : Object.entries(actions);
+  function detailActionButtons(recordId) {
+    const grid = node('div', 'pending-action-grid detail-popout-actions');
+    grid.style.setProperty('--detail-action-count', '4');
+    const entries = [['approve', 'Approve'], ['resubmit', 'Resubmit'], ['cancel', 'Cancel'], ['reject', 'Reject']];
     entries.forEach(([action, title]) => {
-      const button = node('button', `action-btn-${action}`, !ids && action === 'approve' ? 'Approve Selected' : title);
+      const button = node('button', `action-btn-${action}`, title);
       button.type = 'button';
       if (action === 'cancel') {
         button.setAttribute('data-close-approval', '');
         button.addEventListener('click', cancelDialog);
       } else {
         button.dataset.approvalAction = action;
-        button.addEventListener('click', () => confirmAction(ids ? [ids] : [...selected], action, button));
+        button.addEventListener('click', () => confirmAction([recordId], action, button));
       }
       grid.append(button);
     });
@@ -156,7 +156,7 @@
     const input = node('textarea', 'detail-popout-comment-control'); input.id = label.htmlFor;
     input.rows = 2; input.maxLength = 2000; input.placeholder = 'Add approver remarks (optional)...'; input.value = commentDrafts.get(record.id) || '';
     comments.append(label, input); body.append(comments);
-    $('approvalDetailsActions').replaceChildren(actionButtons(record.id, true));
+    $('approvalDetailsActions').replaceChildren(detailActionButtons(record.id));
     openDialog('approvalDetails', trigger);
     body.scrollTop = 0;
   }
@@ -215,8 +215,8 @@
     all.disabled = !visible.length;
     $('performanceApprovalSelectedCount').textContent = selected.size;
     $('performanceApprovalBulk').hidden = !selected.size;
-    document.querySelector('.phone-container').classList.toggle('has-selection', selected.size > 0);
     document.querySelectorAll('.approval-card-checkbox').forEach(input => { input.checked = selected.has(input.value); });
+    $('performanceApprovalBulk').querySelector('bulk-approval-actions').syncWithQueue($('performanceApprovalQueue'));
   }
   const filter = window.PendingApprovalFilter.create('performanceApprovalFilter', {
     summaryId: 'performanceApprovalFilterSummary', onApply: () => { selected.clear(); render(); }
@@ -261,7 +261,7 @@
         fields.push(['Overall Score', record.overallScore], ['Score Grade', record.scoreGrade]);
       }
       if (record.backupApprover) fields.push(['Backup Approver', record.backupApprover.name]);
-      body.append(createApprovalCardDetails(fields), actionButtons(record.id));
+      body.append(createApprovalCardDetails(fields), createApprovalCardActions('approvalAction'));
       card.append(header, body);
       queue.append(card);
     });
@@ -303,7 +303,14 @@
   $('performanceApprovalSelectAll').addEventListener('change', event => { selected = new Set(event.target.checked ? visible.map(record => record.id) : []); syncSelection(); });
   $('performanceApprovalViewDetails').addEventListener('click', () => showDetails(store.getPending().find(record => record.id === activeRecordId), returnFocus));
   $('performanceApprovalViewWorkflow').addEventListener('click', showWorkflow);
-  $('performanceApprovalBulkActions').append(actionButtons());
+  $('performanceApprovalQueue').addEventListener('click', event => {
+    const button = event.target.closest('button[data-approval-action]');
+    if (button) confirmAction([button.closest('[data-request-id]').dataset.requestId], button.dataset.approvalAction, button);
+  });
+  $('performanceApprovalBulk').addEventListener('click', event => {
+    const button = event.target.closest('button[data-approval-action]');
+    if (button) confirmAction([...selected], button.dataset.approvalAction, button);
+  });
   $('approvalConfirmForm').addEventListener('submit', event => {
     event.preventDefault();
     if (!pendingAction) return;

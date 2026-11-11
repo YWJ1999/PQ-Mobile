@@ -529,73 +529,6 @@ function applyForYouFilters() {
   renderForYouSheetUI();
 }
 
-// Today's sample schedule for the Home preview; replace with employee schedule data when connected.
-const HOME_REMINDER_SCHEDULE = {
-  otPlan: { hours: 2, from: '18:00', to: '20:00' },
-  training: { classes: 1, date: '2026-10-20', from: '09:00', to: '17:00' },
-  shift: { from: '09:00', to: '18:00' }
-};
-
-function renderHomeForYou(counts) {
-  const summaries = [
-    { status: 'pending_approval', title: 'Pending Approval', icon: 'fa-user-check',
-      description: count => count ? `${count} ${count === 1 ? 'request is' : 'requests are'} waiting for your approval` : 'No requests are waiting for your approval' },
-    { status: 'pending_resubmit', title: 'Pending Resubmit', icon: 'fa-rotate-right',
-      description: count => count ? `${count} ${count === 1 ? 'request needs' : 'requests need'} updates before resubmission` : 'No requests need resubmission' }
-  ];
-  const { otPlan, training, shift } = HOME_REMINDER_SCHEDULE;
-  const reminders = [
-    { type: 'training', title: 'Training Reminder', icon: 'fa-graduation-cap', tone: 'rose',
-      description: `You have ${training.classes} training ${training.classes === 1 ? 'class' : 'classes'} today from ${training.from} to ${training.to}.` },
-    { type: 'clocking', title: 'Clocking Reminder', icon: 'fa-clock', tone: 'teal', route: 'clocking',
-      description: `Your current shift starts from ${shift.from} to ${shift.to} today. Please remember to clock in/out.` },
-    { type: 'ot-plan', title: 'OT Plan Reminder', icon: 'fa-business-time', tone: 'blue',
-      description: `You have planned OT of ${otPlan.hours} ${otPlan.hours === 1 ? 'hour' : 'hours'} from ${otPlan.from} to ${otPlan.to}.` }
-  ];
-  document.querySelectorAll('[data-home-notifications]').forEach(list => {
-    list.innerHTML = summaries.map(summary => `
-      <button type="button" class="for-you-card" data-pending-status="${summary.status}"
-        onclick="openForYouModal('${summary.status}')" aria-haspopup="dialog" aria-controls="forYouOverlay">
-        <span class="fy-left">
-          <span class="fy-avatar" style="background: var(--purple-subtle); color: var(--purple-text);">
-            <i class="fa-solid ${summary.icon}" aria-hidden="true"></i>
-          </span>
-          <span class="fy-text">
-            <span class="fy-title">${summary.title}</span>
-            <span class="fy-description">${summary.description(counts[summary.status])}</span>
-          </span>
-        </span>
-        <span class="fy-right" style="color: var(--purple-text);" aria-hidden="true">
-          <i class="fa-solid fa-chevron-right"></i>
-        </span>
-      </button>
-    `).join('') + reminders.map(reminder => {
-      const isTraining = reminder.type === 'training';
-      const isInteractive = isTraining || Boolean(reminder.route);
-      const tag = isTraining ? 'button' : reminder.route ? 'a' : 'article';
-      const action = isTraining
-        ? `type="button" data-training-date="${training.date}" aria-haspopup="dialog" aria-controls="trainingCalendarSheet"`
-        : reminder.route ? `href="${APP_ROUTES[reminder.route]()}"` : '';
-      return `
-      <${tag} class="for-you-card for-you-reminder" data-reminder-type="${reminder.type}" ${action}>
-        <span class="fy-left">
-          <span class="fy-avatar" style="background: var(--tag-${reminder.tone}-bg); color: var(--tag-${reminder.tone}-text);">
-            <i class="fa-solid ${reminder.icon}" aria-hidden="true"></i>
-          </span>
-          <span class="fy-text">
-            <span class="fy-title">${reminder.title}</span>
-            <span class="fy-description">${reminder.description}</span>
-          </span>
-        </span>
-        ${isInteractive ? `<span class="fy-right" style="color: var(--tag-${reminder.tone}-text);" aria-hidden="true">
-          <i class="fa-solid fa-chevron-right"></i>
-        </span>` : ''}
-      </${tag}>
-    `;
-    }).join('');
-  });
-}
-
 function renderForYouSheetUI() {
   const groupedContainer = document.getElementById('forYouGroupedContainer');
   const emptyEl = document.getElementById('forYouEmptyState');
@@ -613,7 +546,9 @@ function renderForYouSheetUI() {
   document.querySelectorAll('[data-for-you-tab]').forEach(tab => {
     tab.classList.toggle('active', tab.dataset.forYouTab === currentForYouTab);
   });
-  renderHomeForYou(counts);
+  document.querySelectorAll('[data-home-count]').forEach(value => {
+    value.textContent = counts[value.dataset.homeCount];
+  });
 
   // Filter Catalog Items
   const filteredList = NOTIFICATIONS_CATALOG.filter(item => {
@@ -748,20 +683,13 @@ function updateInsightSummaries() {
   document.querySelectorAll('[data-insight-scope]').forEach(pane => {
     const scope = pane.dataset.insightScope;
     const metrics = getInsightMetrics(scope);
-    pane.querySelectorAll('.insight-metric-group').forEach(group => {
-      const groupMetrics = metrics.filter(metric => metric.group === group.dataset.group);
-      const groupName = group.dataset.group === 'positive' ? 'Positive' : 'Negative';
-      const count = group.querySelector('.insight-group-count');
-      if (count) count.textContent = groupMetrics.length;
-      group.querySelector('.insight-group-header')?.setAttribute('aria-label', `${groupName}: ${groupMetrics.length} metrics. View all`);
-      group.querySelectorAll('.insight-trend-row').forEach(row => {
-        const total = groupMetrics.filter(metric => metric.trend === row.dataset.trend).length;
-        const trendName = row.dataset.trend === 'unchanged' ? 'No change' : row.dataset.trend === 'improved' ? 'Improved' : 'Worsened';
-        const value = row.querySelector('.insight-trend-count');
-        if (value) value.textContent = total;
-        row.setAttribute('aria-label', `${groupName}, ${trendName}: ${total} ${total === 1 ? 'metric' : 'metrics'}`);
-      });
+    pane.querySelectorAll('button[data-trend]').forEach(button => {
+      const trend = button.dataset.trend;
+      const count = metrics.filter(metric => metric.trend === trend).length;
+      button.querySelector('.insight-trend-count').textContent = count;
+      button.setAttribute('aria-label', `View ${count} ${trend} ${count === 1 ? 'metric' : 'metrics'}`);
     });
+    pane.querySelector('[data-insight-total]').textContent = `${metrics.length} metrics`;
   });
   switchInsightTab(document.getElementById('paneTeam')?.classList.contains('active') ? 'team' : 'my');
 }
@@ -785,8 +713,6 @@ function switchInsightTab(tab) {
     pane.hidden = !active;
   });
   if (title) title.textContent = isTeam ? 'Team Insights' : 'My Insights';
-  const count = document.getElementById('insightMetricCount');
-  if (count) count.textContent = `${getInsightMetrics(isTeam ? 'team' : 'my').length} metrics`;
 }
 
 // 8. V1 Indicators Bottom Sheet Drawer Controls (Team & Individual)

@@ -47,11 +47,7 @@
     </main>
     <aside id="payrollPendingBulk" class="payroll-pending-bulk pending-selection-bar" aria-label="Selected requests" hidden>
       <strong aria-live="polite"><span id="payrollPendingSelectedCount">0</span> Selected</strong>
-      <div class="pending-action-grid">
-        <button type="button" class="action-btn-approve" data-payroll-action="approve"><i class="fa-solid fa-check" aria-hidden="true"></i>Approve Selected</button>
-        <button type="button" class="action-btn-resubmit" data-payroll-action="resubmit"><i class="fa-solid fa-rotate-left" aria-hidden="true"></i>Resubmit</button>
-        <button type="button" class="action-btn-reject" data-payroll-action="reject"><i class="fa-solid fa-xmark" aria-hidden="true"></i>Reject</button>
-      </div>
+      <bulk-approval-actions action-key="payrollAction"></bulk-approval-actions>
     </aside>
     <phone-bottom-nav active="apps"></phone-bottom-nav>
     <left-profile-drawer></left-profile-drawer>

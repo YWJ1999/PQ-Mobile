@@ -72,7 +72,8 @@ document.addEventListener('DOMContentLoaded', () => {
         rows: [
           ['Visit Date', date(fieldValue(fields, 'Visit Date') || row.date)],
           ['Visit Time', fieldValue(fields, 'Visit Time', 'Time') || emptyValue],
-          ['Visitor', fieldValue(fields, 'Visitor', 'Total Guest') || emptyValue]
+          ['Visitor', fieldValue(fields, 'Visitor', 'Total Guest') || emptyValue],
+          ['Location', fieldValue(fields, 'Location') || emptyValue]
         ]
       };
     }
@@ -82,7 +83,8 @@ document.addEventListener('DOMContentLoaded', () => {
         rows: [
           ['Submitted Date', date(fieldValue(fields, 'Submitted Date', 'Submit Date') || row.date)],
           ['Type', fieldValue(fields, 'Type', 'Letter Type') || row.title],
-          ['Acknowledged On', date(fieldValue(fields, 'Acknowledged On'))]
+          ['Acknowledged On', date(fieldValue(fields, 'Acknowledged On'))],
+          ['Reason', fieldValue(fields, 'Reason') || emptyValue]
         ]
       };
     }
@@ -90,7 +92,9 @@ document.addEventListener('DOMContentLoaded', () => {
       title: fieldValue(fields, 'Inventory Item', 'Request Item', 'Inventory Type') || row.title,
       rows: [
         ['Request Date', date(fieldValue(fields, 'Request Date', 'Submit Date') || row.date)],
-        ['Quantity', fieldValue(fields, 'Quantity') || emptyValue]
+        ['Quantity', fieldValue(fields, 'Quantity') || emptyValue],
+        ['UOM', fieldValue(fields, 'UOM', 'Unit') || emptyValue],
+        ['Reason', fieldValue(fields, 'Reason') || emptyValue]
       ]
     };
   }

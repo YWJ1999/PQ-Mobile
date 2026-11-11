@@ -132,7 +132,7 @@ async function shot(page, name) {
       assert.equal(approved.approverComments, '<script>review</script> Approved visit');
       await page.reload({ waitUntil: 'load' });
       assert.equal(await page.$eval('#workplacePendingCount', n => n.textContent), '0', 'Decisions survive reload');
-      for (const [action, status] of [['resubmit', 'resubmit'], ['reject', 'rejected'], ['cancel', 'cancelled']]) {
+      for (const [action, status] of [['resubmit', 'resubmit'], ['reject', 'rejected']]) {
         await page.evaluate(storageKey => localStorage.removeItem(storageKey), key);
         await page.reload({ waitUntil: 'load' });
         await page.click('#workplacePendingSelectAll');
@@ -143,10 +143,12 @@ async function shot(page, name) {
       await page.evaluate(storageKey => localStorage.removeItem(storageKey), key);
       await page.reload({ waitUntil: 'load' });
       await page.evaluate(() => { window.restoreWrite = Storage.prototype.setItem; Storage.prototype.setItem = () => { throw new Error('Storage full'); }; });
-      await page.click('#workplacePendingQueue .action-btn-cancel');
+      await page.click('#workplacePendingQueue .three-dots-btn');
+      await page.click('#workplaceApprovalMenu [data-approval-action="cancel"]');
+      assert.match(await page.$eval('#workplaceApprovalMenuFeedback', n => n.textContent), /Unable/);
       assert.equal(await page.evaluate(() => window.WorkplacePendingStore.getPending().length), 2, 'Failed cancellation retains the pending request');
       await page.evaluate(() => { Storage.prototype.setItem = window.restoreWrite; });
-      await page.click('#workplacePendingQueue .action-btn-cancel');
+      await page.click('#workplaceApprovalMenu [data-approval-action="cancel"]');
       assert.equal(await page.$eval('#workplacePendingCount', n => n.textContent), '0');
       await page.reload({ waitUntil: 'load' });
       assert.equal(await page.evaluate(() => window.WorkplacePendingStore.list().find(item => item.kind === 'guest-visit').status), 'cancelled', 'Card cancellation survives reload');

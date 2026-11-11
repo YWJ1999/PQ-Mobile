@@ -45,7 +45,10 @@
         <div id="performanceApprovalQueue" aria-live="polite"></div>
       </section>
     </main>
-    <aside id="performanceApprovalBulk" class="payroll-pending-bulk pending-selection-bar" aria-label="Selected requests" hidden><strong aria-live="polite"><span id="performanceApprovalSelectedCount">0</span> Selected</strong><div id="performanceApprovalBulkActions"></div></aside>
+    <aside id="performanceApprovalBulk" class="payroll-pending-bulk pending-selection-bar" aria-label="Selected requests" hidden>
+      <strong aria-live="polite"><span id="performanceApprovalSelectedCount">0</span> Selected</strong>
+      <bulk-approval-actions action-key="approvalAction"></bulk-approval-actions>
+    </aside>
     <phone-bottom-nav active="apps"></phone-bottom-nav>
     <left-profile-drawer></left-profile-drawer><notification-sheet></notification-sheet>
     <div id="performanceApprovalMenu" class="payroll-approval-overlay" hidden>

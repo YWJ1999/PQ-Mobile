@@ -5,7 +5,7 @@
 .payroll-pending-header-row { display: flex; align-items: center; gap: 12px; margin-top: 4px; }
 .payroll-pending-header h1 { font-size: 18px; font-weight: 800; line-height: 1.25; }
 .payroll-pending-back { width: 36px; height: 36px; display: grid; place-items: center; border: 1px solid rgba(255, 255, 255, 0.25); border-radius: 12px; background: rgba(255, 255, 255, 0.18); color: #fff; text-decoration: none; }
-.payroll-pending-content { flex: 1; min-height: 0; overflow-y: auto; margin-bottom: 90px; padding: 14px; scrollbar-width: none; }
+.payroll-pending-content { flex: 1; min-height: 0; overflow-y: auto; padding: 14px 14px 104px; scrollbar-width: none; }
 .payroll-pending-content::-webkit-scrollbar { display: none; }
 .payroll-pending-page .sheet-filter-bar { max-width: 100%; overflow-x: auto; }
 .payroll-pending-tabs { display: flex; gap: 8px; margin-bottom: 16px; padding-bottom: 6px; overflow-x: auto; scrollbar-width: none; }
@@ -40,9 +40,6 @@
 .payroll-pending-empty > i { font-size: 28px; color: var(--purple-text); margin-bottom: 12px; }
 .payroll-pending-empty h3 { font-size: 14px; font-weight: 800; margin-bottom: 6px; }
 .payroll-pending-empty p { color: var(--text-muted); font-size: 11.5px; line-height: 1.5; }
-.payroll-pending-bulk { position: absolute; bottom: 90px; left: 14px; right: 14px; z-index: 40; padding: 10px 12px; border: 1px solid var(--purple-border); border-radius: 18px; background: var(--bg-card); box-shadow: var(--shadow-card); }
-.payroll-pending-bulk > strong { display: block; margin-bottom: 8px; font-size: 11.5px; color: var(--purple-text); }
-.payroll-pending-page .phone-container.has-selection .payroll-pending-content { margin-bottom: 178px; }
 .payroll-approval-overlay { position: absolute; inset: 0; z-index: 1050; display: flex; align-items: flex-end; background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(6px); border-radius: inherit; overflow: hidden; }
 .payroll-approval-panel { width: 100%; max-height: 94%; display: flex; flex-direction: column; border: 1px solid var(--border-subtle); border-bottom: 0; border-radius: 28px 28px 0 0; background: var(--bg-card); box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.3); transform: translateY(100%); transition: transform 240ms ease; overflow: hidden; }
 .payroll-approval-overlay.active .payroll-approval-panel { transform: translateY(0); }

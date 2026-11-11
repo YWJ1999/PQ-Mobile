@@ -20,3 +20,25 @@ const COMPANY_NEWS = [
     paragraphs: ['PeopleHCM 3.0 brings instant leave approvals and AI insights to the mobile app.']
   }
 ];
+
+const WORKPLACE_NEWS_STATE_KEY = 'peoplehcm:workplace:news:v1';
+
+function readWorkplaceNewsState(records) {
+  try {
+    const saved = JSON.parse(localStorage.getItem(WORKPLACE_NEWS_STATE_KEY) || '{}');
+    const state = {};
+    for (const record of records) {
+      const row = saved?.[record.id];
+      if (!row || typeof row !== 'object') continue;
+      const acknowledgedAt = typeof row.acknowledgedAt === 'string' && Number.isFinite(Date.parse(row.acknowledgedAt))
+        ? row.acknowledgedAt : null;
+      state[record.id] = {
+        read: row.read === true || row.bookmarked === true || Boolean(acknowledgedAt) || Boolean(row.feedback),
+        bookmarked: row.bookmarked === true,
+        acknowledgedAt,
+        feedback: typeof row.feedback === 'string' ? row.feedback.slice(0, 1000) : ''
+      };
+    }
+    return state;
+  } catch { return {}; }
+}

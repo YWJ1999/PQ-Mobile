@@ -129,9 +129,9 @@
             </div>
             <span id="teamPendingCountVal" style="font-size: 12px; font-weight: 800; color: #ffffff; background: var(--primary-action-background); padding: 4px 12px; border-radius: 12px;">4 Requests</span>
          </div>
-         <button onclick="window.ClaimsEngine.approveAllTeamClaims()" style="width: 100%; padding: 10px; border-radius: 14px; background: var(--primary-action-background); border: 1px solid transparent; color: #ffffff; font-size: 12.5px; font-weight: 800; cursor: pointer;">
-            ✔ Approve All Team Requests
-         </button>
+         <div class="pending-action-grid">
+           <button type="button" onclick="window.ClaimsEngine.approveAllTeamClaims()">Approve All Team Requests</button>
+         </div>
       </div>
 
       <!-- Pending Approval Queue -->

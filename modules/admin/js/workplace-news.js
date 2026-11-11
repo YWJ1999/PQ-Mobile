@@ -29,34 +29,15 @@
   ];
   const allRecords = [...records, ...COMPANY_NEWS];
   const params = new URLSearchParams(location.search);
-  const storageKey = 'peoplehcm:workplace:news:v1';
   const $ = id => document.getElementById(id);
   const escape = value => String(value).replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]));
   const theme = () => document.documentElement.dataset.theme || 'dark';
-  const validTime = value => typeof value === 'string' && Number.isFinite(Date.parse(value));
-
-  function readState() {
-    try {
-      const saved = JSON.parse(localStorage.getItem(storageKey) || '{}');
-      const state = {};
-      for (const record of allRecords) {
-        const row = saved?.[record.id];
-        if (!row || typeof row !== 'object') continue;
-        state[record.id] = {
-          read: row.read === true || row.bookmarked === true || validTime(row.acknowledgedAt) || Boolean(row.feedback),
-          bookmarked: row.bookmarked === true,
-          acknowledgedAt: validTime(row.acknowledgedAt) ? row.acknowledgedAt : null,
-          feedback: typeof row.feedback === 'string' ? row.feedback.slice(0, 1000) : ''
-        };
-      }
-      return state;
-    } catch { return {}; }
-  }
+  const readState = () => readWorkplaceNewsState(allRecords);
 
   function saveState(id, changes) {
     const state = readState();
     state[id] = { ...state[id], ...changes };
-    localStorage.setItem(storageKey, JSON.stringify(state));
+    localStorage.setItem(WORKPLACE_NEWS_STATE_KEY, JSON.stringify(state));
   }
 
   function renderList() {
@@ -290,5 +271,5 @@
   new MutationObserver(refresh).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
   window.addEventListener('popstate', refresh);
   window.addEventListener('pageshow', refresh);
-  window.addEventListener('storage', event => { if (event.key === storageKey || event.key === null) refresh(); });
+  window.addEventListener('storage', event => { if (event.key === WORKPLACE_NEWS_STATE_KEY || event.key === null) refresh(); });
 })();

@@ -61,6 +61,14 @@ const detailLabels = () => [...document.querySelectorAll('#historyDetailBody .hi
     page.on('pageerror', error => errors.push(error.message));
     await page.setViewport({ width: 390, height: 950 });
     await page.goto(pageUrl + '?category=guest-visit&theme=light', { waitUntil: 'load' });
+    await page.click('[data-history-kind="inventory-request"]');
+    assert.deepEqual(await page.$$eval('[data-record-id="sample-inventory-0064"] .history-card-row', rows =>
+      rows.map(row => [row.querySelector('span').textContent, row.querySelector('strong').textContent])
+    ), [
+      ['Request Date', '8 Sep 2026'], ['Quantity', '1'],
+      ['UOM', 'Piece'], ['Reason', 'Inventory Request Reason 1']
+    ]);
+    await page.click('[data-history-kind="guest-visit"]');
     await page.evaluate((key, seededRecords) => localStorage.setItem(key, JSON.stringify(seededRecords)), historyKey, records);
     await page.reload({ waitUntil: 'load' });
 
@@ -73,7 +81,8 @@ const detailLabels = () => [...document.querySelectorAll('#historyDetailBody .hi
     ])), [
       ['Visit Date', '6 Oct 2026'],
       ['Visit Time', '09:00 \u2013 10:00'],
-      ['Visitor', '1']
+      ['Visitor', '1'],
+      ['Location', 'Head Office']
     ]);
     assert.equal(await page.$eval('.history-card-item .status-pill', node => node.textContent.trim()), 'Submitted');
 
@@ -99,7 +108,8 @@ const detailLabels = () => [...document.querySelectorAll('#historyDetailBody .hi
     ])), [
       ['Submitted Date', '5 Oct 2026'],
       ['Type', 'Letter of Guarantee'],
-      ['Acknowledged On', '11 Jul 2026']
+      ['Acknowledged On', '11 Jul 2026'],
+      ['Reason', 'To apply admission to Hospital']
     ]);
 
     await page.click('.history-card-item');
@@ -122,6 +132,7 @@ const detailLabels = () => [...document.querySelectorAll('#historyDetailBody .hi
     assert.match(await page.$eval('#historyDetailBody', n => n.textContent), /laptop-quote.pdf/, 'Existing inventory attachments remain visible');
     await page.keyboard.press('Escape');
     await page.click('[data-history-kind="letter-request"]');
+    assert.equal(await page.$eval('[data-record-id="letter-draft-date"] .history-card-row:last-child strong', n => n.textContent), '—');
     await page.click('[data-record-id="letter-draft-date"] [data-history-action="apply"]');
     const submitDate = await page.evaluate(() => new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }).replace(' Sept ', ' Sep '));
     assert.equal(await page.$eval('[data-record-id="letter-draft-date"] .history-card-row strong', n => n.textContent), submitDate, 'Reapplied letters display their new submit date');

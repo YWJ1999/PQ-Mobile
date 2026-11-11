@@ -101,122 +101,29 @@ html .phone-container input.approval-card-checkbox:disabled { opacity: .5; curso
   font-weight: 700;
   line-height: 1.4;
 }
-.phone-container .approval-card-body > .pending-action-grid:not([hidden]) {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-  align-items: center;
-  gap: 8px;
-  margin-top: 16px;
-}
-.phone-container .approval-card-body > .pending-action-grid:has(> button:nth-of-type(4)) { column-gap: 6px; }
-@container approval-card (max-width: 299px) {
-  .phone-container .approval-card-body > .pending-action-grid:has(> button:nth-of-type(4)) {
-    display: grid;
-    grid-template-columns: repeat(2, max-content);
-    justify-items: end;
-  }
-}
-.phone-container :is(.pending-action-grid.detail-popout-actions, .payroll-approval-details-footer.pending-action-grid, .payroll-approval-details-footer > .pending-action-grid):not([hidden]) {
-  display: flex !important;
-  flex-wrap: wrap !important;
-  justify-content: flex-end !important;
-}
-@media (max-width: 380px) {
-  .phone-container :is(.pending-action-grid.detail-popout-actions, .payroll-approval-details-footer.pending-action-grid, .payroll-approval-details-footer > .pending-action-grid):has(> button:nth-of-type(4)):not([hidden]) {
-    display: grid !important;
-    grid-template-columns: repeat(2, max-content) !important;
-    justify-items: end;
-  }
-}
+.approval-card-body > .pending-action-grid { margin-top: 12px; }
 .approval-backup-assignment { margin: 5px 0 9px; color: var(--text-secondary); font-size: 11.5px; font-weight: 650; overflow-wrap: anywhere; }
 .pending-selection-bar {
-  position: absolute;
+  position: relative;
   z-index: 40;
-  inset-inline: 14px;
-  bottom: 90px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
+  flex: none;
+  width: 100%;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: 8px;
-  padding: 10px 12px;
-  background: var(--bg-card);
+  padding: 10px 15px 14px;
+  background: var(--bg-bottom-nav);
   color: var(--text-primary);
-  border: 1px solid var(--purple-primary);
-  border-radius: 20px;
-  box-shadow: 0 6px 20px rgba(76,29,149,.2);
+  border-top: 1px solid var(--border-subtle);
+  border-radius: 18px 18px 0 0;
+  overflow: clip;
 }
 .pending-selection-bar[hidden] { display: none; }
-.pending-selection-bar > strong, .pending-selection-bar > div { display: flex; align-items: center; gap: 7px; }
-.pending-selection-bar > strong { margin: 0; font-size: 12px; color: var(--text-primary); }
+.pending-selection-bar > strong { display: flex; align-items: center; gap: 7px; margin: 0; font-size: 12px; color: var(--text-primary); }
 .pending-selection-bar > strong span { padding: 3px 8px; border-radius: 12px; background: #7c3aed; color: white; font-variant-numeric: tabular-nums; }
-.payroll-pending-bulk.pending-selection-bar:not([hidden]) {
-  display: flex;
-  justify-content: flex-end;
-  gap: 6px;
+/* The two footer rows size themselves. Only the request list scrolls. */
+.pending-selection-bar:not([hidden]) + phone-bottom-nav { flex: none; }
+.pending-selection-bar:not([hidden]) + phone-bottom-nav .bottom-nav {
+  position: relative;
 }
-.payroll-pending-bulk.pending-selection-bar :is(.pending-action-grid, #performanceApprovalBulkActions) { display: contents; }
-.payroll-pending-bulk.pending-selection-bar > strong { flex-basis: 100%; }
-.payroll-pending-bulk.pending-selection-bar:has(.pending-action-grid > button:nth-of-type(4)):not([hidden]) {
-  display: grid;
-  grid-template-columns: repeat(2, max-content);
-  justify-content: end;
-}
-.payroll-pending-bulk.pending-selection-bar:has(.pending-action-grid > button:nth-of-type(4)) > strong { grid-area: 1 / 1 / auto / -1; }
-.payroll-pending-bulk.pending-selection-bar:has(.pending-action-grid > button:nth-of-type(4)) button { grid-area: auto; }
-.phone-container.has-pending-selection .main-content { padding-bottom: 185px; }
-
-/* Match the compact History card actions, including legacy and pop-out overrides. */
-html .phone-container :is(
-  .pending-action-grid > button, .pending-selection-bar button,
-  .action-btn-approve, .action-btn-resubmit, .action-btn-reject, .action-btn-cancel
-):not([hidden]) {
-  display: inline-flex !important;
-  flex-direction: row !important;
-  align-items: center !important;
-  justify-content: center !important;
-  box-sizing: border-box;
-  gap: 0 !important;
-  min-width: 0 !important;
-  width: auto !important;
-  height: auto !important;
-  min-height: 32px !important;
-  padding: 6px 12px !important;
-  border: 1px solid transparent !important;
-  border-radius: 8px !important;
-  background: var(--primary-action-background) !important;
-  color: #fff !important;
-  box-shadow: none !important;
-  font-family: inherit !important;
-  font-size: 11.5px !important;
-  font-weight: 700 !important;
-  line-height: 1.5 !important;
-  text-align: center;
-  white-space: nowrap !important;
-  cursor: pointer;
-  transition: transform .2s ease, filter .2s ease;
-}
-html .phone-container :is(.pending-action-grid > button, .pending-selection-bar button, .action-btn-approve, .action-btn-resubmit, .action-btn-reject, .action-btn-cancel) :is(i, svg, img) { display: none !important; }
-html .phone-container :is(.pending-action-grid, .pending-selection-bar) button::after { content: none; }
-html .phone-container :is(.pending-action-grid > button, .pending-selection-bar button, .action-btn-approve, .action-btn-resubmit, .action-btn-reject, .action-btn-cancel):hover:not(:disabled) { filter: brightness(1.08); }
-html .phone-container :is(.pending-action-grid > button, .pending-selection-bar button, .action-btn-approve, .action-btn-resubmit, .action-btn-reject, .action-btn-cancel):active:not(:disabled) { transform: scale(.96); }
-html .phone-container :is(.pending-action-grid > button, .pending-selection-bar button, .action-btn-approve, .action-btn-resubmit, .action-btn-reject, .action-btn-cancel):focus-visible { outline: 2px solid var(--purple-text) !important; outline-offset: 3px !important; }
-html .phone-container :is(.pending-action-grid > button, .pending-selection-bar button, .action-btn-approve, .action-btn-resubmit, .action-btn-reject, .action-btn-cancel):disabled { opacity: .48; cursor: not-allowed; filter: none; transform: none; }
-
-/* Selected-request decisions match the green Approve / red Reject Leave bar. */
-html .phone-container .pending-selection-bar button:is([data-decision="approve"], .action-btn-approve):not([hidden]) {
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
-  color: #fff !important;
-}
-html .phone-container .pending-selection-bar button:is([data-decision="reject"], .action-btn-reject):not([hidden]) {
-  background: rgba(239, 68, 68, .12) !important;
-  border-color: rgba(239, 68, 68, .3) !important;
-  color: var(--danger, #ef4444) !important;
-}
-html .phone-container .pending-selection-bar button:is([data-decision="approve"], .action-btn-approve):focus-visible { outline-color: #059669 !important; }
-html .phone-container .pending-selection-bar button:is([data-decision="reject"], .action-btn-reject):focus-visible { outline-color: var(--danger, #ef4444) !important; }
-
-@media (prefers-reduced-motion: reduce) {
-  html .phone-container :is(.pending-action-grid > button, .pending-selection-bar button, .action-btn-approve, .action-btn-resubmit, .action-btn-reject, .action-btn-cancel) { transition: none; transform: none; }
-}
+.phone-container:has(> .pending-selection-bar:not([hidden])) > :is(.main-content, .payroll-pending-content) { padding-bottom: 14px; }

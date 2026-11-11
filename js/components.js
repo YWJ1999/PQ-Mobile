@@ -1340,6 +1340,65 @@ class PolicyDetailSheet extends HTMLElement {
 }
 customElements.define('policy-detail-sheet', PolicyDetailSheet);
 
+function renderApprovalButtons(row, actionKey, { resubmit = true } = {}) {
+  const decisions = [['reject', 'Reject'], ['approve', 'Approve']];
+  if (resubmit) decisions.unshift(['resubmit', 'Resubmit']);
+  row.classList.add('pending-action-grid');
+  row.replaceChildren(...decisions.map(([action, label]) => {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'action-btn-' + action;
+    button.dataset[actionKey] = action;
+    button.textContent = label;
+    return button;
+  }));
+  return row;
+}
+
+function createApprovalCardActions(actionKey, options) {
+  return renderApprovalButtons(document.createElement('div'), actionKey, options);
+}
+
+class BulkApprovalActions extends HTMLElement {
+  static get observedAttributes() { return ['resubmit']; }
+
+  connectedCallback() {
+    this.render();
+  }
+
+  attributeChangedCallback() {
+    if (this.isConnected) this.render();
+  }
+
+  syncWithQueue(queue) {
+    const checked = [...queue.querySelectorAll('.approval-card-checkbox:checked:enabled')]
+      .filter(box => box.getClientRects().length);
+    const canResubmit = checked.length > 0 && checked.every(box => {
+      const card = box.closest('.approval-request-card, .project-approval-card');
+      const button = card?.querySelector('button.action-btn-resubmit:enabled:not([aria-disabled="true"])');
+      return button && button.getClientRects().length > 0;
+    });
+    this.toggleAttribute('resubmit', canResubmit);
+  }
+
+  render() {
+    renderApprovalButtons(this, this.getAttribute('action-key') || 'decision', {
+      resubmit: this.hasAttribute('resubmit')
+    });
+  }
+}
+customElements.define('bulk-approval-actions', BulkApprovalActions);
+
+function formatBulkApprovalResult(action, count, requestType = 'request') {
+  const requests = `${count} ${requestType}${count === 1 ? '' : 's'}`;
+  switch (action) {
+    case 'approve': return `Approved ${requests}.`;
+    case 'reject': return `Rejected ${requests}.`;
+    case 'resubmit': return `Returned ${requests} for resubmission.`;
+    default: return '';
+  }
+}
+
 function createApprovalCardDetails(fields) {
   const summary = document.createElement('div');
   summary.className = 'approval-card-summary';
@@ -1478,16 +1537,16 @@ class PendingApprovalCard extends HTMLElement {
         <div class="approval-card-body" style="cursor: pointer;" onclick="if (!event.target.closest('.pending-action-grid, .approval-card-checkbox, .three-dots-btn')) { window.ClaimsEngine && window.ClaimsEngine.triggerClaimViewDetails ? window.ClaimsEngine.triggerClaimViewDetails('${itemId}') : null; }">
           ${createApprovalCardDetails(fields).outerHTML}
 
-          <!-- Bottom Action Buttons Grid (Approve, Resubmit, Reject) matching Attendance -->
+          <!-- Approval actions -->
           <div class="pending-action-grid">
-            <button type="button" class="action-btn-approve" onclick="window.ClaimsEngine ? window.ClaimsEngine.actionTeamClaim(${itemId}, 'approve', '${userName.replace(/'/g, "\\'")}', '${amount}') : null">
-              <i class="fa-solid fa-check" style="font-size: 11.5px;"></i> Approve
-            </button>
             <button type="button" class="action-btn-resubmit" onclick="window.ClaimsEngine ? window.ClaimsEngine.actionTeamClaim(${itemId}, 'resubmit', '${userName.replace(/'/g, "\\'")}', '${amount}') : null">
               <i class="fa-solid fa-rotate-left" style="font-size: 11px;"></i> Resubmit
             </button>
             <button type="button" class="action-btn-reject" onclick="window.ClaimsEngine ? window.ClaimsEngine.actionTeamClaim(${itemId}, 'reject', '${userName.replace(/'/g, "\\'")}', '${amount}') : null">
               <i class="fa-solid fa-xmark" style="font-size: 11.5px;"></i> Reject
+            </button>
+            <button type="button" class="action-btn-approve" onclick="window.ClaimsEngine ? window.ClaimsEngine.actionTeamClaim(${itemId}, 'approve', '${userName.replace(/'/g, "\\'")}', '${amount}') : null">
+              <i class="fa-solid fa-check" style="font-size: 11.5px;"></i> Approve
             </button>
           </div>
         </div>

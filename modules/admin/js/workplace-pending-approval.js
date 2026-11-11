@@ -52,30 +52,27 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     return grid;
   }
-  function actionButtons(cancel = false) {
+  function detailActionButtons() {
     const grid = node('div', 'pending-action-grid');
-    const available = cancel ? actions : [...actions, ['cancel', 'Cancel', 'fa-ban']];
-    for (const [action, label, symbol] of available) {
+    for (const [action, label, symbol] of actions) {
       const button = node('button', 'action-btn-' + action);
       button.type = 'button';
       button.dataset.approvalAction = action;
       button.append(icon(symbol), node('span', '', label));
       grid.append(button);
     }
-    if (cancel) {
-      const button = node('button', 'action-btn-cancel', 'Cancel');
-      button.type = 'button';
-      button.dataset.closeWorkplaceApproval = '';
-      grid.append(button);
-    }
+    const close = node('button', 'action-btn-cancel', 'Cancel');
+    close.type = 'button';
+    close.dataset.closeWorkplaceApproval = '';
+    grid.append(close);
     return grid;
   }
   function updateSelection() {
     $('workplacePendingSelectAll').checked = visible.length > 0 && visible.every(row => selected.has(row.id));
     $('workplacePendingSelectAll').indeterminate = selected.size > 0 && !$('workplacePendingSelectAll').checked;
     $('workplacePendingBulk').hidden = selected.size === 0;
+    $('workplacePendingBulk').querySelector('bulk-approval-actions').syncWithQueue($('workplacePendingQueue'));
     $('workplacePendingSelectedCount').textContent = selected.size;
-    document.querySelector('.phone-container').classList.toggle('has-selection', selected.size > 0);
   }
   function updateTabs() {
     document.querySelectorAll('[data-workplace-tab]').forEach(tab => {
@@ -111,7 +108,11 @@ document.addEventListener('DOMContentLoaded', () => {
     menu.setAttribute('aria-label', 'Options for ' + item.reference);
     menu.setAttribute('aria-haspopup', 'dialog');
     menu.append(icon('fa-ellipsis-vertical'));
-    menu.addEventListener('click', () => { currentId = item.id; openSheet('workplaceApprovalMenu', menu); });
+    menu.addEventListener('click', () => {
+      currentId = item.id;
+      message('workplaceApprovalMenuFeedback', '');
+      openSheet('workplaceApprovalMenu', menu);
+    });
     header.append(checkbox, identity(item.employeeName, item.empNo), menu);
     const body = node('div', 'approval-card-body payroll-approval-card-body');
     const review = node('div', 'workplace-approval-review');
@@ -129,7 +130,7 @@ document.addEventListener('DOMContentLoaded', () => {
     review.append(createApprovalCardDetails([['Submit Date', date(item.submitDate)], ...rows]));
     review.addEventListener('click', () => openDetails(item.id, review));
     review.addEventListener('keydown', event => { if (['Enter', ' '].includes(event.key)) { event.preventDefault(); openDetails(item.id, review); } });
-    body.append(review, actionButtons());
+    body.append(review, createApprovalCardActions('approvalAction'));
     PendingApprovalBackup.showAssignment(body.lastElementChild, { scope: 'workplace', id: item.id });
     card.append(header, body);
     return card;
@@ -269,7 +270,7 @@ document.addEventListener('DOMContentLoaded', () => {
     comments.maxLength = 2000;
     comments.value = item.approverComments;
     $('workplaceApprovalComments').replaceChildren(commentLabel, comments);
-    $('workplaceApprovalDetailActions').replaceChildren(...actionButtons(true).children);
+    $('workplaceApprovalDetailActions').replaceChildren(...detailActionButtons().children);
     message('workplaceApprovalDetailFeedback', '');
     openSheet('workplaceApprovalDetails', trigger);
     general.parentElement.scrollTop = 0;
@@ -296,8 +297,9 @@ document.addEventListener('DOMContentLoaded', () => {
   function act(button) {
     const action = button.dataset.approvalAction;
     const inDetails = Boolean(button.closest('#workplaceApprovalDetails'));
+    const inMenu = Boolean(button.closest('#workplaceApprovalMenu'));
     const card = button.closest('[data-item-id]');
-    const ids = inDetails ? [currentId] : card ? [card.dataset.itemId] : [...selected];
+    const ids = inDetails || inMenu ? [currentId] : card ? [card.dataset.itemId] : [...selected];
     if (!ids.length) return;
     if (action === 'approve' && !inDetails && ids.length === 1) { openDetails(ids[0], button); return; }
     const options = {};
@@ -313,7 +315,8 @@ document.addEventListener('DOMContentLoaded', () => {
       $('workplacePendingFilterTrigger').focus({ preventScroll: true });
     } catch (error) {
       const text = /^(Please|End Time|Total Guest|This request)/.test(error.message) ? error.message : 'Unable to update this request. Please try again.';
-      message(inDetails ? 'workplaceApprovalDetailFeedback' : 'workplacePendingFeedback', text);
+      const feedback = inDetails ? 'workplaceApprovalDetailFeedback' : inMenu ? 'workplaceApprovalMenuFeedback' : 'workplacePendingFeedback';
+      message(feedback, text);
       if (inDetails) $('workplaceApprovalDetailFeedback').scrollIntoView({ block: 'nearest' });
     }
   }
@@ -334,9 +337,6 @@ document.addEventListener('DOMContentLoaded', () => {
   });
   $('workplacePendingFilterTrigger').addEventListener('click', filter.open);
   $('workplacePendingSelectAll').addEventListener('change', event => { visible.forEach(row => { if (event.target.checked) selected.add(row.id); else selected.delete(row.id); }); render(); });
-  const bulkActions = actionButtons();
-  bulkActions.querySelector('.action-btn-approve span').textContent = 'Approve Selected';
-  $('workplacePendingBulk').querySelector('[data-approval-bulk]').append(...bulkActions.children);
   $('workplacePendingViewDetails').addEventListener('click', () => openDetails(currentId, opener));
   $('workplacePendingViewWorkflow').addEventListener('click', openWorkflow);
   $('workplaceApprovalReview').addEventListener('submit', event => event.preventDefault());

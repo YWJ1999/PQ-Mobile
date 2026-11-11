@@ -38,9 +38,9 @@ const pageUrl = theme => pathToFileURL(
           actions: [...card.querySelectorAll('.project-approval-actions button')].map(button => button.textContent.trim())
         }))),
         [
-          { name: 'Farhan binti rahmat', employeeId: '#EBB12', status: 'Pending', date: '30 Sep 2026', normalHours: '7.50 hrs', otHours: '1.00 hrs', actions: ['Approve', 'Resubmit', 'Reject'] },
-          { name: 'Aina Rahman', employeeId: '#EBB27', status: 'Pending', date: '29 Sep 2026', normalHours: '8.00 hrs', otHours: '0.00 hrs', actions: ['Approve', 'Resubmit', 'Reject'] },
-          { name: 'Daniel Lee', employeeId: '#EBB41', status: 'Pending', date: '28 Sep 2026', normalHours: '6.50 hrs', otHours: '2.00 hrs', actions: ['Approve', 'Resubmit', 'Reject'] }
+          { name: 'Farhan binti rahmat', employeeId: '#EBB12', status: 'Pending', date: '30 Sep 2026', normalHours: '7.50 hrs', otHours: '1.00 hrs', actions: ['Resubmit', 'Reject', 'Approve'] },
+          { name: 'Aina Rahman', employeeId: '#EBB27', status: 'Pending', date: '29 Sep 2026', normalHours: '8.00 hrs', otHours: '0.00 hrs', actions: ['Resubmit', 'Reject', 'Approve'] },
+          { name: 'Daniel Lee', employeeId: '#EBB41', status: 'Pending', date: '28 Sep 2026', normalHours: '6.50 hrs', otHours: '2.00 hrs', actions: ['Resubmit', 'Reject', 'Approve'] }
         ]
       );
 

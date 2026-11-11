@@ -57,7 +57,7 @@ function renderConfirmNewUsers(records) {
 
     const actions = document.createElement('div');
     actions.className = 'confirm-new-user-actions';
-    [['confirm-new-user-confirm', 'Confirm'], ['confirm-new-user-reject', 'Reject']].forEach(([className, label]) => {
+    [['confirm-new-user-reject', 'Reject'], ['confirm-new-user-confirm', 'Confirm']].forEach(([className, label]) => {
       const button = document.createElement('button');
       button.type = 'button';
       button.className = className;

@@ -5,8 +5,9 @@ function mountPendingApprovalSelection(queue, selectAll, decide) {
   bar.className = 'pending-selection-bar';
   bar.setAttribute('aria-label', 'Selected requests');
   bar.hidden = true;
-  bar.innerHTML = '<strong aria-live="polite"><span>0</span> Selected</strong><div><button type="button" data-decision="reject">Reject</button><button type="button" data-decision="approve">Approve Selected</button></div>';
-  phone.append(bar);
+  bar.innerHTML = '<strong aria-live="polite"><span>0</span> Selected</strong><bulk-approval-actions></bulk-approval-actions>';
+  phone.querySelector('phone-bottom-nav').before(bar);
+  const actions = bar.querySelector('bulk-approval-actions');
 
   const boxes = () => [...queue.querySelectorAll('.approval-card-checkbox:not(:disabled)')].filter(box => box.getClientRects().length);
   function sync() {
@@ -17,7 +18,7 @@ function mountPendingApprovalSelection(queue, selectAll, decide) {
     selectAll.indeterminate = count > 0 && count < available.length;
     bar.querySelector('strong span').textContent = count;
     bar.hidden = !count;
-    phone.classList.toggle('has-pending-selection', count > 0);
+    actions.syncWithQueue(queue);
   }
   selectAll.addEventListener('change', () => {
     boxes().forEach(box => { box.checked = selectAll.checked; });

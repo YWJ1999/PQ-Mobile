@@ -1,0 +1,65 @@
+/* Multiple actions share the row. A single action fits its label at the right edge. */
+html body :is(
+  .pending-action-grid, .evaluation-decision-actions,
+  .payroll-approval-details-footer, .payroll-approval-workflow-footer,
+  .history-detail-actions, .history-card-actions, .record-card-actions,
+  .project-history-card-actions, .incident-history-actions, .career-history-card-actions,
+  .staff-feedback-card-actions, .summary-history-actions, .clocking-card-actions,
+  .staff-card-actions, .goal-progress-card-footer, .evaluation-card-footer,
+  .ld-card-footer, .prior-record-footer, .confirm-new-user-actions
+):has(> :is(button, a)):not([hidden]) {
+  display: grid !important;
+  grid-template-columns: none !important;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+  place-items: stretch;
+  gap: 6px !important;
+
+  & > :is(button, a):not([hidden]) {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    width: 100% !important;
+    min-width: 0 !important;
+    min-height: 40px !important;
+    height: auto !important;
+    padding: 8px 4px !important;
+    border: 1px solid #8b5cf6 !important;
+    border-radius: 12px !important;
+    background: #7c3aed !important;
+    color: #fff !important;
+    box-shadow: 0 4px 12px rgba(124, 58, 237, .22), inset 0 1px 0 rgba(255, 255, 255, .12) !important;
+    font-family: inherit !important;
+    font-size: 11.5px !important;
+    font-weight: 800 !important;
+    line-height: 1.25 !important;
+    text-align: center;
+    text-decoration: none;
+    white-space: normal !important;
+    cursor: pointer;
+  }
+
+  &:not(:has(> :nth-child(2 of :is(button, a):not([hidden])))) > :is(button, a):not([hidden]) {
+    grid-column: 1 / -1;
+    justify-self: end;
+    width: fit-content !important;
+    max-width: 100%;
+    padding-inline: 14px !important;
+  }
+
+  & > :is(button, a):hover:not(:disabled) { filter: brightness(1.08); }
+  & > :is(button, a):focus-visible { outline: 2px solid var(--purple-text); outline-offset: 3px; }
+  & > button:disabled { opacity: .48; cursor: not-allowed; }
+}
+
+html body :is(.pending-action-grid, .evaluation-decision-actions, .pending-selection-bar) button :is(i, svg, img) {
+  display: none !important;
+}
+
+@container approval-card (max-width: 265px) {
+  html body .approval-card-body > .pending-action-grid:has(> :nth-child(4 of button:not([hidden]))):not([hidden]) {
+    grid-auto-flow: row;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}

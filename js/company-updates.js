@@ -1,4 +1,17 @@
 (() => {
+  const unreadLabels = document.querySelectorAll('[data-home-news-unread]');
+  if (unreadLabels.length) {
+    function refreshUnread() {
+      const state = readWorkplaceNewsState(COMPANY_NEWS);
+      unreadLabels.forEach(label => { label.hidden = Boolean(state[label.dataset.homeNewsUnread]?.read); });
+    }
+    refreshUnread();
+    window.addEventListener('pageshow', refreshUnread);
+    window.addEventListener('storage', event => {
+      if (event.key === WORKPLACE_NEWS_STATE_KEY || event.key === null) refreshUnread();
+    });
+  }
+
   function renderPolicySummary(summary, record) {
     const documents = policyDocuments(record);
     const department = document.createElement('span');

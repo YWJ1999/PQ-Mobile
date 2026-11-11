@@ -63,12 +63,12 @@
     selectAll.disabled = visible.length === 0;
     byId('payrollPendingSelectedCount').textContent = selected.size;
     byId('payrollPendingBulk').hidden = selected.size === 0;
-    document.querySelector('.phone-container').classList.toggle('has-selection', selected.size > 0);
+    byId('payrollPendingBulk').querySelector('bulk-approval-actions').syncWithQueue(byId('payrollPendingQueue'));
   }
-  function actionButtons(category, details = false) {
+  function detailActionButtons(category) {
     const grid = node('div', 'pending-action-grid');
     const available = actions.filter(([action]) => category !== 'deduction' || action !== 'resubmit');
-    if (details && category === 'tax') available.splice(2, 0, ['cancel', 'Cancel', 'fa-ban']);
+    if (category === 'tax') available.splice(2, 0, ['cancel', 'Cancel', 'fa-ban']);
     grid.dataset.actionCount = available.length;
     for (const [action, label, symbol] of available) {
       const button = node('button', 'action-btn-' + action);
@@ -125,7 +125,7 @@
           ['Period', item.period], ['Cycle', item.cycle]
         ];
     fields.push(['Amount', money(item.amount)]);
-    body.append(createApprovalCardDetails(fields), actionButtons(item.category));
+    body.append(createApprovalCardDetails(fields), createApprovalCardActions('payrollAction', { resubmit: item.category !== 'deduction' }));
     PendingApprovalBackup.showAssignment(body.lastElementChild, { scope: 'payroll', id: item.id });
     body.addEventListener('click', event => { if (!event.target.closest('button')) openDetails(item.id, menu); });
     card.append(header, body);
@@ -143,11 +143,6 @@
       empty.append(icon('fa-circle-check'), node('h3', '', 'No Pending Requests'), node('p', '', 'There are no requests matching this category and filter.'));
       queue.replaceChildren(empty);
     }
-    const bulk = byId('payrollPendingBulk').querySelector('.pending-action-grid');
-    const bulkActions = actionButtons(activeTab);
-    bulkActions.querySelector('.action-btn-approve span').textContent = 'Approve Selected';
-    bulk.dataset.actionCount = bulkActions.dataset.actionCount;
-    bulk.replaceChildren(...bulkActions.children);
     updateSelection();
   }
   function switchTab(tab, focus = false) {
@@ -250,7 +245,7 @@
       return row;
     }));
     const footer = document.querySelector('.payroll-approval-details-footer');
-    const detailActions = actionButtons(item.category, true);
+    const detailActions = detailActionButtons(item.category);
     footer.dataset.actionCount = detailActions.dataset.actionCount;
     footer.replaceChildren(...detailActions.children);
     document.querySelector('.payroll-approval-details-body').scrollTop = 0;

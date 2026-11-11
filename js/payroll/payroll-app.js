@@ -541,11 +541,11 @@
           <!-- Bottom Action Buttons (Only when Pending) -->
           ${isPending ? `
           <div class="pending-action-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
-            <button type="button" class="action-btn-approve" onclick="window.PayrollEngine.actionTeamRelief('${item.id}', 'approve', '${item.userName.replace(/'/g, "\\'")}', '${item.amount.toFixed(2)}')">
-              <i class="fa-solid fa-check" style="font-size: 11.5px;"></i> Approve Relief
-            </button>
             <button type="button" class="action-btn-reject" onclick="window.PayrollEngine.actionTeamRelief('${item.id}', 'reject', '${item.userName.replace(/'/g, "\\'")}', '${item.amount.toFixed(2)}')">
               <i class="fa-solid fa-xmark" style="font-size: 11.5px;"></i> Reject
+            </button>
+            <button type="button" class="action-btn-approve" onclick="window.PayrollEngine.actionTeamRelief('${item.id}', 'approve', '${item.userName.replace(/'/g, "\\'")}', '${item.amount.toFixed(2)}')">
+              <i class="fa-solid fa-check" style="font-size: 11.5px;"></i> Approve Relief
             </button>
           </div>
           ` : `

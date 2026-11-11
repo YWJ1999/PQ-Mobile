@@ -12,7 +12,6 @@
   --record-rejected-accent: #dc2626;
   --record-cancelled-surface: linear-gradient(105deg, #394b66, #596c87);
   --record-cancelled-accent: #596c87;
-  --record-action-ink: #fff;
 }
 
 html body :is(
@@ -243,51 +242,6 @@ html body .history-card-item:has(.history-card-header) .history-card-actions {
   padding: 0 !important;
 }
 
-/* Text actions on record cards share the compact purple approval-button style. */
-html body :is(.history-card-actions, .record-card-actions, .project-history-card-actions, .incident-history-actions, .career-history-card-actions, .staff-feedback-card-actions, .summary-history-actions, .clocking-card-actions, .staff-card-actions, .goal-progress-card-footer, .evaluation-card-footer, .ld-card-footer, .prior-record-footer, .confirm-new-user-actions)
-:is(button, a):not([hidden]) {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  box-sizing: border-box;
-  flex: 0 0 auto !important;
-  width: auto !important;
-  min-width: 0 !important;
-  max-width: 100%;
-  min-height: 32px !important;
-  height: auto !important;
-  padding: 6px 12px !important;
-  border: 1px solid transparent !important;
-  border-radius: 8px !important;
-  background: var(--primary-action-background) !important;
-  color: var(--record-action-ink) !important;
-  box-shadow: none !important;
-  font-family: inherit;
-  font-size: 11.5px !important;
-  font-weight: 700 !important;
-  line-height: 1.5 !important;
-  text-align: center;
-  text-decoration: none;
-  white-space: nowrap;
-  cursor: pointer;
-}
-html body :is(.history-card-actions, .record-card-actions, .project-history-card-actions, .incident-history-actions, .career-history-card-actions, .staff-feedback-card-actions, .summary-history-actions, .clocking-card-actions, .staff-card-actions, .goal-progress-card-footer, .evaluation-card-footer, .ld-card-footer, .prior-record-footer, .confirm-new-user-actions) {
-  flex-wrap: wrap !important;
-}
-html body :is(.history-card-actions, .record-card-actions, .project-history-card-actions, .incident-history-actions, .career-history-card-actions, .staff-feedback-card-actions, .summary-history-actions, .clocking-card-actions, .staff-card-actions, .goal-progress-card-footer, .evaluation-card-footer, .ld-card-footer, .prior-record-footer, .confirm-new-user-actions)
-:is(button, a):hover:not(:disabled) {
-  filter: brightness(1.08);
-}
-html body :is(.history-card-actions, .record-card-actions, .project-history-card-actions, .incident-history-actions, .career-history-card-actions, .staff-feedback-card-actions, .summary-history-actions, .clocking-card-actions, .staff-card-actions, .goal-progress-card-footer, .evaluation-card-footer, .ld-card-footer, .prior-record-footer, .confirm-new-user-actions)
-:is(button, a):focus-visible {
-  outline: 2px solid var(--purple-text);
-  outline-offset: 3px;
-}
-html body :is(.history-card-actions, .record-card-actions, .project-history-card-actions, .incident-history-actions, .career-history-card-actions, .staff-feedback-card-actions, .summary-history-actions, .clocking-card-actions, .staff-card-actions, .goal-progress-card-footer, .evaluation-card-footer, .ld-card-footer, .prior-record-footer, .confirm-new-user-actions)
-button:disabled {
-  opacity: .48;
-  cursor: not-allowed;
-}
 html body :is(.history-card-header, .record-card-header, .incident-history-card-header) :focus-visible {
   outline-color: var(--record-header-ink);
   outline-offset: 3px;

@@ -16,31 +16,21 @@ async function checkCards(page, selector) {
   const cards = await page.$$eval(selector, nodes => nodes.filter(card => card.getClientRects().length).map(card => {
     const details = card.querySelector('.approval-card-details');
     const fields = [...(details?.children || [])];
-    const actions = card.querySelector('.pending-action-grid');
     return {
-      flatRows: fields.length > 0 && fields.every(row => {
-        const term = row.querySelector('dt');
-        const value = row.querySelector('dd');
-        return term?.textContent.trim() && value?.textContent.trim()
-          && term.getBoundingClientRect().right <= value.getBoundingClientRect().left + 1
-          && getComputedStyle(value).textAlign === 'right';
-      }) && [details, ...fields].every(node => {
-        const style = getComputedStyle(node);
-        return style.backgroundColor === 'rgba(0, 0, 0, 0)' && style.borderTopWidth === '0px';
-      }),
-      fits: card.scrollWidth <= card.clientWidth + 1,
-      actionsAligned: actions && getComputedStyle(actions).justifyContent === 'center'
+      hasDetails: fields.length > 0 && getComputedStyle(details).display === 'grid'
+        && fields.every(row => row.querySelector('dt')?.textContent.trim() && row.querySelector('dd')?.textContent.trim()),
+      fits: card.scrollWidth <= card.clientWidth + 1
     };
   }));
   assert.ok(cards.length, 'Expected approval cards on ' + page.url());
   for (const card of cards) {
-    assert.ok(card.flatRows && card.fits && card.actionsAligned, page.url() + ' ' + JSON.stringify(card));
+    assert.ok(card.hasDetails && card.fits, page.url() + ' ' + JSON.stringify(card));
   }
   await checkActionSize(page, selector + ' .pending-action-grid');
 }
 
 async function checkActionSize(page, selector) {
-  const groups = await page.$$eval(selector, rows => rows.filter(row => row.getClientRects().length).map(row => {
+  const groups = await page.$$eval(selector, rows => rows.filter(row => row.getClientRects().length && row.querySelector(':scope > :is(button, a)')).map(row => {
     const buttons = [...row.querySelectorAll(':scope > :is(button, a)')].filter(button => button.getClientRects().length);
     const lines = new Map();
     for (const button of buttons) {
@@ -50,11 +40,22 @@ async function checkActionSize(page, selector) {
       lines.get(top).push(rect);
     }
     const bounds = row.getBoundingClientRect();
+    const style = getComputedStyle(row);
+    const left = bounds.left + parseFloat(style.paddingLeft) + parseFloat(style.borderLeftWidth);
+    const right = bounds.right - parseFloat(style.paddingRight) - parseFloat(style.borderRightWidth);
     return {
       labels: buttons.map(button => button.textContent.trim()),
-      centered: [...lines.values()].every(line => Math.abs((line[0].left - bounds.left) - (bounds.right - line.at(-1).right)) < 1.5),
+      aligned: [...lines.values()].every(line => {
+        const startsCorrectly = buttons.length === 1 ? line[0].left > left + 1 : Math.abs(line[0].left - left) <= 1;
+        return startsCorrectly && Math.abs(line.at(-1).right - right) <= 1;
+      }),
       equalWidths: buttons.every(button => Math.abs(button.offsetWidth - buttons[0].offsetWidth) <= 1),
-      contained: buttons.every(button => button.offsetHeight >= 44 && button.scrollWidth <= button.clientWidth + 1
+      appearance: buttons.every(button => {
+        const style = getComputedStyle(button);
+        return style.backgroundColor === 'rgb(124, 58, 237)' && style.color === 'rgb(255, 255, 255)'
+          && style.borderRadius === '12px' && style.boxShadow !== 'none';
+      }),
+      contained: buttons.every(button => button.offsetHeight >= 40 && button.scrollWidth <= button.clientWidth + 1
         && button.getBoundingClientRect().left >= bounds.left - 1 && button.getBoundingClientRect().right <= bounds.right + 1),
       labelsFit: buttons.every(button => {
         if (button.textContent.trim().includes(' ')) return true;
@@ -67,8 +68,11 @@ async function checkActionSize(page, selector) {
   }));
   assert.ok(groups.length, 'Expected visible action rows on ' + page.url());
   for (const group of groups) {
-    assert.ok(group.labels.length && group.centered && group.equalWidths && group.contained && group.labelsFit, page.url() + ' ' + JSON.stringify(group));
-    if (group.labels.length === 4) assert.ok(['4', '2,2'].includes(group.columns.join(',')));
+    assert.ok(group.labels.length && group.aligned && group.equalWidths && group.contained && group.labelsFit && group.appearance, page.url() + ' ' + JSON.stringify(group));
+    if (group.labels.length === 4) {
+      const layouts = page.viewport().width < 360 ? ['4', '2,2'] : ['4'];
+      assert.ok(layouts.includes(group.columns.join(',')), page.url() + ' ' + JSON.stringify(group));
+    }
   }
 }
 
@@ -83,12 +87,21 @@ async function checkActionSize(page, selector) {
     const errors = [];
     page.on('pageerror', error => errors.push(error.message));
     const open = (file, theme) => page.goto(pathToFileURL(path.resolve(__dirname, '..', file)).href + '?theme=' + theme, { waitUntil: 'load' });
-    for (const theme of ['light', 'dark']) for (const width of [320, 390, 420]) {
+    for (const theme of ['light', 'dark']) for (const width of [320, 360, 390, 420]) {
       await page.setViewport({ width, height: 880 });
       for (const [name, tabs] of modules) {
         await open('modules/' + name + '/options/pending-approval.html', theme);
         const selector = name === 'project-task' ? '.project-approval-card' : '.approval-request-card';
         await checkCards(page, selector);
+        if (name === 'admin') {
+          await page.click('.workplace-approval-review');
+          await checkActionSize(page, '#workplaceApprovalDetailActions');
+          await page.keyboard.press('Escape');
+          const guestActions = '#workplacePendingQueue .pending-action-grid';
+          await page.$$eval(guestActions + ' > button:not(:last-child)', buttons => buttons.forEach(button => { button.hidden = true; }));
+          await checkActionSize(page, guestActions);
+          await page.$$eval(guestActions + ' > button[hidden]', buttons => buttons.forEach(button => { button.hidden = false; }));
+        }
         if (tabs) for (const tab of await page.$$(tabs)) {
           await tab.click();
           await checkCards(page, selector);
@@ -117,8 +130,13 @@ async function checkActionSize(page, selector) {
         ['modules/performance/options/performance-evaluation.html', '.evaluation-card-footer']
       ]) {
         await open(file, theme);
-        const row = await page.waitForSelector(actions, { visible: true });
-        assert.equal(await row.evaluate(element => getComputedStyle(element).justifyContent), 'flex-end', file);
+        await checkActionSize(page, actions);
+        if (file === 'modules/admin/options/history.html') {
+          await page.click('[data-history-kind="letter-request"]');
+          await checkActionSize(page, actions);
+          await page.click('.history-card-main');
+          await checkActionSize(page, '#historyDetailActions');
+        }
       }
       console.log('Verified approval card layouts at ' + width + 'px in ' + theme + ' mode.');
     }

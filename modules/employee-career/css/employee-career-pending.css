@@ -2,10 +2,6 @@
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
-.career-pending-page .career-pending-bulk-actions {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-}
-
 .career-pending-page .pending-action-grid button {
   min-width: 0;
   padding-inline: 3px;

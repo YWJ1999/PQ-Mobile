@@ -1809,9 +1809,11 @@
     renderTeamQueue();
     mountPendingApprovalSelection(document.getElementById('teamApprovalsQueue'), selectAllPending, (action, boxes) => {
       const ids = new Set(boxes.map(box => box.closest('.approval-request-card').dataset.itemId));
+      const message = formatBulkApprovalResult(action, ids.size, 'claim');
+      if (!message) return;
       teamQueue = teamQueue.filter(item => !ids.has(String(item.id)));
       renderTeamQueue();
-      showToast(`${action === 'approve' ? 'Approved' : 'Rejected'} ${ids.size} claim${ids.size === 1 ? '' : 's'}`);
+      showToast(message);
     });
   }
   if (document.readyState === 'loading') {

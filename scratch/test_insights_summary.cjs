@@ -39,6 +39,7 @@ const groups = ['positive', 'negative'];
 const trends = ['improved', 'worsened', 'unchanged'];
 const namesFor = (scope, group) => Object.values(expected[scope][group]).flat().sort();
 const allNames = scope => groups.flatMap(group => namesFor(scope, group)).sort();
+const trendNames = (scope, trend) => groups.flatMap(group => expected[scope][group][trend]).sort();
 const paneFor = scope => scope === 'my' ? '#paneMy' : '#paneTeam';
 const pillFor = scope => scope === 'my' ? '#pillMy' : '#pillTeam';
 const categoryButton = group => `#indicatorsOverlay .sheet-filter-pill[data-group="${group}"]`;
@@ -67,43 +68,46 @@ async function assertSummary(page, scope, context) {
   await page.click(pillFor(scope));
   await page.waitForFunction(selector => getComputedStyle(document.querySelector(selector)).opacity === '1', {}, paneFor(scope));
   assert.equal(await page.$eval('#insightCardTitle', el => el.textContent.trim()), scope === 'my' ? 'My Insights' : 'Team Insights', context);
-  assert.equal(await page.$eval('#insightMetricCount', el => el.textContent.trim()), `${allNames(scope).length} metrics`, context);
+  assert.equal(await page.$eval(`${paneFor(scope)} [data-insight-total]`, el => el.textContent.trim()), `${allNames(scope).length} metrics`, context);
   for (const other of scopes) {
     assert.equal(await page.$eval(pillFor(other), el => el.getAttribute('aria-pressed')), String(other === scope), context);
     assert.equal(await page.$eval(paneFor(other), el => el.hidden), other !== scope, context);
   }
-  for (const group of groups) {
-    const column = `${paneFor(scope)} .insight-metric-group[data-group="${group}"]`;
-    assert.equal(await page.$eval(`${column} .insight-group-count`, el => Number(el.textContent)), namesFor(scope, group).length, context);
-    for (const trend of trends) {
-      assert.equal(await page.$eval(`${column} [data-trend="${trend}"] .insight-trend-count`, el => Number(el.textContent)), expected[scope][group][trend].length, `${context}: ${group} ${trend}`);
-    }
+  for (const trend of trends) {
+    assert.equal(await page.$eval(`${paneFor(scope)} [data-trend="${trend}"] .insight-trend-count`, el => Number(el.textContent)),
+      trendNames(scope, trend).length, `${context}: ${trend}`);
   }
   const layout = await page.$eval('.insights-card', card => {
     const bounds = card.getBoundingClientRect();
-    const visibleChildren = [...card.querySelectorAll('button, .insight-metric-group')].filter(el => el.getClientRects().length);
+    const visibleChildren = [...card.querySelectorAll('button')].filter(el => el.getClientRects().length);
     return {
       overflow: card.scrollWidth > card.clientWidth + 1,
       clipped: visibleChildren.some(el => {
         const rect = el.getBoundingClientRect();
         return rect.left < bounds.left || rect.right > bounds.right || el.scrollWidth > el.clientWidth + 1;
       }),
-      rows: card.querySelectorAll('.insight-tab-pane.active .insight-trend-row').length,
+      rows: card.querySelectorAll('.insight-tab-pane.active button[data-trend]').length,
       mainOverflow: document.querySelector('.main-content').scrollWidth > document.querySelector('.main-content').clientWidth + 1
     };
   });
-  assert.deepEqual(layout, { overflow: false, clipped: false, rows: 6, mainOverflow: false }, context);
+  assert.deepEqual(layout, { overflow: false, clipped: false, rows: 3, mainOverflow: false }, context);
 }
 
 async function assertDrilldowns(page, scope, context) {
   await assertSummary(page, scope, context);
+  const viewDetails = `${paneFor(scope)} .section-action`;
+  for (const trend of trends) {
+    await page.click(`${paneFor(scope)} [data-trend="${trend}"]`);
+    assert.deepEqual(await visibleNames(page, scope), trendNames(scope, trend), `${context}: ${trend} across all metrics`);
+    await closeSheet(page);
+  }
   for (const group of groups) {
-    const column = `${paneFor(scope)} .insight-metric-group[data-group="${group}"]`;
-    await page.click(`${column} .insight-group-header`);
+    await page.click(viewDetails);
+    await page.click(categoryButton(group));
     assert.deepEqual(await visibleNames(page, scope), namesFor(scope, group), `${context}: group header ${group}`);
     await closeSheet(page);
     for (const trend of trends) {
-      await page.click(`${column} .insight-trend-row[data-trend="${trend}"]`);
+      await page.evaluate((scope, group, trend) => openInsightBreakdown(scope, group, trend), scope, group, trend);
       assert.equal(await page.$eval('#indicatorsOverlay', el => el.classList.contains('active')), true);
       assert.deepEqual(await visibleNames(page, scope), [...expected[scope][group][trend]].sort(), `${context}: ${group}/${trend} membership`);
       assert.equal(await page.$eval(categoryButton(group), el => el.classList.contains('active')), true, 'Selected category');
@@ -168,8 +172,11 @@ async function assertDrilldowns(page, scope, context) {
         }
         // Reopening the full feed restores its original presentation and filters.
         await closeSheet(page);
-        await page.evaluate(scope => openIndicatorsModal(scope), scope);
+        await page.click(viewDetails);
         assert.equal(await page.$eval('#indicatorsOverlay', el => el.classList.contains('insight-detail-breakdown')), false);
+        await page.click(categoryButton(group));
+        await page.click(trendButton(trend));
+        assert.deepEqual(await visibleNames(page, scope), [...expected[scope][group][trend]].sort(), 'View details filters');
       }
       // All must clear both filters, including a zero-match status.
       await page.click(categoryButton('all'));
@@ -209,7 +216,7 @@ async function assertDrilldowns(page, scope, context) {
       await page.focus('#pillMy');
       await page.keyboard.press('Enter');
       assert.equal(await page.$eval('#paneMy', el => el.hidden), false);
-      await page.focus('#paneMy .insight-metric-group[data-group="positive"] .insight-trend-row[data-trend="improved"]');
+      await page.focus('#paneMy [data-trend="improved"]');
       await page.keyboard.press('Enter');
       assert.deepEqual(await visibleNames(page, 'my'), ['Attendance%']);
       await closeSheet(page);

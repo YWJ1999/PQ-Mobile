@@ -52,7 +52,7 @@ const url = file => pathToFileURL(path.resolve(__dirname, '..', file)).href;
       assert.equal(card.hasStatusRow, false, 'The card no longer repeats a Pending Approval status row');
       assert.equal(card.hasBackupAssignment, false, 'The card details stay limited to the two requested fields');
       assert.equal((card.text.match(/13\/10\/2026/g) || []).length, 1);
-      assert.deepEqual(card.actions, ['Approve', 'Resubmit', 'Reject']);
+      assert.deepEqual(card.actions, ['Resubmit', 'Reject', 'Approve']);
       assert.equal(card.actionRows, 1, 'The remaining approval actions share one row');
       assert.equal(card.icons, 0);
       assert.ok(card.colours.every(colour => colour === 'rgb(124, 58, 237)'));

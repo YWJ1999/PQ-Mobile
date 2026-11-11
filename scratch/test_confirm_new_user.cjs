@@ -177,8 +177,8 @@ async function inspectScenario(browser, theme, width) {
     assert.equal(card.hasDuplicateNameLabel, false, `${theme}/${width}: card ${index + 1} must not duplicate Name in the grid`);
     assert.equal(card.hasDuplicateIdentityLabel, false, `${theme}/${width}: card ${index + 1} must not duplicate NRIC/Passport in the grid`);
     assert.deepEqual(card.actions, [
-      { text: 'Confirm', type: 'button', ariaLabel: `Confirm ${card.expectedName}` },
-      { text: 'Reject', type: 'button', ariaLabel: `Reject ${card.expectedName}` }
+      { text: 'Reject', type: 'button', ariaLabel: `Reject ${card.expectedName}` },
+      { text: 'Confirm', type: 'button', ariaLabel: `Confirm ${card.expectedName}` }
     ], `${theme}/${width}: card ${index + 1} actions need concise labels and record-specific accessible names`);
   });
   assert.equal(await page.$eval('.confirm-new-user-card:first-child [data-field="nationality"]', node => node.textContent.trim()), '\u2014');

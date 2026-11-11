@@ -49,7 +49,10 @@
       <section id="workplacePendingQueue" role="tabpanel" aria-labelledby="workplacePendingTab-guest-visit"></section>
       <div id="workplacePendingEmpty" class="payroll-pending-empty" hidden><i class="fa-solid fa-circle-check" aria-hidden="true"></i><h3>No pending approvals</h3><p id="workplacePendingEmptyText">Guest Visit requests awaiting review will appear here.</p></div>
     </main>
-    <aside id="workplacePendingBulk" class="payroll-pending-bulk pending-selection-bar" aria-label="Selected requests" hidden><strong aria-live="polite"><span id="workplacePendingSelectedCount">0</span> Selected</strong><div class="pending-action-grid" data-approval-bulk></div></aside>
+    <aside id="workplacePendingBulk" class="payroll-pending-bulk pending-selection-bar" aria-label="Selected requests" hidden>
+      <strong aria-live="polite"><span id="workplacePendingSelectedCount">0</span> Selected</strong>
+      <bulk-approval-actions action-key="approvalAction"></bulk-approval-actions>
+    </aside>
     <phone-bottom-nav active="apps"></phone-bottom-nav>
     <div id="workplaceApprovalMenu" class="payroll-approval-overlay" hidden>
       <section class="payroll-approval-panel payroll-approval-menu" role="dialog" aria-modal="true" aria-labelledby="workplaceApprovalMenuTitle">
@@ -58,6 +61,8 @@
         <div class="payroll-approval-menu-options">
           <button id="workplacePendingViewDetails" type="button" class="payroll-approval-menu-option"><i class="fa-solid fa-eye" aria-hidden="true"></i><span>View Details</span><i class="fa-solid fa-chevron-right" aria-hidden="true"></i></button>
           <button id="workplacePendingViewWorkflow" type="button" class="payroll-approval-menu-option"><i class="fa-solid fa-diagram-project" aria-hidden="true"></i><span>View Workflow</span><i class="fa-solid fa-chevron-right" aria-hidden="true"></i></button>
+          <button type="button" class="payroll-approval-menu-option" data-approval-action="cancel"><i class="fa-solid fa-ban" aria-hidden="true"></i><span>Cancel Request</span></button>
+          <p id="workplaceApprovalMenuFeedback" class="workplace-approval-notice is-error" role="status" hidden></p>
         </div>
       </section>
     </div>

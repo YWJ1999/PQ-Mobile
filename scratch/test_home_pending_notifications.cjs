@@ -45,16 +45,21 @@ const puppeteer = require('puppeteer');
         await page.setViewport({ width, height: 844 });
         const url = pathToFileURL(path.resolve(__dirname, `../home${theme}.html`)).href;
         await page.goto(url, { waitUntil: 'networkidle0' });
-        assert.deepEqual(await page.$$eval('[data-home-notifications] .fy-title', nodes => nodes.map(node => node.textContent)), ['Pending Approval', 'Pending Resubmit', 'Training Reminder', 'Clocking Reminder', 'OT Plan Reminder']);
-        assert.equal(await page.$('.section-action[onclick="openForYouModal()"]'), null, 'For You no longer has View all');
+        assert.deepEqual(await page.$$eval('.main-content h2, .home-shift-label', nodes => nodes.map(node => node.textContent)), [
+          'Good morning, Sarah', "Today's Shift", 'Action Required', 'Today', 'My Insights', 'Company Updates'
+        ]);
+        assert.equal(await page.$('.main-content :is(.shortcuts-grid, .home-shift button, .home-shift hr)'), null);
+        assert.equal(await page.$eval('.home-shift-time', el => el.textContent), '09:00–18:00');
+        assert.deepEqual(await page.$$eval('[data-pending-status] .fy-title', nodes => nodes.map(node => node.textContent)), ['To approve', 'To update']);
+        assert.deepEqual(await page.$$eval('[data-home-count]', nodes => nodes.map(node => Number(node.textContent))), [4, 3]);
+        assert.ok(await page.$eval('.main-content', main => Math.abs(main.getBoundingClientRect().bottom
+          - document.querySelector('.bottom-nav').getBoundingClientRect().top) <= 1), 'Home links scroll above the bottom tabs');
         assert.deepEqual(await page.$$eval('[data-reminder-type] .fy-description', nodes => nodes.map(node => node.textContent)), [
-          'You have 1 training class today from 09:00 to 17:00.',
-          'Your current shift starts from 09:00 to 18:00 today. Please remember to clock in/out.',
-          'You have planned OT of 2 hours from 18:00 to 20:00.'
+          '09:00–17:00', '18:00–20:00 · 2 hours'
         ]);
         assert.equal(await page.$eval('[data-home-notifications]', element => element.scrollWidth <= element.clientWidth), true);
-        assert.deepEqual(await page.$$eval('[data-reminder-type]', nodes => nodes.map(node => [node.dataset.reminderType, node.tagName, !!node.querySelector('.fa-chevron-right')])), [
-          ['training', 'BUTTON', true], ['clocking', 'A', true], ['ot-plan', 'ARTICLE', false]
+        assert.deepEqual(await page.$$eval('[data-reminder-type]', nodes => nodes.map(node => [node.dataset.reminderType, node.tagName, !!node.querySelector('.update-chevron')])), [
+          ['clocking', 'A', true], ['training', 'BUTTON', true], ['ot-plan', 'ARTICLE', false]
         ], 'OT is informational, Training opens a dialog, and Clocking navigates');
         assert.equal(await page.$$eval('[data-reminder-type] .fy-description', nodes => nodes.every(node => node.scrollWidth <= node.clientWidth)), true, 'Reminder copy fits beside the navigation chevrons');
         await page.$eval('[data-reminder-type="ot-plan"]', element => {
@@ -148,14 +153,14 @@ const puppeteer = require('puppeteer');
 
         await page.evaluate(() => { openApprovalDetailModal('notif_1'); actionApproveRequest(); });
         assert.deepEqual(await labels(), ['Pending Approval (3)', 'Pending Resubmit (3)']);
-        assert.equal(await page.$eval(`${card('pending_approval')} .fy-description`, element => element.textContent), '3 requests are waiting for your approval');
+        assert.equal(await page.$eval(`${card('pending_approval')} [data-home-count]`, element => element.textContent), '3');
         assert.equal(await page.$$eval('[data-reminder-type]', nodes => nodes.length), 3, 'Reminders stay visible when pending counts change');
         await page.evaluate(() => { NOTIFICATIONS_CATALOG = []; renderForYouSheetUI(); });
         await close();
         await openCard('pending_approval');
         assert.equal(await page.$eval('#forYouEmptyState', element => getComputedStyle(element).display), 'block');
         assert.deepEqual(await labels(), ['Pending Approval (0)', 'Pending Resubmit (0)']);
-        console.log(`PASS ${theme} ${width}px: three reminders, no View all, home shortcuts, notification tabs, filter reset, live counts and empty state`);
+        console.log(`PASS ${theme} ${width}px: shift, action counts, today's schedule, notification tabs, filter reset and empty state`);
       }
       await page.setViewport({ width: 390, height: 844 });
       for (const [type, destination, headingSelector, heading] of [

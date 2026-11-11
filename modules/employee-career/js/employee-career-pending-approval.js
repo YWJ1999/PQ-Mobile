@@ -32,7 +32,7 @@
     element.append(node('small', '', label), node('strong', '', value == null || value === '' ? '—' : value));
     return element;
   }
-  function actionButtons(engagementDetails = false) {
+  function detailActionButtons(engagementDetails) {
     const grid = node('div', 'pending-action-grid');
     const entries = engagementDetails ? [['approve', 'Approve'], ['resubmit', 'Resubmit'], ['cancel', 'Cancel'], ['reject', 'Reject']] : actions;
     grid.dataset.actionCount = String(entries.length);
@@ -56,7 +56,7 @@
     $('careerPendingSelectAll').disabled = !visible.length;
     $('careerPendingSelectedCount').textContent = String(selected.size);
     $('careerPendingBulk').hidden = !selected.size;
-    document.querySelector('.phone-container').classList.toggle('has-selection', selected.size > 0);
+    $('careerPendingBulk').querySelector('bulk-approval-actions').syncWithQueue($('careerPendingQueue'));
   }
   function renderCard(item) {
     const isEngagement = item.type === 'Staff Engagement';
@@ -88,7 +88,7 @@
     review.addEventListener('click', () => openDetails(item.id, review));
     review.addEventListener('keydown', event => { if (['Enter', ' '].includes(event.key)) { event.preventDefault(); openDetails(item.id, review); } });
     body.append(review);
-    body.append(actionButtons());
+    body.append(createApprovalCardActions('careerApprovalAction'));
     card.append(header, body);
     return card;
   }
@@ -256,7 +256,7 @@
         body.append(remarks);
       }
     }
-    $('careerPendingDetailsActions').replaceChildren(actionButtons(isEngagement));
+    $('careerPendingDetailsActions').replaceChildren(detailActionButtons(isEngagement));
     body.scrollTop = 0;
     body.querySelector('.cv-history-detail-scroll')?.scrollTo(0, 0);
     openSheet('careerPendingDetails', trigger);
