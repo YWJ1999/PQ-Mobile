@@ -255,8 +255,8 @@
       </div>
 
       <div class="history-total-records-card record-summary-metric record-summary-card">
-        <span class="history-total-records-label record-summary-label">Total Records</span>
-        <strong id="categoryRecordsCountBadge" class="history-total-records-value record-summary-value" aria-live="polite">0</strong>
+        <strong id="categoryRecordsCountBadge" class="history-total-records-value record-summary-value" aria-live="polite" data-record-count>0</strong>
+        <span class="history-total-records-label record-summary-label">Records</span>
       </div>
 
       <!-- SECTION TITLE -->
@@ -802,16 +802,13 @@
     });
 
     function getHistoryStatus(item) {
-      const allowedStatuses = {
-        approved: 'Approved',
-        submitted: 'Submitted',
-        draft: 'Draft',
-        pending: 'Pending Approval',
-        rejected: 'Rejected'
+      const status = String(item.status || 'submitted').trim().toLowerCase();
+      const key = status === 'pending' ? 'submitted' : status;
+      const label = item.statusText || status.charAt(0).toUpperCase() + status.slice(1);
+      return {
+        key: ['submitted', 'draft', 'approved', 'rejected', 'cancelled', 'resubmit'].includes(key) ? key : 'other',
+        text: recordReviewStatusLabel(label)
       };
-      const normalizedStatus = item.status === 'pending' ? 'submitted' : item.status;
-      const key = allowedStatuses[normalizedStatus] ? normalizedStatus : 'submitted';
-      return { key, text: allowedStatuses[key] };
     }
 
     function getClaimHistoryActions(item) {
@@ -831,9 +828,12 @@
     function renderClaimHistoryActions(item, context = 'card') {
       const actions = getClaimHistoryActions(item);
       const buttons = actions.map(action => {
-        const handler = action.key === 'submit' ? 'handleHistorySubmit' : 'handleHistoryCancel';
+        const cancel = action.key === 'cancel';
+        const detailCancel = context === 'detail' && cancel;
+        const handler = cancel ? 'handleHistoryCancel' : 'handleHistorySubmit';
         const className = context === 'detail' ? 'history-detail-action' : action.className;
-        return `<button type="button" class="${className}" data-claim-history-action="${action.key}" onclick="${handler}(event, '${item.id}')">${action.label}</button>`;
+        const label = cancel ? recordCancelButtonHTML(actions.length, detailCancel) : action.label;
+        return `<button type="button" class="${className}${detailCancel ? ' record-primary-action' : ''}" data-claim-history-action="${action.key}" onclick="${handler}(event, '${item.id}')">${label}</button>`;
       }).join('');
       if (context === 'detail') {
         return `<footer class="history-detail-actions" ${buttons ? '' : 'hidden'}>${buttons}</footer>`;
@@ -914,7 +914,7 @@
       const countBadge = document.getElementById('categoryRecordsCountBadge');
 
       const catMeta = CATEGORIES.find(c => c.id === activeTabKey) || CATEGORIES[0];
-      const statusTitle = activeStatusFilter === 'resubmit' ? 'Pending Resubmit' : activeStatusFilter.charAt(0).toUpperCase() + activeStatusFilter.slice(1);
+      const statusTitle = activeStatusFilter === 'resubmit' ? 'Pending Resubmit' : recordReviewStatusLabel(activeStatusFilter.charAt(0).toUpperCase() + activeStatusFilter.slice(1));
       if (headerTitle) headerTitle.textContent = activeStatusFilter ? `${statusTitle} Claim History` : catMeta.title;
 
       let items = activeStatusFilter ? STATUS_HISTORY_RECORDS : (HISTORY_DATA[activeTabKey] || []);
@@ -1075,10 +1075,11 @@
           approved: 'fa-square-check',
           submitted: 'fa-paper-plane',
           draft: 'fa-floppy-disk',
-          pending: 'fa-clock',
+          cancelled: 'fa-ban',
+          resubmit: 'fa-rotate-left',
           rejected: 'fa-circle-xmark'
         };
-        const statusIcon = statusIconMap[displayStatus.key];
+        const statusIcon = statusIconMap[displayStatus.key] || 'fa-circle-info';
         const actionHtml = renderClaimHistoryActions(item, 'card');
 
         const otPeriodDisplay = item.claimPeriod || String(periodDisplay).replace('-', '');
@@ -1102,13 +1103,12 @@
             </div>
             <span class="status-pill ${displayStatus.key}">
               <i class="fa-solid ${statusIcon}"></i>
-              ${displayStatus.text}
             </span>
           </div>
           <div class="history-card-details">${detailsBlock}</div>
           ${actionHtml}
         `;
-
+        card.querySelector('.status-pill').append(document.createTextNode(' ' + displayStatus.text));
         container.appendChild(card);
       });
     }
@@ -1173,7 +1173,7 @@
 
       const isMedical = activeTabKey === 'medical' || (item.id && item.id.startsWith('CMD')) || Boolean(item.medicalType);
       const isTravelRequest = activeTabKey === 'travelRequest' || (activeTabKey === 'travel' && item.historyDetailType === 'travel-request');
-      const detailStatus = getHistoryStatus(item);
+      const detailStatus = recordDetailStatus.html(getHistoryStatus(item).text);
 
       let bodyHtml = '';
       let headerTitle = item.title ? item.title.toUpperCase() : 'CLAIM DETAILS';
@@ -1206,7 +1206,7 @@
             <tbody>
               ${renderOtRows([
                 ['Reference #', item.id],
-                ['Status', detailStatus.text],
+                ['Status', detailStatus],
                 ['Period', item.claimPeriod],
                 ['Date', item.dateFrom || item.date],
                 ['OT Type', item.otType || item.title],
@@ -1292,7 +1292,7 @@
           <table style="width: 100%; border-collapse: collapse; font-family: sans-serif; font-size: 11.5px;">
             <tbody>
               ${renderRow('Reference #', item.id || 'CMD000000000276')}
-              ${renderRow('Status', detailStatus.text)}
+              ${renderRow('Status', detailStatus)}
               ${renderRow('Benefit Year', item.benefitYear || '2026')}
               ${renderRow('Claim Period', item.claimPeriod || '202601')}
               ${renderRow('Benefit Type', item.benefitType || item.medicalType || item.title || 'Medical')}
@@ -1376,7 +1376,7 @@
           bodyHtml = `
             ${travelTable([
               ['Reference #', item.id],
-              ['Status', detailStatus.text],
+              ['Status', detailStatus],
               ['Emp #', item.empNo ? `#${item.empNo}` : '—'],
               ['Name', item.empName],
               ['Travel Period', item.claimPeriod],
@@ -1436,7 +1436,7 @@
           bodyHtml = `
             ${travelTable([
               ['Reference #', item.id],
-              ['Status', detailStatus.text],
+              ['Status', detailStatus],
               ['Emp #', item.empNo ? `#${item.empNo}` : '—'],
               ['Name', item.empName],
               ['Travel Request #', item.travelRequestNo],
@@ -1511,7 +1511,7 @@
               ['Project', item.project],
               ['Cost Center', item.costCenter],
               ['Purpose', item.purpose],
-              ['Status', detailStatus.text],
+              ['Status', detailStatus],
               ['Remark', item.remark]
             ])}
             ${detailSection('Claim Details', [
@@ -1533,7 +1533,7 @@
               ['Reference #', item.id],
               ['Emp #', item.empNo ? `#${item.empNo}` : '—'],
               ['Name', item.empName],
-              ['Status', detailStatus.text],
+              ['Status', detailStatus],
               ['Period', item.claimPeriod],
               ['Cost Center', item.costCenter],
               ['Start Date', item.dateFrom || item.date],
@@ -1564,7 +1564,7 @@
           bodyHtml = `
             ${detailTable([
               ['Reference #', item.id],
-              ['Status', detailStatus.text],
+              ['Status', detailStatus],
               ['Emp #', item.empNo ? `#${item.empNo}` : '—'],
               ['Name', item.empName],
               ['Travel Mileage Claim #', item.travelMileageClaimNo],
@@ -1647,7 +1647,7 @@
               ${renderRow('Reference #', item.id || 'CBF000000000220')}
               ${renderRow('Emp#', item.empNo ? `#${item.empNo}` : '#EBB12')}
               ${renderRow('Name', item.empName || 'Farhan binti rahmat')}
-              ${renderRow('Status', detailStatus.text)}
+              ${renderRow('Status', detailStatus)}
               ${renderRow('Currency', item.currency || 'USD')}
               ${renderRow('Amount', item.amount || '12.00')}
               ${renderRow('Quantity', item.quantity || '5.00')}

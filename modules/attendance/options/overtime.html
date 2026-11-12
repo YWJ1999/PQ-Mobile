@@ -187,8 +187,8 @@
 
         <section id="overtimeSummaryCard" class="history-total-records-card overtime-summary-card record-summary-card" aria-label="Overtime summary">
           <div class="overtime-summary-metric record-summary-metric">
-            <span class="history-total-records-label record-summary-label">Total Records</span>
-            <strong id="overtimeTotalRecords" class="history-total-records-value record-summary-value" aria-live="polite">0</strong>
+            <strong id="overtimeTotalRecords" class="history-total-records-value record-summary-value" aria-live="polite" data-record-count>0</strong>
+            <span class="history-total-records-label record-summary-label">Records</span>
           </div>
           <div class="overtime-summary-metric overtime-summary-metric--hours">
             <span class="history-total-records-label">Total Hours</span>
@@ -318,11 +318,11 @@
               </div>
               <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--border-subtle);">
                  <span style="font-size: 13px; font-weight: 600; color: var(--text-secondary);">Plan Status</span>
-                 <span style="font-size: 11px; font-weight: 800; color: #10b981; background: rgba(16, 185, 129, 0.15); padding: 3px 8px; border-radius: 6px;">Approved</span>
+                 <span data-record-detail-status>Approved</span>
               </div>
               <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--border-subtle);">
                  <span style="font-size: 13px; font-weight: 600; color: var(--text-secondary);">Final Status</span>
-                 <span style="font-size: 11px; font-weight: 800; color: #f59e0b; background: rgba(245, 158, 11, 0.15); padding: 3px 8px; border-radius: 6px;">Draft</span>
+                 <span data-record-detail-status>Draft</span>
               </div>
               <div style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border-subtle);">
                  <span style="font-size: 13px; font-weight: 600; color: var(--text-secondary);">Shift</span>

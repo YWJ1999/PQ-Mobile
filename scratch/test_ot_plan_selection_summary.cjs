@@ -22,7 +22,7 @@ const pageUrl = pathToFileURL(path.resolve(__dirname, '../modules/attendance/opt
     assert.ok(await page.$('#staffTabView .list-header.record-summary-card'));
     assert.deepEqual(
       await page.$$eval('#staffTabView .staff-record-label', labels => labels.map(label => label.textContent.trim())),
-      ['Total Records', 'Selected Records']
+      ['Records', 'Selected Records']
     );
     assert.equal(await page.$eval('#listCounterText', node => node.textContent.trim()), '6');
     assert.equal(await page.$eval('#selectedRecordsText', node => node.textContent.trim()), '2');

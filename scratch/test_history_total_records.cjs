@@ -58,7 +58,7 @@ async function assertHistoryTotal(page, options) {
   }, options);
 
   assert.equal(result.summaryCount, 1, `${options.name}: exactly one Total Records card must be visible`);
-  assert.equal(result.label, 'Total Records', `${options.name}: label`);
+  assert.equal(result.label, result.itemCount === 1 ? 'Record' : 'Records', `${options.name}: label`);
   assert.match(result.value || '', /^\d+$/, `${options.name}: value must contain digits only`);
   assert.equal(result.ariaLive, 'polite', `${options.name}: updated totals must be announced`);
   assert.equal(result.iconCount, 0, `${options.name}: total card must not use an icon`);

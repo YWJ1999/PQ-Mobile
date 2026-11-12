@@ -46,9 +46,8 @@
 .cv-history-card-employee .history-employee-id { margin: 3px 0 4px; }
 /* CV request detail layout follows the grouped profile-card reference. */
 .cv-history-navigation { flex: 0 0 auto; padding: 12px 14px 14px; background: var(--bg-phone); }
-.cv-history-detail-tabs { display: flex; gap: 4px; padding: 4px; border: 1px solid var(--border-subtle); border-radius: 14px; background: var(--bg-input); overflow-x: auto; overscroll-behavior-x: contain; scrollbar-width: none; }
-.cv-history-detail-tabs::-webkit-scrollbar { display: none; }
-.cv-history-detail-tab { display: inline-flex; flex: 0 0 auto; align-items: center; justify-content: center; gap: 6px; min-height: 44px; padding: 9px 10px; border: 1px solid transparent; border-radius: 10px; background: transparent; color: var(--text-secondary); font: 800 11px/1.4 'Plus Jakarta Sans', sans-serif; white-space: nowrap; cursor: pointer; touch-action: manipulation; }
+.cv-history-detail-tabs { display: flex; flex-wrap: wrap; gap: 4px; padding: 4px; border: 1px solid var(--border-subtle); border-radius: 14px; background: var(--bg-input); }
+.cv-history-detail-tab { display: inline-flex; flex: 1 0 auto; flex-direction: column; align-items: center; justify-content: center; gap: 4px; min-height: 44px; padding: 5px 4px; border: 1px solid transparent; border-radius: 10px; background: transparent; color: var(--text-secondary); font: 800 11px/1.4 'Plus Jakarta Sans', sans-serif; white-space: nowrap; cursor: pointer; touch-action: manipulation; }
 .cv-history-detail-tab i { color: var(--purple-text); font-size: 13px; }
 .cv-history-detail-tab.active { background: #7c3aed; color: #fff; border-color: #7c3aed; }
 .cv-history-detail-tab.active i { color: #fff; }
@@ -116,6 +115,4 @@
 #historyDetailsModal.cv-history-mobile-sheet .cv-history-detail-employee .history-employee-id { margin-top: 3px; }
 .career-history-phone .history-card-item:is([data-status="cancelled"], [data-status="rejected"]) { border-left-color: #ef4444; background: linear-gradient(135deg, var(--bg-card) 0%, rgba(239, 68, 68, .06) 100%); }
 .career-history-phone .history-card-item:is([data-status="cancelled"], [data-status="rejected"]) .history-card-details { border-color: rgba(239, 68, 68, .18); background: rgba(239, 68, 68, .05); }
-.career-history-phone .status-pill.cancelled { background: rgba(239,68,68,.12); border-color: rgba(239,68,68,.3); color: #f87171; }
-[data-theme="light"] .career-history-phone .status-pill.cancelled { color: #b91c1c; }
 @media (prefers-reduced-motion: reduce) { .career-history-phone .history-card-item { transition: none; } }

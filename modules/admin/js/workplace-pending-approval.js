@@ -120,7 +120,7 @@ document.addEventListener('DOMContentLoaded', () => {
     review.setAttribute('role', 'button');
     review.setAttribute('aria-label', 'View details for ' + item.reference);
     const status = node('span', 'payroll-approval-status');
-    status.append(icon('fa-hourglass-half'), node('span', '', 'Submitted'));
+    status.append(icon('fa-hourglass-half'), node('span', '', recordReviewStatusLabel(item.status)));
     header.insertBefore(status, menu);
     const reference = node('p', 'workplace-approval-reference', 'Ref: ' + item.reference);
     const rows = item.kind === 'inventory-request'
@@ -226,7 +226,7 @@ document.addEventListener('DOMContentLoaded', () => {
         ['Name', item.employeeName],
         ['Position', item.position],
         ['Department', item.department],
-        ['Document Status', 'Submitted'],
+        ['Document Status', recordDetailStatus.create(item.status)],
         ['Submit Date', date(item.submitDate)],
         ['Item Group', item.itemGroup],
         ['Item', item.requestItem],
@@ -244,7 +244,7 @@ document.addEventListener('DOMContentLoaded', () => {
       [guests, attendees, other].forEach(section => { section.hidden = false; });
       sectionTitle(general, 'General');
       table(general, [
-        ['Document Reference', node('span', 'workplace-approval-document-ref', item.reference)], ['Document Status', 'Submitted'],
+        ['Document Reference', node('span', 'workplace-approval-document-ref', item.reference)], ['Document Status', recordDetailStatus.create(item.status)],
         ['Submit Date', date(item.submitDate)], ['Visit Date', date(item.visitDate)],
         ['Visit Time', `${item.startTime} – ${item.endTime}`], ['Total Guest', item.totalGuest],
         ['Location', item.location], ['Meal?', item.meal ? 'Yes' : 'No']
@@ -285,7 +285,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const config = item.kind === 'inventory-request' ? tabConfig.inventory : tabConfig['guest-visit'];
     request.append(node('p', 'workplace-approval-reference', item.reference), employee, fieldGrid([['Request', config.requestName], ['Submit Date', date(item.submitDate)]]));
     const steps = node('section', 'payroll-approval-workflow-step is-active');
-    steps.append(node('h3', '', 'Approval Steps'), node('p', 'workplace-approval-notice', 'Submitted'), node('strong', '', 'Awaiting Approval'));
+    steps.append(node('h3', '', 'Approval Steps'), recordDetailStatus.workflowStep('Submitted'), document.createTextNode(' '), recordDetailStatus.create('Awaiting Approval'));
     const backup = PendingApprovalBackup.assigned('workplace', item.id);
     if (backup) steps.append(fieldGrid([['Backup Approver', backup.name]]));
     const audit = node('section', 'payroll-approval-workflow-audit');

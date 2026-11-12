@@ -19,7 +19,6 @@
   const icon = name => { const element = node('i', 'fa-solid ' + name); element.setAttribute('aria-hidden', 'true'); return element; };
   const date = value => { const iso = window.PendingApprovalFilter.toISO(value); return iso ? iso.split('-').reverse().join('/') : (value || '—'); };
   const current = () => records.find(item => item.id === currentId);
-  const escape = value => String(value ?? '').replace(/[&<>"']/g, character => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[character]));
   function identity(name, empNo, position) {
     const element = node('div', 'payroll-employee-copy');
     element.append(node('strong', 'employee-name', name || 'Employee'));
@@ -29,7 +28,7 @@
   }
   function field(label, value) {
     const element = node('div', 'payroll-approval-field');
-    element.append(node('small', '', label), node('strong', '', value == null || value === '' ? '—' : value));
+    element.append(node('small', '', label), value instanceof Node ? value : node('strong', '', value == null || value === '' ? '—' : value));
     return element;
   }
   function detailActionButtons(engagementDetails) {
@@ -193,7 +192,7 @@
     if (isProfile) {
       body.innerHTML = window.EmployeeCareerCVHistoryDetails.render(
         item,
-        escape(item.documentStatus || 'Submitted'),
+        recordDetailStatus.html(item.documentStatus || 'Submitted'),
         date(item.submitDate),
         {qualificationLayout: 'cards'}
       );
@@ -227,7 +226,7 @@
         ['Attachment', engagementAttachments(item.attachments)]
       ] : [
         ['Document Reference', item.reference || item.id],
-        ['Document Status', item.documentStatus || 'Submitted'],
+        ['Document Status', recordDetailStatus.create(item.documentStatus || 'Submitted')],
         ['Employee', identity(item.employeeName, item.empNo, item.position)],
         ['Type', item.type],
         ['Submit Date', date(item.submitDate)],
@@ -267,7 +266,7 @@
     $('careerPendingWorkflowRequest').replaceChildren(field('Document Reference', item.reference || item.id), identity(item.employeeName, item.empNo), field('Request Type', item.type));
     $('careerPendingWorkflowSteps').replaceChildren(...(item.workflow || []).map(step => {
       const entry = node('li', 'payroll-approval-workflow-step');
-      entry.append(field(step.title || 'Approval Step', step.status || 'Pending'));
+      entry.append(field(step.title || 'Approval Step', recordDetailStatus.workflowStep(step.status || 'Pending')));
       if (step.name) entry.append(identity(step.name, step.empNo, step.role));
       if (step.date) entry.append(field('Date', date(step.date)));
       return entry;

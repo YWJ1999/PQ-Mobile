@@ -9,14 +9,8 @@ const puppeteer = require('puppeteer');
     const errors = [];
     page.on('pageerror', error => errors.push(error.message));
     await page.goto(pathToFileURL(path.resolve(__dirname, '../modules/admin/options/guest-visit.html')).href, { waitUntil: 'load' });
-    for (const caption of ['Total Records: 0', 'Total Records: 12', 'Total Records: 1,024']) {
-      await page.$eval('#visitGuestListCount', (node, text) => { node.innerText = text; }, caption);
-      assert.equal(await page.$eval('#visitGuestListCount', node => node.textContent), caption);
-      assert.equal(await page.$eval('#visitGuestListCount', node => node.matches('.record-summary-card') || node.childElementCount > 0), false, 'Editable list headers keep one plain subtitle');
-    }
-    await page.$eval('#visitGuestListCount', node => { node.textContent = 'Total Amount: RM 12.50'; });
-    await page.waitForFunction(() => !document.querySelector('#visitGuestListCount').classList.contains('record-summary-card'));
-    assert.equal(await page.$eval('#visitGuestListCount', node => node.textContent), 'Total Amount: RM 12.50', 'Amount captions keep their content and original presentation');
+    assert.equal(await page.$eval('#visitGuestListCount', node => node.textContent), '0 Records');
+    assert.equal(await page.$eval('#visitGuestListCount', node => node.childElementCount), 0, 'Editable list headers keep one plain subtitle');
     await page.evaluate(() => {
       const node = document.createElement('span');
       node.id = 'insertedCount';
@@ -25,8 +19,18 @@ const puppeteer = require('puppeteer');
       document.querySelector('.phone-container').append(node);
     });
     await page.waitForSelector('#insertedCount .record-summary-value');
-    assert.equal(await page.$eval('#insertedCount', node => node.textContent), 'Total Records: 7', 'New form content receives the same presentation');
+    assert.equal(await page.$eval('#insertedCount', node => node.textContent), '7 Records');
+    assert.equal(await page.$eval('#insertedCount', node => getComputedStyle(node).alignItems), 'baseline');
+    for (const count of ['0', '1', '1,024']) {
+      await page.$eval('#insertedCount', (node, count) => { node.textContent = count + ' Record'; }, count);
+      await page.waitForSelector('#insertedCount .record-summary-value');
+      assert.equal(await page.$eval('#insertedCount', node => node.firstElementChild.textContent), count);
+      assert.equal(await page.$eval('#insertedCount', node => node.lastElementChild.textContent), count === '1' ? 'Record' : 'Records');
+    }
+    await page.$eval('#insertedCount', node => { node.textContent = 'Total Amount: RM 12.50'; });
+    await page.waitForFunction(() => !document.querySelector('#insertedCount').classList.contains('record-summary-card'));
+    assert.equal(await page.$eval('#insertedCount', node => node.textContent), 'Total Amount: RM 12.50');
     assert.deepEqual(errors, []);
-    console.log('PASS: refreshed and inserted record captions preserve zero, grouped counts, original text and amount states without duplication or JavaScript errors.');
+    console.log('PASS: static and refreshed counts use the number-first Record format, including zero and grouped counts.');
   } finally { await browser.close(); }
 })().catch(error => { console.error(error); process.exitCode = 1; });

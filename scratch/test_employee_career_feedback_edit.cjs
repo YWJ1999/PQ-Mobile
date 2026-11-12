@@ -39,16 +39,18 @@ const url = (file, query) => pathToFileURL(path.resolve(__dirname, '..', file)).
         await page.click('[data-record-id="feedback-1"] .career-history-card-open');
         assert.ok((await page.$eval('#historyDetailBody', el => el.textContent)).includes('Updated suggestion'));
         assert.equal(await page.$eval('.career-history-employee-id', el => el.textContent), '#EBB12', 'Editing preserves employee identity');
-        assert.ok(await page.$('#historyEditFeedback'), 'Feedback Detail provides Edit');
-        assert.equal(await page.$eval('#historyEditFeedback', el => el.querySelector('i, svg') === null), true, 'Detail Edit is text only');
-        assert.deepEqual(await page.evaluate(() => {
-          const card = getComputedStyle(document.querySelector('[data-edit-feedback="feedback-1"]'));
-          const detail = getComputedStyle(document.getElementById('historyEditFeedback'));
-          return [detail.backgroundColor, detail.color, detail.borderRadius];
-        }), await page.$eval('[data-edit-feedback="feedback-1"]', el => {
-          const style = getComputedStyle(el);
-          return [style.backgroundColor, style.color, style.borderRadius];
-        }), 'Detail and card Edit buttons have the same design');
+        assert.equal(await page.$eval('#historyEditFeedback', el => el.textContent.trim()), 'Edit Feedback');
+        assert.ok(await page.$('#historyEditFeedback > .fa-pen[aria-hidden="true"]'));
+        assert.ok(await page.$eval('#historyEditFeedback', el => {
+          const footer = el.parentElement;
+          const style = getComputedStyle(footer);
+          const contentWidth = footer.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight);
+          const button = el.getBoundingClientRect();
+          const icon = el.firstElementChild.getBoundingClientRect();
+          const label = el.lastElementChild.getBoundingClientRect();
+          return Math.abs(button.width - contentWidth) <= 1 && button.height >= 44
+            && icon.right < label.left && Math.abs((icon.left + label.right) - (button.left + button.right)) <= 2;
+        }), 'The pencil and label are centered in the full-width detail button');
         await page.screenshot({ path: path.join(__dirname, `feedback-detail-edit-${theme}-${width}.png`) });
         await Promise.all([page.waitForNavigation({ waitUntil: 'domcontentloaded' }), page.click('#historyEditFeedback')]);
         assert.equal(await page.$eval('#feedbackTitle', el => el.value), 'Updated feedback', 'Detail Edit opens its active record');

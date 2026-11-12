@@ -118,10 +118,10 @@
         <span class="claim-filter-copy"><span class="claim-eyebrow">Filter</span><span class="claim-filter-value" id="staffFilterText"></span></span>
         <span class="claim-icon-button" aria-hidden="true"><i class="fa-solid fa-sliders"></i></span>
       </button>
-      <dl class="staff-kpis record-summary-grid record-summary-card">
-        <div class="staff-kpi"><dt>Total Claim Amount</dt><dd id="staffTotalAmount">RM 0.00</dd></div>
-        <div class="staff-kpi record-summary-metric"><dt class="record-summary-label">Total Records</dt><dd id="staffTotalRecords" class="record-summary-value">0</dd></div>
-      </dl>
+      <div class="staff-kpis record-summary-grid record-summary-card">
+        <dl class="staff-kpi"><dt>Total Claim Amount</dt><dd id="staffTotalAmount">RM 0.00</dd></dl>
+        <div class="staff-kpi record-summary-metric"><strong id="staffTotalRecords" class="record-summary-value" data-record-count>0</strong> <span class="record-summary-label">Records</span></div>
+      </div>
       <p class="staff-data-note" id="staffStatusNote" hidden>Records without an approval status are excluded.</p>
       <div id="staffCardsContainer" aria-live="polite"></div>
     </main>

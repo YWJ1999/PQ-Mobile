@@ -50,7 +50,7 @@ async function assertOverlayFitsAtWidths(page, selector) {
       await page.goto(pageUrl + '?theme=' + theme, { waitUntil: 'networkidle0' });
 
       assert.equal(await page.$eval('html', node => node.dataset.theme), theme);
-      assert.equal(await page.$eval('#pendingFeedbackTotal', node => node.textContent.trim()), 'Total 2 Records');
+      assert.equal(await page.$eval('#pendingFeedbackTotal', node => node.textContent.trim()), '2 Records');
       const summarySurface = await page.$eval('.pending-feedback-summary', node => {
         const style = getComputedStyle(node);
         return {

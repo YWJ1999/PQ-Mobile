@@ -1059,7 +1059,7 @@
         <!-- Staff Counter Header -->
         <div class="list-header record-summary-card">
           <div class="staff-record-counts" aria-live="polite">
-            <div class="record-summary-metric"><span class="staff-record-label record-summary-label">Total Records</span><strong class="list-counter record-summary-value" id="listCounterText">0</strong></div>
+            <div class="record-summary-metric"><strong class="list-counter record-summary-value" id="listCounterText" data-record-count>0</strong> <span class="staff-record-label record-summary-label">Records</span></div>
             <div><span class="staff-record-label">Selected Records</span><strong class="list-counter" id="selectedRecordsText">0</strong></div>
           </div>
           <label class="select-all-control" id="selectAllControl" for="selectAllCheckbox"><input type="checkbox" id="selectAllCheckbox" onchange="handleSelectAllCheckbox(this.checked)"><span>Select All</span></label>
@@ -1196,9 +1196,9 @@
           <span class="shift-detail-info-value" id="wsSummaryDateFilter">23 Sep 2026</span>
         </div>
         <div class="shift-detail-info-rows">
-          <div class="shift-detail-info-row">
-            <span class="shift-detail-info-label">Total Records:</span>
-            <span class="shift-detail-info-value" id="wsSummaryRecordCount">1</span>
+          <div class="shift-detail-info-row record-summary-metric">
+            <span class="shift-detail-info-value" id="wsSummaryRecordCount" data-record-count>1</span>
+            <span class="shift-detail-info-label">Record</span>
           </div>
         </div>
       </div>
@@ -1352,9 +1352,9 @@
           <span class="shift-detail-info-value" id="nwSummaryDateFilter">23 Sep 2026</span>
         </div>
         <div class="shift-detail-info-rows">
-          <div class="shift-detail-info-row">
-            <span class="shift-detail-info-label">Total Records:</span>
-            <span class="shift-detail-info-value" id="nwSummaryRecordCount">1</span>
+          <div class="shift-detail-info-row record-summary-metric">
+            <span class="shift-detail-info-value" id="nwSummaryRecordCount" data-record-count>1</span>
+            <span class="shift-detail-info-label">Record</span>
           </div>
         </div>
       </div>
@@ -1396,9 +1396,9 @@
           <span class="shift-detail-info-value" id="otSummaryDateFilter">23 Sep 2026</span>
         </div>
         <div class="shift-detail-info-rows">
-          <div class="shift-detail-info-row">
-            <span class="shift-detail-info-label">Total Records:</span>
-            <span class="shift-detail-info-value" id="otSummaryRecordCount">2</span>
+          <div class="shift-detail-info-row record-summary-metric">
+            <span class="shift-detail-info-value" id="otSummaryRecordCount" data-record-count>2</span>
+            <span class="shift-detail-info-label">Records</span>
           </div>
         </div>
       </div>
@@ -1467,9 +1467,9 @@
           <span class="shift-detail-info-value" id="lvSummaryDateFilter">23 Sep 2026</span>
         </div>
         <div class="shift-detail-info-rows">
-          <div class="shift-detail-info-row">
-            <span class="shift-detail-info-label">Total Records:</span>
-            <span class="shift-detail-info-value" id="lvSummaryRecordCount">3</span>
+          <div class="shift-detail-info-row record-summary-metric">
+            <span class="shift-detail-info-value" id="lvSummaryRecordCount" data-record-count>3</span>
+            <span class="shift-detail-info-label">Records</span>
           </div>
         </div>
       </div>

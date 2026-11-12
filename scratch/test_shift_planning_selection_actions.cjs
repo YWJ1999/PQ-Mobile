@@ -33,7 +33,7 @@ const pageUrl = pathToFileURL(path.resolve(__dirname, '../modules/attendance/opt
     assert.equal(initiallySelected, 0, 'No staff is preselected');
     assert.equal(await page.$eval('#shiftPlanningActionBar', node => getComputedStyle(node).display), 'none');
     assert.equal(await page.$eval('#selectedRecordsText', node => node.textContent), '0');
-    assert.deepEqual(await page.$$eval('.list-header .staff-record-label', nodes => nodes.map(node => node.textContent)), ['Total Records', 'Selected Records']);
+    assert.deepEqual(await page.$$eval('.list-header .staff-record-label', nodes => nodes.map(node => node.textContent)), ['Records', 'Selected Records']);
     assert.equal(await page.$('#selectedCountText'), null);
     assert.equal(await page.$eval('#shiftPlanningActionBar', node => getComputedStyle(node).position), 'absolute');
 

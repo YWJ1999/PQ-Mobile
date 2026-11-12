@@ -110,7 +110,7 @@
 
   if (document.getElementById('taxDependantsList')) {
     const list = document.getElementById('taxDependantsList');
-    setText('taxRecordCount', dependants ? `Total Records: ${dependants.length}` : 'Records unavailable');
+    setText('taxRecordCount', dependants ? window.PeopleHcmRecordSummary.formatCount(dependants.length) : 'Records unavailable');
     if (!dependants || !dependants.length) {
       const empty = document.createElement('div');
       empty.className = 'tax-empty';

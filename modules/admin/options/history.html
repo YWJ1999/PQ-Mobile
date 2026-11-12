@@ -43,8 +43,8 @@
         <span class="claim-icon-button" aria-hidden="true"><i class="fa-solid fa-sliders"></i></span>
       </button>
       <div class="history-total-records-card record-summary-metric record-summary-card" id="historyRecordHeading">
-        <span class="history-total-records-label record-summary-label">Total Records</span>
-        <strong id="historyRecordCount" class="history-total-records-value record-summary-value" aria-live="polite">0</strong>
+        <strong id="historyRecordCount" class="history-total-records-value record-summary-value" aria-live="polite" data-record-count>0</strong>
+        <span class="history-total-records-label record-summary-label">Records</span>
       </div>
       <h2 id="historyCategoryTitle" class="history-sr-only">Guest Visit History</h2>
       <p id="historyLoadError" class="history-filter-error" role="status" hidden></p>
@@ -63,7 +63,7 @@
         <div class="claim-filter-fields">
           <div class="history-date-fields"><div><label for="historyDateFrom" class="claim-filter-label">Start Date</label><input id="historyDateFrom" class="claim-control" type="date"></div><div><label for="historyDateTo" class="claim-filter-label">End Date</label><input id="historyDateTo" class="claim-control" type="date"></div></div>
           <div id="historyTypeField" hidden><label id="historyTypeLabel" for="historyType" class="claim-filter-label">Letter Type</label><div class="claim-filter-select-wrap"><select id="historyType" class="claim-filter-select"><option value="">All Types</option></select><i class="fa-solid fa-chevron-down claim-filter-chevron" aria-hidden="true"></i></div></div>
-          <div id="historyStatusField"><label id="historyStatusLabel" for="historyStatus" class="claim-filter-label">Status</label><div class="claim-filter-select-wrap"><select id="historyStatus" class="claim-filter-select"><option value="">All Statuses</option><option value="draft">Draft</option><option value="submitted">Submitted</option><option value="resubmit">Resubmit</option><option value="approved">Approved</option><option value="rejected">Rejected</option><option value="cancelled">Cancelled</option></select><i class="fa-solid fa-chevron-down claim-filter-chevron" aria-hidden="true"></i></div></div>
+          <div id="historyStatusField"><label id="historyStatusLabel" for="historyStatus" class="claim-filter-label">Status</label><div class="claim-filter-select-wrap"><select id="historyStatus" class="claim-filter-select"><option value="">All Statuses</option><option value="draft">Draft</option><option value="submitted">Pending</option><option value="resubmit">Resubmit</option><option value="approved">Approved</option><option value="rejected">Rejected</option><option value="cancelled">Cancelled</option></select><i class="fa-solid fa-chevron-down claim-filter-chevron" aria-hidden="true"></i></div></div>
           <p id="historyFilterError" class="history-filter-error" role="alert" hidden></p>
         </div>
         <button id="applyHistoryFilter" class="claim-filter-apply" type="submit">Apply Filter</button>

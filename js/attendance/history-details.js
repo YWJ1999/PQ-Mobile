@@ -23,7 +23,7 @@
 
   function setStatus(id, status) {
     const node = document.getElementById(id);
-    node.textContent = status || '-';
+    node.replaceChildren(recordDetailStatus.create(status || '-'));
     node.dataset.status = resubmittable(status) ? 'resubmit' : /approved/i.test(status) ? 'approved' : 'pending-review';
   }
 

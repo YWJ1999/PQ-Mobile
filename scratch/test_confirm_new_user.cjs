@@ -117,7 +117,7 @@ async function inspectScenario(browser, theme, width) {
   assert.match(headerGradient, /rgb\(109, 40, 217\)/, `${theme}/${width}: header must use the standard middle purple`);
   assert.match(headerGradient, /rgb\(124, 58, 237\)/, `${theme}/${width}: header must end with the standard brand purple`);
   assert.doesNotMatch(headerGradient, /rgb\(147, 51, 234\)/, `${theme}/${width}: header must not use the overly bright magenta endpoint`);
-  assert.equal(await page.$eval('.confirm-new-user-summary-label', node => node.textContent.trim()), 'Total records');
+  assert.equal(await page.$eval('.confirm-new-user-summary-label', node => node.textContent.trim()), 'Records');
   assert.equal(await page.$eval('#confirmNewUserTotal', node => node.textContent.trim()), '13');
   assert.equal(await page.$eval('#confirmNewUserTotal', node => node.getAttribute('aria-label')), null, `${theme}/${width}: visible total must remain available to assistive technology`);
   const totalMetrics = await page.$eval('.confirm-new-user-summary', summary => {

@@ -31,7 +31,7 @@
   }
   function field(label, value) {
     const element = node('div', 'payroll-approval-field');
-    element.append(node('small', '', label), node('strong', '', value ?? '-'));
+    element.append(node('small', '', label), value instanceof Node ? value : node('strong', '', value ?? '-'));
     return element;
   }
   function fieldGrid(entries) {
@@ -112,7 +112,7 @@
 
     const body = node('div', 'approval-card-body payroll-approval-card-body');
     const status = node('span', 'payroll-approval-status');
-    status.append(icon('fa-hourglass-half'), node('span', '', item.status));
+    status.append(icon('fa-hourglass-half'), node('span', '', recordReviewStatusLabel(item.status)));
     header.insertBefore(status, menu);
     const fields = item.category === 'tax'
       ? [
@@ -216,7 +216,7 @@
     comments.value = item.approverActionComments || '';
     if (item.category === 'tax') {
       rows.push(
-        ['Reference #', item.id], ['Name', employeeName], ['Emp #', employeeId], ['Status', item.status],
+        ['Reference #', item.id], ['Name', employeeName], ['Emp #', employeeId], ['Status', recordDetailStatus.create(item.status)],
         ['Submit Date', date(item.submitDate)], ['Rebate Item', item.rebateItem], ['Transaction Date', date(item.transactionDate)],
         ['Description', item.description || '-'], ['Receipt #', item.receiptNo || '-'], ['Amount', money(item.amount)],
         ['Process', item.process ? 'Yes' : 'No'], ['Period', item.period || '-'], ['Cycle', item.cycle || '-'],
@@ -227,7 +227,7 @@
       const employee = node('div');
       employee.append(employeeName, employeeId);
       rows.push(
-        ['Document Reference', item.id], ['Document Status', item.status], ['Employee', employee],
+        ['Document Reference', item.id], ['Document Status', recordDetailStatus.create(item.status)], ['Employee', employee],
         ['Deduction Type', item.deductionType], ['Request Type', item.requestType],
         ['Stop Period', item.stopPeriod || '-'], ['Stop Date', date(item.stopDate)], ['Stop Cycle', item.stopCycle || '-'],
         ['Account #', item.accountNo || '-'], ['Remarks', item.remarks || '-'], ['Attachment', attachmentContent(item)]
@@ -261,16 +261,16 @@
     employee.append(node('small', '', 'Employee'), node('h3', 'employee-name', item.employeeName), node('div', 'employee-id', '#' + item.empNo));
     byId('payrollPendingWorkflowRequest').replaceChildren(
       field('Document Reference', item.id), employee,
-      fieldGrid([['Document Status', item.status], [item.category === 'tax' ? 'Submit Date' : 'Request Date', submittedDate]])
+      fieldGrid([['Document Status', recordDetailStatus.create(item.status)], [item.category === 'tax' ? 'Submit Date' : 'Request Date', submittedDate]])
     );
 
     const submitted = node('li', 'payroll-approval-workflow-step is-complete');
     const submittedHeading = node('div', 'payroll-approval-workflow-step-heading');
-    submittedHeading.append(icon('fa-circle-check'), node('h4', '', 'Request Submitted'), node('span', 'payroll-approval-workflow-badge', 'Completed'));
+    submittedHeading.append(icon('fa-circle-check'), node('h4', '', 'Request Submitted'), recordDetailStatus.create('Completed'));
     submitted.append(submittedHeading, fieldGrid([['Submitted By', item.employeeName], ['Date', submittedDate]]));
     const approval = node('li', 'payroll-approval-workflow-step is-active');
     const approvalHeading = node('div', 'payroll-approval-workflow-step-heading');
-    approvalHeading.append(icon('fa-hourglass-half'), node('h4', '', 'Payroll Approval'), node('span', 'payroll-approval-workflow-badge', 'Awaiting Approval'));
+    approvalHeading.append(icon('fa-hourglass-half'), node('h4', '', 'Payroll Approval'), recordDetailStatus.create('Awaiting Approval'));
     approval.append(approvalHeading, fieldGrid([['Approver', '-'], ['Action Date', '-']]));
     const backup = PendingApprovalBackup.assigned('payroll', item.id);
     if (backup) approval.append(field('Backup Approver', backup.name));

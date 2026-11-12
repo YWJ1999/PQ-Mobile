@@ -869,7 +869,7 @@
               </div>
               <div>
                 <h2 class="form-section-heading" id="v3CategoryTitleText" style="font-size: 15px; font-weight: 800; color: var(--text-primary); margin: 0;">Task</h2>
-                <span id="v3CategoryItemsCount" class="form-list-caption">Total Records: 0</span>
+                <span id="v3CategoryItemsCount" class="form-list-caption">0 Records</span>
               </div>
             </div>
             <button type="button" class="btn-submit-primary" aria-label="Add Item" title="Add Item" style="width: 40px; height: 40px; padding: 0; border-radius: 12px; font-size: 15px; display: inline-flex; align-items: center; justify-content: center; box-shadow: 0 4px 14px rgba(124, 58, 237, 0.35);" onclick="openEntryForm('add')">
@@ -1183,7 +1183,7 @@
 
       if (iconBox) iconBox.innerHTML = iconHtml;
       if (titleText) titleText.innerText = catName;
-      if (countText) countText.innerText = `Total Records: ${items.length}`;
+      if (countText) countText.innerText = window.PeopleHcmRecordSummary.formatCount(items.length);
 
       if (!container) return;
 
@@ -1550,7 +1550,7 @@
           const totalAmount = config.items.reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
           countText.textContent = `Total Amount: RM ${totalAmount.toFixed(2)}`;
         } else {
-          countText.textContent = `Total Records: ${config.items.length}`;
+          countText.textContent = window.PeopleHcmRecordSummary.formatCount(config.items.length);
         }
       }
 
@@ -1625,7 +1625,7 @@
       const travelingMetric = document.getElementById('catTravelingCount');
       const accomodationMetric = document.getElementById('catAccomodationCount');
 
-      if (taskMetric) taskMetric.innerText = `${taskCount} ${taskCount === 1 ? 'Record' : 'Records'}`;
+      if (taskMetric) taskMetric.innerText = window.PeopleHcmRecordSummary.formatCount(taskCount);
       if (travelingMetric) travelingMetric.innerText = `RM ${travelingTotal.toFixed(2)}`;
       if (accomodationMetric) accomodationMetric.innerText = `RM ${accommodationTotal.toFixed(2)}`;
     }

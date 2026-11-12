@@ -157,9 +157,7 @@
     }).join('');
     const pending = unscoped.length ? `<section class="cv-history-qualification-unscoped"><h4>Requested Qualification Changes</h4><dl class="cv-history-fields">${unscoped.map(change => fieldRows(row, 'qualification', {}, [change], true)).join('')}</dl></section>` : '';
     if (layout === 'cards' || layout === 'numbered-cards') {
-      const total = records.length;
-      const noun = total === 1 ? 'record' : 'records';
-      const count = `<span class="cv-history-qualification-total">${total} ${noun}</span>`;
+      const count = `<span class="cv-history-qualification-total">${window.PeopleHcmRecordSummary.formatCount(records.length)}</span>`;
       const heading = `<h3 class="cv-history-panel-title cv-history-qualification-heading"><span>Qualification details</span>${count}</h3>`;
       const cardList = qualificationCardList(row, records, assigned, layout === 'numbered-cards');
       const content = cardList ? `<div class="cv-history-qualification-list">${cardList}</div>` : (!pending ? '<p class="cv-history-empty-members">No qualification records</p>' : '');

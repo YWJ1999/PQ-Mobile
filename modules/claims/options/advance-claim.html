@@ -849,7 +849,7 @@
 
       if (iconBox) iconBox.innerHTML = '<i class="fa-solid fa-receipt"></i>';
       if (titleText) titleText.innerText = 'Details';
-      if (countText) countText.innerText = `Total Records: ${items.length}`;
+      if (countText) countText.innerText = window.PeopleHcmRecordSummary.formatCount(items.length);
 
       if (items.length === 0) {
         container.innerHTML = `
@@ -1196,7 +1196,7 @@
       const catAdvAmt = document.getElementById('catAdvanceAmount');
       const catAdvSub = document.getElementById('catAdvanceSubtitle');
       if (catAdvAmt) catAdvAmt.innerText = `RM ${grandTotal.toFixed(2)}`;
-      if (catAdvSub) catAdvSub.innerText = `Total Records: ${formData.claimDetails.addedDetails.length}`;
+      if (catAdvSub) catAdvSub.innerText = window.PeopleHcmRecordSummary.formatCount(formData.claimDetails.addedDetails.length);
     }
 
     function triggerFileUpload(target) {

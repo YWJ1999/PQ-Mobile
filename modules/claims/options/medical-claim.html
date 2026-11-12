@@ -778,7 +778,7 @@
               </div>
               <div>
                 <h2 class="form-section-heading" id="v3CategoryTitleText" style="font-size: 15px; font-weight: 800; color: var(--text-primary); margin: 0;">Details</h2>
-                <span id="v3CategoryItemsCount" class="form-list-caption">Total Records: 0</span>
+                <span id="v3CategoryItemsCount" class="form-list-caption">0 Records</span>
               </div>
             </div>
             <button type="button" id="v3AddItemButton" class="btn-submit-primary btn-add-item-icon" aria-label="Add Item" title="Add Item" style="width: 40px; height: 40px; padding: 0; border-radius: 12px; font-size: 15px; display: inline-flex; align-items: center; justify-content: center; box-shadow: 0 4px 14px rgba(124, 58, 237, 0.35);" onclick="openEntryForm('add')">
@@ -1063,7 +1063,7 @@
       }
       if (countText) {
         const totalAmount = formData.expenseItems.reduce((sum, item) => sum + Number(item.localAmount || 0), 0);
-        countText.innerText = isTreatment ? `Total Records: ${items.length}` : `Total Amount: RM ${totalAmount.toFixed(2)}`;
+        countText.innerText = isTreatment ? window.PeopleHcmRecordSummary.formatCount(items.length) : `Total Amount: RM ${totalAmount.toFixed(2)}`;
       }
       if (addItemButton) {
         addItemButton.style.display = isTreatment && items.length >= 1 ? 'none' : 'inline-flex';
@@ -1563,13 +1563,13 @@
       const catExpenseSub = document.getElementById('catExpenseSubtitle');
       const catExpenseAmt = document.getElementById('catExpenseAmount');
       if (catExpenseSub) catExpenseSub.innerText = formData.expenseItems.length > 0
-        ? `Total Records: ${formData.expenseItems.length}`
+        ? window.PeopleHcmRecordSummary.formatCount(formData.expenseItems.length)
         : '';
       if (catExpenseAmt) catExpenseAmt.innerText = formData.expenseItems.length > 0
         ? `RM ${grandTotal.toFixed(2)}`
         : '0';
       const detailsCount = document.getElementById('v2DetailsCount');
-      if (detailsCount) detailsCount.innerText = `Total Records: ${formData.expenseItems.length}`;
+      if (detailsCount) detailsCount.innerText = window.PeopleHcmRecordSummary.formatCount(formData.expenseItems.length);
     }
 
     function triggerFileUpload(target) {

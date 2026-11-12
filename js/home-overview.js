@@ -10,7 +10,7 @@
   const chevron = '<span class="update-chevron" aria-hidden="true"></span>';
 
   function requestAction(status, label, description) {
-    return `<button type="button" class="for-you-card home-request-action" data-pending-status="${status}"
+    return `<button type="button" class="home-request-action" data-pending-status="${status}"
         onclick="openForYouModal('${status}')" aria-haspopup="dialog" aria-controls="forYouOverlay">
       <strong class="home-request-count" data-home-count="${status}"></strong>
       <span class="fy-text"><span class="fy-title">${label}</span><span class="fy-description">${description}</span></span>
@@ -39,7 +39,7 @@
               aria-haspopup="dialog" aria-controls="indicatorsOverlay"><span class="insight-trend-count"></span> unchanged</button>
           <span aria-hidden="true">·</span><span data-insight-total></span>
         </div>
-        <button type="button" class="section-action" onclick="openIndicatorsModal('${scope}')"
+        <button type="button" class="section-action" onclick="openInsightBreakdown('${scope}', 'all')"
             aria-haspopup="dialog" aria-controls="indicatorsOverlay">View details ${chevron}</button>
       </div>
     </div>`;
@@ -65,14 +65,14 @@
     <section aria-labelledby="homeTodayTitle">
       <div class="section-header"><h2 class="section-title" id="homeTodayTitle">Today</h2></div>
       <div class="home-schedule-list">
-        <button type="button" class="for-you-card for-you-reminder" data-reminder-type="training"
+        <button type="button" class="home-schedule-row" data-reminder-type="training"
             data-training-date="${schedule.training.date}" aria-haspopup="dialog" aria-controls="trainingCalendarSheet">
           <span class="fy-left">
             <span class="fy-avatar"><i class="fa-solid fa-graduation-cap" aria-hidden="true"></i></span>
             <span class="fy-text"><span class="fy-title">Training</span><span class="fy-description">${timeRange(schedule.training)}</span></span>
           </span>${chevron}
         </button>
-        <article class="for-you-card for-you-reminder" data-reminder-type="ot-plan">
+        <article class="home-schedule-row" data-reminder-type="ot-plan">
           <span class="fy-left">
             <span class="fy-avatar"><i class="fa-solid fa-business-time" aria-hidden="true"></i></span>
             <span class="fy-text"><span class="fy-title">Planned OT</span><span class="fy-description">${timeRange(schedule.otPlan)} · ${schedule.otPlan.hours} ${schedule.otPlan.hours === 1 ? 'hour' : 'hours'}</span></span>

@@ -26,7 +26,7 @@ async function screenshot(page, filename) {
       assert.equal(await page.$eval('#bookingEditor', n => n.hidden), true);
       assert.equal(await page.$$eval('#bookingRecords .history-card-item', n => n.length), 1);
       assert.equal(await page.$$eval('#bookingRecords .fa-chevron-right', n => n.length), 0);
-      assert.equal(await page.$eval('.history-total-records-label', n => n.textContent.trim()), 'Total Records');
+      assert.equal(await page.$eval('.history-total-records-label', n => n.textContent.trim()), 'Record');
       assert.equal(await page.$eval('#bookingRecordCount', n => n.textContent.trim()), '1');
       assert.ok(await page.$eval('.history-total-records-card', n => n.getBoundingClientRect().width >= n.parentElement.getBoundingClientRect().width - 1), 'Total Records must use the shared full-width summary card');
       assert.ok(await page.$eval('#bookingRecordCount', n => n.classList.contains('history-total-records-value')), 'Total Records value must use the shared summary typography');

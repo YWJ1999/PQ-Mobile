@@ -255,13 +255,20 @@
   }
 
   function historyStatus(value) {
-    return statusKey(value) === 'draft' ? 'Draft' : 'Submitted';
+    const status = String(value || '').trim();
+    if (!status) return 'Draft';
+    if (statusKey(status) === 'pending') return 'Submitted';
+    return status.charAt(0).toUpperCase() + status.slice(1);
   }
 
   function statusIconClass(value) {
     return {
       submitted: 'fa-paper-plane',
-      draft: 'fa-floppy-disk'
+      draft: 'fa-floppy-disk',
+      approved: 'fa-check',
+      cancelled: 'fa-ban',
+      rejected: 'fa-xmark',
+      resubmit: 'fa-rotate-left'
     }[statusKey(value)] || 'fa-circle';
   }
 
@@ -437,7 +444,7 @@
     const badge = createNode('span', 'project-history-status-badge');
     const icon = createNode('i', 'fa-solid ' + statusIconClass(status));
     icon.setAttribute('aria-hidden', 'true');
-    badge.append(icon, createNode('span', '', status));
+    badge.append(icon, createNode('span', '', recordReviewStatusLabel(status)));
     return badge;
   }
 
@@ -504,11 +511,13 @@
     return true;
   }
 
-  function createProjectHistoryActionButton(record, kind, action, surface) {
+  function createProjectHistoryActionButton(record, kind, action, surface, actionCount) {
     const className = surface === 'detail'
       ? 'history-detail-action'
       : 'project-history-card-action project-history-card-action-' + action.variant;
     const button = createNode('button', className, action.label);
+    if (action.key === 'cancel') setRecordCancelButton(button, actionCount, surface === 'detail');
+    else if (action.key === 'discard' && surface === 'detail') setRecordDeleteButton(button);
     button.type = 'button';
     button.dataset.historyAction = action.key;
     button.addEventListener('click', event => {
@@ -522,8 +531,10 @@
     const descriptors = getProjectHistoryActions(record);
     if (!descriptors.length) return null;
     const actions = createNode('div', 'project-history-card-actions');
-    actions.setAttribute('aria-label', record.status + ' actions');
-    actions.append(...descriptors.map(action => createProjectHistoryActionButton(record, kind, action, 'card')));
+    actions.setAttribute('aria-label', recordReviewStatusLabel(record.status) + ' actions');
+    for (const action of descriptors) {
+      actions.append(createProjectHistoryActionButton(record, kind, action, 'card', descriptors.length));
+    }
     return actions;
   }
 
@@ -652,9 +663,9 @@
     updateTimesheetFilterSummary(filters);
   }
 
-  function createDetailRow(label, value, valueClass) {
+  function createDetailRow(label, value) {
     const row = createNode('div', 'project-history-detail-row');
-    const detailValue = createNode('strong', valueClass || '');
+    const detailValue = createNode('strong');
     if (value instanceof Node) detailValue.append(value);
     else detailValue.textContent = displayValue(value);
     row.append(createNode('span', '', label), detailValue);
@@ -685,7 +696,7 @@
       createDetailRow('Milestone', record.milestone),
       createDetailRow('Schedule From', formatDate(record.scheduleFrom)),
       createDetailRow('Schedule To', formatDate(record.scheduleTo)),
-      createDetailRow('Status', record.status, 'project-history-detail-status'),
+      createDetailRow('Status', recordDetailStatus.create(record.status)),
       createDetailRow('Assignee', record.assignee),
       createDetailRow('Est. Complete', formatDate(record.estimatedComplete)),
       createDetailRow('Act. Complete', formatDate(record.actualComplete)),
@@ -712,7 +723,7 @@
       createDetailRow('Reference #', record.id),
       createDetailRow('Date', formatDate(record.date)),
       createDetailRow('Remark', record.remark),
-      createDetailRow('Status', record.status, 'project-history-detail-status'),
+      createDetailRow('Status', recordDetailStatus.create(record.status)),
       createDetailRow('Normal Hours', formatMinutes(record.normalMinutes)),
       createDetailRow('OT Hours', formatMinutes(record.overtimeMinutes))
     );
@@ -757,7 +768,7 @@
   function renderProjectDetailActions(record, kind) {
     const footer = byId('projectHistoryDetailActions');
     const actions = getProjectHistoryActions(record);
-    footer.replaceChildren(...actions.map(action => createProjectHistoryActionButton(record, kind, action, 'detail')));
+    footer.replaceChildren(...actions.map(action => createProjectHistoryActionButton(record, kind, action, 'detail', actions.length)));
     footer.hidden = actions.length === 0;
   }
 

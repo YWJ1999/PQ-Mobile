@@ -49,7 +49,9 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   function detailRow(label, value) {
     const line = node('tr', '');
-    line.append(node('td', 'detail-popout-label', label), node('td', 'detail-popout-value', value || '—'));
+    const cell = node('td', 'detail-popout-value');
+    cell.append(label === 'Status' ? recordDetailStatus.create(value) : value || '—');
+    line.append(node('td', 'detail-popout-label', label), cell);
     detailsContent.append(line);
   }
   function closeDetails() {
@@ -129,8 +131,10 @@ document.addEventListener('DOMContentLoaded', () => {
         row(details, 'Remarks', record.remarks);
         summary.append(header, details);
         const actions = node('div', 'history-card-actions');
+        const remove = action(record, 'Delete', 'delete');
         if (planned) actions.append(action(record, 'Confirm', 'confirm'));
-        actions.append(action(record, 'Delete', 'delete'));
+        else remove.innerHTML = recordCardActionLabels.delete;
+        actions.append(remove);
         card.append(summary, actions);
         list.append(card);
       }

@@ -22,7 +22,7 @@
     tax: { title: 'Tax Relief History', detail: 'Tax Relief Detail', label: 'Rebate Item', all: 'All Rebate Items', description: 'Description', file: 'tax-relief-request.html', name: 'Tax Relief' },
     deduction: { title: 'Deduction Request History', detail: 'Deduction Request Detail', label: 'Deduction Type', all: 'All Deduction Types', description: 'Remarks', file: 'deduction-request.html', name: 'Deduction Request' }
   };
-  const statuses = { submitted: 'Submitted', draft: 'Draft', approved: 'Approved', rejected: 'Rejected', cancelled: 'Cancelled' };
+  const statuses = { submitted: 'Pending', draft: 'Draft', approved: 'Approved', rejected: 'Rejected', cancelled: 'Cancelled' };
   const statusIcons = { submitted: 'fa-paper-plane', draft: 'fa-floppy-disk', approved: 'fa-circle-check', rejected: 'fa-circle-xmark', cancelled: 'fa-ban' };
   let kind = new URLSearchParams(location.search).get('category') === 'deduction' ? 'deduction' : 'tax';
   let currentModal = null, opener = null;
@@ -51,7 +51,11 @@
   const renderCardActions = record => {
     const actions = getHistoryActions(record);
     if (!actions.length) return '';
-    return `<div class="history-card-actions" aria-label="${record.status === 'draft' ? 'Draft' : 'Submitted'} actions">${actions.map(action => `<button type="button" class="history-card-action ${action.className}" data-history-action="${action.key}">${action.label}</button>`).join('')}</div>`;
+    const buttons = actions.map(action => {
+      const label = action.key === 'cancel' ? recordCancelButtonHTML(actions.length) : action.label;
+      return `<button type="button" class="history-card-action ${action.className}" data-history-action="${action.key}">${label}</button>`;
+    });
+    return `<div class="history-card-actions" aria-label="${statuses[record.status]} actions">${buttons.join('')}</div>`;
   };
 
   function selectCardAction(event) {
@@ -180,12 +184,16 @@
   function renderDetailActions(record, recordKind) {
     const footer = $('historyDetailActions');
     footer.replaceChildren();
-    getHistoryActions(record).forEach(action => {
+    const actions = getHistoryActions(record);
+    const actionCount = actions.length + (record.localDraft ? 1 : 0);
+    actions.forEach(action => {
       const button = document.createElement('button');
       button.type = 'button';
       button.className = 'history-detail-action';
       button.dataset.historyAction = action.key;
-      button.textContent = action.label;
+      if (action.key === 'cancel') setRecordCancelButton(button, actionCount, true);
+      else if (action.key === 'discard') setRecordDeleteButton(button);
+      else button.textContent = action.label;
       button.addEventListener('click', event => {
         event.stopPropagation();
         executeHistoryAction(recordKind, record.id, action.key, 'detail');
@@ -194,10 +202,10 @@
     });
     if (record.localDraft) {
       const edit = document.createElement('a');
-      edit.className = 'history-detail-action';
+      edit.className = 'record-primary-action';
       edit.dataset.historyDetailAux = '';
       edit.href = categories[recordKind].file;
-      edit.innerHTML = 'Continue editing <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>';
+      edit.innerHTML = `<i class="fa-solid fa-pen" aria-hidden="true"></i><span>Edit ${categories[recordKind].name}</span>`;
       footer.append(edit);
     }
     footer.hidden = !footer.childElementCount;
@@ -220,7 +228,7 @@
       row('Reference #', reference(record)),
       row('Emp #', employeeId, true),
       row('Name', employeeName, true),
-      row('Status', statuses[record.status]),
+      row('Status', recordDetailStatus.html(statuses[record.status]), true),
       row('Submit Date', date(record.submitDate || record.savedDate))
     ];
     if (recordKind === 'tax') {

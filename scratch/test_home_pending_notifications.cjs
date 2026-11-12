@@ -50,6 +50,7 @@ const puppeteer = require('puppeteer');
         ]);
         assert.equal(await page.$('.main-content :is(.shortcuts-grid, .home-shift button, .home-shift hr)'), null);
         assert.equal(await page.$eval('.home-shift-time', el => el.textContent), '09:00–18:00');
+        assert.equal(await page.$eval('.greeting-sub', el => el.textContent), "Here's what matters today.");
         assert.deepEqual(await page.$$eval('[data-pending-status] .fy-title', nodes => nodes.map(node => node.textContent)), ['To approve', 'To update']);
         assert.deepEqual(await page.$$eval('[data-home-count]', nodes => nodes.map(node => Number(node.textContent))), [4, 3]);
         assert.ok(await page.$eval('.main-content', main => Math.abs(main.getBoundingClientRect().bottom

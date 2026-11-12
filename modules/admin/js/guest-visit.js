@@ -192,8 +192,8 @@ document.addEventListener('DOMContentLoaded', () => {
   function updateSummaries() {
     $('visitGuestSummaryCount').textContent = String(guests.length);
     $('visitSummarySubtitle').textContent = guests.length + (guests.length === 1 ? ' guest, ' : ' guests, ') + attendeeIds.length + (attendeeIds.length === 1 ? ' attendee added' : ' attendees added');
-    $('visitGuestListCount').textContent = 'Total Records: ' + guests.length;
-    $('visitAttendeeListCount').textContent = 'Total Records: ' + attendeeIds.length;
+    $('visitGuestListCount').textContent = window.PeopleHcmRecordSummary.formatCount(guests.length);
+    $('visitAttendeeListCount').textContent = window.PeopleHcmRecordSummary.formatCount(attendeeIds.length);
     $('visitGuestCategoryCount').textContent = String(guests.length);
     $('visitAttendeeCategoryCount').textContent = String(attendeeIds.length);
     $('visitOtherCategoryCount').textContent = String(form.querySelectorAll('[data-other-request]:checked').length);

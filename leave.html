@@ -4589,8 +4589,8 @@
 
 
         <section class="history-total-records-card record-summary-metric record-summary-card" aria-label="History record count">
-          <span class="history-total-records-label record-summary-label">Total Records</span>
-          <strong id="leaveHistoryTotalRecords" class="history-total-records-value record-summary-value" aria-live="polite">0</strong>
+          <strong id="leaveHistoryTotalRecords" class="history-total-records-value record-summary-value" aria-live="polite" data-record-count>0</strong>
+          <span class="history-total-records-label record-summary-label">Records</span>
         </section>
 
         <!-- DYNAMIC HISTORY CARDS LIST -->
@@ -5225,10 +5225,8 @@
         <div class="entitlement-summary record-summary-grid record-summary-card" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 16px;">
           <!-- KPI 1: Total Records -->
           <div style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 18px; padding: 12px 10px; box-shadow: var(--shadow-sm);" class="record-summary-metric">
-            <div style="font-size: 9.5px; font-weight: 900; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.4px;" class="record-summary-label">Total Records</div>
-            <div style="display: flex; align-items: baseline; gap: 4px; margin-top: 6px;">
-              <span id="seStatTotalRecords" style="font-size: 14px; font-weight: 900; color: var(--text-primary); letter-spacing: -0.5px;" class="record-summary-value">22</span>
-            </div>
+            <span id="seStatTotalRecords" style="font-size: 14px; font-weight: 900; color: var(--text-primary); letter-spacing: -0.5px;" class="record-summary-value" data-record-count>22</span>
+            <div style="font-size: 9.5px; font-weight: 900; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.4px;" class="record-summary-label">Records</div>
           </div>
 
           <!-- KPI 2: Total Taken -->
@@ -6813,7 +6811,7 @@
                     <div style="font-size: 10.5px; color: var(--text-muted);">Line Manager</div>
                   </div>
                 </div>
-                <span style="font-size: 10px; font-weight: 800; color: #10b981; background: rgba(16, 185, 129, 0.15); padding: 2px 7px; border-radius: 6px;">✓ Approved</span>
+                <span data-record-detail-status>Approved</span>
               </div>
 
               <!-- Approver 2 -->
@@ -6838,7 +6836,7 @@
                     <div style="font-size: 10.5px; color: var(--text-muted);">Senior Ops Exec</div>
                   </div>
                 </div>
-                <span style="font-size: 10px; font-weight: 700; color: #d97706; background: rgba(245, 158, 11, 0.15); padding: 2px 7px; border-radius: 6px;">⏳ Pending</span>
+                <span data-record-detail-status>Pending</span>
               </div>
 
               <!-- Approver 4 -->
@@ -6851,7 +6849,7 @@
                     <div style="font-size: 10.5px; color: var(--text-muted);">Deputy HOD</div>
                   </div>
                 </div>
-                <span style="font-size: 10px; font-weight: 700; color: #d97706; background: rgba(245, 158, 11, 0.15); padding: 2px 7px; border-radius: 6px;">⏳ Pending</span>
+                <span data-record-detail-status>Pending</span>
               </div>
 
               <!-- Approver 5 -->
@@ -6864,7 +6862,7 @@
                     <div style="font-size: 10.5px; color: var(--text-muted);">Regional Ops Lead</div>
                   </div>
                 </div>
-                <span style="font-size: 10px; font-weight: 700; color: #d97706; background: rgba(245, 158, 11, 0.15); padding: 2px 7px; border-radius: 6px;">⏳ Pending</span>
+                <span data-record-detail-status>Pending</span>
               </div>
 
             </div>
@@ -6878,9 +6876,7 @@
                 <span style="font-size: 12.5px; font-weight: 800; color: var(--text-primary); letter-spacing: 0.1px;">Level 2 Approver Details</span>
                 <span style="font-size: 10.5px; font-weight: 700; color: #d97706; background: rgba(245, 158, 11, 0.15); padding: 1.5px 7px; border-radius: 6px; border: 1px solid rgba(245, 158, 11, 0.3);">👥 7 Approvers Pool (All Must)</span>
               </div>
-              <span style="font-size: 10px; font-weight: 800; color: #d97706; background: rgba(245, 158, 11, 0.15); padding: 2.5px 8px; border-radius: 20px; border: 1px solid rgba(245, 158, 11, 0.3); display: flex; align-items: center; gap: 3px;">
-                <span style="width: 6px; height: 6px; border-radius: 50%; background: #f59e0b;"></span> ⏳ Pending
-              </span>
+              <span data-record-detail-status>Pending</span>
             </div>
 
             <!-- Approver Summary Bar (Stacked Avatars + Toggle) -->
@@ -6932,7 +6928,7 @@
                     <div style="font-size: 10.5px; color: var(--text-muted);">HR Lead</div>
                   </div>
                 </div>
-                <span style="font-size: 10px; font-weight: 700; color: #d97706; background: rgba(245, 158, 11, 0.15); padding: 2px 7px; border-radius: 6px;">⏳ Pending</span>
+                <span data-record-detail-status>Pending</span>
               </div>
 
               <!-- Approver 3 -->
@@ -6945,7 +6941,7 @@
                     <div style="font-size: 10.5px; color: var(--text-muted);">Finance Director</div>
                   </div>
                 </div>
-                <span style="font-size: 10px; font-weight: 700; color: #d97706; background: rgba(245, 158, 11, 0.15); padding: 2px 7px; border-radius: 6px;">⏳ Pending</span>
+                <span data-record-detail-status>Pending</span>
               </div>
 
               <!-- Approver 4 -->
@@ -6958,7 +6954,7 @@
                     <div style="font-size: 10.5px; color: var(--text-muted);">Audit Officer</div>
                   </div>
                 </div>
-                <span style="font-size: 10px; font-weight: 700; color: #d97706; background: rgba(245, 158, 11, 0.15); padding: 2px 7px; border-radius: 6px;">⏳ Pending</span>
+                <span data-record-detail-status>Pending</span>
               </div>
 
               <!-- Approver 5 -->
@@ -6971,7 +6967,7 @@
                     <div style="font-size: 10.5px; color: var(--text-muted);">VP Operations</div>
                   </div>
                 </div>
-                <span style="font-size: 10px; font-weight: 700; color: #d97706; background: rgba(245, 158, 11, 0.15); padding: 2px 7px; border-radius: 6px;">⏳ Pending</span>
+                <span data-record-detail-status>Pending</span>
               </div>
 
               <!-- Approver 6 -->
@@ -6984,7 +6980,7 @@
                     <div style="font-size: 10.5px; color: var(--text-muted);">Legal Counsel</div>
                   </div>
                 </div>
-                <span style="font-size: 10px; font-weight: 700; color: #d97706; background: rgba(245, 158, 11, 0.15); padding: 2px 7px; border-radius: 6px;">⏳ Pending</span>
+                <span data-record-detail-status>Pending</span>
               </div>
 
               <!-- Approver 7 -->
@@ -6997,7 +6993,7 @@
                     <div style="font-size: 10.5px; color: var(--text-muted);">Compliance Manager</div>
                   </div>
                 </div>
-                <span style="font-size: 10px; font-weight: 700; color: #d97706; background: rgba(245, 158, 11, 0.15); padding: 2px 7px; border-radius: 6px;">⏳ Pending</span>
+                <span data-record-detail-status>Pending</span>
               </div>
 
             </div>
@@ -7547,7 +7543,7 @@
         <!-- Action Footer -->
         <div class="cal-event-sheet-actions">
           <button type="button" class="cal-event-sheet-cancel" onclick="closeCalEventSheet(null, true)">
-            Cancel
+            <i class="fa-solid fa-ban" aria-hidden="true"></i> <span>Cancel</span>
           </button>
         </div>
       </div>
@@ -7639,7 +7635,7 @@
         </div>
 
         <div class="cal-event-sheet-actions">
-          <button type="button" class="cal-event-sheet-cancel" onclick="closeStaffOnLeaveSheet(null, true)">Cancel</button>
+          <button type="button" class="cal-event-sheet-cancel" onclick="closeStaffOnLeaveSheet(null, true)"><i class="fa-solid fa-ban" aria-hidden="true"></i> <span>Cancel</span></button>
         </div>
       </div>
     </div>
@@ -7665,7 +7661,7 @@
 
         <div class="cal-event-sheet-actions">
           <button type="button" class="cal-event-sheet-cancel"
-            onclick="closeTeamUpcomingLeaveSheet(null, true)">Cancel</button>
+            onclick="closeTeamUpcomingLeaveSheet(null, true)"><i class="fa-solid fa-ban" aria-hidden="true"></i> <span>Cancel</span></button>
         </div>
       </div>
     </div>
@@ -8722,15 +8718,9 @@
       if (titleEl) titleEl.innerText = formattedDate;
 
       const st = itemData ? (itemData.status || 'Approved') : 'Approved';
-      if (subEl) subEl.innerText = `${st} • Leave & Shift Event Details`;
+      if (subEl) subEl.innerText = `${recordReviewStatusLabel(st)} • Leave & Shift Event Details`;
 
-      const getBadgeHTML = (s) => {
-        if (s === 'Draft') return `<span class="sheet-tag-badge amber" style="background: rgba(245,158,11,0.15); color: #f59e0b; padding: 4px 10px; border-radius: 8px; font-size: 11px; font-weight: 800;">📝 Draft</span>`;
-        if (s === 'Submitted') return `<span class="sheet-tag-badge blue" style="background: rgba(59,130,246,0.15); color: #3b82f6; padding: 4px 10px; border-radius: 8px; font-size: 11px; font-weight: 800;">📩 Submitted</span>`;
-        if (s === 'Pending') return `<span class="sheet-tag-badge amber" style="background: rgba(245,158,11,0.15); color: #f59e0b; padding: 4px 10px; border-radius: 8px; font-size: 11px; font-weight: 800;">⏳ Pending Approval</span>`;
-        if (s === 'Rejected') return `<span class="sheet-tag-badge red" style="background: rgba(239,68,68,0.15); color: #ef4444; padding: 4px 10px; border-radius: 8px; font-size: 11px; font-weight: 800;">❌ Rejected</span>`;
-        return `<span class="sheet-tag-badge green" style="background: rgba(16,185,129,0.15); color: #10b981; padding: 4px 10px; border-radius: 8px; font-size: 11px; font-weight: 800;">✅ Approved</span>`;
-      };
+      const statusBadge = recordDetailStatus.html(st === 'Pending' ? 'Pending Approval' : st);
 
       const type = itemData ? itemData.type : 'work';
 
@@ -8774,7 +8764,7 @@
                     <div style="font-size: 11.5px; color: var(--text-muted); font-weight: 600;">Scheduled Corporate Event</div>
                   </div>
                 </div>
-                ${getBadgeHTML(st)}
+                ${statusBadge}
               </div>
               <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 11.5px; background: var(--bg-input); padding: 12px; border-radius: 14px; border: 1px solid var(--border-subtle);">
                 <div><span style="color: var(--text-muted); font-weight: 600; display: block; margin-bottom: 2px;">Organizer</span><strong style="color: var(--text-primary);">HR &amp; L&amp;D Team</strong></div>
@@ -8793,7 +8783,7 @@
                     <div style="font-size: 11.5px; color: var(--text-muted); font-weight: 600;">09:00 AM – 06:00 PM (8.0 Hours)</div>
                   </div>
                 </div>
-                ${getBadgeHTML(st)}
+                ${statusBadge}
               </div>
               <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 11.5px; background: var(--bg-input); padding: 12px; border-radius: 14px; border: 1px solid var(--border-subtle);">
                 <div><span style="color: var(--text-muted); font-weight: 600; display: block; margin-bottom: 2px;">Shift Policy</span><strong style="color: var(--text-primary);">Standard Day Shift</strong></div>
@@ -9044,7 +9034,9 @@
 
     function getStatusBadgeHTML(status) {
       const map = {
-        'submitted': { icon: '⏳', label: 'Submitted' },
+        'submitted': { icon: '⏳', label: 'Pending' },
+        'pending': { icon: '⏳', label: 'Pending' },
+        'resubmit': { icon: '↩', label: 'Resubmit' },
         'approved': { icon: '✅', label: 'Approved' },
         'rejected': { icon: '❌', label: 'Rejected' },
         'cancelled': { icon: '🚫', label: 'Cancelled' },
@@ -9089,13 +9081,14 @@
     function buildHistoryActionsHTML(item, context = 'card') {
       if (!['submitted', 'approved', 'draft'].includes(item.status)) return '';
       const isDetail = context === 'detail';
-      const buttonAttributes = isDetail ? 'class="history-detail-action"' : 'class="record-card-cancel"';
-      const applyAttributes = isDetail ? buttonAttributes : 'class="record-card-apply"';
+      const cancelClass = isDetail ? 'history-detail-action record-primary-action' : 'record-card-cancel';
+      const applyClass = isDetail ? 'history-detail-action' : 'record-card-apply';
       const buttons = [];
       if (item.status === 'draft') {
-        buttons.push(`<button type="button" ${applyAttributes} onclick="event.stopPropagation(); cancelHistoryItem('${item.ref}', 'submitted')">Apply</button>`);
+        buttons.push(`<button type="button" class="${applyClass}" onclick="event.stopPropagation(); cancelHistoryItem('${item.ref}', 'submitted')">Apply</button>`);
       }
-      buttons.push(`<button type="button" ${buttonAttributes} onclick="event.stopPropagation(); cancelHistoryItem('${item.ref}', 'cancelled')">Cancel</button>`);
+      const cancelLabel = recordCancelButtonHTML(buttons.length + 1, isDetail);
+      buttons.push(`<button type="button" class="${cancelClass}" onclick="event.stopPropagation(); cancelHistoryItem('${item.ref}', 'cancelled')">${cancelLabel}</button>`);
       if (isDetail) return buttons.join('');
       return `<div class="record-card-actions" style="margin-top: 16px; display: flex; justify-content: flex-end; gap: 8px;">${buttons.join('')}</div>`;
     }
@@ -9185,7 +9178,7 @@
 
       // 2. Status
       if (currentHistoryTab !== 'offtime' && statusVal !== 'all') {
-        const statusMap = { 'submitted': 'Submitted', 'resubmit': 'Pending Resubmit', 'approved': 'Approved', 'rejected': 'Rejected', 'cancelled': 'Cancelled', 'draft': 'Draft' };
+        const statusMap = { 'submitted': 'Pending', 'resubmit': 'Pending Resubmit', 'approved': 'Approved', 'rejected': 'Rejected', 'cancelled': 'Cancelled', 'draft': 'Draft' };
         if (statusMap[statusVal]) parts.push(statusMap[statusVal]);
       }
 
@@ -9374,13 +9367,7 @@
       const tbody = document.getElementById('historyDetailsTableBody');
       if (!tbody) return;
 
-      let statusColor = '#f59e0b'; // submitted
-      if (item.status === 'approved') statusColor = '#2563eb';
-      if (item.status === 'rejected') statusColor = '#ef4444';
-      if (item.status === 'cancelled') statusColor = '#64748b';
-      if (item.status === 'draft') statusColor = '#94a3b8';
-      
-      const statusText = item.status.charAt(0).toUpperCase() + item.status.slice(1);
+      const statusBadge = recordDetailStatus.html(item.status.charAt(0).toUpperCase() + item.status.slice(1));
       const titleEl = document.getElementById('historyDetailsModalTitle');
       let rows = [];
 
@@ -9408,14 +9395,14 @@
           { label: 'Hours', value: item.duration || '2.00' },
           { label: 'Reason', value: item.reason || '' },
           { label: 'Remarks', value: item.reason || 'test' },
-          { label: 'Status', value: `<span style="color: ${statusColor}; font-weight: 700;">${statusText}</span>` },
+          { label: 'Status', value: statusBadge },
           { label: 'Attachments', value: '<div style="display:flex; align-items:center; gap:8px; color:var(--text-primary); font-weight:600;"><i class="fa-solid fa-paperclip" style="color:var(--purple-primary);"></i><span style="overflow-wrap:anywhere;">1302f11d5a254abbb2b9a10cb3b8f00f.jpg</span></div>' }
         ];
       } else if (isCredit) {
         if (titleEl) titleEl.innerText = 'Leave Credit History';
         rows = [
           { label: 'Reference #', value: item.ref },
-          { label: 'Leave Credit Status', value: `<span style="color: ${statusColor}; font-weight: 700;">${statusText} <span style="font-size:14px">👁</span></span>` },
+          { label: 'Leave Credit Status', value: statusBadge },
           { label: 'Submitter', value: 'EBB12 - Farhan binti rahmat' },
           { label: 'Submit Date', value: item.submittedDate || '8 Sep 2026' },
           { label: 'Emp#', value: 'EBB12' },
@@ -9438,7 +9425,7 @@
         if (titleEl) titleEl.innerText = 'Leave Detail';
         rows = [
           { label: 'Reference #', value: item.ref },
-          { label: 'Leave Status', value: `<span style="color: ${statusColor}; font-weight: 700;">${statusText} <span style="font-size:14px">👁</span></span>` },
+          { label: 'Leave Status', value: statusBadge },
           { label: 'Backdated', value: 'No' },
           { label: 'Submitter', value: 'EBB12 - Farhan binti rahmat' },
           { label: 'Branch', value: 'TIMES SQUARE BRANCH' },
@@ -9900,7 +9887,7 @@
         { label: 'To', value: data.endDate },
         { label: 'Duration', value: data.duration },
         { label: 'Session', value: data.session },
-        { label: 'Status', value: data.status },
+        { label: 'Status', value: recordDetailStatus.html(data.status) },
         { label: 'Reason', value: data.reason },
         { label: 'Reliever', value: data.reliever },
         { label: 'Remarks', value: data.remarks },
@@ -10984,7 +10971,7 @@
 
           // Populate Leave Credit fields according to user screenshot
           setElText('lcDetailsDocRef', data.docRef || 'LVR000000000589');
-          setElText('lcDetailsDocStatus', data.docStatus || 'Pending Approval');
+          document.getElementById('lcDetailsDocStatus').replaceChildren(recordDetailStatus.create(data.docStatus || 'Pending Approval'));
           setElText('lcDetailsEmployee', data.employee || 'EBB12 - Farhan binti rahmat');
           setElText('lcDetailsCreditLeave', data.creditLeave || 'REPLACEMENT LEAVE');
           setElText('lcDetailsOffsetLeave', data.offsetLeave || '');
@@ -11010,7 +10997,7 @@
           if (lcView) lcView.style.display = 'none';
           if (actionFooter) actionFooter.style.display = 'block';
 
-          setElText('timeOffDetailsDocStatus', data.docStatus || 'Pending Approval');
+          document.getElementById('timeOffDetailsDocStatus').replaceChildren(recordDetailStatus.create(data.docStatus || 'Pending Approval'));
           setElText('timeOffDetailsDate', data.date || data.fromDate || data.dates || '\u2014');
           setElText('timeOffDetailsStartTime', data.startTime || '\u2014');
           setElText('timeOffDetailsEndTime', data.endTime || '\u2014');
@@ -11027,7 +11014,7 @@
           if (actionFooter) actionFooter.style.display = 'block';
 
           setElText('detailsDocRef', data.docRef || 'VLV000000000790');
-          setElText('detailsDocStatus', data.docStatus || 'Pending Approval');
+          document.getElementById('detailsDocStatus').replaceChildren(recordDetailStatus.create(data.docStatus || 'Pending Approval'));
           const employeeValue = String(data.employee || `${data.applicant || 'Afifah Nasir'} • Emp #004177`).trim();
           const employeeBulletMatch = employeeValue.match(/^(.*?)\s*•\s*(?:Emp\s*)?#?([A-Z0-9-]+)$/i);
           const employeeDashMatch = employeeValue.match(/^#?([A-Z0-9-]+)\s+-\s+(.+)$/i);
@@ -12029,7 +12016,7 @@
             style="width: 100%; padding: 14px 16px; border-radius: 16px; background: var(--bg-input); border: 1px solid var(--border-subtle); color: var(--text-primary); font-size: 13.5px; font-weight: 700; outline: none; appearance: none; -webkit-appearance: none; cursor: pointer;">
             <option value="all">All Status</option>
             <option value="draft">Draft</option>
-            <option value="submitted">Submitted</option>
+            <option value="submitted">Pending</option>
             <option value="resubmit">Pending Resubmit</option>
             <option value="approved">Approved</option>
             <option value="rejected">Rejected</option>

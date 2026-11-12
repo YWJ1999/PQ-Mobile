@@ -387,7 +387,8 @@ table th[scope="col"] *,
 .record-summary-card:has(> .record-summary-label):has(> .record-summary-value) {
   display: flex !important;
   flex-direction: row !important;
-  align-items: center !important;
+  align-items: baseline !important;
+  flex-wrap: nowrap !important;
   justify-content: flex-start !important;
   gap: 6px !important;
   color: var(--text-muted) !important;
@@ -425,7 +426,7 @@ table th[scope="col"] *,
 /* A chart summary keeps its count and action on the same line. */
 .record-summary-card record-chart-count {
   display: inline-flex;
-  align-items: center;
+  align-items: baseline;
   gap: 5px;
   white-space: nowrap;
 }
@@ -501,8 +502,4 @@ table th[scope="col"] *,
 .record-summary-secondary-grid > * > :first-child {
   white-space: normal !important;
   text-transform: none !important;
-}
-
-.record-summary-metric > :has(> .record-summary-value) {
-  margin: 0 !important;
 }

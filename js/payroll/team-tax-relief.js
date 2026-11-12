@@ -86,7 +86,7 @@
     const [year, month, day] = value.split('-').map(Number);
     return new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }).format(new Date(year, month - 1, day));
   };
-  const formatStatus = value => value.charAt(0).toUpperCase() + value.slice(1);
+  const formatStatus = value => recordReviewStatusLabel(value.charAt(0).toUpperCase() + value.slice(1));
   const effectiveDate = record => record.submitDate || record.transactionDate;
   const periodCycle = record => [record.period, record.cycle].filter(Boolean).join(' / ') || '—';
 
@@ -132,7 +132,7 @@
     const filtered = records.filter(matches);
     byId('taxReliefRecords').innerHTML = filtered.map(cardMarkup).join('');
     byId('taxReliefEmpty').hidden = filtered.length !== 0;
-    byId('taxReliefRecordCount').textContent = `${filtered.length} ${filtered.length === 1 ? 'Record' : 'Records'}`;
+    byId('taxReliefRecordCount').textContent = window.PeopleHcmRecordSummary.formatCount(filtered.length);
     byId('taxReliefFilterSummary').textContent = summaryText(filtered.length);
   }
 
@@ -210,7 +210,7 @@
       detailRow('Reference #', record.reference),
       detailRow('Emp #', `#${record.empNo.replace(/^#+/, '')}`),
       detailRow('Name', record.name),
-      detailRow('Status', formatStatus(record.status)),
+      detailRow('Status', recordDetailStatus.html(formatStatus(record.status)), true),
       detailRow('Submit Date', formatDate(record.submitDate)),
       detailRow('Rebate Item', record.rebateItem),
       detailRow('Transaction Date', formatDate(record.transactionDate)),

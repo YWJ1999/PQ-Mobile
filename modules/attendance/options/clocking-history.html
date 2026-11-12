@@ -248,8 +248,8 @@
       </div>
 
       <section class="history-total-records-card record-summary-metric record-summary-card" aria-label="History record count">
-        <span class="history-total-records-label record-summary-label">Total Records</span>
-        <strong id="legacyAttendanceHistoryTotalRecords" class="history-total-records-value record-summary-value" aria-live="polite">0</strong>
+        <strong id="legacyAttendanceHistoryTotalRecords" class="history-total-records-value record-summary-value" aria-live="polite" data-record-count>0</strong>
+        <span class="history-total-records-label record-summary-label">Records</span>
       </section>
 
       <!-- Clocking History List View (Separated Clock In & Clock Out) -->
@@ -557,7 +557,7 @@
               </tr>
               <tr>
                 <td class="detail-label">Status</td>
-                <td class="detail-value" id="modalClkStatus"><span style="color: #10b981; font-weight: 800;">Normal</span></td>
+                <td class="detail-value" id="modalClkStatus" data-record-detail-status>Normal</td>
               </tr>
             </tbody>
           </table>
@@ -641,7 +641,7 @@
               </tr>
               <tr>
                 <td class="detail-label">Status</td>
-                <td class="detail-value" id="modalOtPlanStatus"><span style="color: #3b82f6; font-weight: 800;">Approved</span></td>
+                <td class="detail-value" id="modalOtPlanStatus" data-record-detail-status>Approved</td>
               </tr>
               <tr>
                 <td class="detail-label" colspan="2" style="border-right: none; background: rgba(124, 58, 237, 0.08); font-weight: 800; color: var(--text-primary);">Attachments</td>
@@ -729,7 +729,7 @@
               </tr>
               <tr>
                 <td class="detail-label">Status</td>
-                <td class="detail-value" id="modalFbkDocStatus"><span style="color: #3b82f6; font-weight: 800;">Approved</span></td>
+                <td class="detail-value" id="modalFbkDocStatus" data-record-detail-status>Approved</td>
               </tr>
               <tr>
                 <td class="detail-label" colspan="2" style="border-right: none; background: rgba(124, 58, 237, 0.08); font-weight: 800; color: var(--text-primary);">Attachments</td>
@@ -865,9 +865,7 @@
         if (document.getElementById('modalOtReason')) document.getElementById('modalOtReason').innerText = otReason || 'MATERIAL';
         if (document.getElementById('modalOtTask')) document.getElementById('modalOtTask').innerText = task || 'Material handling & inventory check';
         if (document.getElementById('modalOtRemarks')) document.getElementById('modalOtRemarks').innerText = remarks || 'Urgent overtime for material shipment';
-        if (document.getElementById('modalOtPlanStatus')) document.getElementById('modalOtPlanStatus').innerHTML = (planStatus === 'Approved' || planStatus === 'Approved')
-          ? '<span style="color: #3b82f6; font-weight: 800;">Approved</span>'
-          : `<span style="color: #f59e0b; font-weight: 800;">${planStatus || 'To Resubmit'}</span>`;
+        document.getElementById('modalOtPlanStatus').replaceChildren(recordDetailStatus.create(planStatus || 'To Resubmit'));
 
         const m = document.getElementById('otDetailsModal');
         m.style.display = 'flex';
@@ -907,9 +905,7 @@
         if (document.getElementById('modalFbkShift')) document.getElementById('modalFbkShift').innerText = shift || '8.00AM-5.30PM';
         if (document.getElementById('modalFbkSubmitter')) document.getElementById('modalFbkSubmitter').innerText = `${submitter || 'EBB12'} (${submitDate || '26 Feb 2026'})`;
         if (document.getElementById('modalFbkApproverComments')) document.getElementById('modalFbkApproverComments').innerText = comments || '[Comment by FARHAN BIN RAHMAT (EBB12)] okay';
-        if (document.getElementById('modalFbkDocStatus')) document.getElementById('modalFbkDocStatus').innerHTML = docStatus === 'Approved'
-          ? '<span style="color: #3b82f6; font-weight: 800;">Approved</span>'
-          : `<span style="color: #f59e0b; font-weight: 800;">${docStatus || 'To Resubmit'}</span>`;
+        document.getElementById('modalFbkDocStatus').replaceChildren(recordDetailStatus.create(docStatus || 'To Resubmit'));
 
         const m = document.getElementById('feedbackDetailsModal');
         m.style.display = 'flex';

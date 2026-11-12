@@ -1180,7 +1180,7 @@
 
       if (iconBox) iconBox.innerHTML = iconHtml;
       if (titleText) titleText.innerText = catName;
-      if (countText) countText.innerText = `Total Records: ${items.length}`;
+      if (countText) countText.innerText = window.PeopleHcmRecordSummary.formatCount(items.length);
 
       if (items.length === 0) {
         container.innerHTML = `
@@ -1804,7 +1804,7 @@
       const catDetAmt = document.getElementById('catDetailsAmount');
       const catDetSub = document.getElementById('catDetailsSubtitle');
       if (catDetAmt) catDetAmt.innerText = `RM ${totalAmt.toFixed(2)}`;
-      if (catDetSub) catDetSub.innerText = `Total Records: ${formData.claimDetails.addedDetails.length}`;
+      if (catDetSub) catDetSub.innerText = window.PeopleHcmRecordSummary.formatCount(formData.claimDetails.addedDetails.length);
 
       const catEmpCnt = document.getElementById('catEmployeesCount');
       const catEmpSub = document.getElementById('catEmployeesSubtitle');

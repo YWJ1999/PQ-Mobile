@@ -45,8 +45,8 @@
           </button>
         </div>
         <div class="history-total-records-card record-summary-metric record-summary-card">
-          <span class="history-total-records-label record-summary-label">Total Records</span>
-          <strong class="history-total-records-value record-summary-value" id="workPlanHistoryCount" aria-live="polite">0</strong>
+          <strong class="history-total-records-value record-summary-value" id="workPlanHistoryCount" aria-live="polite" data-record-count>0</strong>
+          <span class="history-total-records-label record-summary-label">Records</span>
         </div>
         <div class="project-history-list-heading">
           <h2>Work Plan History</h2>
@@ -65,8 +65,8 @@
           </button>
         </div>
         <div class="history-total-records-card record-summary-metric record-summary-card">
-          <span class="history-total-records-label record-summary-label">Total Records</span>
-          <strong class="history-total-records-value record-summary-value" id="timesheetHistoryCount" aria-live="polite">0</strong>
+          <strong class="history-total-records-value record-summary-value" id="timesheetHistoryCount" aria-live="polite" data-record-count>0</strong>
+          <span class="history-total-records-label record-summary-label">Records</span>
         </div>
         <div class="project-history-list-heading">
           <h2>Timesheet History</h2>
@@ -116,7 +116,7 @@
             <div class="project-history-select-wrap">
               <select id="workPlanFilterStatus">
                 <option value="all">All Status</option>
-                <option value="submitted">Submitted</option>
+                <option value="submitted">Pending</option>
                 <option value="draft">Draft</option>
               </select>
               <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>

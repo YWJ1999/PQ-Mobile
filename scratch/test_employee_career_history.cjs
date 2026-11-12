@@ -64,13 +64,14 @@ const url = file => pathToFileURL(path.resolve(file)).href;
       await page.click('.history-card-item');
       await page.screenshot({path:`scratch/employee_career_history_feedback_details_${theme}.png`});
       assert.equal(await page.$eval('#historyDetailActions',n=>n.hidden),false);
-      assert.equal(await page.$eval('#historyEditFeedback',n=>n.textContent.trim()),'Edit');
+      assert.equal(await page.$eval('#historyEditFeedback',n=>n.textContent.trim()),'Edit Feedback');
       await page.click('#closeHistoryDetails');
       await page.click('[data-history-kind="whereabout"]');
       await page.click('.history-card-item');
       assert.equal(await page.$eval('#historyDeleteWhereabout',n=>n.hidden),false);
       assert.equal(await page.$eval('#historyDetailActions',n=>n.hidden),false);
-      assert.equal(await page.$('#historyDetailsModal .fa-trash-can'),null);
+      assert.equal(await page.$eval('#historyDeleteWhereabout',n=>n.textContent.trim()),'Delete Record');
+      assert.ok(await page.$('#historyDeleteWhereabout .fa-trash-can[aria-hidden="true"]'));
       await page.click('#closeHistoryDetails');
       assert.equal(await page.$$eval('.history-card-item',n=>n.length),1);
       await page.click('[data-history-kind="feedback"]');
@@ -82,6 +83,37 @@ const url = file => pathToFileURL(path.resolve(file)).href;
       await page.click('#resetHistoryFilter');
       await page.click('#applyHistoryFilter');
       assert.equal(await page.$$eval('.history-card-item',n=>n.length),3);
+      await page.evaluate(() => {
+        const requests = ['Pending HR Approval', 'Submitted'].map((status, i) => ({
+          id: 'status-test-' + i, submittedAt: '2026-10-01', status, changes: []
+        }));
+        localStorage.setItem('pq_change_request_history', JSON.stringify(requests));
+      });
+      await page.reload({waitUntil:'load'});
+      for (const [category, status, label, fill] of [
+        ['feedback', 'pending', 'Pending', 'rgb(179, 90, 13)'],
+        ['whereabout', 'approved', 'Pass', 'rgb(34, 129, 86)'],
+        ['cv-change-request', 'pending', 'Pending HR Approval', 'rgb(179, 90, 13)'],
+        ['cv-change-request', 'submitted', 'Submitted', 'rgb(34, 129, 86)'],
+        ['cv-change-request', 'approved', 'Approved', 'rgb(34, 129, 86)'],
+        ['cv-change-request', 'cancelled', 'Cancelled', 'rgb(107, 114, 128)']
+      ]) {
+        await page.click(`[data-history-kind="${category}"]`);
+        const header = `.history-card-header:has(.record-status-badge[data-status="${status}"])`;
+        assert.match(await page.$eval(header, el => getComputedStyle(el).backgroundImage), /^linear-gradient\(/);
+        await page.click(header);
+        assert.deepEqual(await page.$eval('#historyDetailBody .record-status-badge', el => {
+          const style = getComputedStyle(el);
+          return [el.textContent.trim(), style.backgroundImage, style.backgroundColor];
+        }), [label, 'none', fill], `${theme} ${category} ${label} badge`);
+        await page.click('#closeHistoryDetails');
+      }
+      await page.click('#historyFilterTrigger');
+      await page.select('#cvHistoryStatus', 'submitted');
+      await page.click('#applyHistoryFilter');
+      assert.deepEqual(await page.$$eval('#careerHistoryList .record-status-badge', badges => badges.map(el => el.textContent.trim())),
+        ['Pending HR Approval', 'Submitted'], 'Both badges remain visible under the Submitted filter');
+      await page.evaluate(() => localStorage.removeItem('pq_change_request_history'));
     }
     assert.deepEqual(errors,[]);
     console.log('PASS: History navigation, reference fields, filters, Feedback Detail Edit, Whereabout Delete, both themes and mobile widths.');

@@ -42,8 +42,8 @@
         <span class="claim-icon-button" aria-hidden="true"><i class="fa-solid fa-sliders"></i></span>
       </button>
       <div class="history-total-records-card record-summary-metric record-summary-card">
-        <span class="history-total-records-label record-summary-label">Total Records</span>
-        <strong id="historyRecordCount" class="history-total-records-value record-summary-value" aria-live="polite">0</strong>
+        <strong id="historyRecordCount" class="history-total-records-value record-summary-value" aria-live="polite" data-record-count>0</strong>
+        <span class="history-total-records-label record-summary-label">Records</span>
       </div>
       <div class="history-section-heading"><h2 id="historyCategoryTitle">Tax Relief History</h2></div>
       <p id="historyStorageNotice" class="history-notice" role="status" hidden></p>
@@ -71,7 +71,7 @@
             <div><label id="historyDateToLabel" for="historyDateTo" class="claim-filter-label">End Date</label><input id="historyDateTo" class="claim-control" type="date" required></div>
           </div>
           <div><label id="historyItemLabel" for="historyRebateItem" class="claim-filter-label">Rebate Item</label><div class="claim-filter-select-wrap"><select id="historyRebateItem" class="claim-filter-select"></select><i class="fa-solid fa-chevron-down claim-filter-chevron" aria-hidden="true"></i></div></div>
-          <div id="historyStatusField"><label for="historyStatus" class="claim-filter-label">Status</label><div class="claim-filter-select-wrap"><select id="historyStatus" class="claim-filter-select"><option value="all">All Status</option><option value="submitted">Submitted</option><option value="draft">Draft</option><option value="approved">Approved</option><option value="rejected">Rejected</option><option value="cancelled">Cancelled</option></select><i class="fa-solid fa-chevron-down claim-filter-chevron" aria-hidden="true"></i></div></div>
+          <div id="historyStatusField"><label for="historyStatus" class="claim-filter-label">Status</label><div class="claim-filter-select-wrap"><select id="historyStatus" class="claim-filter-select"><option value="all">All Status</option><option value="submitted">Pending</option><option value="draft">Draft</option><option value="approved">Approved</option><option value="rejected">Rejected</option><option value="cancelled">Cancelled</option></select><i class="fa-solid fa-chevron-down claim-filter-chevron" aria-hidden="true"></i></div></div>
           <div id="historyDescriptionField"><label id="historyDescriptionLabel" for="historyDescription" class="claim-filter-label">Description</label><input id="historyDescription" class="claim-control" type="search" placeholder="Search description" maxlength="2000"></div>
           <p id="historyFilterError" class="history-filter-error" role="alert" hidden></p>
         </div>

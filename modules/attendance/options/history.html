@@ -232,8 +232,8 @@
         </div>
 
         <section class="history-total-records-card record-summary-metric record-summary-card" aria-label="History record count">
-          <span class="history-total-records-label record-summary-label">Total Records</span>
-          <strong id="attendanceHistoryTotalRecords" class="history-total-records-value record-summary-value" aria-live="polite">0</strong>
+          <strong id="attendanceHistoryTotalRecords" class="history-total-records-value record-summary-value" aria-live="polite" data-record-count>0</strong>
+          <span class="history-total-records-label record-summary-label">Records</span>
         </section>
 
         <!-- Clocking History List View (Separated Clock In & Clock Out) -->
@@ -679,7 +679,7 @@
             </table>
           </div>
           <footer class="attendance-history-modal-footer attendance-history-action-footer history-detail-actions">
-            <button type="button" class="attendance-history-action-cancel history-detail-action" onclick="closeClockDetailsDirect()">Cancel</button>
+            <button type="button" class="attendance-history-action-cancel history-detail-action" onclick="closeClockDetailsDirect()"><i class="fa-solid fa-ban" aria-hidden="true"></i> <span>Cancel</span></button>
           </footer>
         </div>
       </div>

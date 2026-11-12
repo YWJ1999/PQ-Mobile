@@ -36,8 +36,8 @@
         <button id="staffTnaFilterTrigger" type="button" aria-label="Open Staff TNA filter" aria-haspopup="dialog" aria-controls="staffTnaFilterOverlay" aria-expanded="false"><i class="fa-solid fa-sliders" aria-hidden="true"></i></button>
       </section>
       <section class="staff-tna-summary record-summary-card" aria-label="Staff TNA total records">
-        <span class="record-summary-label">Total Records</span>
-        <strong id="staffTnaTotalRecords" class="record-summary-value" aria-live="polite">0</strong>
+        <strong id="staffTnaTotalRecords" class="record-summary-value" aria-live="polite" data-record-count>0</strong>
+        <span class="record-summary-label">Records</span>
       </section>
       <section id="staffTnaList" class="staff-tna-list" aria-label="Staff training need analysis records" aria-live="polite"></section>
       <div id="staffTnaEmpty" class="staff-tna-empty" hidden><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i><h2>No Staff TNA Found</h2><p>Adjust the filters to view staff training need records.</p></div>
@@ -80,7 +80,7 @@
           <section class="staff-tna-detail-section" aria-label="Application Details"><dl id="staffTnaApplicationDetails" class="staff-tna-detail-list"></dl></section>
           <section class="staff-tna-detail-section" aria-labelledby="staffTnaDetailsHeading"><h3 id="staffTnaDetailsHeading" class="staff-tna-detail-section-heading">Details</h3><div id="staffTnaDetailItems" class="staff-tna-detail-items"></div></section>
         </div>
-        <footer class="history-detail-actions"><button id="staffTnaDetailCancel" class="history-detail-action" type="button">Cancel</button></footer>
+        <footer class="history-detail-actions"><button id="staffTnaDetailCancel" class="history-detail-action" type="button"><i class="fa-solid fa-ban" aria-hidden="true"></i> <span>Cancel</span></button></footer>
       </section>
     </div>
   </div>

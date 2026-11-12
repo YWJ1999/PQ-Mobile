@@ -24,7 +24,7 @@
   }
   const records = {feedback: window.EmployeeCareerFeedbackStore?.all() || data.feedback.map(row => ({...row})), whereabout: readWhereabouts(), 'career-plan': (data['career-plan'] || []).map(row => ({...row})), 'cv-change-request': readCVRequests()};
   const labels = {feedback: 'Feedback', whereabout: 'Whereabout', 'career-plan': 'Career Plan', 'cv-change-request': 'CV Change Request'};
-  const cvStatusLabels = {draft: 'Draft', submitted: 'Submitted', resubmit: 'Resubmit', approved: 'Approved', rejected: 'Rejected', cancelled: 'Cancelled'};
+  const cvStatusLabels = {draft: 'Draft', submitted: 'Pending', resubmit: 'Resubmit', approved: 'Approved', rejected: 'Rejected', cancelled: 'Cancelled'};
   const defaults = {
     feedback: {from: '', to: '', type: '', category: '', status: ''},
     whereabout: {year: '', month: ''},
@@ -42,8 +42,12 @@
   let pendingWhereaboutDelete = null;
   const date = value => value ? new Date(value + 'T00:00:00').toLocaleDateString('en-GB', {day:'numeric',month:'short',year:'numeric'}) : '\u2014';
   const months = Array.from({length:12}, (_, index) => new Date(2026,index,1).toLocaleDateString('en-GB',{month:'long'}));
-  const status = '<span class="status-pill submitted"><i class="fa-solid fa-paper-plane" aria-hidden="true"></i>Pending</span>';
-  const whereaboutStatus = '<span class="status-pill approved"><i class="fa-solid fa-check" aria-hidden="true"></i>Pass</span>';
+  function statusPill(key, label, icon) {
+    const statusKey = escape(key);
+    return `<span class="status-pill record-status-badge ${statusKey}" data-status="${statusKey}"><i class="fa-solid ${icon}" aria-hidden="true"></i>${escape(label)}</span>`;
+  }
+  const status = statusPill('pending', 'Pending', 'fa-paper-plane');
+  const whereaboutStatus = statusPill('approved', 'Pass', 'fa-check');
   const recordDate = row => {
     if (kind === 'career-plan') return row.submitDate || '';
     if (kind !== 'cv-change-request') return row.date;
@@ -52,16 +56,21 @@
     if (Number.isNaN(local.getTime())) return '';
     return [local.getFullYear(), String(local.getMonth() + 1).padStart(2, '0'), String(local.getDate()).padStart(2, '0')].join('-');
   };
+  const statusAliases = new Map([['submit', 'submitted'], ['approve', 'approved'], ['cancel', 'cancelled'], ['canceled', 'cancelled']]);
   const cvStatusKey = row => {
     const value = String(row.status || 'Submitted').trim().toLowerCase();
-    if (['pending', 'pending hr approval'].includes(value)) return 'submitted';
-    return value === 'canceled' ? 'cancelled' : value;
+    return value.startsWith('pending ') ? 'pending' : (statusAliases.get(value) || value);
+  };
+  // The legacy submitted filter key includes requests awaiting approval.
+  const cvStatusGroup = row => {
+    const key = cvStatusKey(row);
+    return key === 'pending' ? 'submitted' : key;
   };
   const cvStatus = row => {
     const key = cvStatusKey(row);
-    const icons = {draft: 'fa-file-pen', submitted: 'fa-paper-plane', resubmit: 'fa-rotate-left', approved: 'fa-check', rejected: 'fa-xmark', cancelled: 'fa-ban'};
-    const label = row.status || 'Submitted';
-    return `<span class="status-pill ${escape(key)}"><i class="fa-solid ${icons[key] || 'fa-file-lines'}" aria-hidden="true"></i>${escape(label)}</span>`;
+    const icons = {draft: 'fa-file-pen', pending: 'fa-paper-plane', submitted: 'fa-paper-plane', resubmit: 'fa-rotate-left', approved: 'fa-check', rejected: 'fa-xmark', cancelled: 'fa-ban'};
+    const label = recordReviewStatusLabel(row.status || 'Pending');
+    return statusPill(key, label, icons[key] || 'fa-file-lines');
   };
   const summaryRow = (label,value) => `<span class="history-card-row"><span>${escape(label)} :</span><strong>${escape(value || '\u2014')}</strong></span>`;
   const detailRow = (label,value,markup = false) => `<tr><th scope="row">${escape(label)}</th><td>${markup ? value : escape(value === '' || value == null ? '\u2014' : value)}</td></tr>`;
@@ -77,7 +86,7 @@
     $('historyCategoryTitle').textContent = label + ' History';
     const f = filters[kind];
     const rows = records[kind].filter(row => {
-      if (isRequestKind()) return (!f.from || recordDate(row) >= f.from) && (!f.to || recordDate(row) <= f.to) && (!f.status || cvStatusKey(row) === f.status);
+      if (isRequestKind()) return (!f.from || recordDate(row) >= f.from) && (!f.to || recordDate(row) <= f.to) && (!f.status || cvStatusGroup(row) === f.status);
       if (kind === 'whereabout') return (!f.year || row.date.slice(0,4) === f.year) && (!f.month || Number(row.date.slice(5,7)) === Number(f.month));
       return (!f.from || row.feedbackDate1 >= f.from) && (!f.to || row.feedbackDate1 <= f.to) &&
         (!f.type || row.type === f.type) && (!f.category || row.category === f.category) &&
@@ -91,14 +100,15 @@
     $('historyRecordCount').textContent = String(rows.length);
     $('historyEmptyState').hidden = rows.length > 0;
     $('careerHistoryList').innerHTML = rows.map(row => {
-      const title = kind === 'feedback' ? row.title : row.description;
+      const title = kind === 'cv-change-request' ? (row.reference || row.id)
+        : kind === 'feedback' ? row.title : row.description;
       const details = kind === 'feedback'
         ? summaryRow('Feedback Date',date(row.feedbackDate1)) + summaryRow('Submit Date',date(row.submitDate)) + summaryRow('Type',row.type) + summaryRow('Category',row.category)
         : kind === 'whereabout' ? summaryRow('Date',date(row.date)) + summaryRow('Time',`${row.startTime} - ${row.endTime}`) + summaryRow('Project',row.project) + summaryRow('Task',row.task)
         : kind === 'career-plan' ? summaryRow('Career Path',row.careerPath) + summaryRow('Next Position',row.nextPosition) + summaryRow('Target Date',date(row.targetDate)) + summaryRow('Submit Date',date(row.submitDate))
         : summaryRow('Submitted Date',date(recordDate(row)));
       const reference = kind === 'cv-change-request' ? '' : row.reference;
-      const heading = isRequestKind()
+      const heading = kind === 'career-plan'
         ? `<span class="history-card-title-row"><span class="cv-history-card-employee history-card-title"><span class="history-employee-name">${escape(row.name || row.employeeName || '\u2014')}</span>${row.empNo ? `<span class="history-employee-id">#${escape(String(row.empNo).replace(/^#+/, ''))}</span>` : ''}</span></span>`
         : `<span class="history-card-title-row"><span class="history-card-title">${escape(title)}</span></span>`;
       const content = `
@@ -107,16 +117,16 @@
       if (kind === 'feedback') {
         return `<article class="history-card-item career-history-feedback-card" data-status="submitted" data-record-id="${escape(row.id)}">
           <button type="button" class="career-history-card-open" aria-label="View ${escape(title)} feedback details" aria-haspopup="dialog" aria-controls="historyDetailsModal">${content}</button>
-          <div class="career-history-card-actions"><a class="career-history-edit-btn" data-edit-feedback="${escape(row.id)}" href="individual/feedback.html?edit=${encodeURIComponent(row.id)}&theme=${theme()}" aria-label="Edit ${escape(title)} feedback"><span>Edit</span></a></div>
+          <div class="career-history-card-actions"><a class="career-history-edit-btn" data-edit-feedback="${escape(row.id)}" href="individual/feedback.html?edit=${encodeURIComponent(row.id)}&theme=${theme()}" aria-label="Edit ${escape(title)} feedback">${recordCardActionLabels.edit}</a></div>
         </article>`;
       }
       if (kind === 'whereabout') {
         return `<article class="history-card-item career-history-whereabout-card" data-status="approved" data-record-id="${escape(row.id)}">
           <button type="button" class="career-history-card-open" aria-label="View ${escape(title)} Whereabout details" aria-haspopup="dialog" aria-controls="historyDetailsModal">${content}</button>
-          <div class="career-history-card-actions"><button type="button" class="career-history-delete-btn" data-delete-whereabout="${escape(row.id)}" aria-label="Delete ${escape(title)} Whereabout" aria-haspopup="dialog" aria-controls="whereaboutDeleteOverlay">Delete</button></div>
+          <div class="career-history-card-actions"><button type="button" class="career-history-delete-btn" data-delete-whereabout="${escape(row.id)}" aria-label="Delete ${escape(title)} Whereabout" aria-haspopup="dialog" aria-controls="whereaboutDeleteOverlay">${recordCardActionLabels.delete}</button></div>
         </article>`;
       }
-      return `<button type="button" class="history-card-item" data-status="${isRequestKind() ? escape(cvStatusKey(row)) : 'approved'}" data-record-id="${escape(row.id)}" aria-haspopup="dialog" aria-controls="historyDetailsModal">${content}
+      return `<button type="button" class="history-card-item" data-status="${isRequestKind() ? escape(cvStatusGroup(row)) : 'approved'}" data-record-id="${escape(row.id)}" aria-haspopup="dialog" aria-controls="historyDetailsModal">${content}
       </button>`;
     }).join('');
   }
@@ -232,21 +242,21 @@
     $('historyDetailsModal').classList.toggle('career-plan-history-details', kind === 'career-plan');
     $('historyDetailTitle').textContent = kind === 'feedback' ? 'Feedback Detail' : kind === 'whereabout' ? 'Whereabout History Details' : kind === 'career-plan' ? 'Career Plan Details' : 'CV Change Request Details';
     if (kind === 'cv-change-request') {
-      $('historyDetailBody').innerHTML = window.EmployeeCareerCVHistoryDetails.render(row, cvStatus(row), date(recordDate(row)), {qualificationLayout: 'numbered-cards'});
+      $('historyDetailBody').innerHTML = window.EmployeeCareerCVHistoryDetails.render(row, recordDetailStatus.html(row.status || 'Submitted'), date(recordDate(row)), {qualificationLayout: 'numbered-cards'});
       return;
     }
     let content = '';
     let fields;
     if (kind === 'feedback') {
-      fields = [['Name',row.name],['Emp #',String(row.empNo).replace(/^#/, '')],['Type',row.type],['Category',row.category],['Title',row.title],['Feedback Date 1',date(row.feedbackDate1)],['Feedback Date 2',date(row.feedbackDate2)],['Feedback Note',row.note],['Feedback Remarks',row.remarks],['Submit Date',date(row.submitDate)],['Reviewer Comment',row.reviewerComment],['Reviewed By',row.reviewedBy],['Reviewed Date',date(row.reviewedDate)],['Rating',row.rating],['Reward',row.reward],['Status','Submitted'],['Attachments',row.attachments?.length ? row.attachments.map(file=>file.name).join(', ') : 'No Data of Attachments']];
+      fields = [['Name',row.name],['Emp #',String(row.empNo).replace(/^#/, '')],['Type',row.type],['Category',row.category],['Title',row.title],['Feedback Date 1',date(row.feedbackDate1)],['Feedback Date 2',date(row.feedbackDate2)],['Feedback Note',row.note],['Feedback Remarks',row.remarks],['Submit Date',date(row.submitDate)],['Reviewer Comment',row.reviewerComment],['Reviewed By',row.reviewedBy],['Reviewed Date',date(row.reviewedDate)],['Rating',row.rating],['Reward',row.reward],['Status','Pending'],['Attachments',row.attachments?.length ? row.attachments.map(file=>file.name).join(', ') : 'No Data of Attachments']];
     } else if (kind === 'career-plan') {
-      fields = [['Name',row.name],['Emp #',String(row.empNo || '').replace(/^#+/, '')],['Position',row.position],['Department',row.department],['Career Path',row.careerPath],['Next Position',row.nextPosition],['Target Date',date(row.targetDate)],['Justification',row.justification],['Action Plan',row.actionPlan],['Development Needs',row.developmentNeeds],['Remarks',row.remarks],['Submit Date',date(row.submitDate)],['Status',row.status],['Attachments',row.attachments?.length ? row.attachments.map(file=>file.name).join(', ') : 'No Data of Attachments']];
+      fields = [['Name',row.name],['Emp #',String(row.empNo || '').replace(/^#+/, '')],['Position',row.position],['Department',row.department],['Career Path',row.careerPath],['Next Position',row.nextPosition],['Target Date',date(row.targetDate)],['Justification',row.justification],['Action Plan',row.actionPlan],['Development Needs',row.developmentNeeds],['Remarks',row.remarks],['Submit Date',date(row.submitDate)],['Status',row.status || 'Submitted'],['Attachments',row.attachments?.length ? row.attachments.map(file=>file.name).join(', ') : 'No Data of Attachments']];
     } else {
       fields = [['Description',row.description],['Date',date(row.date)],['Time',`${row.startTime}-${row.endTime}`],['Status','Pass'],['Project',row.project],['Task',row.task],['State',row.state],['Remarks',row.remarks]];
     }
     $('historyDetailBody').innerHTML = content + `<table class="history-detail-table"><tbody>${fields.map(([key,value]) => {
       if (key === 'Emp #') return detailRow(key,`<span class="career-history-employee-id">#${escape(value)}</span>`,true);
-      return detailRow(key,key === 'Status' ? (isRequestKind() ? cvStatus(row) : kind === 'whereabout' ? whereaboutStatus : status) : value,key === 'Status');
+      return detailRow(key,key === 'Status' ? recordDetailStatus.html(value) : value,key === 'Status');
     }).join('')}</tbody></table>`;
   }
 

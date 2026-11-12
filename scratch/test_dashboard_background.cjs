@@ -6,11 +6,80 @@ const puppeteer = require('puppeteer');
 async function waitForFade(page) {
   await page.waitForFunction(() => {
     const main = document.querySelector('.dashboard-page > .main-content');
-    const card = main.querySelector('.insights-card, .shortcuts-grid');
+    const intro = main.querySelector(main.parentElement.dataset.dashboardIntro || '.insights-card, .shortcuts-grid');
     const prefix = main.closest('.dashboard-home') ? 'home' : 'apps';
     const end = parseFloat(getComputedStyle(main).getPropertyValue('--' + prefix + '-fade-end'));
-    return Math.abs(end - (card.getBoundingClientRect().bottom - main.getBoundingClientRect().top + main.scrollTop + 8)) < 1;
+    return Math.abs(end - (intro.getBoundingClientRect().bottom - main.getBoundingClientRect().top + main.scrollTop + 8)) < 1;
   });
+}
+
+async function checkHomeEdge(page) {
+  const bounds = await page.$eval('.greeting-header-box', async greeting => {
+    const phone = greeting.closest('.phone-container');
+    // The drawer's closing transition briefly tints the page beneath it.
+    const transitions = phone.getAnimations({ subtree: true }).filter(animation => animation instanceof CSSTransition);
+    await Promise.allSettled(transitions.map(transition => transition.finished));
+    const { left, right, top, bottom } = greeting.getBoundingClientRect();
+    const surface = getComputedStyle(phone).backgroundColor;
+    return {
+      left, right, top, bottom,
+      subtitleBottom: greeting.querySelector('.greeting-sub').getBoundingClientRect().bottom,
+      surface: surface.match(/\d+/g).slice(0, 3).map(Number),
+      corner: parseFloat(getComputedStyle(greeting).borderBottomLeftRadius)
+    };
+  });
+  // A full viewport capture preserves the pixel alignment of the centered desktop preview.
+  const screenshot = await page.screenshot({ encoding: 'base64' });
+  const levels = await page.evaluate(async (source, bounds) => {
+    const image = new Image();
+    image.src = 'data:image/png;base64,' + source;
+    await image.decode();
+    const { width, height } = image;
+    const canvas = document.createElement('canvas');
+    canvas.width = width;
+    canvas.height = height;
+    const context = canvas.getContext('2d');
+    context.drawImage(image, 0, 0);
+    const pixels = context.getImageData(0, 0, width, height).data;
+    const scaleX = width / innerWidth;
+    const scaleY = height / innerHeight;
+    const center = (bounds.left + bounds.right) / 2;
+    function distanceToPage(x, y) {
+      const sample = (Math.round(y * scaleY) * width + Math.round(x * scaleX)) * 4;
+      return Math.max(...bounds.surface.map((value, channel) => Math.abs(pixels[sample + channel] - value)));
+    }
+    function lineContrast(x, y, dx, dy) {
+      const stride = 4 * (dy * width + dx);
+      let peak = 0;
+      for (let offset = -2; offset <= 2; offset++) {
+        const sample = (y * width + x) * 4 + offset * stride;
+        for (let channel = 0; channel < 3; channel++) {
+          const i = sample + channel;
+          const neighbours = (pixels[i - 2 * stride] + pixels[i + 2 * stride]) / 2;
+          peak = Math.max(peak, Math.abs(pixels[i] - neighbours));
+        }
+      }
+      return peak;
+    }
+    // Sample outside the antialiased outline on both sides of the quarter circles.
+    const { left, right, bottom, corner } = bounds;
+    const outside = [distanceToPage(center, bottom + 3)];
+    for (const inset of [3, 8, 16]) {
+      const outsideY = bottom - corner + Math.sqrt((corner + 3) ** 2 - (corner - inset) ** 2);
+      outside.push(distanceToPage(left + inset, outsideY), distanceToPage(right - inset, outsideY));
+    }
+    const midY = Math.round((bounds.subtitleBottom + bottom) / 2 * scaleY);
+    return {
+      artworkAtEdge: distanceToPage(center, bottom - 3) / distanceToPage(center, bounds.subtitleBottom + 2),
+      outside: Math.max(...outside),
+      topLine: lineContrast(Math.round(center * scaleX), Math.round(bounds.top * scaleY), 0, 1),
+      leftLine: lineContrast(Math.round((left + corner) * scaleX), midY, 1, 0),
+      rightLine: lineContrast(Math.round((right - corner) * scaleX), midY, 1, 0)
+    };
+  }, screenshot, bounds);
+  assert.ok(levels.artworkAtEdge > .85, 'Home artwork stays purple up to the lower edge');
+  assert.ok(levels.outside <= 1, 'Both corners and the area below the header match the page background');
+  assert.ok(Math.max(levels.topLine, levels.leftLine, levels.rightLine) < 8, 'Home greeting has no hairline seams: ' + JSON.stringify(levels));
 }
 
 (async () => {
@@ -29,6 +98,7 @@ async function waitForFade(page) {
         await page.$eval('.main-content', node => { node.scrollTop = 0; });
         await page.waitForFunction(() => !document.querySelector('.dashboard-page').classList.contains('is-header-compact'));
         await waitForFade(page);
+        if (isHome) await checkHomeEdge(page);
         const before = await page.$eval('.hero-bg', node => ({
           top: node.getBoundingClientRect().top,
           height: node.getBoundingClientRect().height,
@@ -95,20 +165,31 @@ async function waitForFade(page) {
           } else {
             const canvas = await page.$eval('.main-content', node => {
               const style = getComputedStyle(node);
-              const end = parseFloat(style.getPropertyValue('--home-fade-end'));
-              const headings = [...node.querySelectorAll(':scope > .section-header')];
+              const main = node.getBoundingClientRect();
+              const greeting = node.querySelector('.greeting-header-box');
+              const edge = greeting.getBoundingClientRect();
+              const corners = getComputedStyle(greeting);
+              const origin = main.top - node.scrollTop;
+              const fadeStart = origin + parseFloat(style.getPropertyValue('--home-fade-start'));
+              const canvasTop = origin + parseFloat(style.getPropertyValue('--home-fade-end'));
+              const sections = node.querySelectorAll('.home-overview > *, :scope > .section-header, :scope > .updates-list');
               return {
                 local: style.backgroundAttachment === 'local',
-                feedOnPlainCanvas: headings.every(heading => heading.getBoundingClientRect().top - node.getBoundingClientRect().top + node.scrollTop > end),
-                fadeLength: end - parseFloat(style.getPropertyValue('--home-fade-start'))
+                fullWidth: Math.abs(edge.left - main.left) < 1 && Math.abs(edge.right - main.right) < 1,
+                radii: [corners.borderBottomLeftRadius, corners.borderBottomRightRadius],
+                edgeBelowGreeting: edge.bottom > greeting.querySelector('.greeting-sub').getBoundingClientRect().bottom,
+                artworkReachesEdge: fadeStart >= edge.bottom,
+                feedOnPlainCanvas: Array.from(sections).every(section => section.getBoundingClientRect().top > canvasTop)
               };
             });
-            assert.deepEqual(canvas, { local: true, feedOnPlainCanvas: true, fadeLength: 180 });
+            assert.deepEqual(canvas, {
+              local: true, fullWidth: true, radii: ['24px', '24px'], edgeBelowGreeting: true, artworkReachesEdge: true, feedOnPlainCanvas: true
+            }, file + ': rounded greeting above the feed');
           }
         }
         await page.click('.burger-btn');
         assert.equal(await page.$eval('#profileDrawerOverlay', node => node.classList.contains('active')), true);
-        await page.click('.drawer-close-btn');
+        await page.locator('#profileDrawerOverlay .drawer-close-btn').click();
         assert.equal(await page.$eval('#profileDrawerOverlay', node => node.classList.contains('active')), false);
         if (width === 420) {
           await page.$eval('.main-content', node => { node.scrollTop = 240; });
@@ -120,16 +201,23 @@ async function waitForFade(page) {
           await waitForFade(page);
           assert.equal(await page.$eval('#paneTeam', node => node.classList.contains('active')), true);
           await page.click('#pillMy');
+          await page.$eval('.main-content', node => { node.scrollTop = 0; });
+          await page.waitForFunction(() => !document.querySelector('.dashboard-home').classList.contains('is-header-compact'));
           await waitForFade(page);
           const previousEnd = await page.$eval('.dashboard-home', node => parseFloat(node.style.getPropertyValue('--home-fade-end')));
-          await page.$eval('.insights-card', node => { node.style.paddingBottom = '80px'; });
+          await page.$eval('.greeting-sub', node => { node.style.minHeight = (node.getBoundingClientRect().height + 40) + 'px'; });
           await waitForFade(page);
           assert.ok(await page.$eval('.dashboard-home', node => parseFloat(node.style.getPropertyValue('--home-fade-end'))) > previousEnd);
-          await page.$eval('.insights-card', node => { node.style.removeProperty('padding-bottom'); });
+          await page.$eval('.greeting-sub', node => { node.style.removeProperty('min-height'); });
           await waitForFade(page);
         }
         await page.$eval('.main-content', node => { node.scrollTop = 0; });
-        console.log('PASS ' + file + ' ' + width + 'px: compact toolbar, menu access, stationary artwork, fade and mobile layout');
+        console.log('PASS ' + file + ' ' + width + 'px: compact toolbar, menu access, stationary artwork and mobile layout');
+      }
+      if (isHome) {
+        await page.setViewport({ width: 1005, height: 900, deviceScaleFactor: .9375 });
+        await waitForFade(page);
+        await checkHomeEdge(page);
       }
     }
     assert.deepEqual(errors, []);

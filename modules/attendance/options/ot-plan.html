@@ -844,7 +844,7 @@
         <!-- Staff Counter Header -->
         <div class="list-header record-summary-card">
           <div class="staff-record-counts" aria-live="polite">
-            <div class="record-summary-metric"><span class="staff-record-label record-summary-label">Total Records</span><strong class="list-counter record-summary-value" id="listCounterText">0</strong></div>
+            <div class="record-summary-metric"><strong class="list-counter record-summary-value" id="listCounterText" data-record-count>0</strong> <span class="staff-record-label record-summary-label">Records</span></div>
             <div><span class="staff-record-label">Selected Records</span><strong class="list-counter" id="selectedRecordsText">0</strong></div>
           </div>
           <label class="select-all-control" id="selectAllControl" for="selectAllCheckbox"><input type="checkbox" id="selectAllCheckbox" onchange="handleSelectAllCheckbox(this.checked)"><span>Select All</span></label>
@@ -1181,9 +1181,9 @@
           <span class="calendar-summary-meta-label">Date:</span>
           <strong class="calendar-summary-meta-value" id="otSummaryDateFilter">23 Sep 2026</strong>
         </div>
-        <div class="calendar-summary-meta-row">
-          <span class="calendar-summary-meta-label">Total Records:</span>
-          <strong class="calendar-summary-meta-value">2</strong>
+        <div class="calendar-summary-meta-row record-summary-metric">
+          <strong class="calendar-summary-meta-value" data-record-count>2</strong>
+          <span class="calendar-summary-meta-label">Records</span>
         </div>
       </div>
       <div class="scroll-body">
@@ -1249,9 +1249,9 @@
           <span class="calendar-summary-meta-label">Date:</span>
           <strong class="calendar-summary-meta-value" id="approvedOtSummaryDateFilter">15 Sep 2026</strong>
         </div>
-        <div class="calendar-summary-meta-row">
-          <span class="calendar-summary-meta-label">Total Records:</span>
-          <strong class="calendar-summary-meta-value">1</strong>
+        <div class="calendar-summary-meta-row record-summary-metric">
+          <strong class="calendar-summary-meta-value" data-record-count>1</strong>
+          <span class="calendar-summary-meta-label">Record</span>
         </div>
       </div>
       <div class="scroll-body">
@@ -1297,9 +1297,9 @@
           <span class="calendar-summary-meta-label">Date:</span>
           <strong class="calendar-summary-meta-value" id="pendingOtSummaryDateFilter">15 Sep 2026</strong>
         </div>
-        <div class="calendar-summary-meta-row">
-          <span class="calendar-summary-meta-label">Total Records:</span>
-          <strong class="calendar-summary-meta-value">2</strong>
+        <div class="calendar-summary-meta-row record-summary-metric">
+          <strong class="calendar-summary-meta-value" data-record-count>2</strong>
+          <span class="calendar-summary-meta-label">Records</span>
         </div>
       </div>
       <div class="scroll-body">
@@ -1365,9 +1365,9 @@
           <span class="calendar-summary-meta-label">Date:</span>
           <strong class="calendar-summary-meta-value" id="lvSummaryDateFilter">23 Sep 2026</strong>
         </div>
-        <div class="calendar-summary-meta-row">
-          <span class="calendar-summary-meta-label">Total Records:</span>
-          <strong class="calendar-summary-meta-value">3</strong>
+        <div class="calendar-summary-meta-row record-summary-metric">
+          <strong class="calendar-summary-meta-value" data-record-count>3</strong>
+          <span class="calendar-summary-meta-label">Records</span>
         </div>
       </div>
       <div class="scroll-body">
@@ -1598,9 +1598,9 @@
       </div>
       <div class="sheet-body">
         <div class="staff-history-summary">
-          <div class="staff-history-summary-row">
-            <span class="staff-history-summary-label">Total Records</span>
-            <strong class="staff-history-summary-value" id="staffHistoryTotalRecords">0</strong>
+          <div class="staff-history-summary-row record-summary-metric">
+            <strong class="staff-history-summary-value" id="staffHistoryTotalRecords" data-record-count>0</strong>
+            <span class="staff-history-summary-label">Records</span>
           </div>
           <div class="staff-history-summary-row">
             <span class="staff-history-summary-label">Total Hours</span>

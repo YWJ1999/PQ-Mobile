@@ -12,66 +12,102 @@ async function actionLabels(page, selector) {
   return page.$$eval(`${selector} .history-detail-action:not([data-history-detail-aux])`, nodes => nodes.map(node => node.textContent.trim()));
 }
 
-async function assertPurpleActions(page, selector) {
-  const state = await page.$eval(selector, node => {
-    const footer = getComputedStyle(node);
-    const buttons = [...node.querySelectorAll('.history-detail-action')];
+async function assertCardActions(page, selector, expected) {
+  const layout = await page.$eval(selector, footer => {
+    const buttons = [...footer.querySelectorAll('button')];
+    const rect = footer.getBoundingClientRect();
+    const style = getComputedStyle(footer);
+    const right = rect.right - parseFloat(style.borderRightWidth) - parseFloat(style.paddingRight);
     return {
-      footer: {
-        display: footer.display,
-        justifyContent: footer.justifyContent,
-        gap: footer.gap
-      },
+      labels: buttons.map(button => button.textContent.trim()),
+      detailAction: !!footer.querySelector('.record-primary-action'),
+      icons: buttons.map(button => button.querySelector('.record-card-action-icon')?.className || ''),
+      right,
+      width: right - rect.left - parseFloat(style.paddingLeft) - parseFloat(style.borderLeftWidth),
       buttons: buttons.map(button => {
-        const style = getComputedStyle(button);
-        return {
-          backgroundImage: style.backgroundImage,
-          borderRadius: style.borderRadius,
-          boxShadow: style.boxShadow,
-          color: style.color,
-          fontSize: style.fontSize,
-          fontWeight: style.fontWeight,
-          padding: [style.paddingTop, style.paddingRight, style.paddingBottom, style.paddingLeft],
-          disabled: button.disabled
-        };
-      }),
-      viewportWidth: document.documentElement.clientWidth,
-      scrollWidth: document.documentElement.scrollWidth
+        const { top, right, width } = button.getBoundingClientRect();
+        return { top, right, width };
+      })
     };
   });
+  assert.deepEqual(layout.labels, expected, selector);
+  assert.equal(layout.detailAction, false, selector);
+  assert.ok(Math.abs(layout.buttons.at(-1).right - layout.right) <= 1, selector);
+  if (expected.length === 1) {
+    assert.ok(layout.buttons[0].width < layout.width / 2, `${selector} single action is compact`);
+    assert.match(layout.icons[0], /fa-ban(?:\s|$)/, selector);
+  } else {
+    assert.ok(layout.icons.every(icon => !icon), `${selector} grouped actions keep their original labels`);
+    for (const button of layout.buttons) {
+      assert.ok(Math.abs(button.top - layout.buttons[0].top) <= 1, `${selector} actions share a row`);
+      assert.ok(Math.abs(button.width - layout.buttons[0].width) <= 1, `${selector} actions have equal widths`);
+    }
+  }
+}
 
-  assert.equal(state.footer.display, 'flex');
-  assert.equal(state.footer.justifyContent, 'flex-end');
-  assert.equal(state.footer.gap, '8px');
-  assert.ok(state.buttons.length > 0);
-  state.buttons.forEach(button => {
-    assert.match(button.backgroundImage, /linear-gradient\(135deg, rgb\(124, 58, 237\)(?: 0%)?, rgb\(109, 40, 217\)(?: 100%)?\)/);
-    assert.equal(button.borderRadius, '20px');
-    if (button.disabled) assert.equal(button.boxShadow, 'none');
-    else assert.match(button.boxShadow, /rgba\(124, 58, 237,/);
-    assert.equal(button.color, 'rgb(255, 255, 255)');
-    assert.equal(button.fontSize, '12px');
-    assert.equal(button.fontWeight, '700');
-    assert.deepEqual(button.padding, ['8px', '16px', '8px', '16px']);
+async function assertPurpleActions(page, selector) {
+  const layout = await page.$eval(selector, footer => {
+    const style = getComputedStyle(footer);
+    const width = footer.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight);
+    const right = footer.getBoundingClientRect().right - parseFloat(style.borderRightWidth) - parseFloat(style.paddingRight);
+    const actions = [...footer.querySelectorAll(':scope > :is(button, a):not([hidden])')].map(button => {
+      const rect = button.getBoundingClientRect();
+      const appearance = getComputedStyle(button);
+      const icon = button.querySelector('i[aria-hidden="true"]')?.getBoundingClientRect();
+      const label = button.querySelector('span')?.getBoundingClientRect();
+      return {
+        left: rect.left, right: rect.right, top: rect.top, width: rect.width, height: rect.height,
+        colour: appearance.color,
+        background: appearance.backgroundImage === 'none' ? appearance.backgroundColor : appearance.backgroundImage,
+        primary: button.classList.contains('record-primary-action'),
+        label: button.textContent.trim(),
+        cancelIcon: !!button.querySelector('i.fa-ban[aria-hidden="true"]'),
+        centeredIcon: !!icon && !!label && icon.right < label.left
+          && Math.abs(icon.left + label.right - rect.left - rect.right) <= 2,
+        fits: button.scrollWidth <= button.clientWidth + 1
+      };
+    });
+    return { width, right, actions };
   });
-  assert.ok(state.scrollWidth <= state.viewportWidth + 1, 'Detail actions must not overflow the viewport');
+  const { actions } = layout;
+  assert.ok(actions.length, selector);
+  const pair = actions.length === 2;
+  if (pair) {
+    const [first, second] = actions;
+    assert.ok(Math.abs(first.top - second.top) <= 1 && second.left >= first.right + 6, selector + ' one horizontal row in order');
+    assert.ok(Math.abs(first.width - second.width) <= 1 && first.width <= 132, selector + ' equal compact widths');
+    assert.ok(Math.abs(first.height - second.height) <= 1 && first.height >= 40, selector + ' matching tap targets');
+    assert.ok(Math.abs(second.right - layout.right) <= 1, selector + ' aligned with footer');
+  }
+  for (const action of actions) {
+    assert.equal(action.colour, 'rgb(255, 255, 255)', selector);
+    assert.match(action.background, /rgb\(124, 58, 237\)/, selector);
+    assert.ok(action.fits, selector + ' label fits');
+    if (actions.length === 1 && action.label === 'Cancel') assert.ok(action.cancelIcon, selector + ' has the cancel icon');
+    if (action.primary) {
+      assert.ok(action.centeredIcon, selector + ' centered icon and label');
+      assert.match(action.background, /rgb\(109, 40, 217\)/, selector);
+      if (!pair) assert.ok(Math.abs(action.width - layout.width) <= 1 && action.height >= 44, selector + ' full-width primary action');
+    }
+  }
 }
 
 async function runStyle(browser) {
   for (const theme of ['light', 'dark']) {
-    for (const width of [360, 420]) {
+    for (const width of [320, 420]) {
       const page = await browser.newPage();
       await page.setViewport({ width, height: 760 });
       await page.setContent(`<!doctype html><html data-theme=${theme}><body>
         <main style=width:min(100%,420px);margin:auto>
           <footer id=testActions class=history-detail-actions>
             <button type=button class=history-detail-action>Submit</button>
+            <button type=button class=record-primary-action data-history-detail-aux hidden>Edit</button>
             <button type=button class=history-detail-action>Cancel</button>
           </footer>
         </main>
       </body></html>`);
       await page.addStyleTag({ path: path.join(root, 'css/detail-popout.css') });
-      await new Promise(resolve => setTimeout(resolve, 250));
+      await page.addStyleTag({ path: path.join(root, 'css/request-actions.css') });
       assert.deepEqual(await actionLabels(page, '#testActions'), ['Submit', 'Cancel']);
       await assertPurpleActions(page, '#testActions');
       await page.close();
@@ -98,9 +134,9 @@ async function runWorkplace(browser) {
   });
   await page.reload({ waitUntil: 'domcontentloaded' });
 
-  assert.deepEqual(await page.$$eval('[data-record-id=parity-guest-draft] [data-history-action]', nodes => nodes.map(node => node.textContent.trim())), ['Apply', 'Cancel']);
+  await assertCardActions(page, '[data-record-id=parity-guest-draft] .history-card-actions', ['Apply', 'Cancel']);
   await page.$eval('[data-record-id=parity-guest-draft] .history-card-main', node => node.click());
-  assert.deepEqual(await actionLabels(page, '#historyDetailActions'), ['Apply', 'Cancel']);
+  assert.deepEqual(await actionLabels(page, '#historyDetailActions'), ['Apply', 'Delete Record']);
   await assertPurpleActions(page, '#historyDetailActions');
 
   await page.$eval('#historyDetailActions [data-history-action=apply]', node => node.click());
@@ -115,13 +151,13 @@ async function runWorkplace(browser) {
   await page.keyboard.press('Escape');
 
   await page.$eval('[data-history-kind=letter-request]', node => node.click());
-  assert.deepEqual(await page.$$eval('[data-record-id=parity-letter-approved] [data-history-action]', nodes => nodes.map(node => node.textContent.trim())), ['Cancel']);
+  await assertCardActions(page, '[data-record-id=parity-letter-approved] .history-card-actions', ['Cancel']);
   await page.$eval('[data-record-id=parity-letter-approved] .history-card-main', node => node.click());
   assert.deepEqual(await actionLabels(page, '#historyDetailActions'), ['Cancel']);
   await page.keyboard.press('Escape');
 
   await page.$eval('[data-history-kind=inventory-request]', node => node.click());
-  assert.deepEqual(await page.$$eval('[data-record-id=parity-inventory-submitted] [data-history-action]', nodes => nodes.map(node => node.textContent.trim())), ['Cancel']);
+  await assertCardActions(page, '[data-record-id=parity-inventory-submitted] .history-card-actions', ['Cancel']);
   await page.$eval('[data-record-id=parity-inventory-submitted] [data-history-action=cancel]', node => node.click());
   assert.equal(await page.$eval('#historyDetailsModal', node => node.getAttribute('aria-hidden')), 'true', 'Card actions must not open details');
 
@@ -191,13 +227,11 @@ async function runLeave(browser) {
     showLeaveSection('viewMyLeaveHistory');
     switchHistoryTab('leave');
   });
-  const draft = await page.$eval('#myHistoryCardsList [data-status=draft]', node => ({
-    ref: node.dataset.ref,
-    actions: [...node.querySelectorAll('button')].map(button => button.textContent.trim())
-  }));
-  assert.deepEqual(draft.actions, ['Apply', 'Cancel']);
-  await page.evaluate(ref => openHistoryDetailsModal(ref), draft.ref);
-  assert.deepEqual(await actionLabels(page, '#historyDetailsActions'), ['Apply', 'Cancel']);
+  const draftSelector = '#myHistoryCardsList [data-status=draft]';
+  const draftRef = await page.$eval(draftSelector, node => node.dataset.ref);
+  await assertCardActions(page, draftSelector + ' .record-card-actions', ['Apply', 'Cancel']);
+  await page.evaluate(ref => openHistoryDetailsModal(ref), draftRef);
+  assert.deepEqual(await actionLabels(page, '#historyDetailsActions'), ['Apply', 'Delete Record']);
   await assertPurpleActions(page, '#historyDetailsActions');
   assert.equal(await page.$eval('#historyDetailsActions', node => node.parentElement.classList.contains('history-details-dialog')), true);
   await page.evaluate(() => closeHistoryDetailsModal());
@@ -303,9 +337,11 @@ async function runClaims(browser) {
       status: node.dataset.status,
       labels: [...node.querySelectorAll('.history-card-actions button')].map(button => button.textContent.trim())
     }));
-    assert.ok(card.labels.length, `${tab} fixture must expose a card action`);
+    const expected = card.status === 'draft' ? ['Submit', 'Cancel'] : ['Cancel'];
+    assert.deepEqual(card.labels, expected, `${tab} history card`);
     await page.$eval('#claimHistoryListContainer .history-card-item', node => node.click());
-    assert.deepEqual(await actionLabels(page, '#claimDetailsModalContainer .history-detail-actions'), card.labels, `${tab} detail actions mirror its card`);
+    assert.deepEqual(await actionLabels(page, '#claimDetailsModalContainer .history-detail-actions'),
+      card.status === 'draft' ? ['Submit', 'Delete Record'] : ['Cancel'], `${tab} record detail`);
     await assertPurpleActions(page, '#claimDetailsModalContainer .history-detail-actions');
     const beforeStatus = await page.$eval('#claimHistoryListContainer .history-card-item', node => node.dataset.status);
     await page.$eval('#claimDetailsModalContainer .history-detail-action', node => node.click());
@@ -321,7 +357,8 @@ async function runClaims(browser) {
   const draftLabels = await page.$$eval('#claimHistoryListContainer .history-card-item', (nodes, index) => [...nodes[index].querySelectorAll('.history-card-actions button')].map(button => button.textContent.trim()), draftIndex);
   assert.deepEqual(draftLabels, ['Submit', 'Cancel']);
   await page.$$eval('#claimHistoryListContainer .history-card-item', (nodes, index) => nodes[index].click(), draftIndex);
-  assert.deepEqual(await actionLabels(page, '#claimDetailsModalContainer .history-detail-actions'), ['Submit', 'Cancel']);
+  assert.deepEqual(await actionLabels(page, '#claimDetailsModalContainer .history-detail-actions'), ['Submit', 'Delete Record']);
+  await assertPurpleActions(page, '#claimDetailsModalContainer .history-detail-actions');
   await page.evaluate(() => closeDetailsModal());
 
   await page.$eval('#claimHistoryListContainer .history-card-item .history-cancel-btn', node => node.click());
@@ -345,7 +382,7 @@ async function runPayroll(browser) {
   const url = pathToFileURL(path.join(root, 'modules/payroll/options/history.html')).href;
   await page.goto(url + '?theme=dark', { waitUntil: 'networkidle0' });
   await page.waitForSelector('[data-reference=RBT000000000039]');
-  assert.deepEqual(await page.$$eval('[data-reference=RBT000000000039] [data-history-action]', nodes => nodes.map(node => node.textContent.trim())), ['Cancel']);
+  await assertCardActions(page, '[data-reference=RBT000000000039] .history-card-actions', ['Cancel']);
   await page.$eval('[data-reference=RBT000000000039] .history-card-main', node => node.click());
   assert.deepEqual(await actionLabels(page, '#historyDetailActions'), ['Cancel']);
   await assertPurpleActions(page, '#historyDetailActions');
@@ -357,9 +394,10 @@ async function runPayroll(browser) {
 
   await page.$eval('[data-history-kind=deduction]', node => node.click());
   await page.waitForSelector('[data-reference=PDR000000000004]');
-  assert.deepEqual(await page.$$eval('[data-reference=PDR000000000004] [data-history-action]', nodes => nodes.map(node => node.textContent.trim())), ['Submit', 'Cancel']);
+  await assertCardActions(page, '[data-reference=PDR000000000004] .history-card-actions', ['Submit', 'Cancel']);
   await page.$eval('[data-reference=PDR000000000004] .history-card-main', node => node.click());
-  assert.deepEqual(await actionLabels(page, '#historyDetailActions'), ['Submit', 'Cancel']);
+  assert.deepEqual(await actionLabels(page, '#historyDetailActions'), ['Submit', 'Delete Record']);
+  await assertPurpleActions(page, '#historyDetailActions');
   await page.$eval('#historyDetailActions [data-history-action=submit]', node => node.click());
   await page.waitForFunction(() => document.querySelector('[data-reference=PDR000000000004]')?.dataset.status === 'submitted');
   assert.deepEqual(await actionLabels(page, '#historyDetailActions'), ['Cancel']);
@@ -385,13 +423,15 @@ async function runProject(browser) {
   await page.waitForFunction(() => document.documentElement.dataset.projectHistoryReady === 'true');
 
   const workPlanDraft = '#workPlanHistoryList [data-record-id="WP-2026-0039"]';
-  assert.deepEqual(
-    await page.$$eval(`${workPlanDraft} [data-history-action]`, nodes => nodes.map(node => node.textContent.trim())),
-    ['Submit', 'Cancel']
-  );
+  const workPlanSubmitted = '#workPlanHistoryList [data-record-id="WP-2026-0048"]';
+  for (const width of [320, 390]) {
+    await page.setViewport({ width, height: 900 });
+    await assertCardActions(page, workPlanSubmitted + ' .project-history-card-actions', ['Cancel']);
+    await assertCardActions(page, workPlanDraft + ' .project-history-card-actions', ['Submit', 'Cancel']);
+  }
   await page.$eval(workPlanDraft, node => node.click());
   await page.waitForSelector('#projectHistoryDetailOverlay.is-open');
-  assert.deepEqual(await actionLabels(page, '#projectHistoryDetailActions'), ['Submit', 'Cancel']);
+  assert.deepEqual(await actionLabels(page, '#projectHistoryDetailActions'), ['Submit', 'Delete Record']);
   await assertPurpleActions(page, '#projectHistoryDetailActions');
 
   await page.$eval('#projectHistoryDetailActions [data-history-action=submit]', node => node.click());
@@ -430,13 +470,10 @@ async function runProject(browser) {
   await page.waitForFunction(() => document.documentElement.dataset.projectHistoryReady === 'true');
   await page.$eval('#historyTab-timesheet', node => node.click());
   const timesheetDraft = '#timesheetHistoryList [data-record-id="TS-DRAFT-LOCAL"]';
-  assert.deepEqual(
-    await page.$$eval(`${timesheetDraft} [data-history-action]`, nodes => nodes.map(node => node.textContent.trim())),
-    ['Submit', 'Cancel']
-  );
+  await assertCardActions(page, timesheetDraft + ' .project-history-card-actions', ['Submit', 'Cancel']);
   await page.$eval(timesheetDraft, node => node.click());
   await page.waitForSelector('#projectHistoryDetailOverlay.is-open');
-  assert.deepEqual(await actionLabels(page, '#projectHistoryDetailActions'), ['Submit', 'Cancel']);
+  assert.deepEqual(await actionLabels(page, '#projectHistoryDetailActions'), ['Submit', 'Delete Record']);
   await assertPurpleActions(page, '#projectHistoryDetailActions');
   await page.evaluate(() => {
     window.__draftRemovedAfterDetailClosed = null;
@@ -496,13 +533,14 @@ async function runNoActions(browser) {
   page.on('pageerror', error => errors.push(error.message));
   await page.setViewport({ width: 390, height: 900 });
 
-  await page.goto(pathToFileURL(path.join(root, 'modules/employee-career/options/history.html')).href + '?category=feedback&theme=dark', { waitUntil: 'domcontentloaded' });
-  await page.waitForSelector('[data-record-id="feedback-1"]');
-  assert.equal(await page.$$eval('[data-record-id="feedback-1"] :is(.history-card-actions, [data-history-action], .history-detail-action)', nodes => nodes.length), 0);
-  await page.$eval('[data-record-id="feedback-1"]', node => node.click());
+  await page.goto(pathToFileURL(path.join(root, 'modules/employee-career/options/history.html')).href + '?category=cv-change-request&theme=dark', { waitUntil: 'domcontentloaded' });
+  const readOnlyCard = '#careerHistoryList [data-record-id]';
+  await page.waitForSelector(readOnlyCard);
+  assert.equal(await page.$$eval(readOnlyCard + ' .career-history-card-actions', nodes => nodes.length), 0);
+  await page.$eval(readOnlyCard, node => node.click());
   await page.waitForSelector('#historyDetailsModal[aria-hidden="false"]');
-  assert.equal(await page.$('#historyDetailsModal .history-detail-actions'), null);
-  assert.equal(await page.$$eval('#historyDetailsModal .history-detail-action', nodes => nodes.length), 0);
+  assert.equal(await page.$eval('#historyDetailActions', footer => footer.hidden), true);
+  assert.equal(await page.$$eval('#historyDetailActions > :is(button, a):not([hidden])', nodes => nodes.length), 0);
 
   await page.goto(pathToFileURL(path.join(root, 'leave.html')).href + '?theme=dark', { waitUntil: 'networkidle0' });
   await page.evaluate(() => {

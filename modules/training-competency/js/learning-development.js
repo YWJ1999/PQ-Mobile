@@ -92,9 +92,8 @@
     $(container).replaceChildren(...rows.map(([label, value, field]) => {
       const row = node('div', 'ld-summary-field');
       row.dataset.field = field;
-      const isRecordCount = field === 'total-records';
-      row.classList.toggle('record-summary-metric', isRecordCount);
-      row.append(node('span', isRecordCount ? 'record-summary-label' : '', label), node('strong', isRecordCount ? 'record-summary-value' : '', value));
+      if (field === 'total-records') window.PeopleHcmRecordSummary.renderCount(row, value);
+      else row.append(node('span', '', label), node('strong', '', value));
       return row;
     }));
   }

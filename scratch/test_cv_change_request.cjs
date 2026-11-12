@@ -263,7 +263,7 @@ assert.ok(
         };
       }), {
         title: 'Qualification',
-        count: '3 records',
+        count: '3 Records',
         addIcon: 'fa-solid fa-plus',
         addSize: [40, 40],
         headerHasDivider: '1px'

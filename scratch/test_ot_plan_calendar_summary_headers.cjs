@@ -48,7 +48,7 @@ const pageUrl = pathToFileURL(path.resolve(__dirname, '../modules/attendance/opt
       assert.equal(summary.display, 'grid');
       assert.equal(summary.iconCount, 0);
       assert.equal(summary.rowTexts[0], 'Date: 15 Sep 2026');
-      assert.equal(summary.rowTexts[1], `Total Records: ${expectedRecords}`);
+      assert.equal(summary.rowTexts[1], `${expectedRecords} ${expectedRecords === '1' ? 'Record' : 'Records'}`);
       assert.equal(summary.recordValue, expectedRecords);
       assert.equal(summary.recordBorderTop, '1px');
       assert.notEqual(summary.background, 'rgb(255, 255, 255)');

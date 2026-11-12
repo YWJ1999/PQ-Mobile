@@ -12,8 +12,8 @@ const puppeteer = require('puppeteer');
     const url = pathToFileURL(path.resolve(__dirname, '../modules/attendance/options/feedback-history.html')).href;
     for (const theme of ['light', 'dark']) {
       await page.goto(url + '?theme=' + theme, { waitUntil: 'networkidle0' });
-      assert.equal(await page.$eval('#pendingFeedbackTotal', node => node.textContent.trim()), 'Total 2 Records');
-      assert.equal(await page.$eval('.pending-feedback-summary', node => node.textContent.trim().replace(/\s+/g, ' ')), 'Total 2 Records');
+      assert.equal(await page.$eval('#pendingFeedbackTotal', node => node.textContent.trim()), '2 Records');
+      assert.equal(await page.$eval('.pending-feedback-summary', node => node.textContent.trim().replace(/\s+/g, ' ')), '2 Records');
       for (const width of [360, 390, 420]) {
         await page.setViewport({ width, height: 950 });
         const cards = await page.$$eval('.pending-feedback-record', nodes => nodes.map(node => {

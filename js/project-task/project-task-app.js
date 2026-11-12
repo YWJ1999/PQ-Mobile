@@ -178,8 +178,8 @@
       const name = document.createElement('span');
       name.textContent = label;
       const content = document.createElement('strong');
-      content.textContent = value === '' || value == null ? '—' : String(value);
-      if (label === 'Status') content.className = 'project-history-detail-status';
+      if (label === 'Status') content.append(recordDetailStatus.create(value));
+      else content.textContent = value === '' || value == null ? '—' : String(value);
       row.append(name, content);
       return row;
     };
@@ -301,7 +301,7 @@
     const updateCount = () => {
       const count = document.querySelectorAll('#projectTimesheetApprovalList .project-approval-card').length;
       const label = document.getElementById('projectTimesheetApprovalCount');
-      if (label) label.textContent = count + (count === 1 ? ' Record' : ' Records');
+      if (label) label.textContent = window.PeopleHcmRecordSummary.formatCount(count);
     };
     const handled = new Set(read().map(item => item.reference));
     document.querySelectorAll('#projectTimesheetApprovalList .project-approval-card').forEach(card => {
@@ -379,7 +379,6 @@
     const fillDetails = () => {
       const fields = {
         projectApprovalDetailDocumentReference: 'documentReference',
-        projectApprovalDetailDocumentStatus: 'documentStatus',
         projectApprovalDetailEmployeeName: 'employeeName',
         projectApprovalDetailEmployeeId: 'employeeId',
         projectApprovalDetailTimesheetDate: 'timesheetDate',
@@ -395,6 +394,7 @@
       Object.entries(fields).forEach(([id, key]) => {
         document.getElementById(id).textContent = value(key);
       });
+      document.getElementById('projectApprovalDetailDocumentStatus').replaceChildren(recordDetailStatus.create(value('documentStatus')));
       document.getElementById('projectApprovalApproverComments').value = '';
       details.dataset.reference = value('reference');
     };

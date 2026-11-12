@@ -101,7 +101,7 @@
     empNo.id = ids.employeeId;
     heading.append(name, empNo);
     const end = node('div', 'staff-tna-card-end');
-    const status = node('span', 'card-status-badge', record.status);
+    const status = node('span', 'card-status-badge', recordReviewStatusLabel(record.status));
     status.id = ids.status;
     status.dataset.status = 'submitted';
     status.dataset.tnaStatus = record.status;

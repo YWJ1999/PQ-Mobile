@@ -1163,13 +1163,13 @@
             No shift breakdown records found matching filters.
           </div>
         `;
-        if (badge) badge.innerText = `0 Records`;
+        if (badge) badge.innerText = '0 Records';
         if (footerSummary) footerSummary.innerText = `0 Shifts &bull; 0 Roles`;
         if (footerTotal) footerTotal.innerText = `0.00`;
         return;
       }
 
-      if (badge) badge.innerText = `${data.length} Record${data.length === 1 ? '' : 's'}`;
+      if (badge) badge.innerText = window.PeopleHcmRecordSummary.formatCount(data.length);
 
       const total = data.reduce((sum, item) => sum + item.count, 0);
       const shiftGroups = {};
@@ -1283,7 +1283,7 @@
       `;
       document.getElementById('detailRoleDisplay').innerText = role === 'all' ? 'All Roles' : role;
       document.getElementById('detailHeadcountDisplay').innerText = `${list.length} Staff`;
-      document.getElementById('detailRecordCountBadge').innerText = `${list.length} Record${list.length === 1 ? '' : 's'}`;
+      document.getElementById('detailRecordCountBadge').innerText = window.PeopleHcmRecordSummary.formatCount(list.length);
 
       const container = document.getElementById('detailEmployeeListContainer');
       if (!container) return;

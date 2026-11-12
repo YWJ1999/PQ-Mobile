@@ -318,9 +318,7 @@
                 <div style="font-size: 11.5px; font-weight: 600; color: var(--text-muted); margin-top: 1px;">${trip.dates || '28–30 Sep 2026 • 3 days'}</div>
               </div>
             </div>
-            <span style="font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 10px; background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3);">
-              ${trip.status || 'Approved'}
-            </span>
+            ${recordDetailStatus.html(trip.status || 'Approved')}
           </div>
 
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding-top: 12px; border-top: 1px dashed var(--border-subtle); font-size: 11.5px;">
@@ -443,9 +441,7 @@
                 <div style="font-size: 11.5px; font-weight: 700; color: var(--text-muted); opacity: 0.8; font-family: monospace, sans-serif; margin-bottom: 4px;">#${s.empNo.replace(/^#/, '')}</div>
                 <div style="font-size: 11px; font-weight: 600; color: var(--text-muted);">${s.trip}</div>
               </div>
-              <span style="font-size: 10.5px; font-weight: 800; padding: 3px 9px; border-radius: 8px; ${s.status === 'Approved' ? 'background: rgba(16, 185, 129, 0.15); color: #10b981;' : 'background: rgba(245, 158, 11, 0.15); color: #f59e0b;'}">
-                ${s.status}
-              </span>
+              ${recordDetailStatus.html(s.status)}
             </div>
           `).join('')}
         </div>
@@ -477,7 +473,7 @@
       items = items.filter(i => i.status === filterType);
     }
 
-    if (badge) badge.textContent = `${items.length} Records`;
+    if (badge) badge.textContent = window.PeopleHcmRecordSummary.formatCount(items.length);
 
     container.innerHTML = '';
     if (items.length === 0) {
@@ -494,7 +490,7 @@
       card.className = 'submission-card';
       card.style.cssText = 'background: var(--bg-card); border-radius: 18px; padding: 14px; border: 1px solid var(--border-subtle); margin-bottom: 10px; transition: transform 0.15s ease; cursor: pointer; display: flex; align-items: center; gap: 12px;';
 
-      const statusClass = item.status === 'pending' ? 'pending' : (item.status === 'approved' ? 'approved' : 'rejected');
+      const statusClass = ['submitted', 'pending'].includes(item.status) ? 'pending' : (item.status === 'approved' ? 'approved' : 'rejected');
 
       card.innerHTML = `
         <div style="width: 44px; height: 44px; border-radius: 14px; background: var(--bg-input); border: 1px solid var(--border-subtle); display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0;">
@@ -503,7 +499,7 @@
         <div style="flex: 1; min-width: 0;">
           <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px;">
             <div style="font-size: 13.5px; font-weight: 800; color: var(--text-primary); text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">${item.category}</div>
-            <span class="status-badge ${statusClass}">${item.statusText}</span>
+            <span class="status-badge ${statusClass}">${recordReviewStatusLabel(item.statusText || item.status)}</span>
           </div>
           <div style="display: flex; justify-content: space-between; align-items: center;">
             <div style="font-size: 11px; font-weight: 600; color: var(--text-muted); text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">
@@ -1059,7 +1055,7 @@
     const empNo = rawEmp;
     const deptClean = d.dept || 'Operations • Quality Assurance';
     const docRef = d.docRef || (optLower.includes('medical') ? 'CMD000000000133' : optLower.includes('ot') ? 'BXT000000000283' : 'CBF000000000025');
-    const docStatus = d.docStatus || 'Submitted';
+    const docStatus = recordDetailStatus.html(d.docStatus || 'Submitted');
     const receiptFile = d.receipt || (d.receiptNo ? `Receipt #${d.receiptNo}` : 'supporting_receipt_docs.pdf');
 
     const employeeHtml = `
@@ -1512,7 +1508,7 @@
         <table style="width: 100%; border-collapse: collapse; font-size: 12px; text-align: left;">
           <tbody>
             ${makeTableRow('Document Reference', `<span style="font-family: monospace; letter-spacing: 0.3px; font-weight: 800; color: var(--text-primary);">${docRef}</span>`)}
-            ${makeTableRow('Document Status', `<span style="font-size: 10.5px; font-weight: 800; color: #7c3aed; background: rgba(124, 58, 237, 0.12); padding: 3px 9px; border-radius: 6px; border: 1px solid rgba(124, 58, 237, 0.25);">${docStatus}</span>`)}
+            ${makeTableRow('Document Status', docStatus)}
             ${makeTableRow('Claim Type', `<span style="color: var(--purple-primary); font-weight: 800; font-size: 12.5px;">${claimType.toUpperCase()}</span>`)}
             ${specificRowsHtml}
           </tbody>

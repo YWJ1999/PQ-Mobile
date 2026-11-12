@@ -63,7 +63,7 @@ const viewports = [320, 360, 390, 420];
         });
 
         assert.equal(summary.cardCount, 1, `${theme} ${width}px: exactly one overtime totals card is shown`);
-        assert.deepEqual(summary.labels, ['Total Records', 'Total Hours'], `${theme} ${width}px: both totals share one card`);
+        assert.deepEqual(summary.labels, ['Records', 'Total Hours'], `${theme} ${width}px: both totals share one card`);
         assert.equal(Number(summary.values[0]), summary.visibleRecordCount, `${theme} ${width}px: Total Records matches visible overtime cards`);
         assert.equal(summary.values[1], '2.00 HRS', `${theme} ${width}px: existing Total Hours value stays in the summary`);
         assert.equal(summary.backgroundImage, 'none', `${theme} ${width}px: totals card uses the neutral History surface`);

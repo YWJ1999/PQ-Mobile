@@ -257,7 +257,7 @@ async function check(name, fn) {
       assert.equal(scheduled.count, '22');
       assert.equal(scheduled.totalHours, '176.00');
       assert.deepEqual(scheduled.summary, {
-        labels: ['Total Records', 'Total Hours'],
+        labels: ['Records', 'Total Hours'],
         chartInsideFirstRow: true,
         chartAfterCount: true,
         secondRowBelowFirst: true,

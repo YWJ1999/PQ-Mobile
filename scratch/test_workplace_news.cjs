@@ -77,6 +77,8 @@ async function checkCompanyNews(page, theme) {
       assert.equal(await page.$eval('#newsAcknowledged', node => node.hidden), true, 'Opening a news item must not acknowledge it');
       assert.ok((await page.$eval('#newsDetailActions', node => node.textContent)).includes('this device'), 'Local acknowledgement must not imply it was delivered to a server');
       assert.equal(await page.$eval('#newsAcknowledge', node => node.hidden), false);
+      assert.equal(await page.$eval('#newsFeedbackTrigger', node => node.textContent.trim()), 'Feedback');
+      assert.equal(await page.$eval('#newsFeedbackTrigger i', node => node.hidden), true);
       await Promise.all([page.waitForNavigation(), page.click('#newsDetailBack')]);
       assert.equal(await page.$eval('#newsSearch', node => node.value), 'lockdown');
       assert.equal(await page.$eval(readLabel, node => node.textContent), 'Read');
@@ -84,8 +86,20 @@ async function checkCompanyNews(page, theme) {
       await page.keyboard.press('Escape');
       assert.equal(await page.$eval('#newsSearchPanel', node => node.hidden), true);
       await Promise.all([page.waitForNavigation(), page.click('[data-news-id="lockdown-3"]')]);
+      await page.click('#newsFeedbackTrigger');
+      await page.type('#newsFeedbackText', 'Thanks for the update.');
+      await page.click('#newsFeedbackSave');
+      assert.ok(await page.$eval('.news-action-buttons', footer => {
+        const [edit, acknowledge] = [...footer.querySelectorAll('button:not([hidden])')];
+        const left = edit.getBoundingClientRect();
+        const right = acknowledge.getBoundingClientRect();
+        return edit.textContent.trim() === 'Edit Feedback' && left.top === right.top && right.left >= left.right + 6
+          && Math.abs(left.width - right.width) <= 1 && left.width <= 132;
+      }), 'Edit Feedback and Acknowledge share a compact row');
       await page.click('#newsAcknowledge');
       assert.equal(await page.$eval('#newsAcknowledged', node => node.hidden), false);
+      assert.ok(await page.$eval('#newsFeedbackTrigger', button =>
+        Math.abs(button.offsetWidth - button.parentElement.clientWidth) <= 1), 'A lone Edit Feedback uses the full footer');
       const acknowledgedTime = await page.$eval('#newsAcknowledged time', node => node.dateTime);
       await page.reload({ waitUntil: 'domcontentloaded' });
       assert.equal(await page.$eval('#newsAcknowledged time', node => node.dateTime), acknowledgedTime, 'Acknowledgement timestamp must persist');
@@ -121,6 +135,10 @@ async function checkCompanyNews(page, theme) {
       assert.equal(await page.$('#newsSavedFeedback script'), null, 'Feedback must render as text');
       await page.reload({ waitUntil: 'domcontentloaded' });
       assert.equal(await page.$eval('#newsSavedFeedbackText', node => node.textContent), '<script>unsafe</script> Thank you for the update.');
+      assert.equal(await page.$eval('#newsFeedbackTrigger', node => node.textContent.trim()), 'Edit Feedback');
+      assert.ok(await page.$('#newsFeedbackTrigger > .fa-pen:not([hidden])'));
+      assert.ok(await page.$eval('#newsFeedbackTrigger', node =>
+        Math.abs(node.getBoundingClientRect().width - node.parentElement.clientWidth) <= 1));
       await page.click('#newsFeedbackTrigger');
       await page.$eval('#newsFeedbackText', node => { node.value = 'Updated feedback'; });
       await page.click('#newsFeedbackSave');

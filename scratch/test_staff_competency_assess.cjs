@@ -18,7 +18,7 @@ const storageKey = 'peoplehcm.competencyAssessments.v1';
     await page.goto(url('staff-competency-employee.html', '?emp=EBB12&theme=light&company=PeopleHCM+Malaysia'), { waitUntil: 'domcontentloaded' });
     await page.evaluate(key => localStorage.removeItem(key), storageKey);
     await navigate('#staffCompetencyAssess', '#staffAssessForm');
-    assert.deepEqual(await page.$$eval('#staffAssessSummary > .cs-summary-field > :first-child', nodes => nodes.map(node => node.textContent)), ['Employee', 'Department', 'Position', 'Skill Group', 'Total Records']);
+    assert.deepEqual(await page.$$eval('#staffAssessSummary > .cs-summary-field > span:first-of-type', nodes => nodes.map(node => node.textContent)), ['Employee', 'Department', 'Position', 'Skill Group', 'Record']);
     assert.equal(await page.$eval('#staffAssessTotalRecords', node => node.textContent), '1');
     assert.equal(await page.$eval('.csa-card-header', node => node.textContent.trim()), 'Effective Communication');
     assert.deepEqual(await page.$$eval('.csa-card-detail > label, .csa-card-detail > dt', nodes => nodes.map(node => node.textContent)), ['Required Level', 'Last Level', 'Current Level', 'Gap']);
@@ -47,14 +47,14 @@ const storageKey = 'peoplehcm.competencyAssessments.v1';
     assert.equal(await page.$eval('#staffCompetencyAssess', node => node.textContent.trim()), 'Assess');
     await navigate('#staffCompetencyAssess', '#staffAssessForm');
     assert.deepEqual(await page.$$eval('#staffAssessSummary .cs-summary-field', fields => fields.map(field => ({
-      label: field.firstElementChild.textContent.trim(),
+      label: field.querySelector('span').textContent.trim(),
       value: [...field.querySelectorAll('strong')].map(node => node.textContent.trim()).join(' ')
     }))), [
       { label: 'Employee', value: 'Mei Ling' },
       { label: 'Department', value: 'Finance' },
       { label: 'Position', value: 'Accounts Assistant' },
       { label: 'Skill Group', value: 'People Area' },
-      { label: 'Total Records', value: '1' }
+      { label: 'Record', value: '1' }
     ]);
     assert.equal(await page.$eval('#staffAssessEmployeeId', node => node.textContent.trim()), '#EBB06');
     assert.equal(await page.$eval('.csa-card-header', node => node.textContent.trim()), 'Effective Communication');

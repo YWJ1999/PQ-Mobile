@@ -101,8 +101,18 @@ async function assertDrilldowns(page, scope, context) {
     assert.deepEqual(await visibleNames(page, scope), trendNames(scope, trend), `${context}: ${trend} across all metrics`);
     await closeSheet(page);
   }
+  await page.click(viewDetails);
+  assert.deepEqual(await visibleNames(page, scope), allNames(scope), `${context}: View details includes every metric`);
+  assert.equal(await page.$eval('#indicatorsSheetTitle', el => el.textContent), scope === 'my' ? 'My Indicators' : 'Team Indicators');
+  assert.equal(await page.$eval('#indicatorsSheetSubtitle', el => el.textContent), `${allNames(scope).length} metrics`);
+  const detailCards = await page.$$eval('#insightBreakdownCards .insight-detail-metric', cards => cards
+    .filter(card => card.getClientRects().length && card.querySelector('.insight-detail-current strong')?.textContent
+      && card.querySelector('.insight-detail-change strong')?.textContent)
+    .map(card => card.dataset.metricName).sort());
+  assert.deepEqual(detailCards, allNames(scope), `${context}: each restored card shows a value and change`);
+  await closeSheet(page);
   for (const group of groups) {
-    await page.click(viewDetails);
+    await page.evaluate(scope => openIndicatorsModal(scope), scope);
     await page.click(categoryButton(group));
     assert.deepEqual(await visibleNames(page, scope), namesFor(scope, group), `${context}: group header ${group}`);
     await closeSheet(page);
@@ -172,11 +182,11 @@ async function assertDrilldowns(page, scope, context) {
         }
         // Reopening the full feed restores its original presentation and filters.
         await closeSheet(page);
-        await page.click(viewDetails);
+        await page.evaluate(scope => openIndicatorsModal(scope), scope);
         assert.equal(await page.$eval('#indicatorsOverlay', el => el.classList.contains('insight-detail-breakdown')), false);
         await page.click(categoryButton(group));
         await page.click(trendButton(trend));
-        assert.deepEqual(await visibleNames(page, scope), [...expected[scope][group][trend]].sort(), 'View details filters');
+        assert.deepEqual(await visibleNames(page, scope), [...expected[scope][group][trend]].sort(), 'Full indicator feed filters');
       }
       // All must clear both filters, including a zero-match status.
       await page.click(categoryButton('all'));

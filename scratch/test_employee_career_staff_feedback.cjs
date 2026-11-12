@@ -96,9 +96,10 @@ const url = pathToFileURL(path.resolve(__dirname, '../modules/employee-career/op
      assert.equal(await page.$eval('#staffFeedbackDetailsOverlay', node => node.hidden), false);
       const detailStatus = await page.$$eval('#staffFeedbackDetailsTable tr', rows => {
         const row = rows.find(node => node.cells[0].textContent.trim() === 'Status');
-        return { text: row.cells[1].textContent.trim(), hasBadge: Boolean(row.cells[1].querySelector('.status-pill, i')) };
+        const badge = row.cells[1].querySelector('.record-detail-status');
+        return { text: badge?.textContent.trim(), state: badge?.dataset.status };
       });
-      assert.deepEqual(detailStatus, { text: 'Pending', hasBadge: false });
+      assert.deepEqual(detailStatus, { text: 'Pending', state: 'pending' });
       assert.equal(await page.$eval('main', node => node.inert), true);
       await page.screenshot({ path: path.join(__dirname, `employee_career_staff_feedback_details_${theme}_top.png`) });
       await page.$eval('#staffFeedbackDetailsOverlay .detail-popout-body', node => { node.scrollTop = node.scrollHeight; });

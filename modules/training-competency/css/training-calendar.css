@@ -143,7 +143,6 @@ training-schedule-sheet { display: contents; }
 .training-calendar-class-detail-row dd { min-width: 0; margin: 0; padding: 10px; font-size: 11px; line-height: 1.45; overflow-wrap: anywhere; }
 .training-calendar-class-detail-row dt { border-right: 1px solid var(--border-subtle); background: var(--bg-input); color: var(--text-muted); font-weight: 750; }
 .training-calendar-class-detail-row dd { background: var(--bg-card); color: var(--text-primary); font-weight: 750; }
-.training-calendar-class-detail-row dd.training-calendar-class-status { color: var(--purple-text); font-weight: 850; }
 .training-calendar-class-detail-row dd.training-calendar-class-attachment { color: var(--purple-text); }
 .training-calendar-detail-footer { display: flex; justify-content: flex-end; padding: 11px 13px 13px; border-top: 1px solid var(--border-subtle); background: var(--bg-card); }
 .training-calendar-detail-footer button { min-height: 38px; padding: 8px 18px; border: 0; border-radius: 12px; background: linear-gradient(135deg, #7c3aed, #6d28d9); color: #fff; font: inherit; font-size: 12px; font-weight: 800; cursor: pointer; box-shadow: 0 4px 12px rgba(124, 58, 237, .25); }
@@ -156,9 +155,6 @@ training-schedule-sheet { display: contents; }
 .training-request-field:last-child { margin-bottom: 0; }
 .training-request-field dt { margin-bottom: 6px; color: var(--text-muted); font-size: 11.5px; font-weight: 750; }
 .training-request-field dd { display: flex; flex-direction: column; justify-content: center; margin: 0; color: var(--text-primary); font-size: 12.5px; font-weight: 650; line-height: 1.55; overflow-wrap: anywhere; }
-.training-request-status { align-self: flex-start; padding: 4px 9px; border: 1px solid rgba(16, 185, 129, .28); border-radius: 999px; background: rgba(16, 185, 129, .12); color: #10b981; font-size: 10.5px; font-weight: 800; }
-.training-request-status.scheduled,
-.training-request-status.registered { border-color: rgba(124, 58, 237, .28); background: rgba(124, 58, 237, .12); color: var(--purple-text); }
 .training-request-employee-name { display: block; color: var(--text-primary); font-weight: 800; }
 .training-request-employee-id { display: block; margin-top: 3px; margin-bottom: 4px; color: var(--text-muted); opacity: .8; font-family: monospace, sans-serif; font-size: 11.5px; font-weight: 700; }
 .training-request-actions { max-width: 384px; display: flex; justify-content: flex-end; margin: 18px auto 0; }

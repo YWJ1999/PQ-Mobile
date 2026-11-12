@@ -1,4 +1,29 @@
 /* Shared Leave Detail presentation. Business content and open/close state stay with each page. */
+.record-detail-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  width: fit-content;
+  max-width: 100%;
+  box-sizing: border-box;
+  padding: 4px 8px;
+  border-radius: 8px;
+  background: var(--detail-status-fill, #7c3aed);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 1.4;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  vertical-align: middle;
+}
+.record-detail-status > i { flex: none; color: inherit; }
+.record-detail-status[data-status="pending"] { --detail-status-fill: #b35a0d; }
+.record-detail-status:is([data-status="submitted"], [data-status="approved"]) { --detail-status-fill: var(--record-approved-accent, #228156); }
+.record-detail-status[data-status="cancelled"] { --detail-status-fill: #6b7280; }
+.record-detail-status:is([data-status="draft"], [data-status="resubmit"]) { --detail-status-fill: var(--record-draft-accent, #2e6dca); }
+.record-detail-status[data-status="rejected"] { --detail-status-fill: var(--record-rejected-accent, #dc2626); }
+
 .detail-popout-overlay,
 .record-detail-table {
   --detail-surface: rgba(22, 21, 46, 0.65);
@@ -324,7 +349,7 @@
   background: var(--detail-surface) !important;
 }
 .history-detail-actions[hidden] { display: none !important; }
-.history-detail-action {
+.history-detail-action:where(:not(.record-primary-action)) {
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;

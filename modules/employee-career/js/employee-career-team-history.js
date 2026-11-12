@@ -144,7 +144,7 @@
   }
 
   function statusMarkup(record) {
-    const label = String(record.status || 'Pending');
+    const label = recordReviewStatusLabel(record.status || 'Pending');
     const meta = statusMeta[label.toLowerCase()] || statusMeta.pending;
     return {
       tone: meta.tone,
@@ -203,7 +203,7 @@
       : isExit ? `type="button" data-exit-id="${escape(record.id || '')}" aria-haspopup="dialog" aria-controls="teamExitDetailsOverlay"`
       : isRequest ? `type="button" data-request-id="${escape(record.id || '')}" aria-haspopup="dialog" aria-controls="teamRequestDetailsOverlay"`
       : isEngagement ? `type="button" data-engagement-id="${escape(record.id || '')}" aria-haspopup="dialog" aria-controls="teamEngagementDetailsOverlay"` : '';
-    return `<${tag} ${triggerAttributes} class="history-card-item team-history-card" data-status="${status.tone}" aria-label="${hasDetails ? 'View details for ' : ''}${escape(name || labels[kind])}, ${escape(record.status || 'Pending')}">
+    return `<${tag} ${triggerAttributes} class="history-card-item team-history-card" data-status="${status.tone}" aria-label="${hasDetails ? 'View details for ' : ''}${escape(name || labels[kind])}, ${escape(recordReviewStatusLabel(record.status || 'Pending'))}">
       <span class="history-card-header">
         ${headingMarkup(record)}
         ${status.html}
@@ -234,7 +234,7 @@
     if ($('teamEngagementFilterBar')) $('teamEngagementFilterBar').hidden = kind !== 'staff-engagement';
     if ($('teamEngagementFilterSummary')) {
       const { keyword, startDate, endDate, status } = engagementFilter;
-      $('teamEngagementFilterSummary').textContent = [keyword, startDate ? `From ${formatDate(startDate)}` : '', endDate ? `Until ${formatDate(endDate)}` : '', status].filter(Boolean).join(' / ') || 'All Interview Dates';
+      $('teamEngagementFilterSummary').textContent = [keyword, startDate ? `From ${formatDate(startDate)}` : '', endDate ? `Until ${formatDate(endDate)}` : '', recordReviewStatusLabel(status)].filter(Boolean).join(' / ') || 'All Interview Dates';
     }
     if ($('teamRequestFilterSummary')) {
       const { periodFrom, periodTo, ...selections } = requestFilter;
@@ -243,7 +243,7 @@
     if ($('teamConfirmationFilterSummary')) $('teamConfirmationFilterSummary').textContent = confirmationFilterSummary();
     if ($('teamExitFilterSummary')) {
       const { keyword, startDate, endDate, status } = exitFilter;
-      $('teamExitFilterSummary').textContent = [keyword, startDate ? `From ${formatDate(startDate)}` : '', endDate ? `Until ${formatDate(endDate)}` : '', status].filter(Boolean).join(' / ') || 'All Staff Exit Records';
+      $('teamExitFilterSummary').textContent = [keyword, startDate ? `From ${formatDate(startDate)}` : '', endDate ? `Until ${formatDate(endDate)}` : '', recordReviewStatusLabel(status)].filter(Boolean).join(' / ') || 'All Staff Exit Records';
     }
     if (title) title.textContent = `${labels[kind]} History`;
     if (count) count.textContent = String(records.length);
@@ -366,7 +366,7 @@
       labelCell.className = 'detail-popout-label';
       labelCell.textContent = label;
       valueCell.className = 'detail-popout-value';
-      valueCell.textContent = display(value);
+      valueCell.append(label === 'Status' ? recordDetailStatus.create(value) : display(value));
       row.append(labelCell, valueCell);
       return row;
     });

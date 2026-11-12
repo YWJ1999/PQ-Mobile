@@ -98,7 +98,9 @@
       const row = node('tr');
       const heading = node('th', '', label);
       heading.scope = 'row';
-      row.append(heading, node('td', '', String(value ?? '—')));
+      const cell = node('td');
+      cell.append(label === 'Status' ? recordDetailStatus.create(value) : String(value ?? '—'));
+      row.append(heading, cell);
       body.append(row);
     });
     const overlay = $('vacantPositionDetailOverlay');

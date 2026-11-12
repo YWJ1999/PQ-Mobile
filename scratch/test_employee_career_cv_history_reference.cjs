@@ -23,7 +23,8 @@ const ref = number => 'ECR' + String(number).padStart(16, '0');
       assert.equal(await page.$eval('#historyCategoryTitle', node => node.textContent), 'CV Change Request History');
       assert.equal(await page.$eval('html', node => node.dataset.theme), theme);
       assert.equal(await page.$eval('#historyRecordCount', node => node.textContent), '10', 'Count only the readable reference records');
-      assert.ok(await page.$$eval('.cv-history-card-employee', nodes => nodes.length > 0 && nodes.every(node => node.querySelector('.history-employee-name').nextElementSibling.textContent === '#EBB12')));
+      assert.deepEqual(await page.$$eval('#careerHistoryList .history-card-heading', nodes => nodes.map(node => node.textContent.trim())),
+        [98, 99, 100, 101, 102, 103, 110, 104, 224, 225].map(ref));
       const apply = async (from, to, status) => {
         await page.click('#historyFilterTrigger');
         assert.equal(await page.$eval('#historyFilterTitle', node => node.textContent), 'Filter');

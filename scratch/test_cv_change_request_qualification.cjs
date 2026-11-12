@@ -148,12 +148,12 @@ const pageUrl = pathToFileURL(path.join(root, 'change-request.html')).href + '?t
     await page.$eval('#input_qual_yearfrom', input => { input.value = '2025'; });
     await page.$eval('#input_qual_yearto', input => { input.value = '2025'; });
     await page.click('#saveQualificationButton');
-    assert.equal(await page.$eval('#qualificationRecordCount', node => node.textContent.trim()), '4 records');
+    assert.equal(await page.$eval('#qualificationRecordCount', node => node.textContent.trim()), '4 Records');
     assert.equal(await page.$$eval('[data-qualification-index]', nodes => nodes.length), 4);
     assert.equal(await page.$eval('[data-qualification-index="3"] [data-qualification-name]', node => node.textContent.trim()), 'Postgraduate Certificate');
 
     await page.click('[data-qualification-index="3"] [data-delete-qualification]');
-    assert.equal(await page.$eval('#qualificationRecordCount', node => node.textContent.trim()), '3 records');
+    assert.equal(await page.$eval('#qualificationRecordCount', node => node.textContent.trim()), '3 Records');
     assert.equal(await page.$$eval('[data-qualification-index]', nodes => nodes.length), 3);
     assert.equal(await page.$eval('#btnReviewSubmit', button => button.disabled), false);
     assert.ok(await page.$eval('#cat-qualification', section => section.scrollWidth <= section.clientWidth + 1), 'Qualification cards fit the mobile viewport');

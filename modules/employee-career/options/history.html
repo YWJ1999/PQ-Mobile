@@ -49,8 +49,8 @@
         <span class="claim-icon-button" aria-hidden="true"><i class="fa-solid fa-sliders"></i></span>
       </button>
       <div class="history-total-records-card record-summary-metric record-summary-card">
-        <span class="history-total-records-label record-summary-label">Total Records</span>
-        <strong id="historyRecordCount" class="history-total-records-value record-summary-value" aria-live="polite">0</strong>
+        <strong id="historyRecordCount" class="history-total-records-value record-summary-value" aria-live="polite" data-record-count>0</strong>
+        <span class="history-total-records-label record-summary-label">Records</span>
       </div>
       <div class="history-section-heading"><h2 id="historyCategoryTitle">Feedback History</h2></div>
       <div id="careerHistoryList" aria-live="polite"></div>
@@ -84,7 +84,7 @@
           <div id="cvHistoryFields" hidden>
             <div><label for="cvHistoryDateFrom" class="claim-filter-label">Start Date</label><input id="cvHistoryDateFrom" class="claim-control" type="date"></div>
             <div><label for="cvHistoryDateTo" class="claim-filter-label">End Date</label><input id="cvHistoryDateTo" class="claim-control" type="date"></div>
-            <div><label for="cvHistoryStatus" class="claim-filter-label">Status</label><div class="claim-filter-select-wrap"><select id="cvHistoryStatus" class="claim-filter-select"><option value="">All Statuses</option><option value="draft">Draft</option><option value="submitted">Submitted</option><option value="resubmit">Resubmit</option><option value="approved">Approved</option><option value="rejected">Rejected</option><option value="cancelled">Cancelled</option></select><i class="fa-solid fa-chevron-down claim-filter-chevron" aria-hidden="true"></i></div></div>
+            <div><label for="cvHistoryStatus" class="claim-filter-label">Status</label><div class="claim-filter-select-wrap"><select id="cvHistoryStatus" class="claim-filter-select"><option value="">All Statuses</option><option value="draft">Draft</option><option value="submitted">Pending</option><option value="resubmit">Resubmit</option><option value="approved">Approved</option><option value="rejected">Rejected</option><option value="cancelled">Cancelled</option></select><i class="fa-solid fa-chevron-down claim-filter-chevron" aria-hidden="true"></i></div></div>
           </div>
           <p id="historyFilterError" class="history-filter-error" role="alert" hidden></p>
         </div>
@@ -95,7 +95,14 @@
       <section class="history-detail-panel">
         <div class="history-detail-header"><h2 id="historyDetailTitle">Feedback Detail</h2><button id="closeHistoryDetails" type="button" aria-label="Close details"><i class="fa-solid fa-circle-xmark" aria-hidden="true"></i></button></div>
         <div id="historyDetailBody" class="history-detail-body"></div>
-        <footer id="historyDetailActions" class="history-detail-actions career-history-detail-actions" hidden><a id="historyEditFeedback" class="career-history-edit-btn" href="individual/feedback.html"><span>Edit</span></a><button id="historyDeleteWhereabout" class="career-history-delete-btn" type="button" hidden>Delete</button></footer>
+        <footer id="historyDetailActions" class="history-detail-actions career-history-detail-actions" hidden>
+          <a id="historyEditFeedback" class="record-primary-action" href="individual/feedback.html">
+            <i class="fa-solid fa-pen" aria-hidden="true"></i><span>Edit Feedback</span>
+          </a>
+          <button id="historyDeleteWhereabout" class="record-primary-action" type="button" hidden>
+            <i class="fa-regular fa-trash-can" aria-hidden="true"></i><span>Delete Record</span>
+          </button>
+        </footer>
       </section>
     </div>
     <div id="whereaboutDeleteOverlay" class="history-detail-overlay detail-popout-overlay" role="alertdialog" aria-modal="true" aria-hidden="true" aria-labelledby="whereaboutDeleteTitle" aria-describedby="whereaboutDeleteMessage">

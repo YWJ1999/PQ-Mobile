@@ -38,7 +38,7 @@ const storageKey = 'peoplehcm.staffLearningDevelopment.records.v1';
 
     assert.equal(await page.$eval('h1', node => node.textContent.trim()), 'Staff L&D Plan');
     assert.equal(await page.$eval('#sldBack', node => node.getAttribute('href')), '../index.html?scope=team&theme=dark');
-    assert.deepEqual(await summaryLabels('#sldPlanSummary'), ['Employee', 'Position', 'Period', 'Description', 'Total Records', 'Average Progress%']);
+    assert.deepEqual(await summaryLabels('#sldPlanSummary'), ['Employee', 'Position', 'Period', 'Description', 'Records', 'Average Progress%']);
     assert.deepEqual(await page.$eval('[data-field="employee"] strong', node => {
       const name = node.querySelector('.sld-employee-name');
       const employeeId = node.querySelector('.sld-employee-id');
@@ -73,7 +73,7 @@ const storageKey = 'peoplehcm.staffLearningDevelopment.records.v1';
     await Promise.all([page.waitForNavigation({ waitUntil: 'domcontentloaded' }), click('.sld-update')]);
     await page.waitForSelector('#sldProgressSummary');
     assert.equal(await page.$eval('h1', node => node.textContent.trim()), 'Staff L&D Progress');
-    assert.deepEqual(await summaryLabels('#sldProgressSummary'), ['Activity', 'Deadline', 'Budget Hours', 'Review Due', 'Progress%', 'Total Records', 'Total Used Hours']);
+    assert.deepEqual(await summaryLabels('#sldProgressSummary'), ['Activity', 'Deadline', 'Budget Hours', 'Review Due', 'Progress%', 'Records', 'Total Used Hours']);
     assert.equal(await summaryValue('activity'), 'Leadership & Crisis Management');
     assert.equal(await summaryValue('progress'), '50%');
     assert.equal(await summaryValue('total-records'), '2');

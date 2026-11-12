@@ -95,9 +95,11 @@
     $(containerId).replaceChildren(...rows.map(([label, value, field]) => {
       const row = node('div', 'ld-summary-field');
       row.dataset.field = field;
-      const isRecordCount = field === 'total-records';
-      row.classList.toggle('record-summary-metric', isRecordCount);
-      const strong = node('strong', isRecordCount ? 'record-summary-value' : '');
+      if (field === 'total-records') {
+        window.PeopleHcmRecordSummary.renderCount(row, value);
+        return row;
+      }
+      const strong = node('strong', '');
       if (field === 'employee') {
         strong.append(
           node('span', 'sld-employee-name', value.name),
@@ -106,7 +108,7 @@
       } else {
         strong.textContent = value;
       }
-      row.append(node('span', isRecordCount ? 'record-summary-label' : '', label), strong);
+      row.append(node('span', '', label), strong);
       return row;
     }));
   }

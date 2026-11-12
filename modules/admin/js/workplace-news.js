@@ -123,15 +123,20 @@
     $('newsBookmark').querySelector('i').className = (row.bookmarked ? 'fa-solid' : 'fa-regular') + ' fa-bookmark';
     $('newsAcknowledged').hidden = !acknowledgedAt;
     $('newsAcknowledge').hidden = !!acknowledgedAt;
-    $('newsFeedbackTrigger').classList.toggle('news-secondary-button', !acknowledgedAt);
     if (acknowledgedAt) {
       const time = $('newsAcknowledged').querySelector('time');
       time.dateTime = acknowledgedAt;
       time.textContent = formatAcknowledgement(acknowledgedAt);
     }
-    $('newsSavedFeedback').hidden = !row.feedback;
+    const hasFeedback = Boolean(row.feedback);
+    $('newsSavedFeedback').hidden = !hasFeedback;
     $('newsSavedFeedbackText').textContent = row.feedback || '';
-    $('newsFeedbackTrigger').querySelector('span').textContent = row.feedback ? 'Edit feedback' : 'Feedback';
+    const feedbackButton = $('newsFeedbackTrigger');
+    feedbackButton.classList.toggle('news-primary-button', !hasFeedback);
+    feedbackButton.classList.toggle('news-secondary-button', !acknowledgedAt && !hasFeedback);
+    feedbackButton.classList.toggle('record-primary-action', hasFeedback);
+    feedbackButton.querySelector('i').hidden = !hasFeedback;
+    feedbackButton.querySelector('span').textContent = hasFeedback ? 'Edit Feedback' : 'Feedback';
   }
 
   function updateBackLinks() {

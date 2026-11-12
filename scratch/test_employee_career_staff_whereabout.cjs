@@ -24,7 +24,7 @@ const url = pathToFileURL(path.resolve(__dirname, '../modules/employee-career/op
       assert.deepEqual(await page.$$eval('#staffWhereaboutFilterForm label', nodes => nodes.map(n => n.textContent)), ['Date', 'Search Keyword', 'Branch', 'Department', 'Whereabout']);
       assert.equal(await page.$eval('#staffWhereaboutCurrentDate', n => n.textContent), '05 Oct 2026');
       assert.equal(await page.$eval('.staff-whereabout-date-switcher', n => n.nextElementSibling.classList.contains('staff-whereabout-filter-summary')), true);
-      assert.equal(await page.$eval('.history-total-records-label', n => n.textContent), 'Total Records');
+      assert.equal(await page.$eval('.history-total-records-label', n => n.textContent), 'Records');
       assert.equal(await page.$eval('#staffWhereaboutTotal', n => n.textContent), '5');
       assert.equal(await page.$$eval('main h2', nodes => nodes.some(n => n.textContent === 'Staff Whereabout')), false);
       await page.click('#staffWhereaboutPreviousDate');

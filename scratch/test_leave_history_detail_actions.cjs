@@ -23,7 +23,7 @@ const puppeteer = require('puppeteer');
         document.documentElement.dataset.theme = theme;
         showLeaveSection('viewMyLeaveHistory');
       }, theme);
-      for (const width of [360, 390, 420]) {
+      for (const width of [320, 360, 390, 420]) {
         await page.setViewport({ width, height: 844 });
         for (const tab of ['leave', 'credit', 'offtime']) {
           await page.evaluate(tab => switchHistoryTab(tab), tab);
@@ -38,8 +38,9 @@ const puppeteer = require('puppeteer');
               ? [] : card.status === 'draft' ? ['Apply', 'Cancel'] : ['Cancel'];
             assert.deepEqual(card.buttons, expected);
             await page.evaluate(ref => openHistoryDetailsModal(ref), card.ref);
-            assert.deepEqual(await page.$$eval(`${actions} button`, buttons => buttons.map(button => button.textContent.trim())), expected,
-              `${theme}/${width}/${card.ref}: details actions must match the card`);
+            const detailLabels = expected.length === 2 ? ['Apply', 'Delete Record'] : expected;
+            assert.deepEqual(await page.$$eval(`${actions} button`, buttons => buttons.map(button => button.textContent.trim())), detailLabels,
+              `${theme}/${width}/${card.ref}: record detail actions`);
             assert.equal(await page.$eval(actions, node => node.hidden), !expected.length);
             if (expected.length) {
               const layout = await page.$eval(actions, node => {
@@ -47,33 +48,29 @@ const puppeteer = require('puppeteer');
                 const body = panel.querySelector('.history-details-body');
                 body.scrollTop = body.scrollHeight;
                 const footerStyle = getComputedStyle(node);
-                const buttonStyles = [...node.querySelectorAll('button')].map(button => {
-                  const style = getComputedStyle(button);
-                  return {
-                    background: style.backgroundImage,
-                    color: style.color,
-                    radius: style.borderRadius,
-                    padding: [style.paddingTop, style.paddingRight, style.paddingBottom, style.paddingLeft]
-                  };
-                });
+                const remove = node.querySelector('button.record-primary-action');
+                const style = getComputedStyle(remove);
+                const width = node.clientWidth - parseFloat(footerStyle.paddingLeft) - parseFloat(footerStyle.paddingRight);
+                const first = node.firstElementChild.getBoundingClientRect();
+                const last = remove.getBoundingClientRect();
                 return {
                   directChild: node.parentElement === panel,
                   outsideScrollableBody: !body.contains(node),
-                  justifyContent: footerStyle.justifyContent,
-                  gap: footerStyle.gap,
-                  buttonStyles,
+                  background: style.backgroundImage,
+                  colour: style.color,
+                  icon: remove.querySelector('i[aria-hidden="true"]')?.className,
+                  fullWidth: Math.abs(remove.offsetWidth - width) <= 1,
+                  compactPair: Math.abs(first.top - last.top) <= 1 && last.left >= first.right + 6
+                    && Math.abs(first.width - last.width) <= 1 && last.width <= 132
+                    && Math.abs(first.height - last.height) <= 1 && last.height >= 40,
                   fits: panel.scrollWidth <= panel.clientWidth + 1
                 };
               });
               assert.ok(layout.directChild && layout.outsideScrollableBody && layout.fits);
-              assert.equal(layout.justifyContent, 'flex-end');
-              assert.equal(layout.gap, '8px');
-              layout.buttonStyles.forEach(style => {
-                assert.match(style.background, /rgb\(124, 58, 237\).*rgb\(109, 40, 217\)/);
-                assert.equal(style.color, 'rgb(255, 255, 255)');
-                assert.equal(style.radius, '20px');
-                assert.deepEqual(style.padding, ['8px', '16px', '8px', '16px']);
-              });
+              assert.match(layout.icon, expected.length === 1 ? /fa-ban/ : /fa-trash-can/);
+              assert.ok(expected.length === 2 ? layout.compactPair : layout.fullWidth, `${theme}/${width}/${card.ref}: action layout`);
+              assert.match(layout.background, /rgb\(124, 58, 237\).*rgb\(109, 40, 217\)/);
+              assert.equal(layout.colour, 'rgb(255, 255, 255)');
               if (width === 390 && tab === 'leave' && ['draft', 'submitted'].includes(card.status)) {
                 await page.screenshot({ path: path.join(__dirname, `leave_history_details_${card.status}_${theme}.png`) });
               }
@@ -141,7 +138,7 @@ const puppeteer = require('puppeteer');
       assert.equal(await page.$$eval(`${actions} button`, buttons => buttons.every(button => !button.disabled)), true);
     }
     assert.deepEqual(errors, []);
-    console.log('PASS: Leave History details mirror card actions in a fixed right-aligned purple footer across both themes and three widths; Apply/Cancel update both views and cancellation can be dismissed.');
+    console.log('PASS: Leave History pairs share a compact row and single Cancel uses the full footer in both themes at four widths. Apply and cancellation update both views.');
   } finally {
     await browser.close();
   }

@@ -1,4 +1,4 @@
-/* Multiple actions share the row. A single action fits its label at the right edge. */
+/* Compact actions share a row. A single compact action fits its label at the right edge. */
 html body :is(
   .pending-action-grid, .evaluation-decision-actions,
   .payroll-approval-details-footer, .payroll-approval-workflow-footer,
@@ -15,7 +15,7 @@ html body :is(
   place-items: stretch;
   gap: 6px !important;
 
-  & > :is(button, a):not([hidden]) {
+  & > :is(button, a):not([hidden], .record-primary-action) {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -40,18 +40,97 @@ html body :is(
     cursor: pointer;
   }
 
-  &:not(:has(> :nth-child(2 of :is(button, a):not([hidden])))) > :is(button, a):not([hidden]) {
+  &:not(:has(> :nth-child(2 of :is(button, a):not([hidden])))) > :is(button, a):not([hidden], .record-primary-action) {
     grid-column: 1 / -1;
     justify-self: end;
     width: fit-content !important;
     max-width: 100%;
     padding-inline: 14px !important;
+
+    &:has(> .record-card-action-icon) {
+      width: clamp(96px, 40%, 120px) !important;
+      gap: 8px;
+      border: 0 !important;
+      border-radius: 10px !important;
+      background: var(--primary-action-background) !important;
+      box-shadow: 0 3px 8px rgba(109, 40, 217, .18) !important;
+      font-size: 13px !important;
+      font-weight: 700 !important;
+      white-space: nowrap !important;
+
+      & > .record-card-action-icon { font-size: 16px; }
+    }
   }
 
   & > :is(button, a):hover:not(:disabled) { filter: brightness(1.08); }
   & > :is(button, a):focus-visible { outline: 2px solid var(--purple-text); outline-offset: 3px; }
   & > button:disabled { opacity: .48; cursor: not-allowed; }
 }
+
+/* Record details use full rows for primary actions by default. */
+html body :is(.history-detail-actions, .news-action-buttons):not([hidden]):has(> .record-primary-action:not([hidden])) {
+  display: flex !important;
+  flex-wrap: wrap;
+
+  & > :is(button, a):not([hidden], .record-primary-action) { flex: 1 1 0; }
+}
+
+/* Exactly two visible actions share a single row, including primary actions. */
+html body :is(
+  .pending-action-grid, .evaluation-decision-actions,
+  .payroll-approval-details-footer, .payroll-approval-workflow-footer,
+  .history-detail-actions, .history-card-actions, .record-card-actions,
+  .project-history-card-actions, .incident-history-actions, .career-history-card-actions,
+  .staff-feedback-card-actions, .summary-history-actions, .clocking-card-actions,
+  .staff-card-actions, .goal-progress-card-footer, .evaluation-card-footer,
+  .ld-card-footer, .prior-record-footer, .confirm-new-user-actions,
+  .news-action-buttons, .detail-popout-actions
+):not([hidden]):has(> :nth-child(2 of :is(button, a):not([hidden]))):not(:has(> :nth-child(3 of :is(button, a):not([hidden])))) {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 132px)) !important;
+  justify-content: end !important;
+  align-items: stretch !important;
+  gap: 8px !important;
+
+  & > :is(button, a):not([hidden]) {
+    box-sizing: border-box;
+    width: 100% !important;
+    min-width: 0 !important;
+    min-height: 40px !important;
+    height: auto !important;
+    padding: 8px !important;
+    flex-direction: row !important;
+    font-size: 12px !important;
+    line-height: 1.25 !important;
+  }
+}
+
+:is(.history-detail-actions, .news-action-buttons) > :is(button, a).record-primary-action:not([hidden]) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex: 0 0 100%;
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 16px;
+  border: 0;
+  border-radius: 10px;
+  background: var(--primary-action-background);
+  color: #fff;
+  box-shadow: 0 3px 8px rgba(109, 40, 217, .18);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.35;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.record-primary-action:hover:not(:disabled) { filter: brightness(1.08); }
+.record-primary-action:focus-visible { outline: 2px solid var(--purple-text); outline-offset: 3px; }
 
 html body :is(.pending-action-grid, .evaluation-decision-actions, .pending-selection-bar) button :is(i, svg, img) {
   display: none !important;

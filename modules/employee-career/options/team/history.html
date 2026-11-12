@@ -62,8 +62,8 @@
         <button type="button" id="teamEngagementFilterTrigger" aria-label="Open Staff Engagement filter" aria-haspopup="dialog" aria-controls="teamEngagementFilterOverlay"><i class="fa-solid fa-sliders" aria-hidden="true"></i></button>
       </section>
       <div class="history-total-records-card record-summary-metric record-summary-card">
-        <span class="history-total-records-label record-summary-label">Total Records</span>
-        <strong id="teamHistoryRecordCount" class="history-total-records-value record-summary-value" aria-live="polite">0</strong>
+        <strong id="teamHistoryRecordCount" class="history-total-records-value record-summary-value" aria-live="polite" data-record-count>0</strong>
+        <span class="history-total-records-label record-summary-label">Records</span>
       </div>
       <div class="team-history-section-heading">
         <h2 id="teamHistoryCategoryTitle">Staff Confirmation History</h2>
@@ -146,7 +146,7 @@
           <div class="team-history-filter-wide"><label for="teamEngagementKeyword">Search Keyword</label><input id="teamEngagementKeyword" name="keyword" type="search" placeholder="Search reference, name, ID, position or reason"></div>
           <div><label for="teamEngagementStartDate">Start Date</label><input id="teamEngagementStartDate" name="startDate" type="date" aria-describedby="teamEngagementFilterError"></div>
           <div><label for="teamEngagementEndDate">End Date</label><input id="teamEngagementEndDate" name="endDate" type="date" aria-describedby="teamEngagementFilterError"></div>
-          <div class="team-history-filter-wide"><label for="teamEngagementStatus">Status</label><select id="teamEngagementStatus" name="status"><option value="">All Status</option><option value="Submitted">Submitted</option><option value="Approved">Approved</option><option value="Rejected">Rejected</option><option value="To Resubmit">To Resubmit</option></select></div>
+          <div class="team-history-filter-wide"><label for="teamEngagementStatus">Status</label><select id="teamEngagementStatus" name="status"><option value="">All Status</option><option value="Submitted">Pending</option><option value="Approved">Approved</option><option value="Rejected">Rejected</option><option value="To Resubmit">To Resubmit</option></select></div>
           <p id="teamEngagementFilterError" class="team-history-filter-error" role="alert" hidden></p>
         </div>
         <footer class="standard-filter-footer"><button type="submit" id="teamEngagementApplyFilter" class="standard-filter-apply">Apply Filter</button></footer>
@@ -207,7 +207,7 @@
           <div class="team-history-filter-wide"><label for="teamExitKeyword">Search Keyword</label><input id="teamExitKeyword" name="keyword" type="search" placeholder="Search name, employee ID, position or reason"></div>
           <div><label for="teamExitStartDate">Start Date</label><input id="teamExitStartDate" name="startDate" type="date" aria-describedby="teamExitFilterError"></div>
           <div><label for="teamExitEndDate">End Date</label><input id="teamExitEndDate" name="endDate" type="date" aria-describedby="teamExitFilterError"></div>
-          <div class="team-history-filter-wide"><label for="teamExitStatus">Status</label><select id="teamExitStatus" name="status"><option value="">All Status</option><option value="Approved">Approved</option><option value="Submitted">Submitted</option></select></div>
+          <div class="team-history-filter-wide"><label for="teamExitStatus">Status</label><select id="teamExitStatus" name="status"><option value="">All Status</option><option value="Approved">Approved</option><option value="Submitted">Pending</option></select></div>
           <p id="teamExitFilterError" class="team-history-filter-error" role="alert" hidden></p>
         </div>
         <footer class="standard-filter-footer"><button type="submit" id="teamExitApplyFilter" class="standard-filter-apply">Apply Filter</button></footer>

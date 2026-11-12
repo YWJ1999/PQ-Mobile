@@ -167,7 +167,8 @@
     const rows = fields.map(([label, value]) => {
       const row = element('tr', '');
       const cell = element('td', 'detail-popout-value');
-      cell.textContent = value === '' || value == null ? '—' : String(value);
+      if (label === 'Status') cell.append(recordDetailStatus.create(value));
+      else cell.textContent = value === '' || value == null ? '—' : String(value);
       row.append(element('td', 'detail-popout-label', label), cell);
       return row;
     });

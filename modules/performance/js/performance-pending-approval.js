@@ -29,7 +29,7 @@
   }
   function field(label, value) {
     const field = node('div', 'payroll-approval-field');
-    field.append(node('small', '', label), node('strong', '', value));
+    field.append(node('small', '', label), value instanceof Node ? value : node('strong', '', value));
     return field;
   }
   function detailActionButtons(recordId) {
@@ -121,7 +121,7 @@
       ['Reporting To', record.reportingTo],
       ...(record.backupApprover ? [['Backup Approver', person(record.backupApprover)]] : [])
     ]), node('h3', '', 'Appraisal Details'), table([
-      ['Reference #', record.id], ['Status', 'Pending Approval'], ['Submit Date', date(record.submittedAt)],
+      ['Reference #', record.id], ['Status', recordDetailStatus.create('Pending Approval')], ['Submit Date', date(record.submittedAt)],
       [record.category === 'goal-plan' ? 'Session' : 'Period', record.category === 'goal-plan' ? record.session : record.period], ['Appraisal Type', record.appraisalType],
       ['Period Start', date(record.startDate)], ['Period End', date(record.endDate)]
     ]));
@@ -168,11 +168,11 @@
     const record = store.getPending().find(item => item.id === activeRecordId); if (!record) return;
     $('performanceApprovalWorkflowTitle').textContent = `${names[record.category]} Workflow`;
     const employee = node('div', 'payroll-approval-workflow-person'); employee.append(person(record));
-    $('performanceApprovalWorkflowRequest').replaceChildren(field('Reference #', record.id), employee, field('Status', 'Pending Approval'), field(record.category === 'goal-plan' ? 'Session' : 'Period', record.category === 'goal-plan' ? record.session : record.period));
+    $('performanceApprovalWorkflowRequest').replaceChildren(field('Reference #', record.id), employee, field('Status', recordDetailStatus.create('Pending Approval')), field(record.category === 'goal-plan' ? 'Session' : 'Period', record.category === 'goal-plan' ? record.session : record.period));
     const submitted = node('li', 'payroll-approval-workflow-step is-complete');
-    submitted.append(field('Request Submitted', 'Completed'), field('Submitted By', record.name), field('Submit Date', date(record.submittedAt)));
+    submitted.append(field('Request Submitted', recordDetailStatus.create('Completed')), field('Submitted By', record.name), field('Submit Date', date(record.submittedAt)));
     const approval = node('li', 'payroll-approval-workflow-step is-active');
-    approval.append(field(`${names[record.category]} Approval`, 'Awaiting Approval'), field('Approver', record.reportingTo), field('Action Date', '—'));
+    approval.append(field(`${names[record.category]} Approval`, recordDetailStatus.create('Awaiting Approval')), field('Approver', record.reportingTo), field('Action Date', '—'));
     if (record.backupApprover) approval.append(person(record.backupApprover), field('Assignment', 'Backup Approver'));
     $('performanceApprovalWorkflowSteps').replaceChildren(submitted, approval);
     const audit = node('li'); audit.append(field('Request Submitted', date(record.submittedAt)), node('span', '', record.name));

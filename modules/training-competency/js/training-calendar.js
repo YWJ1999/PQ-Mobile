@@ -135,7 +135,7 @@
       const term = document.createElement('dt');
       term.textContent = label;
       const description = document.createElement('dd');
-      description.textContent = value || '-';
+      description.append(label === 'Class Status' ? recordDetailStatus.create(value) : value || '-');
       if (modifier) description.classList.add(modifier);
       row.append(term, description);
       return row;
@@ -156,7 +156,7 @@
         classDetailRow('Class', details.class),
         classDetailRow('Description', details.description),
         classDetailRow('Course Title', details.courseTitle),
-        classDetailRow('Class Status', details.classStatus, 'training-calendar-class-status'),
+        classDetailRow('Class Status', details.classStatus),
         classDetailRow('Start', formatDateTime(details.start)),
         classDetailRow('End', formatDateTime(details.end)),
         classDetailRow('Venue', details.venue),
@@ -197,7 +197,7 @@
       eventDate.textContent = formatDate(key);
       eventList.replaceChildren(...events.map(event => {
         const details = event.classDetails;
-        const status = String(event.status || 'Submitted');
+        const status = event.requestDetails?.documentStatus || event.status || 'Pending';
         const statusTheme = status.toLowerCase();
         const card = document.createElement('article');
         card.className = 'training-calendar-event-card history-card-item';
@@ -220,7 +220,7 @@
         const statusIcon = document.createElement('i');
         statusIcon.className = statusTheme === 'approved' ? 'fa-solid fa-check' : 'fa-solid fa-hourglass-half';
         statusIcon.setAttribute('aria-hidden', 'true');
-        badge.append(statusIcon, document.createTextNode(status));
+        badge.append(statusIcon, document.createTextNode(recordReviewStatusLabel(status)));
         const header = document.createElement('header');
         header.className = 'training-calendar-event-card-header history-card-header';
         header.append(heading, badge);
@@ -334,13 +334,6 @@
     }
   }
 
-  function statusMarkup(value, modifier = '') {
-    const span = document.createElement('span');
-    span.className = `training-request-status ${modifier}`.trim();
-    span.textContent = value;
-    return span;
-  }
-
   function field(label, value, name, renderer) {
     const row = document.createElement('div');
     row.className = 'training-request-field';
@@ -377,13 +370,13 @@
     const requestData = event.requestDetails;
     classFields.replaceChildren(
       field('Class', classData.class), field('Description', classData.description), field('Course Title', classData.courseTitle),
-      field('Class Status', '', 'class-status', () => statusMarkup(classData.classStatus, 'scheduled')),
+      field('Class Status', '', 'class-status', () => recordDetailStatus.create(classData.classStatus)),
       field('Start', formatDateTime(classData.start)), field('End', formatDateTime(classData.end)), field('Venue', classData.venue),
       field('Trainer / Facilitator', classData.trainer), field('Class Capacity', classData.capacity), field('Remark', classData.remark)
     );
     requestFields.replaceChildren(
       field('Document Reference', requestData.documentReference),
-      field('Document Status', '', 'document-status', () => statusMarkup(requestData.documentStatus)),
+      field('Document Status', '', 'document-status', () => recordDetailStatus.create(requestData.documentStatus)),
       field('Employee', '', 'employee', () => {
         const wrapper = document.createElement('span');
         const name = document.createElement('span');
@@ -395,7 +388,7 @@
         wrapper.append(name, employeeId);
         return wrapper;
       }),
-      field('Attendance Status', '', 'attendance-status', () => statusMarkup(requestData.attendanceStatus, 'registered')),
+      field('Attendance Status', '', 'attendance-status', () => recordDetailStatus.create(requestData.attendanceStatus)),
       field('Reason', requestData.reason), field('Is Require Traveling', requestData.requireTraveling),
       field('Is Require Accommodation', requestData.requireAccommodation), field('Is Vegetarian', requestData.vegetarian),
       field('Remark', requestData.remark), field('Attended Hours', requestData.attendedHours),

@@ -95,9 +95,7 @@
 .payroll-approval-workflow-step-heading { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
 .payroll-approval-workflow-step-heading > i { color: var(--purple-text); font-size: 13px; }
 .payroll-approval-workflow-step-heading h4 { flex: 1; font-size: 12px; font-weight: 800; }
-.payroll-approval-workflow-badge { padding: 4px 7px; border-radius: 8px; background: var(--bg-input); color: var(--text-muted); font-size: 10px; font-weight: 800; white-space: nowrap; }
 .payroll-approval-workflow-step.is-active { border-color: var(--purple-border); }
-.payroll-approval-workflow-step.is-active .payroll-approval-workflow-badge { background: var(--purple-subtle); color: var(--purple-text); }
 .payroll-approval-workflow-audit ul { margin-top: 12px; list-style: none; }
 .payroll-approval-workflow-audit-heading { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; font-size: 11px; }
 .payroll-approval-workflow-audit-heading > i { color: var(--purple-text); }

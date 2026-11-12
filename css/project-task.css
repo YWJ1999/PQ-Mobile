@@ -1417,19 +1417,9 @@
 }
 .project-approval-workflow-step strong { display: block; font-size: 11.5px; font-weight: 800; }
 .project-approval-workflow-step small { display: block; margin-top: 2px; color: var(--text-muted); font-size: 9.5px; font-weight: 600; }
-.project-approval-workflow-step > span {
-  padding: 4px 7px;
-  border-radius: 8px;
-  background: var(--bg-input);
-  color: var(--text-muted);
-  font-size: 9px;
-  font-weight: 800;
-}
 .project-approval-workflow-step.is-complete > i { background: rgba(16, 185, 129, 0.14); color: #10b981; }
-.project-approval-workflow-step.is-complete > span { background: rgba(16, 185, 129, 0.12); color: #10b981; }
 .project-approval-workflow-step.is-active { border-color: var(--purple-border); }
-.project-approval-workflow-step.is-active > i,
-.project-approval-workflow-step.is-active > span { background: var(--purple-subtle); color: var(--purple-text); }
+.project-approval-workflow-step.is-active > i { background: var(--purple-subtle); color: var(--purple-text); }
 @media (max-width: 370px) {
   .project-approval-actions button {
     gap: 4px;
@@ -2068,10 +2058,6 @@
 .project-history-detail-row > strong {
   color: var(--text-primary);
   font-weight: 500;
-}
-.project-history-detail-status {
-  color: var(--purple-text) !important;
-  font-weight: 800 !important;
 }
 .project-history-attachments {
   display: flex;

@@ -50,20 +50,21 @@ async function run() {
     assert.ok(cards[2].includes('TXR05') && cards[2].includes('RM 14.00'));
     assert.deepEqual(await page.$$eval('.history-card-item', nodes => nodes.map(node => node.dataset.status)), ['submitted', 'submitted', 'submitted'], 'Tax Relief History must match the three Submitted screenshot records');
     const submittedActions = await page.$eval('[data-reference="RBT000000000039"]', card => [...card.querySelectorAll('.history-card-action')].map(button => button.textContent.trim()));
-    assert.deepEqual(submittedActions, ['Cancel'], 'Submitted history cards must expose only the Cancel action');
+    assert.deepEqual(submittedActions, ['Cancel'], 'Submitted history cards expose Cancel');
     const remainingSubmittedActions = await page.$$eval('[data-reference="RBT000000000049"], [data-reference="RBT000000000050"]', cards => cards.map(card => [...card.querySelectorAll('.history-card-action')].map(button => button.textContent.trim())));
-    assert.deepEqual(remainingSubmittedActions, [['Cancel'], ['Cancel']], 'All screenshot Tax Relief records must remain Submitted');
+    assert.deepEqual(remainingSubmittedActions, [['Cancel'], ['Cancel']], 'Submitted Tax Relief cards expose Cancel');
     const cancelPresentation = await page.$eval('[data-reference="RBT000000000039"] .history-card-action', button => {
       const rect = button.getBoundingClientRect();
-      const style = getComputedStyle(button);
+      const footer = button.parentElement;
+      const footerStyle = getComputedStyle(footer);
       return {
-        size: { width: rect.width, height: rect.height },
-        background: style.backgroundImage,
-        color: style.color
+        width: rect.width,
+        available: footer.clientWidth - parseFloat(footerStyle.paddingLeft) - parseFloat(footerStyle.paddingRight),
+        rightInset: footer.getBoundingClientRect().right - rect.right - parseFloat(footerStyle.paddingRight)
       };
     });
-    assert.match(cancelPresentation.background, /linear-gradient/);
-    assert.equal(cancelPresentation.color, 'rgb(255, 255, 255)', 'Cancel must use the purple primary style in dark mode');
+    assert.ok(cancelPresentation.width < cancelPresentation.available / 2 && Math.abs(cancelPresentation.rightInset) <= 1,
+      'Submitted card Cancel is compact and right-aligned');
     await page.click('#historyFilterTrigger');
     const taxFilterLabels = await page.evaluate(() => ({
       from: document.getElementById('historyDateFromLabel').textContent.trim(),
@@ -135,21 +136,15 @@ async function run() {
     assert.deepEqual(await refs(page), ['PDR000000000004', 'deduction-202008-asb', 'deduction-202112-absent', 'deduction-202205-advance', 'deduction-202507-uniform']);
     const deductionCards = await page.$$eval('.history-card-item', cards => cards.map(card => card.textContent.replace(/\s+/g, ' ')));
     for (const expected of ['HOUSE DEDUCTION', '202007', '11 Jun 2020', 'MONTH END', 'RM 200.00', 'Draft']) assert.ok(deductionCards[0].includes(expected));
-    const submitPresentation = await page.$eval('[data-reference="PDR000000000004"] .history-card-action-primary', button => {
-      const rect = button.getBoundingClientRect();
-      const style = getComputedStyle(button);
-      return {
-        size: { width: rect.width, height: rect.height },
-        background: style.backgroundImage,
-        boxShadow: style.boxShadow,
-        color: style.color
-      };
-    });
-    assert.deepEqual(cancelPresentation.size, submitPresentation.size, 'Cancel and Submit buttons must have identical dimensions');
-    assert.equal(submitPresentation.background, 'linear-gradient(135deg, rgb(124, 58, 237) 0%, rgb(109, 40, 217) 100%)', 'Submit must use the exact Claim History purple');
-    assert.ok(submitPresentation.boxShadow.includes('rgba(124, 58, 237, 0.4)') && submitPresentation.color === 'rgb(255, 255, 255)', 'Submit must use the Claim History purple glow');
+    const draftLayout = await page.$$eval('[data-reference="PDR000000000004"] .history-card-action', buttons => buttons.map(button => {
+      const { top, width } = button.getBoundingClientRect();
+      return { top, width, label: button.textContent.trim() };
+    }));
+    assert.deepEqual(draftLayout.map(button => button.label), ['Submit', 'Cancel']);
+    assert.equal(draftLayout[0].top, draftLayout[1].top, 'Draft card actions share a row');
+    assert.ok(Math.abs(draftLayout[0].width - draftLayout[1].width) <= 1, 'Draft card actions have equal widths');
     await page.click('[data-reference="PDR000000000004"] .history-card-main');
-    assert.deepEqual(await page.$$eval('#historyDetailActions [data-history-action]', nodes => nodes.map(node => node.textContent.trim())), ['Submit', 'Cancel']);
+    assert.deepEqual(await page.$$eval('#historyDetailActions [data-history-action]', nodes => nodes.map(node => node.textContent.trim())), ['Submit', 'Delete Record']);
     const deductionRows = await page.$$eval('#historyDetailBody tr', rows => Object.fromEntries(rows.map(row => [row.querySelector('th').textContent.trim(), row.querySelector('td').textContent.replace(/\s+/g, ' ').trim()])));
     assert.deepEqual(Object.keys(deductionRows), ['Reference #', 'Emp #', 'Name', 'Status', 'Submit Date', 'Request Type', 'Deduction Type', 'Period', 'Cycle', 'Deduction Date', 'Account No', 'Amount', 'Attachments']);
     assert.equal(deductionRows['Reference #'], 'PDR000000000004');
@@ -195,11 +190,19 @@ async function run() {
     const deduction = await page.$eval('[data-reference="EBB01:deduction"]', node => node.textContent);
     for (const expected of ['HOUSING LOAN', 'Draft', '202610', 'MONTH END', 'RM 0.00']) assert.ok(deduction.includes(expected));
     const draftActions = await page.$eval('[data-reference="EBB01:deduction"]', card => [...card.querySelectorAll('.history-card-action')].map(button => button.textContent.trim()));
-    assert.deepEqual(draftActions, ['Submit', 'Cancel'], 'Draft history cards must expose Submit and Cancel actions');
+    assert.deepEqual(draftActions, ['Submit', 'Cancel'], 'Draft history cards expose Submit and Cancel');
     await page.click('[data-reference="EBB01:deduction"] .history-card-main');
     const savedDetail = await page.$eval('#historyDetailBody', node => node.textContent);
-    assert.deepEqual(await page.$$eval('#historyDetailActions [data-history-action]', nodes => nodes.map(node => node.textContent.trim())), ['Submit', 'Cancel']);
-    assert.equal(await page.$eval('#historyDetailActions [data-history-detail-aux]', node => node.textContent.trim()), 'Continue editing');
+    assert.deepEqual(await page.$$eval('#historyDetailActions [data-history-action]', nodes => nodes.map(node => node.textContent.trim())), ['Submit', 'Delete Record']);
+    assert.equal(await page.$eval('#historyDetailActions [data-history-detail-aux]', node => node.textContent.trim()), 'Edit Deduction Request');
+    assert.ok(await page.$('#historyDetailActions [data-history-detail-aux] > .fa-pen[aria-hidden="true"]'));
+    assert.ok(await page.$eval('#historyDetailActions', footer => {
+      const [submit, remove, edit] = [...footer.children].map(action => action.getBoundingClientRect());
+      const css = getComputedStyle(footer);
+      const width = footer.clientWidth - parseFloat(css.paddingLeft) - parseFloat(css.paddingRight);
+      return remove.top >= submit.bottom && edit.top >= remove.bottom
+        && Math.abs(remove.width - width) <= 1 && Math.abs(edit.width - width) <= 1;
+    }), 'Delete Record and Edit occupy their own full-width rows');
     for (const expected of ['Sarah Jenkins', '#EBB01', 'Stop Deduction', '202610', '1 Oct 2026', 'MONTH END', '001235', 'deduction.txt']) assert.ok(savedDetail.includes(expected));
     assert.equal(savedDetail.includes('Please stop the housing loan deduction.'), false, 'Deduction details must only show fields supplied by the history schema');
     assert.equal(await page.$eval('.history-attachment', async link => (await fetch(link.href)).text()), 'Payroll deduction attachment', 'Saved attachments must retain their actual file contents');

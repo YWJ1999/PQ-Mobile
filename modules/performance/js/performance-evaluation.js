@@ -174,7 +174,14 @@
     const period = element('div', 'goal-form-grid');
     period.append(field('evaluationPeriod', 'Period', record.period), field('evaluationType', 'Type', record.type));
     const documentFields = element('div', 'goal-form-grid');
-    documentFields.append(field('evaluationStatus', 'Status', record.status), field('evaluationDocumentDate', 'Document Date', record.documentDate));
+    const statusField = element('div', 'goal-form-field');
+    const statusLabel = element('label', '', 'Status');
+    const statusValue = element('output');
+    statusValue.id = 'evaluationStatus';
+    statusLabel.htmlFor = statusValue.id;
+    statusValue.append(recordDetailStatus.create(record.status));
+    statusField.append(statusLabel, statusValue);
+    documentFields.append(statusField, field('evaluationDocumentDate', 'Document Date', record.documentDate));
     general.replaceChildren(field('evaluationName', 'Name', employee.name), field('evaluationPosition', 'Position', employee.position),
       field('evaluationDepartment', 'Department', employee.department), field('evaluationSupervisor', 'Supervisor', employee.supervisor?.name),
       field('evaluationReportTo', 'Report To', employee.reportingTo?.name), field('evaluationRef', 'Evaluation Ref#', record.evaluationRef),
@@ -188,7 +195,7 @@
       const status = button.dataset.evaluationDecision;
       store.setStatus(record.id, status);
       record.status = status;
-      $('evaluationStatus').value = status;
+      statusValue.replaceChildren(recordDetailStatus.create(status));
       $('evaluationDecisionMessage').textContent = 'Performance Evaluation ' + decisionLabels[status] + '.';
     }));
     let section = ['goals', 'competencies'].includes(params.get('kind')) ? params.get('kind') : null;

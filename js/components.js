@@ -3,33 +3,126 @@
    Zero build tool required. 100% offline & file:// compatible.
    ======================================================== */
 
-// Keep legacy count captions consistent when their numeric value refreshes.
+const recordDeleteLabel = 'Delete Record';
+const recordDeleteLabelHTML = `<i class="fa-regular fa-trash-can" aria-hidden="true"></i><span>${recordDeleteLabel}</span>`;
+const recordCardActionLabels = {
+  cancel: '<i class="record-card-action-icon fa-solid fa-ban" aria-hidden="true"></i><span>Cancel</span>',
+  edit: '<i class="record-card-action-icon fa-solid fa-pencil" aria-hidden="true"></i><span>Edit</span>',
+  delete: '<i class="record-card-action-icon fa-regular fa-trash-can" aria-hidden="true"></i><span>Delete</span>'
+};
+
+// A submitted request is pending until a reviewer makes a decision.
+function recordReviewStatusLabel(value) {
+  const label = String(value ?? '').trim();
+  return /^(?:submit(?:ted)?|pending)$/i.test(label) ? 'Pending' : label;
+}
+
+// Read-only record details share a palette independent of the card header and action buttons.
+const recordDetailStatus = (() => {
+  const states = [
+    ['resubmit', /^(?:(?:to |pending )?resubmit(?:ted)?|needs? resubmission)$/, 'fa-rotate-left'],
+    ['pending', /^(?:pending\b.*|awaiting\b.*|in review|(?:next|final) approval|unapproved(?: ot)?)$/, 'fa-paper-plane'],
+    ['submitted', /^(?:submit(?:ted)?|verified & submitted)$/, 'fa-paper-plane'],
+    ['approved', /^(?:approved?|confirmed|completed?|pass(?:ed)?|normal|no exception|verified|mc verified|responded|resolved|paid)$/, 'fa-check'],
+    ['cancelled', /^(?:cancel(?:led|ed)?|withdrawn|void(?:ed)?)$/, 'fa-ban'],
+    ['draft', /^(?:draft|new|plan|planning)$/, 'fa-file-pen'],
+    ['rejected', /^(?:reject(?:ed)?|declined|denied)$/, 'fa-xmark']
+  ];
+  function badgeForLabel(label) {
+    const badge = document.createElement('span');
+    if (!label || /^[-–—]$/.test(label)) {
+      badge.textContent = label || '—';
+      return badge;
+    }
+    const normalized = label.toLowerCase().replace(/[-_\s]+/g, ' ');
+    const state = states.find(([, pattern]) => pattern.test(normalized));
+    badge.className = 'record-detail-status record-status-badge';
+    badge.dataset.status = state ? state[0] : 'other';
+    const icon = document.createElement('i');
+    icon.className = 'fa-solid ' + (state ? state[2] : 'fa-circle-info');
+    icon.setAttribute('aria-hidden', 'true');
+    badge.append(icon, document.createTextNode(label));
+    return badge;
+  }
+  const create = value => badgeForLabel(recordReviewStatusLabel(value));
+  const workflowStep = value => badgeForLabel(String(value ?? '').trim());
+  function renderStaticStatuses() {
+    for (const field of document.querySelectorAll('[data-record-detail-status]')) {
+      field.replaceChildren(create(field.textContent));
+    }
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', renderStaticStatuses, { once: true });
+  else renderStaticStatuses();
+  return { create, html: value => create(value).outerHTML, workflowStep };
+})();
+
+function recordCancelButtonHTML(actionCount, isDetail = false) {
+  if (actionCount === 1) return recordCardActionLabels.cancel;
+  return isDetail ? recordDeleteLabelHTML : 'Cancel';
+}
+
+function setRecordCancelButton(button, actionCount, isDetail) {
+  if (isDetail) button.classList.add('record-primary-action');
+  button.innerHTML = recordCancelButtonHTML(actionCount, isDetail);
+}
+
+function setRecordDeleteButton(button) {
+  button.classList.add('record-primary-action');
+  button.innerHTML = recordDeleteLabelHTML;
+}
+
+function recordCountUnit(count, unit = 'Record') {
+  return Number(count) === 1 ? unit : unit + 's';
+}
+
 window.PeopleHcmRecordSummary = (() => {
   const registered = new WeakSet();
+  function formatCount(count) {
+    return count + ' ' + recordCountUnit(count);
+  }
+
+  function renderCount(element, count) {
+    const value = document.createElement('strong');
+    value.className = 'record-summary-value';
+    value.textContent = count;
+    const label = document.createElement('span');
+    label.className = 'record-summary-label';
+    label.textContent = recordCountUnit(count);
+    element.classList.add('record-summary-metric');
+    element.replaceChildren(value, ' ', label);
+  }
+
   function enhance(element) {
     if (!element || registered.has(element)) return;
     registered.add(element);
     const observer = new MutationObserver(render);
     function render() {
       observer.disconnect();
-      const match = element.textContent.trim().match(/^Total\s+Records?(?:\s+Found)?\s*:?\s*([\d,]+)$/i);
+      const caption = element.textContent.trim();
+      const match = caption.match(/^([\d,]+)\s+Records?$/i)
+        || caption.match(/^Total\s+Records?(?:\s+Found)?\s*:?\s*([\d,]+)$/i);
       element.classList.toggle('record-summary-card', !!match);
-      element.classList.toggle('record-summary-metric', !!match);
-      if (match) {
-        const label = document.createElement('span');
-        label.className = 'record-summary-label';
-        label.textContent = 'Total Records';
-        const value = document.createElement('strong');
-        value.className = 'record-summary-value';
-        value.textContent = match[1];
-        element.replaceChildren(label, document.createTextNode(' '), value);
-      }
+      if (match) renderCount(element, match[1]);
+      else element.classList.remove('record-summary-metric');
       observer.observe(element, { childList: true, characterData: true, subtree: true });
     }
     render();
   }
+  // Filters and tab switches update the numeric field in place.
+  function bindValue(value) {
+    if (registered.has(value)) return;
+    registered.add(value);
+    function updateLabel() {
+      const label = value.nextElementSibling;
+      if (label) label.textContent = recordCountUnit(value.textContent);
+    }
+    new MutationObserver(updateLabel).observe(value, { childList: true, characterData: true, subtree: true });
+    updateLabel();
+  }
   function scan(root) {
     if (root.nodeType !== Node.ELEMENT_NODE) return;
+    if (root.matches('[data-record-count]')) bindValue(root);
+    root.querySelectorAll('[data-record-count]').forEach(bindValue);
     if (root.matches('[data-record-summary-count]')) enhance(root);
     root.querySelectorAll('[data-record-summary-count]').forEach(enhance);
   }
@@ -41,7 +134,7 @@ window.PeopleHcmRecordSummary = (() => {
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, { once: true });
   else init();
-  return { enhance };
+  return { enhance, renderCount, formatCount };
 })();
 
 // Editable form rows keep their disclosure separate from Edit and Remove.
@@ -72,7 +165,7 @@ class RecordChartCount extends HTMLElement {
     const label = this.querySelector('.record-summary-label');
     if (!value || !label) return;
     const unit = this.getAttribute('unit') || 'Record';
-    const text = value.textContent.trim() === '1' ? unit : unit + 's';
+    const text = recordCountUnit(value.textContent, unit);
     if (label.textContent !== text) label.textContent = text;
   }
 }
@@ -1417,7 +1510,7 @@ function createApprovalCardDetails(fields) {
     const term = document.createElement('dt');
     term.textContent = label;
     const description = document.createElement('dd');
-    description.textContent = text;
+    description.textContent = /^(?:Document )?Status$/i.test(label) ? recordReviewStatusLabel(text) : text;
     row.append(term, description);
     details.append(row);
   }
@@ -1469,7 +1562,7 @@ class PendingApprovalCard extends HTMLElement {
     const rawEmpId = this.getAttribute('emp-id') || '000000';
     const empId = rawEmpId.startsWith('#') ? rawEmpId : `#${rawEmpId}`;
     const dept = this.getAttribute('dept') || 'Department';
-    const docStatus = this.getAttribute('doc-status') || 'Submitted';
+    const docStatus = recordReviewStatusLabel(this.getAttribute('doc-status') || 'Pending');
     const claimDate = this.getAttribute('claim-date') || this.getAttribute('date') || 'DD/MM/YYYY';
     const submitDate = this.getAttribute('submit-date') || this.getAttribute('date') || 'DD/MM/YYYY';
     const period = this.getAttribute('period') || '2026-09';

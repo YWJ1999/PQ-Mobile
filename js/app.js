@@ -735,11 +735,9 @@ function openIndicatorsModal(scope = null, instant = false) {
   if (!overlay) return;
   overlay.classList.remove('insight-detail-breakdown');
   document.getElementById('insightBreakdownCards')?.replaceChildren();
-  const titleEl = document.getElementById('indicatorsSheetTitle');
   const myFeed = document.getElementById('myIndicatorsFeed');
   const teamFeed = document.getElementById('teamIndicatorsFeed');
   const metrics = getInsightMetrics(scope);
-  if (titleEl) titleEl.textContent = scope === 'team' ? 'Team Indicators' : 'My Indicators';
   if (myFeed) myFeed.style.display = scope === 'my' ? 'block' : 'none';
   if (teamFeed) teamFeed.style.display = scope === 'team' ? 'block' : 'none';
   [['indicatorCountAll', metrics.length],
@@ -875,13 +873,21 @@ function applyIndicatorFilters() {
   });
   const trendNames = { all: 'All changes', improved: 'Improved', worsened: 'Worsened', unchanged: 'No change' };
   const groupName = group === 'all' ? 'All metrics' : group === 'positive' ? 'Positive' : 'Negative';
-  const subtitle = document.getElementById('indicatorsSheetSubtitle');
-  if (subtitle) subtitle.textContent = `${groupName} • ${trendNames[trend]} • ${visibleMetrics.length} ${visibleMetrics.length === 1 ? 'metric' : 'metrics'}`;
+  const countLabel = `${visibleMetrics.length} ${visibleMetrics.length === 1 ? 'metric' : 'metrics'}`;
+  let title = scope === 'team' ? 'Team Indicators' : 'My Indicators';
+  let subtitle = `${groupName} • ${trendNames[trend]} • ${countLabel}`;
   if (overlay.classList.contains('insight-detail-breakdown')) {
-    document.getElementById('indicatorsSheetTitle').textContent = trend === 'all' ? groupName : trendNames[trend];
-    if (subtitle) subtitle.textContent = `${scope === 'team' ? 'Team averages' : 'My'} · ${groupName} · ${visibleMetrics.length} ${visibleMetrics.length === 1 ? 'metric' : 'metrics'}`;
+    subtitle = countLabel;
+    if (group !== 'all' || trend !== 'all') {
+      title = trend === 'all' ? groupName : trendNames[trend];
+      subtitle = `${scope === 'team' ? 'Team averages' : 'My'} · ${groupName} · ${countLabel}`;
+    }
     renderInsightBreakdown(visibleMetrics, scope);
   }
+  const titleEl = overlay.querySelector('#indicatorsSheetTitle');
+  const subtitleEl = overlay.querySelector('#indicatorsSheetSubtitle');
+  if (titleEl) titleEl.textContent = title;
+  if (subtitleEl) subtitleEl.textContent = subtitle;
   const empty = document.getElementById('indicatorEmptyState');
   if (empty) {
     empty.hidden = visibleMetrics.length !== 0;

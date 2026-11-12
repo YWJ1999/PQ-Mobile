@@ -134,7 +134,7 @@
       const cell = element('td', 'detail-popout-value');
       if (label === 'Name') {
         cell.append(element('strong', 'staff-whereabout-detail-name', value || '-'));
-      } else cell.textContent = value || '-';
+      } else cell.append(label === 'Status' ? recordDetailStatus.create(value) : value || '-');
       field.append(heading, cell);
       body.append(field);
     });

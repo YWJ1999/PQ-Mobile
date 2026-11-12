@@ -170,7 +170,7 @@
         }
         const rows = [
           ['Document Reference', data.docRef],
-          ['Document Status', data.documentStatus ?? data.docStatus ?? data.statusText],
+          ['Document Status', recordDetailStatus.create(data.documentStatus ?? data.docStatus ?? data.statusText)],
           ['Employee', identity(data.name, data.empId || data.id)],
           ['Employee Branch', data.employeeBranch ?? data.branch],
           ['Employee Department', data.employeeDepartment ?? data.department ?? data.dept],
@@ -219,7 +219,9 @@
         const data = currentAttendanceSelectedData;
         const setVal = (id, val) => {
           const el = document.getElementById(id);
-          if (el) el.textContent = (val !== undefined && val !== null && val !== '') ? val : '-';
+          if (!el) return;
+          if (id === 'attFieldPlanStatus' || id === 'attFieldFinalStatus') el.replaceChildren(recordDetailStatus.create(val));
+          else el.textContent = val === undefined || val === null || val === '' ? '-' : val;
         };
 
         let isOtPlanModal = data.category === 'ot_plan' || (data.type && data.type.toLowerCase().includes('ot plan')) || (data.duration && data.duration.includes('('));
@@ -276,7 +278,7 @@
           }
         }
 
-        setVal('attFieldFinalStatus', 'Submitted');
+        setVal('attFieldFinalStatus', data.finalStatus || data.documentStatus || data.docStatus || 'Pending');
         
         const empEl = document.getElementById('attFieldEmployee');
         if (empEl) {
@@ -3323,7 +3325,7 @@
                 </tr>
                 <tr>
                   <td style="padding: 9px 12px; border-bottom: 1px solid var(--border-subtle); border-right: 1px solid var(--border-subtle); font-weight: 700; color: var(--text-muted); background: var(--bg-input); width: 42%;">Final Status:</td>
-                  <td style="padding: 9px 12px; border-bottom: 1px solid var(--border-subtle); color: var(--text-primary); width: 58%; font-weight: 700;" id="attFieldFinalStatus">Submitted</td>
+                  <td style="padding: 9px 12px; border-bottom: 1px solid var(--border-subtle); color: var(--text-primary); width: 58%; font-weight: 700;" id="attFieldFinalStatus">Pending</td>
                 </tr>
                 <tr>
                   <td style="padding: 9px 12px; border-bottom: 1px solid var(--border-subtle); border-right: 1px solid var(--border-subtle); font-weight: 700; color: var(--text-muted); background: var(--bg-input); width: 42%;">Employee:</td>
@@ -3478,7 +3480,7 @@
           <div style="background: var(--bg-card); border: 1px solid var(--border-card); border-radius: 16px; padding: 14px; box-shadow: var(--shadow-card);">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
               <span style="font-size: 12.5px; font-weight: 800; color: var(--text-primary);">Level 2: Operations Head</span>
-              <span style="font-size: 10.5px; font-weight: 800; color: var(--text-muted); background: var(--bg-input); padding: 2px 8px; border-radius: 10px;">Pending Level 1</span>
+              <span data-record-detail-status>Pending Level 1</span>
             </div>
             <div style="font-size: 11.5px; color: var(--text-muted);">Assigned: Marcus Vance (Operations Manager)</div>
           </div>
@@ -4055,7 +4057,7 @@
           const clockingStr = item.clocking || '07:03 AM – 07:30 PM';
           const shiftStr = item.shift || '08:00 AM – 05:30 PM';
           const remarkText = item.remark || '';
-          const docStatusStr = item.docStatus || item.statusText || 'Submitted';
+          const docStatusStr = recordReviewStatusLabel(item.documentStatus || item.docStatus || item.statusText || 'Pending');
           const isDraft = docStatusStr.toLowerCase().includes('draft');
           const statusIcon = isDraft ? '<i class="fa-solid fa-file-pen"></i>' : '<i class="fa-solid fa-hourglass-half"></i>';
 
@@ -4256,7 +4258,7 @@
             const startDateStr = item.startDate || 'Tue, 23/02/2026';
             const endDateStr = item.endDate || 'Thu, 25/02/2026';
             const durationStr = item.duration || '3 Days';
-            const docStatusStr = item.docStatus || item.statusText || 'Submitted';
+            const docStatusStr = recordReviewStatusLabel(item.documentStatus || item.docStatus || item.statusText || 'Pending');
             const isDraft = docStatusStr.toLowerCase().includes('draft');
             const statusIcon = isDraft ? '<i class="fa-solid fa-file-pen"></i>' : '<i class="fa-solid fa-hourglass-half"></i>';
             const fields = [

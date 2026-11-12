@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
   const $ = id => document.getElementById(id);
   const labels = { 'guest-visit': 'Guest Visit', 'letter-request': 'Letter Request', 'inventory-request': 'Inventory Request' };
-  const statuses = { submitted: ['Submitted', 'fa-paper-plane'], resubmit: ['Resubmit', 'fa-rotate-right'], approved: ['Approved', 'fa-check'], rejected: ['Rejected', 'fa-xmark'] };
+  const statuses = { submitted: ['Pending', 'fa-paper-plane'], resubmit: ['Resubmit', 'fa-rotate-right'], approved: ['Approved', 'fa-check'], rejected: ['Rejected', 'fa-xmark'] };
   const requested = new URLSearchParams(location.search).get('category');
   let kind = labels[requested] ? requested : 'guest-visit';
   const emptyFilter = () => ({ from: '', to: '', status: '' });

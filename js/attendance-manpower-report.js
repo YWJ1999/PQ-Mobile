@@ -55,12 +55,6 @@ function appendManpowerRows(container, rows) {
     const text = document.createElement('dd');
     key.textContent = label;
     text.textContent = value;
-    if (label === 'Total Records') {
-      container.classList.add('record-summary-card');
-      row.classList.add('record-summary-metric');
-      key.classList.add('record-summary-label');
-      text.classList.add('record-summary-value');
-    }
     row.append(key, text);
     list.append(row);
   }
@@ -94,10 +88,17 @@ function prepareManpowerDetailView(title, overviewRows) {
     scope.textContent = `${group.company} · ${group.section} · ${group.costCenter}`;
   }
   const overview = document.getElementById('manpowerDetailOverview');
-  overview.classList.remove('record-summary-card');
-  overview.classList.toggle('manpower-summary-overview', currentView === 'summary');
+  const isSummary = currentView === 'summary';
+  overview.classList.toggle('record-summary-card', isSummary);
+  overview.classList.toggle('manpower-summary-overview', isSummary);
   overview.replaceChildren();
-  appendManpowerRows(overview, overviewRows);
+  if (isSummary) {
+    const count = document.createElement('div');
+    window.PeopleHcmRecordSummary.renderCount(count, manpowerNavigation.records.length);
+    overview.append(count);
+  } else {
+    appendManpowerRows(overview, overviewRows);
+  }
   document.getElementById('manpowerDetailList').replaceChildren();
   document.getElementById('manpowerDetailEmpty').hidden = true;
   document.querySelector('.main-content').scrollTop = 0;
@@ -122,7 +123,7 @@ function openManpowerSummary(type, group = null) {
 function renderManpowerSummary() {
   const { type, records } = manpowerNavigation;
   currentView = 'summary';
-  prepareManpowerDetailView(manpowerDetailTitles[type][0], [['Total Records', records.length]]);
+  prepareManpowerDetailView(manpowerDetailTitles[type][0]);
   const list = document.getElementById('manpowerDetailList');
   for (const record of records) {
     const card = document.createElement('button');

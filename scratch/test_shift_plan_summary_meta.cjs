@@ -45,8 +45,9 @@ const summaries = [
             rowsShareWidth: Math.abs(dateBox.left - countBox.left) <= 1 && Math.abs(dateBox.right - countBox.right) <= 1,
             dateLabelColor: getComputedStyle(dateRow.querySelector('.shift-detail-info-label')).color,
             totalLabelColor: getComputedStyle(countRow.querySelector('.shift-detail-info-label')).color,
-            totalValueAlign: getComputedStyle(countValue).textAlign,
-            totalRowColumns: countStyle.gridTemplateColumns,
+            totalText: countRow.textContent.replace(/\s+/g, ' ').trim(),
+            count: countValue.textContent,
+            countAlignment: countStyle.alignItems,
             overviewBackgroundImage: overviewStyle.backgroundImage,
             detailBackgroundImage: detailStyle.backgroundImage,
             overviewRadius: overviewStyle.borderRadius,
@@ -61,8 +62,8 @@ const summaries = [
         assert.equal(layout.dateAboveTotal, true, `${theme} ${viewId}: Date must occupy the first row and Total Records the second row`);
         assert.equal(layout.rowsShareWidth, true, `${theme} ${viewId}: Date and Total Records must each use a full row`);
         assert.equal(layout.dateLabelColor, layout.totalLabelColor, `${theme} ${viewId}: Date label must use the normal muted text color`);
-        assert.equal(layout.totalValueAlign, 'right', `${theme} ${viewId}: Total Records value must align like employee detail values`);
-        assert.match(layout.totalRowColumns, /px.*px/, `${theme} ${viewId}: Total Records must use the same two-column row layout`);
+        assert.equal(layout.totalText, layout.count + (layout.count === '1' ? ' Record' : ' Records'));
+        assert.equal(layout.countAlignment, 'baseline');
         assert.equal(layout.overviewBackgroundImage, layout.detailBackgroundImage, `${theme} ${viewId}: Summary and detail metadata must share the same surface`);
         assert.equal(layout.overviewRadius, layout.detailRadius, `${theme} ${viewId}: Summary and detail metadata must share the same radius`);
         assert.equal(layout.overviewShadow, layout.detailShadow, `${theme} ${viewId}: Summary and detail metadata must share the same shadow`);

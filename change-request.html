@@ -157,7 +157,7 @@
             <span class="qualification-manager-icon"><i class="fa-solid fa-graduation-cap" aria-hidden="true"></i></span>
             <div>
               <h2 class="form-section-heading">Qualification</h2>
-              <span id="qualificationRecordCount" class="qualification-record-count">3 records</span>
+              <span id="qualificationRecordCount" class="qualification-record-count">3 Records</span>
             </div>
           </div>
           <button id="addQualificationButton" class="qualification-add-button" type="button" aria-label="Add qualification" title="Add qualification" onclick="newQualificationRecord()">
@@ -1288,7 +1288,7 @@ DAMANSARA KOTA</textarea>
       const container = document.getElementById('qualificationItems');
       const count = document.getElementById('qualificationRecordCount');
       if (!container || !count) return;
-      count.textContent = qualificationRecords.length + (qualificationRecords.length === 1 ? ' record' : ' records');
+      count.textContent = window.PeopleHcmRecordSummary.formatCount(qualificationRecords.length);
       if (qualificationRecords.length === 0) {
         container.innerHTML = '<div class=qualification-empty-state>No qualification records yet</div>';
         return;

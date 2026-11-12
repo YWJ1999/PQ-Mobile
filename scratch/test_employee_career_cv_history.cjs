@@ -12,7 +12,7 @@ const requests = [
     { label: 'Mobile Phone #', oldVal: '0123456789', newVal: '0191122334' },
     { label: 'Delete family member', oldVal: 'REMOVED FAMILY MEMBER', newVal: 'Removed' }
   ] },
-  { id: 'REQ-CV-2026-09', submittedAt: '2026-09-05T01:00:00.000Z', status: 'Approved', changes: [{ label: 'Mobile Number', oldVal: '0123456789', newVal: '0198765432' }] }
+  { id: 'REQ-CV-2026-09', reference: 'CV-2026-009', submittedAt: '2026-09-05T01:00:00.000Z', status: 'Approved', changes: [{ label: 'Mobile Number', oldVal: '0123456789', newVal: '0198765432' }] }
 ];
 
 (async () => {
@@ -36,6 +36,7 @@ const requests = [
       await page.evaluate(rows => localStorage.setItem('pq_change_request_history', JSON.stringify(rows)), requests);
       await page.reload({ waitUntil: 'load' });
       assert.equal(await page.$eval('#historyRecordCount', node => node.textContent), '12');
+      assert.deepEqual(await page.$$eval('[data-record-id^="REQ-CV"] .history-card-heading', nodes => nodes.map(node => node.textContent.trim())), ['REQ-CV-2026-10', 'CV-2026-009']);
       assert.deepEqual(await page.$$eval('[data-record-id^="REQ-CV"] .status-pill', nodes => nodes.map(node => node.textContent.trim())), ['Pending HR Approval', 'Approved']);
       await page.click('[data-record-id="REQ-CV-2026-10"]');
       assert.equal(await page.$eval('#historyDetailTitle', node => node.textContent), 'CV Change Request Details');

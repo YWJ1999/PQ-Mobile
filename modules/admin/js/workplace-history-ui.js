@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const $ = id => document.getElementById(id);
   const labels = { 'guest-visit': 'Guest Visit', 'letter-request': 'Letter Request', 'inventory-request': 'Inventory Request' };
   const statuses = {
-    submitted: ['Submitted', 'fa-paper-plane'],
+    submitted: ['Pending', 'fa-paper-plane'],
     resubmit: ['Resubmit', 'fa-rotate-right'],
     approved: ['Approved', 'fa-check'],
     rejected: ['Rejected', 'fa-xmark'],
@@ -150,7 +150,7 @@ document.addEventListener('DOMContentLoaded', () => {
       ['Sit Arrange?', fieldValue(fields, 'Sit Arrange?') || requestFlag(otherRequest, ['sit arrange', 'sitting arrangement', 'seating arrangement'])],
       ['Multi Room?', fieldValue(fields, 'Multi Room?') || requestFlag(otherRequest, ['multi room'])],
       ['Remarks', fieldValue(fields, 'Remarks', 'Remark') || emptyValue],
-      ['Status', statusPill(row.status)]
+      ['Status', recordDetailStatus.create(statuses[row.status]?.[0] || row.status)]
     ], 'history-detail-main-table');
 
     const guestSection = appendSection(body, 'Guest Information');
@@ -201,7 +201,7 @@ document.addEventListener('DOMContentLoaded', () => {
       ['Request Date', date(fieldValue(fields, 'Request Date') || row.date)],
       ['Reference #', referenceNumber(row, fields)],
       ['Type', fieldValue(fields, 'Type', 'Letter Type') || row.title],
-      ['Status', statusPill(row.status)],
+      ['Status', recordDetailStatus.create(statuses[row.status]?.[0] || row.status)],
       ['Description', fieldValue(fields, 'Description') || row.title || emptyValue],
       ['1st Merge Text', fieldValue(fields, '1st Merge Text') || emptyValue],
       ['2nd Merge Text', fieldValue(fields, '2nd Merge Text') || emptyValue],
@@ -217,7 +217,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const fields = fieldMap(row);
     const detailRows = [
       ['Reference #', referenceNumber(row, fields)],
-      ['Status', statusPill(row.status)],
+      ['Status', recordDetailStatus.create(statuses[row.status]?.[0] || row.status)],
       ['Submit Date', date(fieldValue(fields, 'Submit Date', 'Request Date') || row.date)],
       ['Required By', date(fieldValue(fields, 'Required By'))],
       ['Inventory Item', fieldValue(fields, 'Inventory Item', 'Request Item', 'Inventory Type') || row.title],
@@ -262,11 +262,13 @@ document.addEventListener('DOMContentLoaded', () => {
   function appendHistoryActions(container, row, context = 'card') {
     container.replaceChildren();
     const description = actionDescription(row);
-    historyActions(row).forEach(action => {
+    const actions = historyActions(row);
+    actions.forEach(action => {
       const button = node('button', context === 'detail' ? 'history-detail-action' : action.className, action.label);
+      if (action.key === 'cancel') setRecordCancelButton(button, actions.length, context === 'detail');
       button.type = 'button';
       button.dataset.historyAction = action.key;
-      button.setAttribute('aria-label', `${action.label} ${description}`);
+      button.setAttribute('aria-label', `${button.textContent} ${description}`);
       container.append(button);
     });
     if (context === 'detail') container.hidden = !container.childElementCount;
