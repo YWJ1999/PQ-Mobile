@@ -27,7 +27,7 @@ async function shot(page, name) {
         { text: 'Inventory', selected: 'false' }
       ]);
       assert.equal(await page.$$eval('#workplacePendingQueue .approval-request-card', n => n.length), 1);
-      assert.match(await page.$eval('#workplacePendingQueue', n => n.textContent), /Farhan binti rahmat.*#EBB12.*Submitted.*16 Aug 2024.*FGV0000000000013/s);
+      assert.match(await page.$eval('#workplacePendingQueue', n => n.textContent), /Farhan binti rahmat.*#EBB12.*Pending.*16 Aug 2024.*FGV0000000000013/s);
       assert.equal(await page.$eval('.employee-id', n => n.previousElementSibling.textContent), 'Farhan binti rahmat');
       await shot(page, `workplace-pending-list-${theme}-${width}.png`);
       await page.focus('[data-workplace-tab="guest-visit"]');
@@ -48,7 +48,7 @@ async function shot(page, name) {
         ['Name', 'Farhan binti rahmat'],
         ['Position', 'GROUP HR MANAGER'],
         ['Department', 'HUMAN RESOURCE'],
-        ['Document Status', 'Submitted'],
+        ['Document Status', 'Pending'],
         ['Submit Date', '8 Sep 2026'],
         ['Item Group', 'OFFICE EQUIPMENT'],
         ['Item', 'LOCKER 1000'],

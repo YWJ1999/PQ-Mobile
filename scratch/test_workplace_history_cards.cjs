@@ -84,7 +84,7 @@ const detailLabels = () => [...document.querySelectorAll('#historyDetailBody .hi
       ['Visitor', '1'],
       ['Location', 'Head Office']
     ]);
-    assert.equal(await page.$eval('.history-card-item .status-pill', node => node.textContent.trim()), 'Submitted');
+    assert.equal(await page.$eval('.history-card-item .status-pill', node => node.textContent.trim()), 'Pending');
 
     await page.click('.history-card-item');
     assert.equal(await page.$eval('#historyDetailTitle', node => node.textContent.trim()), 'Guest Visit Details');

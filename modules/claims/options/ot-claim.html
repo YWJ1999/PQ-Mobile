@@ -197,27 +197,6 @@
       display: inline-block;
     }
 
-    .btn-step-back {
-      padding: 11px 22px;
-      border-radius: 9999px;
-      background: var(--bg-card);
-      border: 1.5px solid var(--border-subtle);
-      color: var(--text-primary);
-      font-size: 13.5px;
-      font-weight: 700;
-      cursor: pointer;
-      white-space: nowrap;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      box-shadow: var(--shadow-sm);
-      transition: all 0.2s ease;
-    }
-    .btn-step-back:active {
-      transform: scale(0.96);
-    }
-
     .btn-submit-primary {
       padding: 11px 26px;
       border-radius: 9999px;
@@ -854,7 +833,7 @@
 
         <!-- BOTTOM ACTION BUTTONS -->
         <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 24px;">
-          <button type="button" class="btn-step-back" onclick="switchView('view-1-main', 'OT Claim')">
+          <button type="button" class="btn-submit-primary" onclick="switchView('view-1-main', 'OT Claim')">
             <i class="fa-solid fa-xmark"></i>
             <span>Cancel</span>
           </button>

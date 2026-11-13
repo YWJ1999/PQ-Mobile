@@ -88,7 +88,7 @@ const puppeteer = require('puppeteer');
       await page.click(`${actions} button:first-child`);
       await page.waitForFunction(() => HISTORY_LEAVE_DATA[0].status === 'submitted');
       assert.deepEqual(await page.$$eval(`${actions} button`, buttons => buttons.map(button => button.textContent.trim())), ['Cancel']);
-      assert.match(await page.$eval('#historyDetailsTableBody', node => node.textContent), /Submitted/);
+      assert.equal(await page.$eval('#historyDetailsTableBody .record-detail-status', node => node.textContent.trim()), 'Pending');
       assert.deepEqual(await page.$$eval('#myHistoryCardsList [data-ref="LV-2026-0055"] button', buttons => buttons.map(button => button.textContent.trim())), ['Cancel']);
 
       page.once('dialog', dialog => dialog.dismiss());

@@ -1619,7 +1619,7 @@ class PendingApprovalCard extends HTMLElement {
             </div>
           </div>
           <div style="display: flex; align-items: center; gap: 8px;">
-            <span class="approval-header-status" data-approval-status="${recordStatus}">${icon} ${docStatus}</span>
+            <span class="approval-header-status" data-approval-status="${recordStatus}">${icon}</span>
             <button type="button" class="three-dots-btn" onclick="window.ClaimsEngine && window.ClaimsEngine.openClaimThreeDotsMenu ? window.ClaimsEngine.openClaimThreeDotsMenu(this, '${itemId}') : null" title="Options" style="width: 28px; height: 28px; border-radius: 50%; background: rgba(255, 255, 255, 0.2); border: 1px solid rgba(255, 255, 255, 0.35); color: #ffffff; display: flex; align-items: center; justify-content: center; cursor: pointer; backdrop-filter: blur(4px);">
               <i class="fa-solid fa-ellipsis-vertical" style="font-size: 13px;"></i>
             </button>
@@ -1645,6 +1645,7 @@ class PendingApprovalCard extends HTMLElement {
         </div>
       </div>
     `;
+    this.querySelector('.approval-header-status').append(document.createTextNode(' ' + docStatus));
   }
 }
 customElements.define('pending-approval-card', PendingApprovalCard);

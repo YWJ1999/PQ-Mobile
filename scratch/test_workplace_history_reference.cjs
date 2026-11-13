@@ -92,7 +92,7 @@ const screenshot = async (page, name) => {
       assert.equal(await page.$$eval('#workplaceHistoryList [data-record-id]', n => n.length), 2);
       await screenshot(page, `workplace-history-reference-inventory-${theme}-${width}.png`);
       await page.click('[data-record-id="sample-inventory-0064"] .history-card-main');
-      assert.match(await page.$eval('#historyDetailBody', n => n.textContent), /IRQ0000000000064.*Submitted.*8 Sep 2026.*LOCKER 1000.*Quantity.*1.*UOM.*Piece.*Inventory Request Reason 1.*#EBB12.*Is Assigned\?.*No/s);
+      assert.match(await page.$eval('#historyDetailBody', n => n.textContent), /IRQ0000000000064.*Pending.*8 Sep 2026.*LOCKER 1000.*Quantity.*1.*UOM.*Piece.*Inventory Request Reason 1.*#EBB12.*Is Assigned\?.*No/s);
       await screenshot(page, `workplace-history-reference-inventory-detail-${theme}-${width}.png`);
       await page.keyboard.press('Escape');
       await page.click('#historyFilterTrigger');
@@ -120,7 +120,7 @@ const screenshot = async (page, name) => {
       await page.click('#applyHistoryFilter');
       await page.evaluate(() => {
         window.WorkplaceHistoryStore.save({ kind: 'letter-request', title: 'Custom letter', date: '2026-10-08', fields: [['Description', '<script>unsafe()</script>'], ['Reason', 'User record remains']] });
-        window.dispatchEvent(new Event('pageshow'));
+        window.dispatchEvent(new PageTransitionEvent('pageshow', { persisted: true }));
       });
       assert.equal(await page.$$eval('#workplaceHistoryList [data-record-id]', n => n.length), 7, 'New form records coexist with screenshot data');
       assert.equal(await page.$$eval('#workplaceHistoryList script', n => n.length), 0, 'User text is rendered safely');

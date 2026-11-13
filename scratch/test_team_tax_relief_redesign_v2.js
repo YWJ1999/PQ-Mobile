@@ -136,7 +136,7 @@ async function run() {
     assert.equal(detail.values['Reference #'], 'RBT000000000039');
     assert.equal(detail.values['Emp #'], '#EBB12');
     assert.equal(detail.values.Name, 'Farhan binti rahmat');
-    assert.equal(detail.values.Status, 'Submitted');
+    assert.equal(detail.values.Status, 'Pending');
     assert.equal(detail.values['Submit Date'], '7 Jan 2026');
     assert.equal(detail.values['Rebate Item'], 'BASIC SUPPORTING EQUIPMENT');
     assert.equal(detail.values['Transaction Date'], '14 Aug 2025');

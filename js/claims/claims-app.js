@@ -470,7 +470,8 @@
 
     let items = window.MOCK_MY_SUBMISSIONS || [];
     if (filterType !== 'all') {
-      items = items.filter(i => i.status === filterType);
+      const status = recordReviewStatusLabel(filterType).toLowerCase();
+      items = items.filter(item => recordReviewStatusLabel(item.status).toLowerCase() === status);
     }
 
     if (badge) badge.textContent = window.PeopleHcmRecordSummary.formatCount(items.length);

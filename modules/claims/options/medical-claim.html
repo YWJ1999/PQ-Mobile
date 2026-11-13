@@ -197,27 +197,6 @@
       display: inline-block;
     }
 
-    .btn-step-back {
-      padding: 11px 22px;
-      border-radius: 9999px;
-      background: var(--bg-card);
-      border: 1.5px solid var(--border-subtle);
-      color: var(--text-primary);
-      font-size: 13.5px;
-      font-weight: 700;
-      cursor: pointer;
-      white-space: nowrap;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      box-shadow: var(--shadow-sm);
-      transition: all 0.2s ease;
-    }
-    .btn-step-back:active {
-      transform: scale(0.96);
-    }
-
     .btn-submit-primary {
       padding: 11px 26px;
       border-radius: 9999px;
@@ -687,8 +666,8 @@
         </div>
 
         <!-- BOTTOM ACTION BUTTONS -->
-        <div style="display: flex; justify-content: flex-end; align-items: center; gap: 12px; margin-top: 18px;">
-          <button type="button" class="form-cancel-btn" data-page-form-cancel onclick="handleHeaderBack()">
+        <div class="claim-step-actions">
+          <button type="button" class="btn-submit-primary" data-page-form-cancel onclick="handleHeaderBack()">
             <i class="fa-solid fa-xmark"></i>
             <span>Cancel</span>
           </button>
@@ -750,7 +729,7 @@
 
         <!-- BOTTOM ACTION BUTTONS -->
         <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 24px;">
-          <button type="button" class="btn-step-back" onclick="switchView('view-1-main', 'Medical Claim')">
+          <button type="button" class="btn-submit-primary" onclick="switchView('view-1-main', 'Medical Claim')">
             <i class="fa-solid fa-arrow-left"></i>
             <span>Back to Application</span>
           </button>
@@ -812,7 +791,7 @@
 
         <!-- BOTTOM ACTION BUTTONS -->
         <div id="v4BottomActions" style="display: flex; justify-content: flex-end; align-items: center; gap: 12px; margin-top: 24px;">
-          <button type="button" class="btn-step-back" onclick="handleHeaderBack()">
+          <button type="button" class="btn-submit-primary" onclick="handleHeaderBack()">
             <i class="fa-solid fa-xmark"></i>
             <span>Cancel</span>
           </button>
@@ -1071,7 +1050,7 @@
 
       if (bottomActionsContainer) {
         bottomActionsContainer.innerHTML = `
-          <button type="button" class="btn-step-back" onclick="navigateToStep(2)">
+          <button type="button" class="btn-submit-primary" onclick="navigateToStep(2)">
             <i class="fa-solid fa-arrow-left"></i>
             <span>Back to Medical</span>
           </button>
@@ -1274,7 +1253,7 @@
             <i class="fa-solid fa-arrow-right"></i>
           </button>
         ` : `
-          <button type="button" class="btn-step-back" onclick="handleHeaderBack()">
+          <button type="button" class="btn-submit-primary" onclick="handleHeaderBack()">
             <i class="fa-solid fa-xmark"></i>
             <span>Cancel</span>
           </button>

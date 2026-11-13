@@ -98,7 +98,7 @@ async function waitForFilterOpen(page) {
       await page.$eval('#applyWorkPlanHistoryFilter', button => button.click());
       assert.deepEqual(await visibleCardIds(page), ['WP-2026-0048']);
       assert.match(await page.$eval('#workPlanHistoryFilterSummary', node => node.textContent), /Client portal/);
-      assert.match(await page.$eval('#workPlanHistoryFilterSummary', node => node.textContent), /Submitted/);
+      assert.match(await page.$eval('#workPlanHistoryFilterSummary', node => node.textContent), /Pending/);
 
       await page.click('#openWorkPlanHistoryFilter');
       await waitForFilterOpen(page);

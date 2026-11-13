@@ -94,7 +94,7 @@ const url = file => pathToFileURL(path.resolve(file)).href;
         ['feedback', 'pending', 'Pending', 'rgb(179, 90, 13)'],
         ['whereabout', 'approved', 'Pass', 'rgb(34, 129, 86)'],
         ['cv-change-request', 'pending', 'Pending HR Approval', 'rgb(179, 90, 13)'],
-        ['cv-change-request', 'submitted', 'Submitted', 'rgb(34, 129, 86)'],
+        ['cv-change-request', 'submitted', 'Pending', 'rgb(179, 90, 13)'],
         ['cv-change-request', 'approved', 'Approved', 'rgb(34, 129, 86)'],
         ['cv-change-request', 'cancelled', 'Cancelled', 'rgb(107, 114, 128)']
       ]) {
@@ -112,7 +112,7 @@ const url = file => pathToFileURL(path.resolve(file)).href;
       await page.select('#cvHistoryStatus', 'submitted');
       await page.click('#applyHistoryFilter');
       assert.deepEqual(await page.$$eval('#careerHistoryList .record-status-badge', badges => badges.map(el => el.textContent.trim())),
-        ['Pending HR Approval', 'Submitted'], 'Both badges remain visible under the Submitted filter');
+        ['Pending HR Approval', 'Pending'], 'The Pending filter includes both review stages');
       await page.evaluate(() => localStorage.removeItem('pq_change_request_history'));
     }
     assert.deepEqual(errors,[]);

@@ -94,27 +94,6 @@
           <input type="email" class="change-input-box" data-field-id="email" data-original="ebb12@gmail.com" value="ebb12@gmail.com" oninput="handleFieldInput(this)">
         </div>
 
-        <div class="change-field-card" id="card-marital">
-          <div class="change-field-label-row">
-            <label class="change-field-label">Marital Status</label>
-            <span class="change-modified-badge">MODIFIED</span>
-          </div>
-          <select class="change-input-box" data-field-id="marital" data-original="Married" onchange="handleFieldInput(this)">
-            <option value="Single">Single</option>
-            <option value="Married" selected>Married</option>
-            <option value="Divorced">Divorced</option>
-            <option value="Widowed">Widowed</option>
-          </select>
-        </div>
-
-        <div class="change-field-card" id="card-marriagedate">
-          <div class="change-field-label-row">
-            <label class="change-field-label">Marriage Date</label>
-            <span class="change-modified-badge">MODIFIED</span>
-          </div>
-          <input type="text" class="change-input-box" data-field-id="marriagedate" data-original="18 Jul 1984" value="18 Jul 1984" oninput="handleFieldInput(this)">
-        </div>
-
         <div class="change-field-card" id="card-passport">
           <div class="change-field-label-row">
             <label class="change-field-label">Passport #</label>
@@ -165,66 +144,7 @@
           </button>
         </div>
 
-        <div id="qualificationItems" class="qualification-items">
-        <!-- Mobile Card 1 -->
-        <div class="change-history-item" data-qualification-index="0" style="margin-bottom: 0; background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 16px; padding: 14px;">
-          <div style="display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 8px;">
-            <div style="display: flex; align-items: center; gap: 10px;">
-              <div style="width: 40px; height: 40px; border-radius: 12px; background: rgba(124, 58, 237, 0.15); display: flex; align-items: center; justify-content: center; font-size: 20px;">🎓</div>
-              <div>
-                <div data-qualification-name style="font-size: 13px; font-weight: 800; color: var(--text-primary);">Bachelor's Degree</div>
-                <div data-qualification-description style="font-size: 11px; color: var(--text-primary); font-weight: 700;">Bachelor of Business Administration</div>
-                <div data-qualification-context style="font-size: 10.5px; color: var(--purple-primary); font-weight: 700;">Human Resource Management &bull; Universiti Malaya</div>
-              </div>
-            </div>
-            <span class="change-history-status approved" style="font-size: 10px;">★ Highest</span>
-          </div>
-
-          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; background: var(--bg-input); border-radius: 10px; padding: 8px 10px; margin-bottom: 12px; font-size: 11px;">
-            <div>
-              <span style="color: var(--text-muted);">Duration:</span> <strong data-qualification-years style="color: var(--text-primary);">2003 - 2006</strong>
-            </div>
-            <div>
-              <span style="color: var(--text-muted);">CGPA:</span> <strong data-qualification-cgpa style="color: #10b981;">3.62</strong>
-            </div>
-            <div>
-              <span style="color: var(--text-muted);">Cert No:</span> <strong style="color: var(--text-primary);">DEMO-QUAL-001</strong>
-            </div>
-            <div>
-              <span style="color: var(--text-muted);">Verified:</span> <strong style="color: #10b981;">✔ Verified</strong>
-            </div>
-          </div>
-
-          <!-- Action Pills -->
-          <div style="display: flex; gap: 8px;">
-            <button class="change-attach-btn" data-edit-qualification type="button" style="flex: 1; padding: 8px; font-size: 11px; justify-content: center;" onclick="editQualificationRecord(0)">Edit Details</button>
-            <button class="change-btn-cancel" type="button" style="padding: 8px 14px; font-size: 11px; border-radius: 10px;" onclick="deleteQualificationRecord(0)">Delete</button>
-          </div>
-        </div>
-
-        <div class="change-history-item" data-qualification-index="1" style="margin-bottom: 0; background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 16px; padding: 14px;">
-          <div style="display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 8px;">
-            <div style="display: flex; align-items: center; gap: 10px;">
-              <div style="width: 40px; height: 40px; border-radius: 12px; background: rgba(59, 130, 246, 0.15); display: flex; align-items: center; justify-content: center; color: #3b82f6;"><i class="fa-solid fa-graduation-cap" aria-hidden="true"></i></div>
-              <div>
-                <div data-qualification-name style="font-size: 13px; font-weight: 800; color: var(--text-primary);">Diploma</div>
-                <div data-qualification-description style="font-size: 11px; color: var(--text-primary); font-weight: 700;">Diploma in Business Studies</div>
-                <div data-qualification-context style="font-size: 10.5px; color: var(--purple-primary); font-weight: 700;">Business Administration &bull; Kolej Universiti Contoh</div>
-              </div>
-            </div>
-          </div>
-          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; background: var(--bg-input); border-radius: 10px; padding: 8px 10px; margin-bottom: 12px; font-size: 11px;">
-            <div><span style="color: var(--text-muted);">Duration:</span> <strong data-qualification-years style="color: var(--text-primary);">2001 - 2003</strong></div>
-            <div><span style="color: var(--text-muted);">CGPA:</span> <strong data-qualification-cgpa style="color: #10b981;">3.45</strong></div>
-            <div><span style="color: var(--text-muted);">Cert No:</span> <strong style="color: var(--text-primary);">DEMO-QUAL-002</strong></div>
-          </div>
-          <div style="display: flex; gap: 8px;">
-            <button class="change-attach-btn" data-edit-qualification type="button" style="flex: 1; padding: 8px; font-size: 11px; justify-content: center;" onclick="editQualificationRecord(1)">Edit Details</button>
-            <button class="change-btn-cancel" type="button" style="padding: 8px 14px; font-size: 11px; border-radius: 10px;" onclick="deleteQualificationRecord(1)">Delete</button>
-          </div>
-        </div>
-        </div>
-
+        <div id="qualificationItems" class="qualification-items"></div>
       </div>
 
       <!-- ==========================================
@@ -434,7 +354,7 @@ DAMANSARA KOTA</textarea>
             <label class="change-field-label">Contact Address</label>
             <span class="change-modified-badge">MODIFIED</span>
           </div>
-          <input type="text" class="change-input-box" data-field-id="em_address" data-original="AS CORRESPONDENCE ADDRESS" value="AS CORRESPONDENCE ADDRESS" oninput="handleFieldInput(this)">
+          <textarea class="change-input-box" data-field-id="em_address" data-original="AS CORRESPONDENCE ADDRESS" rows="3" oninput="handleFieldInput(this)">AS CORRESPONDENCE ADDRESS</textarea>
         </div>
 
         <div class="change-field-card">
@@ -498,7 +418,7 @@ DAMANSARA KOTA</textarea>
       </div>
 
       <div class="change-form-actions">
-        <button class="form-cancel-btn change-cancel-btn" id="btnPreviousCategory" type="button" onclick="goToPreviousCategory()">
+        <button class="change-cancel-btn" id="btnPreviousCategory" type="button" onclick="goToPreviousCategory()">
           <i class="fa-solid fa-xmark" aria-hidden="true"></i><span>Cancel</span>
         </button>
         <button class="change-next-btn" id="btnNextCategory" type="button" onclick="goToNextCategory()">
@@ -532,6 +452,18 @@ DAMANSARA KOTA</textarea>
               <label class="change-field-label">Qualification</label>
             </div>
             <input type="text" class="change-input-box" id="input_qual_level" value="">
+          </div>
+
+          <div class="change-field-card">
+            <div class="change-field-label-row">
+              <label class="change-field-label" for="input_qual_status">Status</label>
+            </div>
+            <select class="change-input-box" id="input_qual_status">
+              <option value="">Select status</option>
+              <option>Completed</option>
+              <option>Pursuing</option>
+              <option>Incomplete</option>
+            </select>
           </div>
 
           <div class="change-field-card">
@@ -577,18 +509,18 @@ DAMANSARA KOTA</textarea>
             <textarea class="change-input-box" id="input_qual_notes" rows="3"></textarea>
           </div>
 
-          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+          <div class="qualification-date-inputs">
             <div class="change-field-card">
               <div class="change-field-label-row">
-                <label class="change-field-label">Year From</label>
+                <label class="change-field-label" for="input_qual_startdate">Start Date</label>
               </div>
-              <input type="text" class="change-input-box" id="input_qual_yearfrom" value="">
+              <input type="date" class="change-input-box" id="input_qual_startdate">
             </div>
             <div class="change-field-card">
               <div class="change-field-label-row">
-                <label class="change-field-label">Year To</label>
+                <label class="change-field-label" for="input_qual_enddate">End Date</label>
               </div>
-              <input type="text" class="change-input-box" id="input_qual_yearto" value="">
+              <input type="date" class="change-input-box" id="input_qual_enddate">
             </div>
           </div>
 
@@ -928,40 +860,47 @@ DAMANSARA KOTA</textarea>
 
   <script>
     const modifiedFields = new Map();
+    const qualificationDateFormat = new Intl.DateTimeFormat('en-GB', {
+      day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC'
+    });
+    // Sample study dates for the three qualifications in the editable preview.
     const qualificationRecords = [{
       id: 'qual-bachelor',
       qualification: "Bachelor's Degree",
+      status: 'Completed',
       description: 'Bachelor of Business Administration',
       major: 'Human Resource Management',
       institute: 'Universiti Malaya',
       cgpa: '3.62',
       certificate: 'DEMO-QUAL-001',
-      yearFrom: '2003',
-      yearTo: '2006',
+      startDate: '2003-07-07',
+      endDate: '2006-05-19',
       highest: true,
       notes: 'Graduated with honours.'
     }, {
       id: 'qual-diploma',
       qualification: 'Diploma',
+      status: 'Completed',
       description: 'Diploma in Business Studies',
       major: 'Business Administration',
       institute: 'Kolej Universiti Contoh',
       cgpa: '3.45',
       certificate: 'DEMO-QUAL-002',
-      yearFrom: '2001',
-      yearTo: '2003',
+      startDate: '2001-06-11',
+      endDate: '2003-04-25',
       highest: false,
       notes: 'Completed before the degree programme.'
     }, {
       id: 'qual-chrp',
       qualification: 'Professional Certificate',
+      status: 'Completed',
       description: 'Certified Human Resources Professional',
       major: 'Human Resource Management',
       institute: 'Malaysian Institute of Human Resource Management',
       cgpa: '-',
       certificate: 'CHRP-2024-1187',
-      yearFrom: '2024',
-      yearTo: '2024',
+      startDate: '2024-03-04',
+      endDate: '2024-09-27',
       highest: false,
       notes: 'Professional certification in strategic HR practices.'
     }];
@@ -1125,55 +1064,6 @@ DAMANSARA KOTA</textarea>
       }
     }
 
-    function prepareQualificationEditor(index, record) {
-      const fields = {
-        level: record.qualification,
-        desc: record.description,
-        major: record.major,
-        institute: record.institute,
-        cgpa: record.cgpa,
-        cert: record.certificate,
-        yearfrom: record.yearFrom,
-        yearto: record.yearTo,
-        notes: record.notes
-      };
-      Object.entries(fields).forEach(([field, value]) => {
-        const input = document.getElementById('input_qual_' + field);
-        input.value = value || '';
-        input.dataset.original = value || '';
-        input.dataset.fieldId = `qual_${index}_${field}`;
-        input.closest('.change-field-card')?.classList.remove('modified');
-        modifiedFields.delete(input.dataset.fieldId);
-      });
-      const highest = document.getElementById('qual_highest');
-      highest.checked = Boolean(record.highest);
-      highest.dataset.original = String(Boolean(record.highest));
-      highest.dataset.fieldId = `qual_${index}_highest`;
-      modifiedFields.delete(highest.dataset.fieldId);
-      updateDraftBar();
-    }
-
-    function editQualificationRecord(index) {
-      const record = qualificationRecords[index];
-      if (!record) return;
-      prepareQualificationEditor(index, record);
-      toggleQualificationForm(true, `Edit Qualification (${record.qualification})`);
-      showToast('Edit', `Editing qualification: ${record.qualification}`);
-    }
-
-    function newQualificationRecord() {
-      prepareQualificationEditor(qualificationRecords.length, {highest: false});
-      toggleQualificationForm(true, 'Add Qualification Record');
-    }
-
-    function deleteQualificationRecord(index) {
-      const record = qualificationRecords[index];
-      if (!record) return;
-      modifiedFields.set(`qual_delete_${index}`, { element: null, label: 'Delete qualification', oldVal: record.qualification, newVal: 'Removed' });
-      updateDraftBar();
-      showToast('Delete', `Marked ${record.qualification} qualification for deletion.`);
-    }
-
     // Input Change Handler
     function handleFieldInput(el) {
       const fieldId = el.getAttribute('data-field-id');
@@ -1228,6 +1118,14 @@ DAMANSARA KOTA</textarea>
       });
     }
 
+    function formatQualificationDate(value) {
+      if (!value) return '—';
+      const [year, month, day] = value.split('-').map(Number);
+      const date = new Date(0);
+      date.setUTCFullYear(year, month - 1, day);
+      return Number.isNaN(date.getTime()) ? '—' : qualificationDateFormat.format(date);
+    }
+
     function qualificationDetailMarkup(label, value) {
       return '<div class="qualification-detail-row"><span class="qualification-detail-label">' +
         escapeQualificationText(label) +
@@ -1237,7 +1135,8 @@ DAMANSARA KOTA</textarea>
     }
 
     function qualificationDetailsMarkup(record) {
-      return qualificationDetailMarkup('Description', record.description) +
+      return qualificationDetailMarkup('Status', record.status) +
+        qualificationDetailMarkup('Description', record.description) +
         qualificationDetailMarkup('Major', record.major) +
         qualificationDetailMarkup('Institute', record.institute) +
         qualificationDetailMarkup('Certificate #', record.certificate) +
@@ -1259,7 +1158,6 @@ DAMANSARA KOTA</textarea>
 
     function qualificationRecordMarkup(record, index) {
       const context = [record.major, record.institute].filter(Boolean).join(' • ');
-      const years = [record.yearFrom, record.yearTo].filter(Boolean).join(' - ') || '-';
       const highestBadge = record.highest
         ? '<span class="qualification-highest-badge" data-qualification-highest>Highest</span>'
         : '';
@@ -1270,14 +1168,19 @@ DAMANSARA KOTA</textarea>
             '<div class="qualification-record-name" data-qualification-name>' + escapeQualificationText(record.qualification) + '</div>' +
             '<div class="qualification-record-description" data-qualification-description>' + escapeQualificationText(record.description) + '</div>' +
             '<div class="qualification-record-context" data-qualification-context>' + escapeQualificationText(context) + '</div>' +
-            '<div class="qualification-record-years" data-qualification-years>' + escapeQualificationText(years) + '</div>' +
-            highestBadge +
           '</div>' +
           '<div class="qualification-record-meta">' +
-            '<span class="qualification-record-score"><span data-qualification-cgpa>' + escapeQualificationText(record.cgpa || '-') + '</span><small>CGPA</small></span>' +
             qualificationExpandActionMarkup(index) +
             qualificationEditActionMarkup(index) +
             qualificationDeleteActionMarkup(index) +
+          '</div>' +
+          '<div class="qualification-record-facts">' +
+            '<dl class="qualification-record-dates">' +
+              '<div><dt>Start Date</dt><dd data-qualification-start>' + formatQualificationDate(record.startDate) + '</dd></div>' +
+              '<div><dt>End Date</dt><dd data-qualification-end>' + formatQualificationDate(record.endDate) + '</dd></div>' +
+            '</dl>' +
+            highestBadge +
+            '<div class="qualification-record-score">CGPA <strong data-qualification-cgpa>' + escapeQualificationText(record.cgpa || '-') + '</strong></div>' +
           '</div>' +
         '</div>' +
         '<div class="qualification-record-details" hidden>' + qualificationDetailsMarkup(record) + '</div>' +
@@ -1309,22 +1212,28 @@ DAMANSARA KOTA</textarea>
 
     function prepareQualificationEditor(index, record) {
       editingQualificationIndex = index;
+      const editorFields = document.querySelector('#qualSheetOverlay .qualification-editor-fields');
+      const notesField = editorFields.querySelector('#input_qual_notes').closest('.change-field-card');
+      const fieldAfterNotes = index === -1 ? '.qualification-attachment-section' : '.qualification-date-inputs';
+      editorFields.querySelector(fieldAfterNotes).before(notesField);
       editingQualificationAttachments = Array.isArray(record.attachments) ? [...record.attachments] : [];
       const fields = {
         level: record.qualification,
+        status: record.status,
         desc: record.description,
         major: record.major,
         institute: record.institute,
         cgpa: record.cgpa,
         cert: record.certificate,
-        yearfrom: record.yearFrom,
-        yearto: record.yearTo,
+        startdate: record.startDate,
+        enddate: record.endDate,
         notes: record.notes
       };
       Object.entries(fields).forEach(function(entry) {
         const input = document.getElementById('input_qual_' + entry[0]);
         if (input) input.value = entry[1] || '';
       });
+      document.getElementById('input_qual_enddate').min = record.startDate || '';
       document.getElementById('qual_highest').checked = Boolean(record.highest);
       document.getElementById('qualificationFiles').value = '';
       document.getElementById('qualificationCamera').value = '';
@@ -1368,13 +1277,14 @@ DAMANSARA KOTA</textarea>
       };
       return {
         qualification: value('level'),
+        status: value('status'),
         description: value('desc'),
         major: value('major'),
         institute: value('institute'),
         cgpa: value('cgpa') || '-',
         certificate: value('cert'),
-        yearFrom: value('yearfrom'),
-        yearTo: value('yearto'),
+        startDate: value('startdate'),
+        endDate: value('enddate'),
         highest: document.getElementById('qual_highest').checked,
         notes: value('notes'),
         attachments: [...editingQualificationAttachments]
@@ -1408,7 +1318,11 @@ DAMANSARA KOTA</textarea>
 
     function qualificationRecordSummary(record) {
       const attachments = Array.isArray(record.attachments) ? record.attachments.join(', ') : '';
-      return [record.qualification, record.description, record.yearFrom + ' - ' + record.yearTo, attachments].filter(Boolean).join(' | ');
+      const dates = record.startDate || record.endDate
+        ? formatQualificationDate(record.startDate) + ' – ' + formatQualificationDate(record.endDate)
+        : '';
+      const status = record.status ? 'Status: ' + record.status : '';
+      return [record.qualification, record.description, status, dates, attachments].filter(Boolean).join(' | ');
     }
 
     function saveQualificationRecord() {
@@ -1419,9 +1333,12 @@ DAMANSARA KOTA</textarea>
         return;
       }
 
-      if (record.highest) {
-        qualificationRecords.forEach(function(item) { item.highest = false; });
-      }
+      const startInput = document.getElementById('input_qual_startdate');
+      const endInput = document.getElementById('input_qual_enddate');
+      endInput.min = record.startDate;
+      if (!startInput.reportValidity() || !endInput.reportValidity()) return;
+
+      if (record.highest) qualificationRecords.forEach(item => { item.highest = false; });
 
       if (editingQualificationIndex > -1) {
         const previous = qualificationRecords[editingQualificationIndex];
@@ -1461,7 +1378,6 @@ DAMANSARA KOTA</textarea>
     function familyDetailsMarkup(record) {
       const memberEmployeeId = record.memberEmployeeNo ? '#' + record.memberEmployeeNo.replace(/^#/, '') : '-';
       return familyDetailMarkup('Relationship', record.relation) +
-        familyDetailMarkup('Marital Status', record.status) +
         familyDetailMarkup('Birth Date', record.birthdate) +
         familyDetailMarkup('Rank', record.rank) +
         familyDetailMarkup('New NRIC #', record.nric) +
@@ -1679,6 +1595,9 @@ DAMANSARA KOTA</textarea>
       showToast('Delete', removed.name + ' removed.');
     }
 
+    document.getElementById('input_qual_startdate').addEventListener('input', event => {
+      document.getElementById('input_qual_enddate').min = event.target.value;
+    });
     renderQualificationRecords();
     renderFamilyRecords();
     switchCategory('personal');
@@ -1732,11 +1651,11 @@ DAMANSARA KOTA</textarea>
           html += `
             <div style="background: var(--bg-input); border-radius: 10px; padding: 10px 12px; display: flex; align-items: center; justify-content: space-between; border: 1px solid var(--border-card);">
               <div>
-                <div style="font-size: 11.5px; font-weight: 800; color: var(--text-primary);">${val.label}</div>
-                <div style="font-size: 10.5px; color: var(--text-muted); text-decoration: line-through;">${val.oldVal}</div>
+                <div style="font-size: 11.5px; font-weight: 800; color: var(--text-primary);">${escapeQualificationText(val.label)}</div>
+                <div style="font-size: 10.5px; color: var(--text-muted); text-decoration: line-through;">${escapeQualificationText(val.oldVal)}</div>
               </div>
               <div style="font-size: 11.5px; font-weight: 800; color: #10b981; text-align: right;">
-                ➔ ${val.newVal}
+                ➔ ${escapeQualificationText(val.newVal)}
               </div>
             </div>
           `;

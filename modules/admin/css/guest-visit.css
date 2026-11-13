@@ -59,12 +59,10 @@
 .guest-visit-page [aria-invalid="true"] { border-color: var(--red, #ef4444); }
 .visit-page-actions { display: flex; justify-content: flex-end; align-items: center; gap: 12px; margin-top: 18px; }
 .visit-page-actions .claim-button { min-width: 0; min-height: 0; border-radius: 999px; font-size: 14px; white-space: nowrap; }
-.visit-page-actions .form-cancel-btn { flex-shrink: 0; }
 .visit-page-actions .claim-button-secondary { padding: 11px 24px; border-width: 1.5px; box-shadow: var(--shadow-sm); }
 .visit-page-actions .claim-button-primary, .visit-category-actions .claim-button-primary { min-height: 0; padding: 11px 26px; border: 0; font-size: 14px; box-shadow: 0 4px 18px rgba(124,58,237,.45); }
 .visit-page-actions a { text-decoration: none; }
 .visit-page-actions.is-list-page { justify-content: space-between; align-items: center; margin-top: 24px; }
-.visit-page-actions.is-list-page .claim-button-secondary { min-height: 0; padding: 11px 22px; border-width: 1.5px; font-size: 13.5px; font-weight: 700; box-shadow: var(--shadow-sm); }
 .visit-page-actions.is-list-page .claim-button-primary { min-height: 0; padding: 11px 26px; border: 0; font-size: 14px; }
 .visit-entry-actions .claim-button-primary { box-shadow: 0 4px 18px rgba(124,58,237,.4); }
 .visit-summary-card { display: flex; align-items: center; gap: 14px; width: 100%; padding: 18px; margin-bottom: 16px; border: 1.5px solid rgba(124,58,237,.4); border-radius: 22px; background: linear-gradient(135deg, rgba(124,58,237,.12), rgba(109,40,217,.18)); box-shadow: 0 6px 20px rgba(124,58,237,.18); text-align: left; color: var(--text-primary); font-family: inherit; cursor: pointer; }
@@ -84,7 +82,6 @@
 .visit-category-card > i { color: var(--text-muted); font-size: 12px; }
 .visit-category-actions { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 24px; }
 .visit-category-actions .claim-button { border-radius: 999px; white-space: nowrap; }
-.visit-category-actions .claim-button-secondary { min-height: 0; padding: 11px 22px; border-width: 1.5px; font-size: 13.5px; font-weight: 700; box-shadow: var(--shadow-sm); }
 .guest-visit-page .visit-list-card { padding: 0; overflow: hidden; }
 .visit-list-heading { display: flex; align-items: center; gap: 12px; padding: 14px 16px; border-bottom: 1px solid var(--border-subtle); }
 .visit-list-heading-copy { flex: 1; min-width: 0; }

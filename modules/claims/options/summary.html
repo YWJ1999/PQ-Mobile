@@ -359,7 +359,7 @@
       SUMMARY_CATEGORIES.forEach(cat => {
         const validRecords = cat.records.filter(r => {
           if (targetStatus && targetStatus !== 'all') {
-            return r.status.toLowerCase() === targetStatus.toLowerCase();
+            return recordReviewStatusLabel(r.status).toLowerCase() === recordReviewStatusLabel(targetStatus).toLowerCase();
           }
           return includePending || (r.status !== 'pending' && r.status !== 'submitted');
         });
@@ -419,10 +419,10 @@
 
       let statusFilterText = includePending ? 'Include Pending' : 'Approved Only';
       if (targetStatus && targetStatus !== 'all') {
-        statusFilterText = `Status: ${targetStatus.charAt(0).toUpperCase() + targetStatus.slice(1)}`;
+        statusFilterText = `Status: ${recordReviewStatusLabel(targetStatus.charAt(0).toUpperCase() + targetStatus.slice(1))}`;
       }
 
-      document.getElementById('claimSummaryFilterText').innerHTML = `Period: ${displayPeriodLabel} &bull; ${statusFilterText}`;
+      document.getElementById('claimSummaryFilterText').textContent = `Period: ${displayPeriodLabel} • ${statusFilterText}`;
       if (document.getElementById('totalCategoriesCountText')) {
         document.getElementById('totalCategoriesCountText').textContent = totalCat;
       }
@@ -439,7 +439,7 @@
       const includePending = document.getElementById('includePendingSelect').checked;
       const recordsToDisplay = cat.records.filter(r => {
         if (targetStatus && targetStatus !== 'all') {
-          return r.status.toLowerCase() === targetStatus.toLowerCase();
+          return recordReviewStatusLabel(r.status).toLowerCase() === recordReviewStatusLabel(targetStatus).toLowerCase();
         }
         return includePending || (r.status !== 'pending' && r.status !== 'submitted');
       });

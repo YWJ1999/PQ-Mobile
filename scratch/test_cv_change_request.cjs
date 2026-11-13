@@ -1,5 +1,4 @@
 const assert = require('node:assert/strict');
-const fs = require('node:fs');
 const path = require('node:path');
 const { pathToFileURL } = require('node:url');
 const puppeteer = require('puppeteer');
@@ -7,20 +6,6 @@ const puppeteer = require('puppeteer');
 const root = path.resolve(__dirname, '..');
 const chrome = 'C:/Program Files/Google/Chrome/Application/chrome.exe';
 const pageUrl = theme => pathToFileURL(path.join(root, 'change-request.html')).href + `?theme=${theme}`;
-
-const rootProfile = fs.readFileSync(path.join(root, 'me.html'), 'utf8');
-const moduleProfile = fs.readFileSync(path.join(root, 'modules', 'me', 'index.html'), 'utf8');
-
-assert.ok(
-  rootProfile.includes("if (featureKey === 'change')") &&
-    rootProfile.includes("window.location.href = 'change-request.html'"),
-  'The main Profile Change Request option opens the editable CV form'
-);
-assert.ok(
-  moduleProfile.includes('href="../../change-request.html"') &&
-    moduleProfile.includes('<div class="module-option-title">Change Request</div>'),
-  'The module Profile Change Request option opens the same editable CV form'
-);
 
 (async () => {
   const browser = await puppeteer.launch({
@@ -33,6 +18,11 @@ assert.ok(
     const page = await browser.newPage();
     const errors = [];
     page.on('pageerror', error => errors.push(error.message));
+    for (const entry of ['me.html', 'modules/me/index.html']) {
+      await page.goto(pathToFileURL(path.join(root, entry)).href);
+      const destination = await page.$eval('a[href*="change-request.html"]', link => new URL(link.href).pathname);
+      assert.equal(destination, new URL(pageUrl('light')).pathname, entry + ' links to the CV Change Request form');
+    }
 
     for (const theme of ['light', 'dark']) {
       await page.setViewport({ width: 390, height: 950, deviceScaleFactor: 1 });
@@ -54,12 +44,12 @@ assert.ok(
       }, 'CV Change Request header removes the overflow menu and keeps the title centered');
       assert.deepEqual(await page.evaluate(() => {
         const header = document.querySelector('.bonus-top-header').getBoundingClientRect();
-        const categories = document.querySelector('.change-scroller-wrapper').getBoundingClientRect();
-        const content = document.querySelector('.main-content').getBoundingClientRect();
+        const categories = document.querySelector('.cv-stepper').getBoundingClientRect();
+        const content = document.querySelector('#cat-personal').getBoundingClientRect();
         return {
           categoriesBelowHeader: categories.top >= header.bottom - 1,
           contentBelowCategories: content.top >= categories.bottom - 1,
-          categoriesVisible: categories.height > 0 && getComputedStyle(document.querySelector('.change-scroller-wrapper')).visibility === 'visible'
+          categoriesVisible: categories.height > 0 && getComputedStyle(document.querySelector('.cv-stepper')).visibility === 'visible'
         };
       }), {
         categoriesBelowHeader: true,
@@ -107,12 +97,12 @@ assert.ok(
         'CV category headings match their tab names'
       );
       assert.deepEqual(
-        await page.$$eval('.change-cat-pill > span:first-child', nodes => nodes.map(node => node.textContent.trim().replace(/^[^A-Za-z]+/, ''))),
-        ['Personal', 'Qualification', 'Payroll', 'Correspondence Contact', 'Family'],
+        await page.$$eval('.cv-step-label', nodes => nodes.map(node => node.textContent.trim())),
+        ['Personal', 'Qualification', 'Payroll', 'Contact', 'Family'],
         'CV tabs use the requested short category names'
       );
       assert.deepEqual(await page.evaluate(() => {
-        const tabLabel = document.querySelector('#pill-contacts > span:first-child').textContent.trim().replace(/^[^A-Za-z]+/, '');
+        const tabLabel = document.querySelector('#cv-step-contacts .cv-step-label').textContent.trim();
         const heading = document.querySelector('#cat-contacts .change-form-section-heading .form-section-heading').textContent.trim();
         const headingStyle = getComputedStyle(document.querySelector('#cat-contacts .change-form-section-heading .form-section-heading'));
         const sections = [...document.querySelectorAll('#cat-contacts .change-section-header')];
@@ -140,7 +130,7 @@ assert.ok(
           leftPadding: sections.map(section => getComputedStyle(section).paddingLeft)
         };
       }), {
-        tabLabel: 'Correspondence Contact',
+        tabLabel: 'Contact',
         heading: 'Correspondence Contact',
         labels: ['Emergency Contact & Address'],
         icons: [''],
@@ -150,52 +140,11 @@ assert.ok(
         radii: ['0px'],
         leftPadding: ['0px']
       }, 'Correspondence Contact removes the duplicate address subsection heading');
-      await page.evaluate(() => window.scrollTo(0, 0));
-      await page.click('.change-expand-grid-btn');
-      await page.waitForSelector('#catGridOverlay.active');
-      await page.waitForFunction(() => {
-        const sheet = document.querySelector('#catGridOverlay .profile-category-sheet');
-        const transform = new DOMMatrixReadOnly(getComputedStyle(sheet).transform);
-        return Math.abs(transform.m42) < 1;
-      });
-      assert.deepEqual(await page.evaluate(() => {
-        const overlay = document.getElementById('catGridOverlay').getBoundingClientRect();
-        const sheet = document.querySelector('#catGridOverlay .profile-category-sheet');
-        const sheetBounds = sheet.getBoundingClientRect();
-        const cards = [...sheet.querySelectorAll('.profile-category-card')];
-        return {
-          title: sheet.querySelector('.profile-category-title').textContent.trim(),
-          subtitlePresent: Boolean(sheet.querySelector('.sheet-title p')),
-          labels: cards.map(card => card.querySelector('.profile-category-name').textContent.trim()),
-          countItems: sheet.querySelectorAll('.profile-category-count').length,
-          icons: cards.map(card => card.querySelector('.profile-category-icon i').className),
-          consistentPurpleIcons: (() => {
-            const colors = [...new Set(cards.map(card => getComputedStyle(card.querySelector('.profile-category-icon')).color))];
-            const channels = colors[0]?.match(/\d+/g)?.map(Number) || [];
-            return colors.length === 1 && channels.length >= 3 && channels[2] > channels[0] && channels[0] > channels[1];
-          })(),
-          columns: getComputedStyle(sheet.querySelector('.profile-category-grid')).gridTemplateColumns.split(' ').length,
-          familySpan: getComputedStyle(cards[4]).gridColumnEnd,
-          compactHeight: sheetBounds.height / overlay.height > 0.25 && sheetBounds.height / overlay.height < 0.55,
-          bottomAligned: Math.abs(sheetBounds.bottom - overlay.bottom) < 2,
-          sheetRadius: getComputedStyle(sheet).borderTopLeftRadius
-        };
-      }), {
-        title: 'Select Category',
-        subtitlePresent: false,
-        labels: ['Personal Details', 'Qualification', 'Payroll & Statutory', 'Correspondence Contact', 'Family Details'],
-        countItems: 0,
-        icons: ['fa-solid fa-user', 'fa-solid fa-graduation-cap', 'fa-solid fa-credit-card', 'fa-solid fa-location-dot', 'fa-solid fa-people-roof'],
-        consistentPurpleIcons: true,
-        columns: 2,
-        familySpan: '3',
-        compactHeight: true,
-        bottomAligned: true,
-        sheetRadius: '28px'
-      }, 'View-all icon opens a compact bottom category picker');
-      await page.click('[data-profile-category="contacts"]');
-      assert.equal(await page.$eval('.change-cat-pill.active', pill => pill.id), 'pill-contacts');
-      await page.click('#pill-personal');
+      await page.click('#cv-step-contacts');
+      assert.equal(await page.$eval('.cv-step[aria-current="step"]', step => step.dataset.category), 'contacts');
+      assert.deepEqual(await page.$$eval('.cv-step.completed', steps => steps.map(step => step.dataset.category)), ['personal', 'qualification', 'payroll']);
+      assert.equal(await page.$eval('#cat-contacts', section => section.getClientRects().length > 0), true);
+      await page.click('#cv-step-personal');
       assert.deepEqual(await page.evaluate(() => {
         const section = document.getElementById('cat-personal');
         const heading = section.querySelector(':scope > :first-child .form-section-heading');
@@ -215,42 +164,43 @@ assert.ok(
         inputSize: '13.5px',
         hasHeaderCount: false
       }, 'CV form typography matches the Leave Details form reference');
-      assert.deepEqual(
-        await page.$$eval('.change-cat-count', nodes => nodes.slice(0, 5).map(node => node.textContent.trim())),
-        ['10', '3', '12', '16', '2'],
-        'CV editor category counts match the pending approval profile'
-      );
-      assert.equal(await page.$$eval('#catGridOverlay .profile-category-count', nodes => nodes.length), 0, 'Category picker stays concise');
+      assert.deepEqual(await page.evaluate(() => [
+        document.querySelectorAll('#cat-personal [data-field-id]').length,
+        document.querySelectorAll('[data-qualification-index]').length,
+        document.querySelectorAll('#cat-payroll [data-field-id]').length,
+        document.querySelectorAll('#cat-contacts [data-field-id]').length,
+        document.querySelectorAll('[data-family-index]').length
+      ]), [8, 3, 12, 16, 2]);
       assert.equal(await page.$eval('#historyOverlay .sheet-title h3', node => node.textContent.trim()), 'CV Change Request History');
 
       assert.deepEqual(await page.evaluate(() => {
         const value = id => document.querySelector(`[data-field-id="${id}"]`)?.value;
         return {
           name: value('name'), birthdate: value('birthdate'), age: value('age'), email: value('email'),
-          marital: value('marital'), marriageDate: value('marriagedate'), passport: value('passport'),
+          hasMarital: value('marital') !== undefined, hasMarriageDate: value('marriagedate') !== undefined, passport: value('passport'),
           passportExpiry: value('passportexpiry'), license: value('license'), licenseExpiry: value('licenseexpiry'),
           hasNric: Boolean(document.querySelector('[data-field-id="nric"]')),
           hasKeyLevel: Boolean(document.querySelector('[data-field-id="keylevel"]'))
         };
       }), {
         name: 'Farhan', birthdate: '22 Apr 1960', age: '0', email: 'ebb12@gmail.com',
-        marital: 'Married', marriageDate: '18 Jul 1984', passport: 'A212222048',
+        hasMarital: false, hasMarriageDate: false, passport: 'A212222048',
         passportExpiry: '25 Mar 2015', license: 'AX000234496', licenseExpiry: '12 Aug 2021',
         hasNric: false, hasKeyLevel: false
       });
 
       for (const category of ['qualification', 'payroll', 'contacts', 'family']) {
         await page.click('#btnNextCategory');
-        assert.equal(await page.$eval('.change-cat-pill.active', pill => pill.id), 'pill-' + category);
+        assert.equal(await page.$eval('.cv-step[aria-current="step"]', pill => pill.id), 'cv-step-' + category);
       }
       assert.deepEqual(
         await page.$$eval('.change-form-actions button', buttons => buttons.filter(button => !button.hidden).map(button => button.textContent.trim())),
-        ['Cancel', 'Submit']
+        ['Back', 'Submit']
       );
       assert.equal(await page.$eval('#btnReviewSubmit', button => button.disabled), false);
-      await page.click('#pill-personal');
+      await page.click('#cv-step-personal');
 
-      await page.click('#pill-qualification');
+      await page.click('#cv-step-qualification');
       assert.deepEqual(await page.evaluate(() => {
         const header = document.querySelector('#cat-qualification .qualification-manager-header');
         const addButton = document.getElementById('addQualificationButton');
@@ -273,19 +223,20 @@ assert.ok(
         qualification: node.querySelector('[data-qualification-name]').textContent.trim(),
         description: node.querySelector('[data-qualification-description]').textContent.trim(),
         context: node.querySelector('[data-qualification-context]').textContent.trim(),
-        years: node.querySelector('[data-qualification-years]').textContent.trim(),
+        startDate: node.querySelector('[data-qualification-start]').textContent.trim(),
+        endDate: node.querySelector('[data-qualification-end]').textContent.trim(),
         cgpa: node.querySelector('[data-qualification-cgpa]').textContent.trim(),
         highest: Boolean(node.querySelector('[data-qualification-highest]'))
       }))), [{
         qualification: "Bachelor's Degree", description: 'Bachelor of Business Administration',
-        context: 'Human Resource Management • Universiti Malaya', years: '2003 - 2006', cgpa: '3.62', highest: true
+        context: 'Human Resource Management • Universiti Malaya', startDate: '7 Jul 2003', endDate: '19 May 2006', cgpa: '3.62', highest: true
       }, {
         qualification: 'Diploma', description: 'Diploma in Business Studies',
-        context: 'Business Administration • Kolej Universiti Contoh', years: '2001 - 2003', cgpa: '3.45', highest: false
+        context: 'Business Administration • Kolej Universiti Contoh', startDate: '11 Jun 2001', endDate: '25 Apr 2003', cgpa: '3.45', highest: false
       }, {
         qualification: 'Professional Certificate', description: 'Certified Human Resources Professional',
         context: 'Human Resource Management • Malaysian Institute of Human Resource Management',
-        years: '2024 - 2024', cgpa: '-', highest: false
+        startDate: '4 Mar 2024', endDate: '27 Sept 2024', cgpa: '-', highest: false
       }]);
 
       await page.$eval('[data-qualification-index="1"] [data-edit-qualification]', button => button.click());
@@ -296,18 +247,18 @@ assert.ok(
         institute: document.getElementById('input_qual_institute').value,
         cgpa: document.getElementById('input_qual_cgpa').value,
         certificate: document.getElementById('input_qual_cert').value,
-        yearFrom: document.getElementById('input_qual_yearfrom').value,
-        yearTo: document.getElementById('input_qual_yearto').value,
+        startDate: document.getElementById('input_qual_startdate').value,
+        endDate: document.getElementById('input_qual_enddate').value,
         highest: document.getElementById('qual_highest').checked,
         notes: document.getElementById('input_qual_notes').value
       })), {
         qualification: 'Diploma', description: 'Diploma in Business Studies', major: 'Business Administration',
         institute: 'Kolej Universiti Contoh', cgpa: '3.45', certificate: 'DEMO-QUAL-002',
-        yearFrom: '2001', yearTo: '2003', highest: false, notes: 'Completed before the degree programme.'
+        startDate: '2001-06-11', endDate: '2003-04-25', highest: false, notes: 'Completed before the degree programme.'
       });
       await page.evaluate(() => toggleQualificationForm(false));
 
-      await page.click('#pill-payroll');
+      await page.click('#cv-step-payroll');
       assert.deepEqual(await page.evaluate(() => {
         const value = id => document.querySelector(`[data-field-id="${id}"]`)?.value;
         return {
@@ -321,7 +272,7 @@ assert.ok(
         handicap: false, spouseHandicap: true, spouseWorking: false
       });
 
-      await page.click('#pill-contacts');
+      await page.click('#cv-step-contacts');
       assert.equal(await page.$$eval('#cat-contacts [data-field-id]', nodes => nodes.length), 16);
       assert.deepEqual(await page.evaluate(() => {
         const value = id => document.querySelector(`[data-field-id="${id}"]`)?.value;
@@ -346,13 +297,13 @@ assert.ok(
         'Emergency Contact #', 'Contact Name', 'Contact Address', 'Postal Code', 'City', 'State', 'Country', 'Remarks'
       ], 'Emergency contact labels stay concise inside their scoped section');
 
-      await page.click('#pill-family');
+      await page.click('#cv-step-family');
       assert.deepEqual(
         await page.$$eval('[data-family-name]', nodes => nodes.map(node => [node.dataset.familyName, node.dataset.familyRelation])),
         [['ABU KARUDDIN BIN MAHMUD', 'HUSBAND'], ['a', 'DAUGHTER']]
       );
 
-      await page.click('#pill-contacts');
+      await page.click('#cv-step-contacts');
       await page.$eval('[data-field-id="mobile"]', input => {
         input.value = '0198765432';
         input.dispatchEvent(new Event('input', { bubbles: true }));
@@ -360,7 +311,7 @@ assert.ok(
       assert.equal(await page.$eval('#btnReviewSubmit', button => button.disabled), false);
       assert.equal(await page.$eval('#btnReviewSubmit', button => button.hidden), true);
       await page.click('#btnNextCategory');
-      assert.equal(await page.$eval('.change-cat-pill.active', pill => pill.id), 'pill-family');
+      assert.equal(await page.$eval('.cv-step[aria-current="step"]', pill => pill.id), 'cv-step-family');
       assert.equal(await page.$eval('#btnReviewSubmit', button => button.hidden), false);
       await page.click('#btnReviewSubmit');
       assert.equal(await page.$eval('#btnConfirmSubmit', button => getComputedStyle(button).backgroundImage !== 'none'), true);

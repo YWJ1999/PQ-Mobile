@@ -81,7 +81,7 @@
               <div class="claim-field"><label class="claim-field-label" for="visitGuestPosition">Position<span class="claim-required" aria-hidden="true">*</span></label><input id="visitGuestPosition" class="claim-control" type="text" maxlength="200" aria-required="true" placeholder="Enter position"></div>
             </div>
           </div>
-          <div class="visit-entry-actions"><button id="visitGuestCancelEdit" type="button" class="form-cancel-btn"><i class="fa-solid fa-xmark" aria-hidden="true"></i><span>Cancel</span></button><button type="button" class="claim-button claim-button-secondary" data-visit-save-draft><i class="fa-solid fa-floppy-disk" aria-hidden="true"></i><span>Save Draft</span></button><button id="visitGuestAdd" type="button" class="claim-button claim-button-primary"><i class="fa-solid fa-floppy-disk" aria-hidden="true"></i><span>Save Item</span></button></div>
+          <div class="visit-entry-actions"><button id="visitGuestCancelEdit" type="button" class="claim-button claim-button-primary"><i class="fa-solid fa-xmark" aria-hidden="true"></i><span>Cancel</span></button><button type="button" class="claim-button claim-button-secondary" data-visit-save-draft><i class="fa-solid fa-floppy-disk" aria-hidden="true"></i><span>Save Draft</span></button><button id="visitGuestAdd" type="button" class="claim-button claim-button-primary"><i class="fa-solid fa-floppy-disk" aria-hidden="true"></i><span>Save Item</span></button></div>
           </div>
         </section>
         <section id="visitPanel-attendee" role="tabpanel" aria-labelledby="visitTab-attendee" tabindex="0" hidden>
@@ -98,7 +98,7 @@
               <div class="claim-field"><label class="claim-field-label" for="visitStaffPosition">Position</label><input id="visitStaffPosition" class="claim-control" type="text" readonly placeholder="Selected employee position"></div>
             </div>
           </div>
-          <div class="visit-entry-actions"><button id="visitAttendeeCancelEdit" type="button" class="form-cancel-btn"><i class="fa-solid fa-xmark" aria-hidden="true"></i><span>Cancel</span></button><button type="button" class="claim-button claim-button-secondary" data-visit-save-draft><i class="fa-solid fa-floppy-disk" aria-hidden="true"></i><span>Save Draft</span></button><button id="visitAttendeeAdd" type="button" class="claim-button claim-button-primary"><i class="fa-solid fa-floppy-disk" aria-hidden="true"></i><span>Save Item</span></button></div>
+          <div class="visit-entry-actions"><button id="visitAttendeeCancelEdit" type="button" class="claim-button claim-button-primary"><i class="fa-solid fa-xmark" aria-hidden="true"></i><span>Cancel</span></button><button type="button" class="claim-button claim-button-secondary" data-visit-save-draft><i class="fa-solid fa-floppy-disk" aria-hidden="true"></i><span>Save Draft</span></button><button id="visitAttendeeAdd" type="button" class="claim-button claim-button-primary"><i class="fa-solid fa-floppy-disk" aria-hidden="true"></i><span>Save Item</span></button></div>
           </div>
         </section>
         <section id="visitCategories" aria-labelledby="visitCategoriesHeading" hidden>
@@ -107,7 +107,7 @@
           <button type="button" class="visit-category-card" data-visit-category="guest"><span class="visit-list-icon"><i class="fa-solid fa-user-group" aria-hidden="true"></i></span><span class="visit-category-copy"><strong>Guest</strong><span>Guest details</span></span><strong id="visitGuestCategoryCount">0</strong><i class="fa-solid fa-chevron-right" aria-hidden="true"></i></button>
           <button type="button" class="visit-category-card" data-visit-category="attendee"><span class="visit-list-icon visit-attendee-icon"><i class="fa-solid fa-user-tie" aria-hidden="true"></i></span><span class="visit-category-copy"><strong>Attendee</strong><span>Staff attending the visit</span></span><strong id="visitAttendeeCategoryCount">0</strong><i class="fa-solid fa-chevron-right" aria-hidden="true"></i></button>
           <button type="button" class="visit-category-card" data-visit-category="other"><span class="visit-list-icon visit-other-icon"><i class="fa-solid fa-list-check" aria-hidden="true"></i></span><span class="visit-category-copy"><strong>Other</strong><span>Other requests</span></span><strong id="visitOtherCategoryCount">0</strong><i class="fa-solid fa-chevron-right" aria-hidden="true"></i></button>
-          <div class="visit-category-actions"><button id="visitCategoriesBack" type="button" class="claim-button claim-button-secondary"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i><span>Back to Application</span></button><button id="visitCategoriesNext" type="button" class="claim-button claim-button-primary"><span>Next</span><i class="fa-solid fa-arrow-right" aria-hidden="true"></i></button></div>
+          <div class="visit-category-actions"><button id="visitCategoriesBack" type="button" class="claim-button claim-button-primary"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i><span>Back to Application</span></button><button id="visitCategoriesNext" type="button" class="claim-button claim-button-primary"><span>Next</span><i class="fa-solid fa-arrow-right" aria-hidden="true"></i></button></div>
         </section>
         <section id="visitPanel-other" role="tabpanel" aria-labelledby="visitTab-other" tabindex="0" hidden>
           <div class="claim-form-card">
@@ -122,8 +122,8 @@
         </section>
         <p id="visitFeedback" class="visit-feedback" role="status" aria-live="polite" hidden></p>
         <div id="visitPageActions" class="visit-page-actions">
-          <a id="visitCancel" class="form-cancel-btn" data-admin-back href="../index.html"><i class="fa-solid fa-xmark" aria-hidden="true"></i><span>Cancel</span></a>
-          <button id="visitPrevious" class="form-cancel-btn" type="button" hidden><i class="fa-solid fa-xmark" aria-hidden="true"></i><span>Cancel</span></button>
+          <a id="visitCancel" class="claim-button claim-button-primary" data-admin-back href="../index.html"><i class="fa-solid fa-xmark" aria-hidden="true"></i><span>Cancel</span></a>
+          <button id="visitPrevious" class="claim-button claim-button-primary" type="button" hidden><i class="fa-solid fa-xmark" aria-hidden="true"></i><span>Cancel</span></button>
           <button id="visitSaveDraft" class="claim-button claim-button-secondary" type="button"><i class="fa-solid fa-floppy-disk" aria-hidden="true"></i><span>Save Draft</span></button>
           <button id="visitNext" class="claim-button claim-button-primary" type="button"><span>Next</span><i class="fa-solid fa-arrow-right" aria-hidden="true"></i></button>
           <button id="visitSubmit" class="claim-button claim-button-primary" type="submit" hidden><span>Submit</span><i class="fa-solid fa-paper-plane" aria-hidden="true"></i></button>

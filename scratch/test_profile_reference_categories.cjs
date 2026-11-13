@@ -44,7 +44,17 @@ const fields = {
         assert.equal(await page.$$('#meMainScroll > .profile-section').then(nodes => nodes.length), 13);
         assert.equal(await page.$$('#profileDirectory [data-profile-category]').then(nodes => nodes.length), 13);
         assert.equal(await page.$$('#profileDirectory .profile-nav-row').then(nodes => nodes.length), 19);
-        assert.deepEqual(await page.$$eval('.profile-nav-group-title', nodes => nodes.map(node => node.textContent)), ['Work', 'Pay & rewards', 'Career & development', 'My information']);
+        const directoryGroups = await page.$$eval('.profile-nav-group', groups => groups.map(group => [
+          group.querySelector('.profile-nav-group-title').textContent,
+          Array.from(group.querySelectorAll('.profile-nav-label'), label => label.textContent)
+        ]));
+        assert.deepEqual(directoryGroups, [
+          ['Personal information', ['Personal', 'Contact Information', 'Family', 'Qualification']],
+          ['Employment', ['Work Information', 'Job description', 'Subordinates', 'Asset Assignment', 'Work trends', 'Disciplinary History']],
+          ['Pay & rewards', ['Payroll Information', 'Salary history', 'Bonus history']],
+          ['Career & development', ['Career Progression', 'Competencies', 'Performance History', 'Training History']],
+          ['Documents & requests', ['HR Letters', 'Change requests']]
+        ]);
         assert.equal(await page.$eval('#profileDirectory', node => node.hidden), false);
         assert.equal(await page.$eval('#profileDetailNav', node => node.hidden), true);
         assert.equal(await page.$$eval('#meMainScroll > .profile-section', nodes => nodes.every(node => node.hidden)), true);
@@ -67,7 +77,7 @@ const fields = {
           assert.equal(await page.$$('#bento-' + key + ' .profile-reference-row').then(nodes => nodes.length), count, key + ' count');
           assert.deepEqual(await page.$$eval('#bento-' + key + ' th', nodes => nodes.map(node => node.textContent.trim())), headers, key + ' schema');
         }
-        assert.deepEqual(await page.$$eval('#profileDirectory a', nodes => nodes.map(node => node.getAttribute('href'))), ['work-behaviour.html', 'subordinates.html', 'salary-history.html', 'bonus-history.html', 'change-request.html']);
+        assert.deepEqual(await page.$$eval('#profileDirectory a', nodes => nodes.map(node => node.getAttribute('href'))), ['subordinates.html', 'work-behaviour.html', 'salary-history.html', 'bonus-history.html', 'change-request.html']);
         await page.$eval('#meMainScroll', node => { node.scrollTop = 0; });
         await page.click('[data-profile-action="job-description"]');
         assert.equal(await page.$eval('#jdPaperModal', node => node.classList.contains('open')), true);

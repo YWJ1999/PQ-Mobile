@@ -236,7 +236,7 @@ const moduleUrl = (file, query = '') => pathToFileURL(path.join(root, 'modules/t
       classCode: card.querySelector('.history-card-title').textContent.trim(),
       status: card.querySelector('.card-status-badge').textContent.trim(),
       statusTheme: card.dataset.status
-    })), { classCode: 'A02', status: 'Submitted', statusTheme: 'submitted' });
+    })), { classCode: 'A02', status: 'Approved', statusTheme: 'approved' });
 
     for (const theme of ['dark', 'light']) {
       for (const width of [360, 420]) {

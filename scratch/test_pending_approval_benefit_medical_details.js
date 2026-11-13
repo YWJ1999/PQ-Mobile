@@ -84,7 +84,7 @@ async function run() {
       && benefitSection.title === ''
       && JSON.stringify(benefitSection.rows.map(row => row.label)) === JSON.stringify(EXPECTED_BENEFIT_LABELS)
       && /Farhan binti rahmat\s+#EBB12/.test(benefitValues.Employee || '')
-      && benefitValues['Document Status'] === 'Submitted'
+      && benefitValues['Document Status'] === 'Pending'
       && benefitValues['Entitlement Year'] === '2019'
       && benefitValues['Benefit Type'] === 'PERSONAL ALLOWANCE'
       && benefitValues['Claim Period'] === '201902'
@@ -108,7 +108,7 @@ async function run() {
       && medicalGeneralValues['Benefit Type'] === 'General Consultation'
       && medicalGeneralValues['Receipt Date'] === '07/09/2026'
       && medicalGeneralValues['Receipt No.'] === 'QC-5510'
-      && medicalGeneralValues.Status === 'Submitted'
+      && medicalGeneralValues.Status === 'Pending'
       && medicalGeneralValues['Claim Total'] === 'RM 135.00';
 
     let screenshotExamplePassed = true;

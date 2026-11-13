@@ -247,17 +247,19 @@
     }
   }
   function statusKey(value) {
-    return String(value || 'Draft')
+    const key = String(value || 'Draft')
       .trim()
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, '-')
       .replace(/^-|-$/g, '');
+    if (/^(?:to-|pending-)?resubmit(?:ted)?$/.test(key)) return 'resubmit';
+    if (/^(?:pending(?:-|$)|awaiting-|in-review$|(?:next|final)-approval$)/.test(key)) return 'submitted';
+    return key;
   }
 
   function historyStatus(value) {
     const status = String(value || '').trim();
     if (!status) return 'Draft';
-    if (statusKey(status) === 'pending') return 'Submitted';
     return status.charAt(0).toUpperCase() + status.slice(1);
   }
 

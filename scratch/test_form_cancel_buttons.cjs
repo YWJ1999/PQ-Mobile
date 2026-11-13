@@ -67,7 +67,9 @@ for (const form of claimForms) {
   const html = read(form.path);
   const cancelCount = html.split(cancelMarker).length - 1;
   expect(cancelCount === 1, `${form.name} must have exactly one page Cancel button`);
-  expect(/class="[^"]*form-cancel-btn[^"]*"[^>]*data-page-form-cancel|data-page-form-cancel[^>]*class="[^"]*form-cancel-btn/.test(html), `${form.name} does not use the shared Cancel style`);
+  const cancelButton = html.match(/<button\b[^>]*\bdata-page-form-cancel\b[^>]*>/)?.[0] || '';
+  const cancelClasses = cancelButton.match(/class="([^"]*)"/)?.[1].split(/\s+/) || [];
+  expect(cancelClasses.includes(form.multi ? 'btn-submit-primary' : 'form-cancel-btn'), `${form.name} Cancel has the wrong button style`);
   expect(html.includes('Save Draft') || html.includes('<span>Draft</span>') ? form.draft : !form.draft, `${form.name} Draft button presence changed`);
 
   if (form.multi) {

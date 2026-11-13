@@ -16,7 +16,7 @@ const labels = ['Reference #','Emp #','Name','Position','Interviewee #','Intervi
       await page.goto(url+'?category=staff-engagement&theme='+theme,{waitUntil:'load'});
       assert.ok(await page.$('#teamEngagementFilterTrigger'),'Staff Engagement has its own filter');
       assert.deepEqual(await page.$$eval('#teamHistoryList .history-card-row',nodes=>nodes.slice(0,3).map(node=>node.firstElementChild.textContent.trim())),['Notice Date','Last Paid Date','Reason']);
-      assert.deepEqual(await page.$$eval('#teamHistoryList .status-pill',nodes=>nodes.map(node=>node.textContent.trim())),['Submitted','Submitted']);
+      assert.deepEqual(await page.$$eval('#teamHistoryList .status-pill',nodes=>nodes.map(node=>node.textContent.trim())),['Pending','Pending']);
       // Enrich records only inside this browser; distinct people and dates detect accidental field substitutions.
       await page.evaluate(()=>{
         const records=window.EMPLOYEE_CAREER_TEAM_HISTORY_DATA['staff-engagement'];
@@ -35,7 +35,7 @@ const labels = ['Reference #','Emp #','Name','Position','Interviewee #','Intervi
       const first='[data-engagement-id="SEG-2026-0021"]';
       await page.click(first);
       assert.deepEqual(await page.$$eval('#teamEngagementDetailsRows th',nodes=>nodes.map(node=>node.textContent.trim())),labels);
-      assert.deepEqual(await page.$$eval('#teamEngagementDetailsRows td',nodes=>nodes.slice(0,-1).map(node=>node.textContent.trim())),['ENG-REF-0021','#EBB01','Aina Rahman','People Operations Executive','#004177','Finance Analyst','#009988','5 Oct 2026','8 Oct 2026','Low','Continue Development Plan','Interview notes.\nSecond line.','Strong collaboration.','Workload concerns.','Review workload.','Follow up next month.','Acknowledged.','Submitted']);
+      assert.deepEqual(await page.$$eval('#teamEngagementDetailsRows td',nodes=>nodes.slice(0,-1).map(node=>node.textContent.trim())),['ENG-REF-0021','#EBB01','Aina Rahman','People Operations Executive','#004177','Finance Analyst','#009988','5 Oct 2026','8 Oct 2026','Low','Continue Development Plan','Interview notes.\nSecond line.','Strong collaboration.','Workload concerns.','Review workload.','Follow up next month.','Acknowledged.','Pending']);
       assert.equal(await page.$$eval('#teamEngagementDetailsRows tr:last-child a',nodes=>nodes.length),1);
       assert.ok(await page.$eval('#teamEngagementDetailsRows tr:last-child',node=>node.textContent.includes('notes.txt')));
       await page.screenshot({path:path.join(__dirname,`staff-engagement-details-${theme}-${width}.png`)});
@@ -63,7 +63,7 @@ const labels = ['Reference #','Emp #','Name','Position','Interviewee #','Intervi
       };
       await page.click('#teamEngagementFilterTrigger');
       assert.deepEqual(await page.$$eval('#teamEngagementFilterForm label',nodes=>nodes.map(node=>node.textContent.trim())),['Search Keyword','Start Date','End Date','Status']);
-      assert.deepEqual(await page.$$eval('#teamEngagementStatus option',nodes=>nodes.map(node=>node.textContent.trim())),['All Status','Submitted','Approved','Rejected','To Resubmit']);
+      assert.deepEqual(await page.$$eval('#teamEngagementStatus option',nodes=>nodes.map(node=>node.textContent.trim())),['All Status','Pending','Approved','Rejected','To Resubmit']);
       await page.screenshot({path:path.join(__dirname,`staff-engagement-filter-${theme}-${width}.png`)});
       await page.keyboard.press('Escape');
       for(const [values,expected] of [

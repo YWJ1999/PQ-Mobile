@@ -58,7 +58,6 @@ const pageUrl = pathToFileURL(path.join(root, 'change-request.html')).href + '?t
       dividerStyle: 'dashed',
       details: [
         ['Relationship', 'HUSBAND'],
-        ['Marital Status', 'Married'],
         ['Birth Date', '18/07/1984'],
         ['Rank', '- Select Rank-'],
         ['New NRIC #', '880412-14-5589'],

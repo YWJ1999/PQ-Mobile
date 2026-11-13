@@ -55,7 +55,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const listPage = name === 'guest' || name === 'attendee';
     $('visitPageActions').classList.toggle('is-list-page', listPage);
     $('visitSaveDraft').hidden = listPage;
-    $('visitPrevious').className = listPage ? 'claim-button claim-button-secondary' : 'form-cancel-btn';
     $('visitPrevious').querySelector('span').textContent = listPage ? 'Back to Categories' : 'Cancel';
     $('visitPrevious').querySelector('i').className = listPage ? 'fa-solid fa-arrow-left' : 'fa-solid fa-xmark';
     $('visitCancel').hidden = step !== 0;

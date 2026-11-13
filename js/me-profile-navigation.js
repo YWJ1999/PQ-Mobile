@@ -20,18 +20,26 @@
   const byId = new Map(categories.map(category => [category.id, category]));
   const groups = [
     {
-      id: 'work', label: 'Work', items: [
+      id: 'personal', label: 'Personal information', items: [
+        byId.get('bento-personal'), byId.get('bento-contact'),
+        byId.get('bento-family'), byId.get('bento-education')
+      ]
+    },
+    {
+      id: 'employment', label: 'Employment', items: [
+        byId.get('bento-work'),
         { label: 'Job description', icon: 'fa-file-lines', action: 'job-description' },
-        { label: 'Work trends', icon: 'fa-chart-line', href: 'work-behaviour.html' },
         { label: 'Subordinates', icon: 'fa-users', href: 'subordinates.html' },
-        byId.get('bento-work'), byId.get('bento-compliance'), byId.get('bento-assets')
+        byId.get('bento-assets'),
+        { label: 'Work trends', icon: 'fa-chart-line', href: 'work-behaviour.html' },
+        byId.get('bento-compliance')
       ]
     },
     {
       id: 'pay', label: 'Pay & rewards', items: [
+        byId.get('bento-finance'),
         { label: 'Salary history', icon: 'fa-money-bill-wave', href: 'salary-history.html' },
-        { label: 'Bonus history', icon: 'fa-gift', href: 'bonus-history.html' },
-        byId.get('bento-finance')
+        { label: 'Bonus history', icon: 'fa-gift', href: 'bonus-history.html' }
       ]
     },
     {
@@ -41,9 +49,8 @@
       ]
     },
     {
-      id: 'information', label: 'My information', items: [
-        byId.get('bento-personal'), byId.get('bento-education'),
-        byId.get('bento-family'), byId.get('bento-contact'), byId.get('bento-letters'),
+      id: 'documents', label: 'Documents & requests', items: [
+        byId.get('bento-letters'),
         { label: 'Change requests', icon: 'fa-pen-to-square', href: 'change-request.html' }
       ]
     }

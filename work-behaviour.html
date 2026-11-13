@@ -25,26 +25,24 @@
   <!-- Outer Mobile Viewport Frame -->
   <div class="phone-container" style="background: var(--bg-phone); width: 100%; max-width: 420px; min-height: 915px; border-radius: 44px; position: relative; overflow: hidden; box-shadow: var(--shadow-phone); border: 1px solid var(--border-subtle); display: flex; flex-direction: column;">
     
-    <!-- Phone Top Status Bar -->
-    <phone-status-bar time="9:41" style="color: #ffffff;"></phone-status-bar>
-
     <!-- Executive Gradient Header Block -->
-    <div class="wb-header-wrapper" style="background: linear-gradient(135deg, #4c1d95 0%, #6d28d9 50%, #7c3aed 100%); padding: 14px 16px 16px; border-bottom-left-radius: 22px; border-bottom-right-radius: 22px; box-shadow: 0 8px 24px rgba(76, 29, 149, 0.28);">
+    <header class="wb-header-wrapper" style="flex: 0 0 auto; background: linear-gradient(135deg, #4c1d95 0%, #6d28d9 50%, #7c3aed 100%); border-bottom-left-radius: 22px; border-bottom-right-radius: 22px; box-shadow: 0 8px 24px rgba(76, 29, 149, 0.28);">
+      <phone-status-bar time="9:41"></phone-status-bar>
       
       <!-- Top Row: Back Button & Centered Title -->
-      <div style="display: flex; align-items: center; justify-content: space-between;">
+      <div style="display: flex; align-items: center; justify-content: space-between; padding: 14px 16px 16px;">
         <button class="bonus-back-btn" onclick="handleHeaderBack()" aria-label="Go Back" title="Return" style="background: rgba(255, 255, 255, 0.15); border: 1px solid rgba(255, 255, 255, 0.25); width: 36px; height: 36px; border-radius: 10px; color: #ffffff; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0;">
           <i class="fa-solid fa-chevron-left" style="font-size: 16px;"></i>
         </button>
 
-        <div style="text-align: center; flex: 1; padding: 0 8px;">
+        <div style="text-align: center; flex: 1; min-width: 0; padding: 0 8px;">
           <h2 id="topHeaderTitle" style="font-size: 16px; font-weight: 900; color: #ffffff; margin: 0; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Attendance Rate</h2>
         </div>
 
         <div style="width: 36px; flex-shrink: 0;"></div>
       </div>
 
-    </div>
+    </header>
 
     <!-- Scrollable Main Body Content -->
     <div class="main-content" style="overflow-y: auto; flex: 1; padding: 16px;">

@@ -88,8 +88,8 @@ button:disabled { cursor: wait; opacity: .65; }
 .prior-step-actions { display: flex; justify-content: flex-end; align-items: center; gap: 12px; }
 .prior-save-bar p { margin-top: 12px; text-align: right; font-size: 10.5px; color: var(--text-muted); line-height: 1.6; }
 .prior-step-actions button { display: inline-flex; justify-content: center; align-items: center; gap: 8px; min-height: 44px; padding: 11px 24px; border-radius: 9999px; font-size: 14px; font-weight: 800; white-space: nowrap; transition: transform .2s ease; }
-.prior-step-actions .btn-draft-bright, .prior-step-actions .btn-step-back { background: var(--bg-card); border: 1.5px solid var(--border-subtle); color: var(--text-primary); }
-.prior-step-actions .btn-step-back { margin-right: auto; font-size: 13.5px; font-weight: 700; padding-inline: 22px; }
+.prior-step-actions .btn-draft-bright { background: var(--bg-card); border: 1.5px solid var(--border-subtle); color: var(--text-primary); }
+#priorPrevious { margin-right: auto; }
 .prior-step-actions .btn-submit-primary { padding-inline: 26px; background: linear-gradient(135deg,#7c3aed,#6d28d9); color: #fff; border: 0; box-shadow: 0 4px 18px rgba(124,58,237,.45); }
 .prior-step-actions button:active { transform: scale(.96); }
 .prior-load-error { color: var(--text-secondary); font-size: 12px; line-height: 1.7; }

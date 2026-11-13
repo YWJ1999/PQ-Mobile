@@ -54,7 +54,7 @@ const labels = ['Document Reference', 'Document Status', 'Employee', 'Employee B
       assert.equal(details.legacyVisible, false);
       assert.deepEqual(details.employee, { name: 'Afifah Nasir', id: '#004177' });
       const value = label => details.rows.find(row => row.label === label).value;
-      assert.equal(value('Document Status'), 'Submitted');
+      assert.equal(value('Document Status'), 'Pending');
       assert.equal(value('Employee Branch'), '—');
       assert.equal(value('Employee Department'), 'QA Manager');
       assert.equal(value('Date'), 'Tue, 24/02/2026');

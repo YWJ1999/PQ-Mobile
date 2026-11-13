@@ -66,11 +66,11 @@ async function closeDetails(page) {
       assert.equal(await page.$('#timesheetHistoryEmpty'), null);
       assert.deepEqual(
         await page.$$eval('#workPlanHistoryList .project-history-status-badge', badges => [...new Set(badges.map(badge => badge.textContent.trim()))].sort()),
-        ['Draft', 'Submitted']
+        ['Draft', 'Pending']
       );
       assert.deepEqual(
         await page.$$eval('#workPlanFilterStatus option', options => options.map(option => option.textContent.trim())),
-        ['All Status', 'Submitted', 'Draft']
+        ['All Status', 'Pending', 'Draft']
       );
 
       assert.equal(await page.$$eval('#workPlanHistoryList .project-history-card', cards => cards.length), 2);
@@ -136,7 +136,7 @@ async function closeDetails(page) {
         await page.$$eval(workPlanCardSelector + ' .project-history-data-row > span', labels => labels.map(label => label.textContent.trim())),
         ['Scheduled', 'Deadline']
       );
-      assert.equal(await page.$eval(workPlanCardSelector + ' .project-history-status-badge', badge => badge.textContent.trim()), 'Submitted');
+      assert.equal(await page.$eval(workPlanCardSelector + ' .project-history-status-badge', badge => badge.textContent.trim()), 'Pending');
 
       await openCard(page, workPlanCardSelector);
       assert.equal(await page.$eval('#projectHistoryDetailTitle', title => title.textContent.trim()), 'Work Plan Details');
@@ -192,7 +192,7 @@ async function closeDetails(page) {
       assert.equal(await page.$$eval('#timesheetHistoryList .project-history-card', cards => cards.length), 2);
       assert.deepEqual(
         await page.$$eval('#timesheetHistoryList .project-history-status-badge', badges => [...new Set(badges.map(badge => badge.textContent.trim()))].sort()),
-        ['Draft', 'Submitted']
+        ['Draft', 'Pending']
       );
 
       const timesheetCardSelector = '#timesheetHistoryList [data-record-id="TS-2026-0102"]';
@@ -200,7 +200,7 @@ async function closeDetails(page) {
         await page.$$eval(timesheetCardSelector + ' .project-history-data-row > span', labels => labels.map(label => label.textContent.trim())),
         ['Normal Hours', 'OT Hours']
       );
-      assert.equal(await page.$eval(timesheetCardSelector + ' .project-history-status-badge', badge => badge.textContent.trim()), 'Submitted');
+      assert.equal(await page.$eval(timesheetCardSelector + ' .project-history-status-badge', badge => badge.textContent.trim()), 'Pending');
       assert.deepEqual(
         await page.$$eval(timesheetCardSelector + ' .project-history-card-action', buttons => buttons.map(button => button.textContent.trim())),
         ['Cancel']

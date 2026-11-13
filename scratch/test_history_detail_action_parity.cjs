@@ -143,7 +143,7 @@ async function runWorkplace(browser) {
   await page.waitForFunction(() => document.querySelector('[data-record-id=parity-guest-draft]')?.dataset.status === 'submitted');
   assert.equal(await page.$eval('#historyDetailsModal', node => node.getAttribute('aria-hidden')), 'false');
   assert.deepEqual(await actionLabels(page, '#historyDetailActions'), ['Cancel']);
-  assert.match(await page.$eval('#historyDetailBody', node => node.textContent), /Submitted/);
+  assert.equal(await page.$eval('#historyDetailBody .record-detail-status', node => node.textContent.trim()), 'Pending');
 
   await page.$eval('#historyDetailActions [data-history-action=cancel]', node => node.click());
   await page.waitForFunction(() => document.querySelector('[data-record-id=parity-guest-draft]')?.dataset.status === 'cancelled');
@@ -401,7 +401,7 @@ async function runPayroll(browser) {
   await page.$eval('#historyDetailActions [data-history-action=submit]', node => node.click());
   await page.waitForFunction(() => document.querySelector('[data-reference=PDR000000000004]')?.dataset.status === 'submitted');
   assert.deepEqual(await actionLabels(page, '#historyDetailActions'), ['Cancel']);
-  assert.match(await page.$eval('#historyDetailBody', node => node.textContent), /Submitted/);
+  assert.equal(await page.$eval('#historyDetailBody .record-detail-status', node => node.textContent.trim()), 'Pending');
 
   await page.reload({ waitUntil: 'networkidle0' });
   await page.waitForSelector('[data-reference=PDR000000000004]');
@@ -438,7 +438,7 @@ async function runProject(browser) {
   await page.waitForFunction(selector => document.querySelector(selector)?.dataset.status === 'submitted', {}, workPlanDraft);
   assert.equal(await page.$eval('#projectHistoryDetailOverlay', node => node.hidden), false);
   assert.deepEqual(await actionLabels(page, '#projectHistoryDetailActions'), ['Cancel']);
-  assert.match(await page.$eval('#projectHistoryDetailContent', node => node.textContent), /Submitted/);
+  assert.equal(await page.$eval('#projectHistoryDetailContent .record-detail-status', node => node.textContent.trim()), 'Pending');
 
   await page.$eval('#projectHistoryDetailActions [data-history-action=cancel]', node => node.click());
   await page.waitForFunction(selector => document.querySelector(selector)?.dataset.status === 'cancelled', {}, workPlanDraft);

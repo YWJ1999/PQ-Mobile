@@ -79,7 +79,7 @@ const url = file => pathToFileURL(path.resolve(__dirname, '..', file)).href;
         n.querySelector('.history-employee-name').nextElementSibling?.textContent === '#EBB12'
       )));
       assert.ok(await page.$eval('#cv-panel-personal', n => (
-        ['Submitted', '13/10/2026', 'ECR00000000000000563', 'Farhan', '22 Apr 1960', '0', 'ebb12@gmail.com', 'Married', '18 Jul 1984', 'A212222048', '25 Mar 2015', 'AX000234496', '12 Aug 2021']
+        ['Pending', '13/10/2026', 'ECR00000000000000563', 'Farhan', '22 Apr 1960', '0', 'ebb12@gmail.com', 'Married', '18 Jul 1984', 'A212222048', '25 Mar 2015', 'AX000234496', '12 Aug 2021']
           .every(value => n.textContent.includes(value))
       )));
       assert.equal(await page.$eval('#cv-panel-personal [data-cv-field=Name]', n => n.classList.contains('cv-history-field-changed')), true);

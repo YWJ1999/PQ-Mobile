@@ -8411,16 +8411,16 @@ select option {
 .qualification-record-summary {
   min-width: 0;
   padding: 14px;
-  display: flex;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
-  gap: 10px;
+  gap: 8px 10px;
   cursor: pointer;
 }
 
 .qualification-record-icon {
   width: 38px;
   height: 38px;
-  flex: 0 0 38px;
   border-radius: 12px;
   background: rgba(124, 58, 237, 0.15);
   color: var(--purple-primary);
@@ -8432,7 +8432,6 @@ select option {
 
 .qualification-record-copy {
   min-width: 0;
-  flex: 1;
 }
 
 .qualification-record-name {
@@ -8463,35 +8462,58 @@ select option {
   font-weight: 700;
 }
 
-.qualification-record-years {
-  margin-top: 3px;
-  color: var(--text-muted);
-  font-size: 10.5px;
-  font-weight: 700;
-}
-
 .qualification-record-meta {
   display: flex;
   align-items: center;
   gap: 2px;
 }
 
+.qualification-record-facts {
+  grid-column: 2 / -1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 7px;
+}
+
+.qualification-record-dates {
+  margin: 0;
+  width: 100%;
+  max-width: 202px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(78px, 100%), 1fr));
+  gap: 5px 12px;
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+.qualification-record-dates dt,
 .qualification-record-score {
-  min-width: 42px;
+  color: var(--text-muted);
+  font-size: 10.5px;
+  font-weight: 600;
+}
+
+.qualification-record-dates dd {
+  margin: 1px 0 0;
+  color: var(--text-primary);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.qualification-record-score {
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+  line-height: 1.4;
+}
+
+.qualification-record-score strong {
   color: var(--purple-primary);
   font-size: 12px;
   font-weight: 800;
-  text-align: right;
-  white-space: nowrap;
-  display: inline-flex;
-  flex-direction: column;
-  align-items: flex-end;
-}
-
-.qualification-record-score small {
-  color: var(--text-muted);
-  font-size: 8px;
-  font-weight: 700;
+  font-variant-numeric: tabular-nums;
 }
 
 .qualification-icon-button {
@@ -8578,14 +8600,18 @@ select option {
 }
 
 .qualification-highest-badge {
-  margin-top: 6px;
   padding: 3px 7px;
   border-radius: 7px;
   background: rgba(16, 185, 129, 0.12);
-  color: #059669;
+  color: #047857;
   font-size: 9.5px;
+  line-height: 1.3;
   font-weight: 800;
   white-space: nowrap;
+}
+
+[data-theme="dark"] .qualification-highest-badge {
+  color: #34d399;
 }
 
 .qualification-empty-state {
@@ -8656,6 +8682,25 @@ select option {
   gap: 16px;
 }
 
+.qualification-date-inputs {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(130px, 100%), 1fr));
+  gap: 10px;
+}
+
+.qualification-date-inputs > div,
+.qualification-date-inputs input {
+  min-width: 0;
+}
+
+.qualification-date-inputs input {
+  color-scheme: dark;
+}
+
+[data-theme="light"] .qualification-date-inputs input {
+  color-scheme: light;
+}
+
 .qualification-editor-page .qualification-editor-fields > .change-field-card,
 .qualification-editor-page .qualification-editor-fields > div > .change-field-card {
   padding: 0;
@@ -8692,13 +8737,7 @@ select option {
   cursor: pointer;
 }
 
-.qualification-editor-cancel {
-  border: 1.5px solid var(--border-subtle);
-  background: var(--bg-card);
-  color: var(--text-primary);
-  box-shadow: var(--shadow-sm);
-}
-
+.qualification-editor-cancel,
 .qualification-editor-save {
   border: 0;
   background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
@@ -9150,13 +9189,7 @@ select option {
   cursor: pointer;
 }
 
-.family-editor-cancel {
-  border: 1.5px solid var(--border-subtle);
-  background: var(--bg-card);
-  color: var(--text-primary);
-  box-shadow: var(--shadow-sm);
-}
-
+.family-editor-cancel,
 .family-editor-save {
   border: 0;
   background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
@@ -9284,10 +9317,7 @@ select option {
   transition: transform 0.15s ease, opacity 0.15s ease, filter 0.15s ease;
 }
 
-.change-form-actions .change-cancel-btn {
-  padding: 10px 18px;
-}
-
+.change-cancel-btn,
 .change-next-btn,
 .change-form-submit-btn {
   background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
@@ -10784,6 +10814,27 @@ html[data-theme="dark"] .action-btn-reject,
 
 
 
+
+.claim-step-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 18px;
+  container-type: inline-size;
+}
+
+.claim-step-actions > button {
+  padding-inline: 20px;
+}
+
+@container (max-width: 360px) {
+  .claim-step-actions > button {
+    padding-inline: 10px;
+    gap: 6px;
+  }
+}
 
 .form-cancel-btn:not([disabled]) {
   min-height: 44px;

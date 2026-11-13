@@ -47,7 +47,10 @@ async function run() {
         await page.goto(url.href, { waitUntil: 'load' });
       };
       const click = selector => page.$eval(selector, el => el.click());
-      const label = selector => page.$eval(selector, el => el.textContent.trim());
+      const label = async selector => {
+        await page.waitForSelector(selector, { timeout: 5000 });
+        return page.$eval(selector, el => el.textContent.trim());
+      };
 
       await open('modules/employee-career/options/history.html', { category: 'feedback' });
       await click('.career-history-card-open');
@@ -66,6 +69,20 @@ async function run() {
         await checkBadge(page, '#historyDetailBody', 'pending', 'Pending');
         assert.equal(await label('#historyDetailActions button'), 'Cancel');
       }
+      await open('modules/admin/options/history.html', { category: 'guest-visit' });
+      const draft = '[data-record-id="sample-guest-0006"]';
+      await click(draft + ' .history-card-main');
+      await checkBadge(page, '#historyDetailBody', 'draft', 'Draft');
+      await click('#historyDetailActions [data-history-action="apply"]');
+      assert.equal(await label(draft + ' .status-pill'), 'Pending');
+      await checkBadge(page, '#historyDetailBody', 'pending', 'Pending');
+      await page.reload();
+      await click(draft + ' .history-card-main');
+      await checkBadge(page, '#historyDetailBody', 'pending', 'Pending');
+      await click('#historyDetailActions [data-history-action="cancel"]');
+      assert.equal(await label(draft + ' .status-pill'), 'Cancelled');
+      await checkBadge(page, '#historyDetailBody', 'cancelled', 'Cancelled');
+      await page.evaluate(() => localStorage.clear());
 
       await open('leave.html');
       await page.evaluate(() => { showLeaveSection('viewMyLeaveHistory'); switchHistoryTab('leave'); });
@@ -101,10 +118,38 @@ async function run() {
       await page.evaluate(() => window.ClaimsEngine.triggerClaimViewDetails('1'));
       await checkBadge(page, '#claimDetailsModalOverlay', 'pending', 'Pending');
 
+      for (const category of ['tax', 'deduction']) {
+        await open('modules/payroll/options/history.html', { category });
+        const card = '#payrollHistoryList .history-card-item[data-status="submitted"]';
+        assert.equal(await label(card + ' .status-pill'), 'Pending');
+        await click(card + ' .history-card-main');
+        await checkBadge(page, '#historyDetailBody', 'pending', 'Pending');
+      }
+      await open('modules/payroll/options/tax-relief.html');
+      assert.equal(await label('.tax-relief-record-card[data-status="submitted"] .card-status-badge'), 'Pending');
+      await click('.tax-relief-record-card[data-status="submitted"]');
+      await checkBadge(page, '#taxReliefDetailTable', 'pending', 'Pending');
+
       await open('modules/project-task/options/history.html');
       assert.equal(await label('#workPlanHistoryList [data-record-id="WP-2026-0048"] .project-history-status-badge'), 'Pending');
       await click('#workPlanHistoryList [data-record-id="WP-2026-0048"]');
       await checkBadge(page, '#projectHistoryDetailContent', 'pending', 'Pending');
+      await page.evaluate(() => {
+        const states = ['Pending Approval', 'Approved', 'Cancelled'];
+        localStorage.setItem('pq_project_work_plans', JSON.stringify(states.map((status, index) => ({
+          id: 'review-test-' + index, title: 'Work plan', status
+        }))));
+      });
+      await page.reload();
+      for (const [index, status, key] of [[0, 'Pending Approval', 'pending'], [1, 'Approved', 'approved'], [2, 'Cancelled', 'cancelled']]) {
+        const card = '#workPlanHistoryList [data-record-id="review-test-' + index + '"]';
+        assert.equal(await label(card + ' .project-history-status-badge'), status);
+        assert.equal(Boolean(await page.$(card + ' [data-history-action="cancel"]')), key === 'pending');
+        await click(card);
+        await checkBadge(page, '#projectHistoryDetailContent', key, status);
+        await click('#closeProjectHistoryDetails');
+      }
+      await page.evaluate(() => localStorage.removeItem('pq_project_work_plans'));
 
       for (const [module, actions, body, key, label] of [
         ['admin', ['.three-dots-btn', '#workplacePendingViewDetails'], '#workplaceApprovalDetails', 'pending', 'Pending'],
@@ -141,6 +186,16 @@ async function run() {
 
       await open('modules/training-competency/options/training-request-details.html', { request: 'microsoft-365-productivity', date: '2026-10-20' });
       await checkBadge(page, '[data-field="document-status"]', 'approved', 'Approved');
+      await open('modules/training-competency/index.html', { scope: 'individual', date: '2026-10-27' });
+      await page.waitForSelector('#trainingCalendarSheet.is-open');
+      assert.equal(await label('.training-calendar-event-card .card-status-badge'), 'Approved');
+      await Promise.all([page.waitForNavigation(), click('.training-calendar-detail')]);
+      await checkBadge(page, '[data-field="document-status"]', 'approved', 'Approved');
+
+      await open('calendar.html');
+      await page.evaluate(() => { selectFilterStatus('Pending'); renderCalendar(); });
+      assert.ok(await page.$$eval('.dot-pending', dots => dots.length >= 2 && dots.every(dot => dot.title === 'Status: Pending')));
+      assert.equal(await page.$('.dot-submitted'), null);
     }
     assert.deepEqual(errors, []);
     console.log('Record detail statuses passed in light and dark mode.');

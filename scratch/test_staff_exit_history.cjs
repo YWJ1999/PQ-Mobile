@@ -21,7 +21,7 @@ const url = pathToFileURL(path.resolve(__dirname, '../modules/employee-career/op
         status: card.querySelector('.status-pill').textContent.trim(),
         fields: [...card.querySelectorAll('.history-card-row')].map(row => [...row.children].map(node => node.textContent.trim()))
       }))), [
-        { name: 'Daniel Wong', id: '#EBB02', position: 'Product Designer', status: 'Submitted', fields: [['Notice Date', '2 Oct 2026'], ['Last Paid Date', '31 Oct 2026'], ['Reason', 'Career Opportunity']] },
+        { name: 'Daniel Wong', id: '#EBB02', position: 'Product Designer', status: 'Pending', fields: [['Notice Date', '2 Oct 2026'], ['Last Paid Date', '31 Oct 2026'], ['Reason', 'Career Opportunity']] },
         { name: 'Nur Izzati', id: '#EBB03', position: 'Finance Analyst', status: 'Approved', fields: [['Notice Date', '15 Sept 2026'], ['Last Paid Date', '30 Sept 2026'], ['Reason', 'Contract Completed']] }
       ]);
       assert.equal(await page.$eval('#teamExitFilterBar', node => node.hidden), false);
@@ -37,7 +37,7 @@ const url = pathToFileURL(path.resolve(__dirname, '../modules/employee-career/op
       await page.click(firstExit);
       assert.equal(await page.$eval('#teamExitDetailsTitle', node => node.textContent.trim()), 'Staff Exit Details');
       assert.deepEqual(await page.$$eval('#teamExitDetailsRows th', nodes => nodes.map(node => node.textContent.trim())), ['Reference #', 'Status', 'Emp #', 'Name', 'Position', 'Submit Date', 'Notice Date', 'Last Service Date', 'Replacement Deadline', 'Recommended Action', 'Is Blacklist', 'Exit Type', 'Reason', 'Remarks', 'HR Remarks', 'Attachment']);
-      assert.deepEqual(await page.$$eval('#teamExitDetailsRows td', nodes => nodes.slice(0, 15).map(node => node.textContent.trim())), ['SE-REF-0008', 'Submitted', '#EBB02', 'Daniel Wong', 'Product Designer', '3 Oct 2026', '2 Oct 2026', '29 Oct 2026', '25 Oct 2026', 'Replace Position', 'No', 'Resignation', 'Career Opportunity', 'Handover in progress.\nReturn company assets.', 'Final review pending.']);
+      assert.deepEqual(await page.$$eval('#teamExitDetailsRows td', nodes => nodes.slice(0, 15).map(node => node.textContent.trim())), ['SE-REF-0008', 'Pending', '#EBB02', 'Daniel Wong', 'Product Designer', '3 Oct 2026', '2 Oct 2026', '29 Oct 2026', '25 Oct 2026', 'Replace Position', 'No', 'Resignation', 'Career Opportunity', 'Handover in progress.\nReturn company assets.', 'Final review pending.']);
       assert.equal(await page.$$eval('#teamExitDetailsRows tr:last-child a', nodes => nodes.length), 1, 'Unsafe attachment URLs remain plain text');
       assert.ok(await page.$eval('#teamExitDetailsRows tr:last-child', node => node.textContent.includes('resignation.pdf') && node.textContent.includes('handover.txt')));
       await page.keyboard.press('Escape');
@@ -103,7 +103,7 @@ const url = pathToFileURL(path.resolve(__dirname, '../modules/employee-career/op
       assert.equal(await page.$eval('#teamHistoryRecordCount', node => node.textContent.trim()), '0');
       assert.equal(await page.$eval('#teamHistoryEmpty', node => node.hidden), false);
       await page.click('#teamExitFilterTrigger');
-      assert.deepEqual(await page.$$eval('#teamExitStatus option', nodes => nodes.map(node => node.textContent.trim())), ['All Status', 'Approved', 'Submitted']);
+      assert.deepEqual(await page.$$eval('#teamExitStatus option', nodes => nodes.map(node => node.textContent.trim())), ['All Status', 'Approved', 'Pending']);
       await page.click('#teamExitResetFilter');
       assert.ok(await page.$eval('main', node => node.scrollWidth <= node.clientWidth + 1));
       assert.ok(await page.$$eval('#teamHistoryList .history-card-item', cards => cards.every(card => card.scrollWidth <= card.clientWidth + 1)));

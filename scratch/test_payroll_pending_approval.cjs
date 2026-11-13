@@ -215,7 +215,7 @@ async function checkWorkflow(page, theme, category, references) {
       assert.deepEqual(deductionRows.map(([label]) => label), ['Document Reference', 'Document Status', 'Employee', 'Deduction Type', 'Request Type', 'Stop Period', 'Stop Date', 'Stop Cycle', 'Account #', 'Remarks', 'Attachment', 'Approver Action Comments']);
       const deductionDetail = Object.fromEntries(deductionRows);
       assert.equal(deductionDetail['Document Reference'], 'PDR000000000062');
-      assert.equal(deductionDetail['Document Status'], 'Submitted');
+      assert.equal(deductionDetail['Document Status'], 'Pending');
       assert.ok(deductionDetail.Employee.includes('Farhan binti rahmat') && deductionDetail.Employee.includes('#EBB12'));
       assert.equal(await page.$eval('#payrollPendingDetailsTable .employee-name', node => node.nextElementSibling.classList.contains('employee-id')), true);
       for (const label of ['Stop Period', 'Stop Date', 'Stop Cycle', 'Account #', 'Remarks', 'Attachment']) assert.equal(deductionDetail[label], '-', `${label}: missing values must remain unknown rather than being copied from different fields`);
