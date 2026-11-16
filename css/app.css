@@ -2152,7 +2152,7 @@ html.is-mouse-swiping * {
 
 .notification-filter-footer {
   display: grid;
-  grid-template-columns: 1fr 1.6fr;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 10px;
   padding: 16px 20px 20px;
   border-top: 1px solid var(--border-subtle);
@@ -10815,35 +10815,51 @@ html[data-theme="dark"] .action-btn-reject,
 
 
 
-.claim-step-actions {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: flex-end;
+/* Each visible form action gets one equal track. Hidden steps take no space. */
+.claim-step-actions { margin-top: 18px; }
+.form-action-row { justify-content: end; }
+.form-action-row > :is(button, a)[hidden] { display: none !important; }
+.phone-container .form-action-row:not([hidden]) {
+  display: grid;
+  grid-template-columns: none;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 120px);
+  align-items: stretch;
   gap: 8px;
-  margin-top: 18px;
   container-type: inline-size;
 }
 
-.claim-step-actions > button {
-  padding-inline: 20px;
+.phone-container .form-action-row:not([hidden]) > :is(button, a):not([hidden]) {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  max-width: none;
+  min-height: 44px;
+  height: auto;
+  margin-inline: 0;
+  padding: 6px 8px;
+  justify-content: center;
+  text-align: center;
+  white-space: normal;
 }
 
-@container (max-width: 360px) {
-  .claim-step-actions > button {
-    padding-inline: 10px;
-    gap: 6px;
+@container (max-width: 320px) {
+  .phone-container .form-action-row:not([hidden]) > :is(button, a):not([hidden]) {
+    padding-inline: 4px;
+    gap: 4px;
+    font-size: 12px;
   }
 }
 
+.form-primary-btn,
 .form-cancel-btn:not([disabled]) {
   min-height: 44px;
-  padding: 10px 18px !important;
-  border: 1px solid #302d46;
-  border-radius: 999px !important;
-  background: #171529;
-  color: #f8fafc;
-  box-shadow: 0 5px 16px rgba(3, 2, 12, 0.22);
+  padding: 10px 18px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--primary-action-background);
+  color: #fff;
+  box-shadow: 0 5px 16px rgba(124, 58, 237, 0.3);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -10852,23 +10868,19 @@ html[data-theme="dark"] .action-btn-reject,
   font-size: 13px;
   font-weight: 800;
   line-height: 1;
+  text-decoration: none;
   white-space: nowrap;
   cursor: pointer;
 }
 
-[data-theme="light"] .form-cancel-btn:not([disabled]) {
-  border-color: var(--border-subtle) !important;
-  background: var(--bg-card) !important;
-  color: var(--text-primary) !important;
-  box-shadow: 0 5px 16px rgba(15, 23, 42, 0.12);
-}
-
+.form-primary-btn:enabled:active,
 .form-cancel-btn:not([disabled]):active {
   transform: translateY(1px);
 }
 
+.form-primary-btn:focus-visible,
 .form-cancel-btn:focus-visible {
-  outline: 3px solid rgba(124, 58, 237, 0.24);
+  outline: 3px solid var(--purple-text);
   outline-offset: 2px;
 }
 

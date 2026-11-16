@@ -219,27 +219,6 @@
       box-shadow: 0 2px 10px rgba(124, 58, 237, 0.35);
     }
 
-    .btn-draft-bright {
-      padding: 11px 24px;
-      border-radius: 9999px;
-      background: var(--bg-card);
-      border: 1.5px solid var(--border-subtle);
-      color: var(--text-primary);
-      font-size: 14px;
-      font-weight: 800;
-      cursor: pointer;
-      white-space: nowrap;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      box-shadow: var(--shadow-sm);
-      transition: all 0.2s ease;
-    }
-    .btn-draft-bright:active {
-      transform: scale(0.96);
-    }
-
     .btn-add-purple {
       padding: 9px 18px;
       border-radius: 14px;
@@ -630,12 +609,12 @@
         </section>
 
         <!-- BOTTOM ACTION BUTTONS -->
-        <div style="display: flex; justify-content: flex-end; align-items: center; gap: 12px; margin-top: 18px;">
+        <div class="claim-step-actions form-action-row">
           <button type="button" class="form-cancel-btn" data-page-form-cancel onclick="handleHeaderBack()">
             <i class="fa-solid fa-xmark"></i>
             <span>Cancel</span>
           </button>
-          <button type="button" class="btn-draft-bright" onclick="saveDraft()">
+          <button type="button" class="btn-submit-primary" onclick="saveDraft()">
             <i class="fa-solid fa-floppy-disk"></i>
             <span>Save Draft</span>
           </button>
@@ -832,7 +811,7 @@
         </div>
 
         <!-- BOTTOM ACTION BUTTONS -->
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 24px;">
+        <div class="form-action-row" style="justify-content: space-between; margin-top: 24px;">
           <button type="button" class="btn-submit-primary" onclick="switchView('view-1-main', 'OT Claim')">
             <i class="fa-solid fa-xmark"></i>
             <span>Cancel</span>

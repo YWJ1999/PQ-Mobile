@@ -263,27 +263,6 @@
     }
 
     /* Action Buttons Matching PeopleHCM Purple Design System */
-    .btn-draft-bright {
-      padding: 11px 24px;
-      border-radius: 9999px;
-      background: var(--bg-card);
-      border: 1.5px solid var(--border-subtle);
-      color: var(--text-primary);
-      font-size: 14px;
-      font-weight: 800;
-      cursor: pointer;
-      white-space: nowrap;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      box-shadow: var(--shadow-sm);
-      transition: all 0.2s ease;
-    }
-    .btn-draft-bright:active {
-      transform: scale(0.96);
-    }
-
     .btn-submit-primary {
       padding: 11px 26px;
       border-radius: 9999px;
@@ -750,12 +729,12 @@
         </div>
 
         <!-- BOTTOM ACTION BUTTONS -->
-        <div class="claim-step-actions">
+        <div class="claim-step-actions form-action-row">
           <button type="button" class="btn-submit-primary" data-page-form-cancel onclick="handleHeaderBack()">
             <i class="fa-solid fa-xmark"></i>
             <span>Cancel</span>
           </button>
-          <button type="button" class="btn-draft-bright" onclick="saveDraft()">
+          <button type="button" class="btn-submit-primary" onclick="saveDraft()">
             <i class="fa-solid fa-floppy-disk"></i>
             <span>Save Draft</span>
           </button>
@@ -888,7 +867,7 @@
         </div>
 
         <!-- BOTTOM ACTION BUTTONS FOR ENTRY FORM -->
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 24px;">
+        <div class="form-action-row" style="justify-content: space-between; margin-top: 24px;">
           <button type="button" class="btn-submit-primary" onclick="switchView('view-3-list')">
             <i class="fa-solid fa-xmark"></i>
             <span>Cancel</span>

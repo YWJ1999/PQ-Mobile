@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PeopleHCM - New User Details</title>
+  <title>PeopleHCM - Confirm New User</title>
   <script>(()=>{const q=new URLSearchParams(location.search).get('theme');document.documentElement.dataset.theme=q==='light'?'light':'dark';})();</script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -19,14 +19,14 @@
   <script src="../../js/confirm-new-user-data.js" defer></script>
   <script src="../../js/confirm-new-user-details.js" defer></script>
 </head>
-<body class="employee-career-option-page employee-career-form-page employee-career-team-form-page">
+<body class="employee-career-option-page employee-career-form-page employee-career-team-form-page new-user-page">
   <preview-top-bar active-page="v2"></preview-top-bar>
   <div class="phone-container">
     <header class="employee-career-header">
       <phone-status-bar time="9:41"></phone-status-bar>
       <div class="employee-career-header-row">
         <a class="employee-career-back" id="newUserBackLink" href="confirm-new-user.html" aria-label="Back to Confirm New User"><i class="fa-solid fa-chevron-left" aria-hidden="true"></i></a>
-        <div class="employee-career-heading"><h1>New User Details</h1></div>
+        <div class="employee-career-heading"><h1>Confirm New User</h1></div>
         <span class="employee-career-header-spacer" aria-hidden="true"></span>
       </div>
     </header>
@@ -40,81 +40,88 @@
         </div>
       </section>
 
-      <form class="new-user-details-form" id="newUserDetailsForm">
-        <section class="new-user-form-card" aria-labelledby="newUserBasicHeading">
-          <h2 id="newUserBasicHeading">Basic Information</h2>
-          <div class="new-user-details-grid">
-            <label class="new-user-details-field new-user-details-field-wide"><span>Name <b>*</b></span><input class="new-user-details-control" id="newUserName" type="text" required></label>
-            <label class="new-user-details-field"><span>Alias</span><input class="new-user-details-control" id="newUserAlias" type="text"></label>
-            <label class="new-user-details-field"><span>NRIC/Passport #</span><input class="new-user-details-control" id="newUserIdentity" type="text"></label>
-            <label class="new-user-details-field"><span>Birth Date</span><input class="new-user-details-control" id="newUserBirthDate" type="date"></label>
-            <label class="new-user-details-field"><span>Gender</span><select class="new-user-details-control" id="newUserGender"><option value="">Select gender</option><option>Male</option><option>Female</option></select></label>
-            <label class="new-user-details-field"><span>Nationality</span><input class="new-user-details-control" id="newUserNationality" type="text"></label>
-            <label class="new-user-details-field"><span>Race</span><input class="new-user-details-control" id="newUserRace" type="text"></label>
-            <label class="new-user-details-field"><span>Religion</span><input class="new-user-details-control" id="newUserReligion" type="text"></label>
-            <label class="new-user-details-field"><span>Qualification Level</span><input class="new-user-details-control" id="newUserQualification" type="text"></label>
-            <label class="new-user-details-field"><span>Marital Status</span><input class="new-user-details-control" id="newUserMaritalStatus" type="text"></label>
-          </div>
-        </section>
+      <div class="employee-career-scope new-user-tabs" role="tablist" aria-label="User confirmation">
+        <button class="employee-career-scope-tab active" type="button" role="tab" id="employeeTab" aria-controls="employeePanel" aria-selected="true">Employee Details</button>
+        <button class="employee-career-scope-tab" type="button" role="tab" id="employmentTab" aria-controls="employmentPanel" aria-selected="false" tabindex="-1">Employment Setup</button>
+      </div>
 
-        <section class="new-user-form-card" aria-labelledby="newUserContactHeading">
-          <h2 id="newUserContactHeading">Contact</h2>
-          <div class="new-user-details-grid">
-            <label class="new-user-details-field new-user-details-field-wide"><span>Name</span><input class="new-user-details-control" id="newUserContactName" type="text"></label>
-            <label class="new-user-details-field"><span>Phone #</span><input class="new-user-details-control" id="newUserPhone" type="tel"></label>
-            <label class="new-user-details-field"><span>E-Mail</span><input class="new-user-details-control" id="newUserEmail" type="email"></label>
-            <label class="new-user-details-field new-user-details-field-wide"><span>Address Line 1 <b>*</b></span><input class="new-user-details-control" id="newUserAddress1" type="text" required></label>
-            <label class="new-user-details-field new-user-details-field-wide"><span>Address Line 2 <b>*</b></span><input class="new-user-details-control" id="newUserAddress2" type="text" required></label>
-            <label class="new-user-details-field new-user-details-field-wide"><span>Address Line 3 <b>*</b></span><input class="new-user-details-control" id="newUserAddress3" type="text" required></label>
-            <label class="new-user-details-field"><span>Post Code <b>*</b></span><input class="new-user-details-control" id="newUserPostCode" type="text" required></label>
-          </div>
-        </section>
+      <section role="tabpanel" id="employeePanel" aria-labelledby="employeeTab">
+        <p class="new-user-note"><i class="fa-solid fa-lock" aria-hidden="true"></i>Read-only employee information</p>
+        <details class="new-user-section" name="employee-details">
+          <summary>Personal details</summary>
+          <dl class="new-user-facts">
+            <div class="wide"><dt>Name</dt><dd data-field="name"></dd></div>
+            <div><dt>NRIC / Passport</dt><dd data-field="identity"></dd></div>
+            <div><dt>Birth date</dt><dd data-field="birthDate"></dd></div>
+            <div><dt>Gender</dt><dd data-field="gender"></dd></div>
+            <div><dt>Nationality</dt><dd data-field="nationality"></dd></div>
+            <div><dt>Alias</dt><dd data-field="alias"></dd></div>
+            <div><dt>Race</dt><dd data-field="race"></dd></div>
+            <div><dt>Religion</dt><dd data-field="religion"></dd></div>
+            <div><dt>Marital status</dt><dd data-field="maritalStatus"></dd></div>
+            <div class="wide"><dt>Qualification</dt><dd data-field="qualification"></dd></div>
+          </dl>
+        </details>
+        <details class="new-user-section" name="employee-details">
+          <summary>Contact details</summary>
+          <dl class="new-user-facts">
+            <div><dt>Name</dt><dd data-field="name"></dd></div>
+            <div><dt>Phone</dt><dd data-field="mobile"></dd></div>
+            <div class="wide"><dt>Email</dt><dd data-field="email"></dd></div>
+            <div class="wide"><dt>Address</dt><dd data-field="address"></dd></div>
+            <div><dt>Postcode</dt><dd data-field="postCode"></dd></div>
+          </dl>
+        </details>
+        <details class="new-user-section" name="employee-details">
+          <summary>Emergency contact</summary>
+          <dl class="new-user-facts">
+            <div><dt>Contact name</dt><dd data-field="emergencyName"></dd></div>
+            <div><dt>Contact phone</dt><dd data-field="emergencyPhone"></dd></div>
+            <div class="wide"><dt>Address</dt><dd data-field="emergencyAddress"></dd></div>
+            <div><dt>Postcode</dt><dd data-field="emergencyPostCode"></dd></div>
+          </dl>
+        </details>
+        <details class="new-user-section" name="employee-details">
+          <summary>Payment details</summary>
+          <dl class="new-user-facts">
+            <div><dt>Payment mode</dt><dd data-field="paymentMode"></dd></div>
+            <div><dt>Bank</dt><dd data-field="bank"></dd></div>
+            <div class="wide"><dt>Bank account</dt><dd data-field="bankAccount"></dd></div>
+            <div><dt>EPF number</dt><dd data-field="epf"></dd></div>
+            <div><dt>Income tax number</dt><dd data-field="incomeTax"></dd></div>
+          </dl>
+        </details>
+        <details class="new-user-section" name="employee-details">
+          <summary>Attachments <span class="new-user-count" id="newUserAttachmentCount">0</span></summary>
+          <ul class="new-user-attachment-list" id="newUserAttachmentList"></ul>
+        </details>
+      </section>
 
-        <section class="new-user-form-card" aria-labelledby="newUserEmergencyHeading">
-          <h2 id="newUserEmergencyHeading">Emergency Contact</h2>
+      <section role="tabpanel" id="employmentPanel" aria-labelledby="employmentTab" hidden>
+        <form class="new-user-section" id="newUserDetailsForm">
+          <h2 class="new-user-section-title">Employment setup</h2>
           <div class="new-user-details-grid">
-            <label class="new-user-details-field"><span>Contact Name</span><input class="new-user-details-control" id="newUserEmergencyName" type="text"></label>
-            <label class="new-user-details-field"><span>Contact Phone #</span><input class="new-user-details-control" id="newUserEmergencyPhone" type="tel"></label>
-            <label class="new-user-details-field new-user-details-field-wide"><span>Address Line 1 <b>*</b></span><input class="new-user-details-control" id="newUserEmergencyAddress1" type="text" required></label>
-            <label class="new-user-details-field new-user-details-field-wide"><span>Address Line 2 <b>*</b></span><input class="new-user-details-control" id="newUserEmergencyAddress2" type="text" required></label>
-            <label class="new-user-details-field new-user-details-field-wide"><span>Address Line 3 <b>*</b></span><input class="new-user-details-control" id="newUserEmergencyAddress3" type="text" required></label>
-            <label class="new-user-details-field"><span>Post Code <b>*</b></span><input class="new-user-details-control" id="newUserEmergencyPostCode" type="text" required></label>
+            <p class="new-user-note">Complete the fields marked *.</p>
+            <label class="new-user-details-field"><span>Hire Date <b>*</b></span><input class="new-user-details-control" id="newUserHireDate" name="hireDate" type="date" required></label>
+            <label class="new-user-details-field"><span>Basic Pay <b>*</b></span><input class="new-user-details-control" id="newUserBasicPay" name="basicPay" type="number" step="0.01" required></label>
+            <label class="new-user-details-field"><span>Company <b>*</b></span><select class="new-user-details-control" id="newUserCompany" name="company" required><option value="">Select company</option><option>PeopleQuest</option></select></label>
+            <label class="new-user-details-field"><span>Branch <b>*</b></span><select class="new-user-details-control" id="newUserBranch" name="branch" required><option value="">Select branch</option><option>Head Office</option></select></label>
+            <label class="new-user-details-field"><span>Department <b>*</b></span><select class="new-user-details-control" id="newUserDepartment" name="department" required><option value="">Select department</option><option>Operations</option></select></label>
+            <label class="new-user-details-field"><span>Job Type <b>*</b></span><select class="new-user-details-control" id="newUserJobType" name="jobType" required><option value="">Select job type</option><option>Part Time</option></select></label>
+            <label class="new-user-details-field"><span>Job Position <b>*</b></span><input class="new-user-details-control" id="newUserJobPosition" name="jobPosition" type="text" required></label>
+            <label class="new-user-details-field"><span>Reporting Group <b>*</b></span><select class="new-user-details-control" id="newUserReportingGroup" name="reportingGroup" required><option value="">Select reporting group</option><option>GROUP A</option></select></label>
+            <label class="new-user-details-field"><span>Supervisor <b>*</b></span><select class="new-user-details-control" id="newUserSupervisor" name="supervisor" required><option value="">Select supervisor</option><option>EBB04</option></select></label>
+            <label class="new-user-details-field"><span>Shift Group <b>*</b></span><select class="new-user-details-control" id="newUserShiftGroup" name="shiftGroup" required><option value="">Select shift group</option><option>GROUP A</option></select></label>
+            <div class="new-user-details-field"><span id="newUserProbationLabel">Probation Period</span><div class="new-user-probation-grid" role="group" aria-labelledby="newUserProbationLabel"><input class="new-user-details-control" id="newUserProbationMonths" name="probationMonths" type="number" min="0" aria-label="Probation period months"><input class="new-user-details-control" id="newUserProbationDays" name="probationDays" type="number" min="0" aria-label="Probation period days"></div></div>
           </div>
-        </section>
-
-        <section class="new-user-form-card" aria-labelledby="newUserEmploymentHeading">
-          <h2 id="newUserEmploymentHeading">Employment & Payroll</h2>
-          <div class="new-user-details-grid">
-            <label class="new-user-details-field"><span>Payment Mode</span><input class="new-user-details-control" id="newUserPaymentMode" type="text"></label>
-            <label class="new-user-details-field"><span>Bank</span><input class="new-user-details-control" id="newUserBank" type="text"></label>
-            <label class="new-user-details-field new-user-details-field-wide"><span>Bank Account #</span><input class="new-user-details-control" id="newUserBankAccount" type="text"></label>
-            <label class="new-user-details-field"><span>EPF #</span><input class="new-user-details-control" id="newUserEpf" type="text"></label>
-            <label class="new-user-details-field"><span>Income Tax #</span><input class="new-user-details-control" id="newUserIncomeTax" type="text"></label>
-            <label class="new-user-details-field"><span>Hire Date <b>*</b></span><input class="new-user-details-control" id="newUserHireDate" type="date" required></label>
-            <label class="new-user-details-field"><span>Basic Pay <b>*</b></span><input class="new-user-details-control" id="newUserBasicPay" type="number" step="0.01" required></label>
-            <label class="new-user-details-field"><span>Company <b>*</b></span><select class="new-user-details-control" id="newUserCompany" required><option value="">Select company</option><option>PeopleQuest</option></select></label>
-            <label class="new-user-details-field"><span>Branch <b>*</b></span><select class="new-user-details-control" id="newUserBranch" required><option value="">Select branch</option><option>Head Office</option></select></label>
-            <label class="new-user-details-field"><span>Department <b>*</b></span><select class="new-user-details-control" id="newUserDepartment" required><option value="">Select department</option><option>Operations</option></select></label>
-            <label class="new-user-details-field"><span>Job Type <b>*</b></span><select class="new-user-details-control" id="newUserJobType" required><option value="">Select job type</option><option>Part Time</option></select></label>
-            <label class="new-user-details-field"><span>Job Position <b>*</b></span><input class="new-user-details-control" id="newUserJobPosition" type="text" required></label>
-            <label class="new-user-details-field"><span>Reporting Group <b>*</b></span><select class="new-user-details-control" id="newUserReportingGroup" required><option value="">Select reporting group</option><option>GROUP A</option></select></label>
-            <label class="new-user-details-field"><span>Supervisor <b>*</b></span><select class="new-user-details-control" id="newUserSupervisor" required><option value="">Select supervisor</option><option>EBB04</option></select></label>
-            <label class="new-user-details-field new-user-details-field-wide"><span>Shift Group <b>*</b></span><select class="new-user-details-control" id="newUserShiftGroup" required><option value="">Select shift group</option><option>GROUP A</option></select></label>
-            <div class="new-user-details-field new-user-details-field-wide"><span id="newUserProbationLabel">Probation Period</span><div class="new-user-probation-grid" role="group" aria-labelledby="newUserProbationLabel"><input class="new-user-details-control" id="newUserProbationMonths" type="number" min="0" aria-label="Probation period months"><input class="new-user-details-control" id="newUserProbationDays" type="number" min="0" aria-label="Probation period days"></div></div>
-            <div class="new-user-details-field new-user-details-field-wide">
-              <span>Attachments</span>
-              <div class="new-user-attachment-list" id="newUserAttachmentList" aria-live="polite"></div>
-            </div>
-          </div>
-        </section>
-
-        <div class="new-user-form-actions">
-          <a class="new-user-action-button secondary" id="newUserCancel" href="confirm-new-user.html"><i class="fa-solid fa-xmark" aria-hidden="true"></i><span>Cancel</span></a>
-          <a class="new-user-action-button" id="newUserSubmit" href="../../index.html?scope=team"><span>Submit</span><i class="fa-solid fa-paper-plane" aria-hidden="true"></i></a>
-        </div>
-      </form>
+        </form>
+      </section>
     </main>
-    <phone-bottom-nav active="apps"></phone-bottom-nav>
+
+    <footer class="employee-career-form-actions form-action-row new-user-footer">
+      <a class="form-cancel-btn" id="newUserCancel" href="confirm-new-user.html"><i class="fa-solid fa-xmark" aria-hidden="true"></i><span>Cancel</span></a>
+      <a class="employee-career-button primary" id="newUserSubmit" href="../../index.html?scope=team"><span>Submit</span><i class="fa-solid fa-paper-plane" aria-hidden="true"></i></a>
+    </footer>
   </div>
 </body>
 </html>

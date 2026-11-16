@@ -59,12 +59,16 @@
 .guest-visit-page [aria-invalid="true"] { border-color: var(--red, #ef4444); }
 .visit-page-actions { display: flex; justify-content: flex-end; align-items: center; gap: 12px; margin-top: 18px; }
 .visit-page-actions .claim-button { min-width: 0; min-height: 0; border-radius: 999px; font-size: 14px; white-space: nowrap; }
-.visit-page-actions .claim-button-secondary { padding: 11px 24px; border-width: 1.5px; box-shadow: var(--shadow-sm); }
 .visit-page-actions .claim-button-primary, .visit-category-actions .claim-button-primary { min-height: 0; padding: 11px 26px; border: 0; font-size: 14px; box-shadow: 0 4px 18px rgba(124,58,237,.45); }
 .visit-page-actions a { text-decoration: none; }
 .visit-page-actions.is-list-page { justify-content: space-between; align-items: center; margin-top: 24px; }
 .visit-page-actions.is-list-page .claim-button-primary { min-height: 0; padding: 11px 26px; border: 0; font-size: 14px; }
 .visit-entry-actions .claim-button-primary { box-shadow: 0 4px 18px rgba(124,58,237,.4); }
+@media (max-width: 375px) {
+  .visit-page-actions, .visit-entry-actions { gap: 6px; }
+  .visit-page-actions:not(.is-list-page) .claim-button,
+  .visit-entry-actions .claim-button { padding-inline: 8px; gap: 6px; }
+}
 .visit-summary-card { display: flex; align-items: center; gap: 14px; width: 100%; padding: 18px; margin-bottom: 16px; border: 1.5px solid rgba(124,58,237,.4); border-radius: 22px; background: linear-gradient(135deg, rgba(124,58,237,.12), rgba(109,40,217,.18)); box-shadow: 0 6px 20px rgba(124,58,237,.18); text-align: left; color: var(--text-primary); font-family: inherit; cursor: pointer; }
 .visit-summary-icon { display: grid; place-items: center; flex: 0 0 46px; width: 46px; height: 46px; border-radius: 14px; background: linear-gradient(135deg,#7c3aed,#6d28d9); color: #fff; font-size: 20px; box-shadow: 0 4px 14px rgba(124,58,237,.45); }
 .visit-summary-copy { display: flex; flex: 1; min-width: 0; flex-direction: column; gap: 3px; }

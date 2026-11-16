@@ -1603,8 +1603,11 @@ class PendingApprovalCard extends HTMLElement {
     if (showPeriod) fields.push(['Period', period]);
     fields.push(['Amount / Hour', amountHourDisplay]);
 
+    const detailsUrl = new URL('pending-approval.html', location.href);
+    detailsUrl.searchParams.set('theme', document.documentElement.dataset.theme || 'dark');
+    detailsUrl.hash = 'approval/details/' + encodeURIComponent(itemId);
     this.innerHTML = `
-      <div class="approval-request-card" data-item-id="${itemId}" style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 20px; overflow: hidden; box-shadow: var(--shadow-card); transition: all 0.2s ease; text-align: left; margin-bottom: 14px;">
+      <div class="approval-request-card" data-item-id="${itemId}" data-approval-id="${itemId}" style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 20px; overflow: hidden; box-shadow: var(--shadow-card); transition: all 0.2s ease; text-align: left; margin-bottom: 14px;">
         <!-- Record header -->
         <div class="approval-record-header" style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
           <div style="display: flex; align-items: center; gap: 12px; flex: 1; cursor: pointer;" onclick="if (!event.target.closest('.approval-card-checkbox')) { window.ClaimsEngine && window.ClaimsEngine.triggerClaimViewDetails ? window.ClaimsEngine.triggerClaimViewDetails('${itemId}') : null; }">
@@ -1627,8 +1630,8 @@ class PendingApprovalCard extends HTMLElement {
         </div>
 
         <!-- 2. Card Content Body -->
-        <div class="approval-card-body" style="cursor: pointer;" onclick="if (!event.target.closest('.pending-action-grid, .approval-card-checkbox, .three-dots-btn')) { window.ClaimsEngine && window.ClaimsEngine.triggerClaimViewDetails ? window.ClaimsEngine.triggerClaimViewDetails('${itemId}') : null; }">
-          ${createApprovalCardDetails(fields).outerHTML}
+        <div class="approval-card-body" style="cursor: pointer;" onclick="if (!event.target.closest('a, .pending-action-grid, .approval-card-checkbox, .three-dots-btn')) { window.ClaimsEngine && window.ClaimsEngine.triggerClaimViewDetails ? window.ClaimsEngine.triggerClaimViewDetails('${itemId}') : null; }">
+          <a class="approval-record-link" href="${detailsUrl.href}">${createApprovalCardDetails(fields).outerHTML}</a>
 
           <!-- Approval actions -->
           <div class="pending-action-grid">

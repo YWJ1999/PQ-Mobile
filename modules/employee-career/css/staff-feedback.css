@@ -57,9 +57,10 @@
 .staff-feedback-review-field label { display: block; margin: 0 0 6px; color: var(--detail-muted); font-size: 10.5px; font-weight: 800; line-height: 1.4; }
 .staff-feedback-required { color: #ef4444; }
 .staff-feedback-review-body .staff-feedback-review-control { display: block; width: 100% !important; min-width: 0 !important; min-height: 42px; padding: 10px 11px !important; border: 1px solid var(--detail-border) !important; border-radius: 11px !important; background: var(--detail-label-surface) !important; color: var(--detail-text) !important; font: 700 12px 'Plus Jakarta Sans', sans-serif !important; line-height: 1.4; outline: none; box-sizing: border-box; }
-.staff-feedback-review-body input[readonly].staff-feedback-review-control { color: var(--detail-muted) !important; cursor: default; }
+.staff-feedback-review-body .staff-feedback-review-control[readonly] { color: var(--detail-muted) !important; cursor: default; }
 .staff-feedback-review-body select.staff-feedback-review-control { padding-right: 32px !important; cursor: pointer; }
 .staff-feedback-review-body textarea.staff-feedback-review-control { min-height: 72px; resize: vertical; }
+.staff-feedback-review-body textarea.staff-feedback-review-control[readonly] { field-sizing: content; min-height: 42px; resize: none; }
 .staff-feedback-review-body .staff-feedback-review-control:focus { border-color: #7c3aed !important; box-shadow: 0 0 0 3px rgba(124, 58, 237, .15); }
 .staff-feedback-review-body .staff-feedback-review-control[aria-invalid="true"] { border-color: #ef4444 !important; box-shadow: 0 0 0 3px rgba(239, 68, 68, .12); }
 .staff-feedback-review-error { margin: -2px 0 0; color: #ef4444; font-size: 11px; font-weight: 700; line-height: 1.5; }

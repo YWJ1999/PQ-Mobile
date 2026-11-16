@@ -78,9 +78,9 @@ const url = pathToFileURL(path.resolve(__dirname, '../modules/employee-career/op
       assert.equal(await page.$$eval('.staff-feedback-review-button', nodes => nodes.length), 60, 'Every feedback card provides Review');
       assert.deepEqual(await page.$eval('.staff-feedback-review-button', button => ({
         text: button.textContent.trim(),
-        purple: getComputedStyle(button).backgroundImage.includes('linear-gradient'),
-        singleLine: getComputedStyle(button).whiteSpace
-      })), { text: 'Review', purple: true, singleLine: 'nowrap' });
+        background: getComputedStyle(button).backgroundColor,
+        color: getComputedStyle(button).color
+      })), { text: 'Review', background: 'rgb(124, 58, 237)', color: 'rgb(255, 255, 255)' }, 'Review uses the shared purple record action');
       for (const width of [360, 390, 450]) {
         await page.setViewport({ width, height: 950 });
         assert.ok(await page.$eval('main', node => node.scrollWidth <= node.clientWidth + 1), `No main overflow at ${width}px`);
@@ -122,7 +122,9 @@ const url = pathToFileURL(path.resolve(__dirname, '../modules/employee-career/op
         const rect = node.getBoundingClientRect();
         return rect.left >= 0 && rect.right <= innerWidth && node.scrollWidth <= node.clientWidth + 1;
       }), 'Review form stays within a 360px viewport');
-      assert.deepEqual(await page.$$eval('#staffFeedbackReviewForm input[readonly]', nodes => Object.fromEntries(nodes.map(node => [node.previousElementSibling.textContent.trim(), node.value]))), {
+      const readOnlyDetails = await page.$$eval('#staffFeedbackReviewForm [readonly]', nodes => nodes.map(node => [node.labels[0].textContent.trim(), node.value]));
+      assert.deepEqual(readOnlyDetails.map(([label]) => label), ['Employee ID', 'Name', 'Type', 'Category', 'Title', 'Feedback Date 1', 'Feedback Date 2', 'Reference 1', 'Reference 2', 'Feedback Note', 'Feedback Remarks', 'Submit Date', 'Reviewer Comment', 'Reviewed By', 'Reviewed Date']);
+      assert.deepEqual(Object.fromEntries(readOnlyDetails), {
         'Employee ID': '#004177',
         'Name': 'AHMAD RAFY BIN ZULKIPLE',
         'Type': 'Suggestion',
@@ -130,9 +132,15 @@ const url = pathToFileURL(path.resolve(__dirname, '../modules/employee-career/op
         'Title': 'Flexible working hours',
         'Feedback Date 1': '5 Oct 2026',
         'Feedback Date 2': '—',
-        'Reference 1': 'FB-0001'
+        'Reference 1': 'FB-0001',
+        'Reference 2': '—',
+        'Feedback Note': 'Could we allow a flexible start time for the morning shift? This would help staff manage their daily commute.',
+        'Feedback Remarks': 'For consideration at the next team discussion.',
+        'Submit Date': '5 Oct 2026',
+        'Reviewer Comment': '—',
+        'Reviewed By': '—',
+        'Reviewed Date': '—'
       });
-      assert.deepEqual(await page.$$eval('#staffFeedbackReviewForm input[readonly]', nodes => nodes.map(node => node.previousElementSibling.textContent.trim())), ['Employee ID', 'Name', 'Type', 'Category', 'Title', 'Feedback Date 1', 'Feedback Date 2', 'Reference 1'], 'Locked details follow the requested field order');
       assert.ok(await page.$$eval('.staff-feedback-review-section', nodes => nodes.every(node => {
         const style = getComputedStyle(node);
         return style.borderTopStyle === 'solid' && style.borderRadius === '16px';
@@ -171,6 +179,7 @@ const url = pathToFileURL(path.resolve(__dirname, '../modules/employee-career/op
         comments: document.getElementById('staffFeedbackComments').value
       })), { reward: 'RM 50.00', rating: '4', comments: 'Reviewed and approved for follow-up.' }, 'Reopening Review shows the values saved during this page visit');
       await page.type('#staffFeedbackComments', ' Unsaved draft');
+      assert.equal(await page.$eval('#staffFeedbackReviewReviewerComment', node => node.value), 'Reviewed and approved for follow-up.');
       await navigate('#staffFeedbackCancelReview');
       assert.equal(new URL(page.url()).pathname.endsWith('/staff-feedback.html'), true);
       await navigate('.staff-feedback-card:first-child .staff-feedback-review-button');
@@ -227,7 +236,7 @@ const url = pathToFileURL(path.resolve(__dirname, '../modules/employee-career/op
     // Hand-picked records verify inclusive dates, combined filters and chart aggregation.
     await page.evaluateOnNewDocument(() => {
       window.EMPLOYEE_CAREER_STAFF_FEEDBACK_RECORDS = Object.freeze([
-        Object.freeze({ empNo: '004177', name: 'Ahmad Rafy', date: '2026-09-02', title: 'Shift suggestion', feedback: 'Consider flexible starting hours.', type: 'Suggestion', category: 'Policy', status: 'Pending', feedbackDate1: '2026-09-02', feedbackDate2: '2026-09-03', feedbackNote: 'Start at 8 or 9 AM.', feedbackRemarks: 'For morning shifts.', submitDate: '2026-09-04', reviewerComment: 'Review next week.', reviewedBy: 'Sarah Tan', reviewedDate: '2026-09-05', rating: 0, reward: 0, attachments: [{ name: 'shift-note.txt', url: '../../assets/staff-feedback-sample-note.txt' }, { name: 'invalid.txt', url: 'javascript:alert(1)' }] }),
+        Object.freeze({ empNo: '004177', name: 'Ahmad Rafy', date: '2026-09-02', title: 'Shift suggestion', feedback: 'Consider flexible starting hours.', type: 'Suggestion', category: 'Policy', status: 'Pending', feedbackDate1: '2026-09-02', feedbackDate2: '2026-09-03', reference2: 'External-42', feedbackNote: 'Start at 8 or 9 AM.', feedbackRemarks: 'For morning shifts.', submitDate: '2026-09-04', reviewerComment: 'Review next week.', reviewedBy: 'Sarah Tan', reviewedDate: '2026-09-05', rating: 0, reward: 0, attachments: [{ name: 'shift-note.txt', url: '../../assets/staff-feedback-sample-note.txt' }, { name: 'invalid.txt', url: 'javascript:alert(1)' }] }),
         Object.freeze({ empNo: '004177', name: 'Ahmad Rafy', date: '2026-09-18', title: 'Office chairs', feedback: 'Please replace worn chairs.', type: 'Suggestion', category: 'Facilities', status: 'Resolved', reviewerComment: 'New chairs delivered.', reviewedBy: 'Farah Hassan', reviewedDate: '2026-09-20', rating: 4, reward: 'RM 50.00', attachments: [] }),
         Object.freeze({ empNo: '000070', name: 'Yee seong liew', date: '2026-09-18', title: 'Shift suggestion', feedback: 'Add earlier shifts.', type: 'Suggestion', category: 'Policy', status: 'Pending' }),
         Object.freeze({ empNo: '000030', name: 'Andrew', date: '2026-10-05', title: '<img src=x onerror=alert(1)>', feedback: 'Thanks for the training.', type: 'Compliment', category: 'Management', status: 'Resolved' })
@@ -291,6 +300,8 @@ const url = pathToFileURL(path.resolve(__dirname, '../modules/employee-career/op
     await apply({ staffFeedbackKeyword: '#004177', staffFeedbackType: 'Suggestion', staffFeedbackCategory: 'Policy', staffFeedbackStatus: 'Pending' });
     assert.equal(await page.$eval('#staffFeedbackTotal', node => node.textContent), '1');
     await navigate('.staff-feedback-review-button');
+    assert.deepEqual(await page.$$eval('#staffFeedbackReviewForm [readonly]', nodes => nodes.slice(-7).map(node => node.value)),
+      ['External-42', 'Start at 8 or 9 AM.', 'For morning shifts.', '4 Sept 2026', 'Review next week.', 'Sarah Tan', '5 Sept 2026']);
     await page.select('#staffFeedbackReward', 'No Reward');
     await page.select('#staffFeedbackRating', '3');
     await navigate('#staffFeedbackSubmitReview');

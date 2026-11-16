@@ -14,7 +14,24 @@ const puppeteer = require('puppeteer');
     const errors = [];
     page.on('pageerror', error => errors.push(error.message));
     const url = pathToFileURL(path.resolve(__dirname, '../modules/employee-career/options/team/staff-request.html')).href;
-    await page.goto(url, { waitUntil: 'load' });
+    for (const theme of ['light', 'dark']) {
+      await page.goto(url + '?theme=' + theme, { waitUntil: 'load' });
+      const picker = '#staffRequestForm .employee-career-form-select > select#requestManpowerPlan';
+      const plan = await page.$eval(picker, select => ({
+        label: select.labels[0].textContent,
+        required: select.required,
+        value: select.value,
+        choices: Array.from(select.options, option => option.value).filter(Boolean)
+      }));
+      assert.equal(plan.label, 'Manpower Plan #');
+      assert.equal(plan.required, false);
+      assert.equal(plan.value, '');
+      assert.ok(plan.choices.length > 0);
+      await page.select(picker, plan.choices[0]);
+      assert.equal(await page.$eval('#staffRequestForm', form => new FormData(form).get('manpowerPlanNo')), plan.choices[0]);
+      await page.select(picker, '');
+      assert.equal(await page.$eval(picker, select => select.value), '');
+    }
     assert.equal(await page.$$eval('#staffRequestForm .employee-career-form-section', nodes => nodes.length), 1);
     assert.equal(await page.$eval('#requestOverviewHeading', node => node.textContent.trim()), 'Request Detail');
     assert.equal(await page.$('#requestPositionHeading'), null);
@@ -23,7 +40,7 @@ const puppeteer = require('puppeteer');
       'requestOverviewHeading'
     );
     assert.deepEqual(errors, []);
-    console.log('PASS: Staff Request uses one Request Detail section.');
+    console.log('PASS: Staff Request uses one Request Detail section and an optional manpower plan pick list in both themes.');
   } finally {
     await browser.close();
   }

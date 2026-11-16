@@ -47,19 +47,26 @@
   const columns = [['empNo', 'Emp#'], ['name', 'Name'], ...(isAttrition ? [['reason', 'Reason']] : [...(!isRetention ? [['age', 'Age']] : []), ['yos', 'YOS']]), ['branch', 'Branch'], ['department', 'Department'], ['position', 'Position']];
   const state = { filters: { ...defaults }, rows: [], summaryRows: [], view: 'table', metric: 'branch', showAll: false, selectedMonth: null, analysisMetric: 'branch', analysisShowAll: false, chartScroll: 0, trendScroll: 0 };
   const hasResigned = row => row.exitDate ? row.exitDate <= state.filters.asAt : row.employmentStatus === 'Resigned';
-  const summaryCategories = [
-    { id: 'active', label: 'Active Staff', icon: 'fa-users', tone: 'green', matches: row => !hasResigned(row) },
-    { id: 'probationary', label: 'Probationary', icon: 'fa-user-clock', tone: 'green', matches: row => !hasResigned(row) && (row.probationary === true || row.employmentStatus === 'Probationary') },
-    { id: 'key-level-3', label: 'Key Level 3', icon: 'fa-star', tone: 'green', matches: row => Number(row.keyLevel) === 3 },
-    { id: 'key-level-2', label: 'Key Level 2', icon: 'fa-star', tone: 'green', matches: row => Number(row.keyLevel) === 2 },
-    { id: 'key-level-1', label: 'Key Level 1', icon: 'fa-star', tone: 'blue', matches: row => Number(row.keyLevel) === 1 },
-    { id: 'blacklisted', label: 'Blacklisted', icon: 'fa-user-slash', tone: 'blue', matches: row => row.blacklisted === true },
-    { id: 'permit-expiring', label: 'Permit Expiring', icon: 'fa-id-card', tone: 'blue', matches: row => row.permitExpiring === true },
-    { id: 'contract-expiring', label: 'Contract Expiring', icon: 'fa-file-contract', tone: 'blue', matches: row => row.contractExpiring === true },
-    { id: 'exit-notice', label: 'Exit Notice', icon: 'fa-door-open', tone: 'purple', matches: row => !hasResigned(row) && row.exitNotice === true },
-    { id: 'resigned', label: 'Resigned', icon: 'fa-user-minus', tone: 'purple', matches: hasResigned },
-    { id: 'unverified', label: 'Unverified', icon: 'fa-user-check', tone: 'purple', matches: row => row.verified === false },
-    { id: 'unapproved', label: 'Unapproved', icon: 'fa-clipboard-check', tone: 'purple', matches: row => row.approved === false }
+  const overviewGroups = [
+    { id: 'workforce', title: 'Workforce', categories: [
+      { id: 'active', label: 'Active Staff', icon: 'fa-users', matches: row => !hasResigned(row) },
+      { id: 'probationary', label: 'Probationary', icon: 'fa-user-clock', matches: row => !hasResigned(row) && (row.probationary === true || row.employmentStatus === 'Probationary') }
+    ] },
+    { id: 'review', title: 'Review & expiry', categories: [
+      { id: 'unapproved', label: 'Unapproved', icon: 'fa-clipboard-check', matches: row => row.approved === false },
+      { id: 'unverified', label: 'Unverified', icon: 'fa-user-check', matches: row => row.verified === false },
+      { id: 'permit-expiring', label: 'Permit Expiring', icon: 'fa-id-card', matches: row => row.permitExpiring === true },
+      { id: 'contract-expiring', label: 'Contract Expiring', icon: 'fa-file-contract', matches: row => row.contractExpiring === true }
+    ] },
+    { id: 'other', title: 'Other statuses', categories: [
+      { id: 'exit-notice', label: 'Exit Notice', icon: 'fa-door-open', matches: row => !hasResigned(row) && row.exitNotice === true },
+      { id: 'resigned', label: 'Resigned', icon: 'fa-user-minus', matches: hasResigned },
+      { id: 'blacklisted', label: 'Blacklisted', icon: 'fa-user-slash', matches: row => row.blacklisted === true }
+    ] }
+  ];
+  const staffCategories = [
+    ...overviewGroups.flatMap(group => group.categories),
+    ...[3, 2, 1].map(level => ({ id: 'key-level-' + level, label: 'Key Level ' + level, matches: row => Number(row.keyLevel) === level }))
   ];
   const metrics = {
     company: { label: 'Company', plural: 'companies', value: row => row.company },
@@ -112,7 +119,7 @@
       })
       .filter(row => !isRetention || row.yos >= Number(state.filters.serviceYears || 0))
       .filter(row => !isStaffList || ((state.filters.yosFrom === '' || Number(row.yos.toFixed(2)) >= Number(state.filters.yosFrom)) && (state.filters.yosTo === '' || Number(row.yos.toFixed(2)) <= Number(state.filters.yosTo))));
-    const category = isStaffList && summaryCategories.find(category => category.id === state.filters.category);
+    const category = isStaffList && staffCategories.find(category => category.id === state.filters.category);
     state.rows = category ? state.summaryRows.filter(category.matches) : state.summaryRows;
     const body = $('staffListTable').tBodies[0];
     body.replaceChildren();
@@ -150,30 +157,56 @@
     else if (!isRetention) summary.push(formatDate(asAtISO));
     $('staffListFilterSummary').textContent = summary.join(' >> ');
   }
+  function overviewIcon(icon, className = '') {
+    const element = node('i', 'fa-solid ' + icon + ' ' + className);
+    element.setAttribute('aria-hidden', 'true');
+    return element;
+  }
+  function overviewRow(category, count, total) {
+    const percent = total ? Math.round(count / total * 100) : 0;
+    const row = node('button', 'staff-overview-row');
+    row.type = 'button';
+    row.dataset.staffCategory = category.id;
+    row.setAttribute('aria-label', `${category.label}: ${count} staff, ${percent}%. View staff list.`);
+    const label = node('span', 'staff-overview-label');
+    label.append(overviewIcon(category.icon, 'staff-overview-icon'), node('span', '', category.label));
+    row.append(label, node('strong', 'staff-overview-count', count),
+      node('span', 'staff-overview-percent', percent + '%'), overviewIcon('fa-chevron-right', 'staff-overview-chevron'));
+    row.addEventListener('click', () => selectSummaryCategory(category.id));
+    return row;
+  }
   function renderSummary() {
-    $('staffListSummaryAsAt').textContent = 'As At ' + state.filters.asAt.split('-').reverse().join('/');
-    const cards = $('staffListSummaryCards');
-    cards.replaceChildren();
-    summaryCategories.forEach(category => {
-      const count = state.summaryRows.filter(category.matches).length;
-      const percent = state.summaryRows.length ? Math.round(count / state.summaryRows.length * 100) : 0;
-      const card = node('button', 'staff-list-summary-card');
-      card.type = 'button';
-      card.dataset.staffCategory = category.id;
-      card.dataset.tone = category.tone;
-      card.setAttribute('aria-label', `${category.label}: ${count} staff, ${percent}%. View staff list.`);
-      const header = node('span', 'staff-list-summary-card-header');
-      const icons = node('span', 'staff-list-summary-card-icon');
-      const icon = node('i', 'fa-solid ' + category.icon);
-      icon.setAttribute('aria-hidden', 'true');
-      icons.append(icon);
-      header.append(icons, node('span', 'staff-list-summary-card-title', category.label));
-      const values = node('span', 'staff-list-summary-card-values');
-      values.append(node('strong', 'staff-list-summary-card-count', count), node('span', 'staff-list-summary-card-percent', percent + '%'));
-      card.append(header, values);
-      card.addEventListener('click', () => selectSummaryCategory(category.id));
-      cards.append(card);
+    $('staffListSummaryAsAt').textContent = 'As at ' + formatDate(state.filters.asAt || dateISO);
+    const total = state.summaryRows.length;
+    const sections = overviewGroups.map(group => {
+      const section = node('section', 'staff-overview-group');
+      section.dataset.group = group.id;
+      const heading = node('header', 'staff-overview-heading');
+      const title = node('h2', '', group.title);
+      title.id = 'staff-overview-' + group.id;
+      section.setAttribute('aria-labelledby', title.id);
+      heading.append(title);
+
+      const card = node('div', 'staff-overview-card');
+      const columns = node('div', 'staff-overview-columns');
+      columns.setAttribute('aria-hidden', 'true');
+      columns.append(node('span', '', 'Staff'), node('span', '', '%'));
+      card.append(columns);
+      const counts = group.categories.map(category => state.summaryRows.filter(category.matches).length);
+      group.categories.forEach((category, index) => card.append(overviewRow(category, counts[index], total)));
+
+      if (group.id === 'review' && total) {
+        const needsReview = counts.some(count => count > 0);
+        const badge = node('span', 'staff-overview-status');
+        badge.dataset.status = needsReview ? 'review' : 'clear';
+        badge.append(overviewIcon(needsReview ? 'fa-circle-exclamation' : 'fa-circle-check'),
+          needsReview ? 'Needs review' : 'All clear');
+        heading.append(badge);
+      }
+      section.append(heading, card);
+      return section;
     });
+    $('staffListSummaryCards').replaceChildren(...sections);
   }
   function selectSummaryCategory(category) {
     state.filters.category = category;
@@ -184,7 +217,7 @@
     $('staffListFilterTrigger').focus({ preventScroll: true });
   }
   function initSummary() {
-    summaryCategories.forEach(category => $('staffListFilterCategory').add(new Option(category.label, category.id)));
+    staffCategories.forEach(category => $('staffListFilterCategory').add(new Option(category.label, category.id)));
     $('staffListViewSummary').addEventListener('click', () => {
       state.chartScroll = document.querySelector('main').scrollTop;
       renderSummary();
@@ -246,12 +279,15 @@
     state.view = view;
     $('staffListTableView').hidden = view !== 'table';
     $('staffListChartView').hidden = view !== 'chart';
-    if (isStaffList) $('staffListSummaryView').hidden = view !== 'summary';
+    if (isStaffList) {
+      $('staffListSummaryView').hidden = view !== 'summary';
+      $('staffListSummaryAsAt').hidden = view !== 'summary';
+    }
     if (hasTrend) {
       $(trendPrefix + 'TrendView').hidden = view !== 'trend';
       $(trendPrefix + 'AnalysisView').hidden = view !== 'analysis';
     }
-    const titles = { table: reportTitle, summary: 'Staff Listing Summary', chart: isAttrition ? 'Attrition Analysis' : isRetention ? 'Retention Analysis' : 'Staff Analysis', trend: isAttrition ? 'Attrition Trend Analysis' : 'Staff Trend Analysis', analysis: isAttrition ? 'Attrition Analysis' : 'Staff Analysis' };
+    const titles = { table: reportTitle, summary: 'Staff Overview', chart: isAttrition ? 'Attrition Analysis' : isRetention ? 'Retention Analysis' : 'Staff Analysis', trend: isAttrition ? 'Attrition Trend Analysis' : 'Staff Trend Analysis', analysis: isAttrition ? 'Attrition Analysis' : 'Staff Analysis' };
     $('staffListTitle').textContent = titles[view];
     $('staffListBack').setAttribute('aria-label', view === 'analysis' ? 'Back to ' + (isAttrition ? 'Attrition' : 'Staff') + ' Trend' : view === 'summary' || view === 'trend' ? 'Back to ' + (isAttrition ? 'Attrition' : 'Staff') + ' Chart' : view === 'chart' ? 'Back to ' + reportTitle : 'Back to Employee and Career');
     document.querySelector('main').scrollTop = 0;

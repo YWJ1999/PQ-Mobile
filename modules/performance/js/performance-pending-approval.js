@@ -40,8 +40,7 @@
       const button = node('button', `action-btn-${action}`, title);
       button.type = 'button';
       if (action === 'cancel') {
-        button.setAttribute('data-close-approval', '');
-        button.addEventListener('click', cancelDialog);
+        button.setAttribute('data-approval-back', '');
       } else {
         button.dataset.approvalAction = action;
         button.addEventListener('click', () => confirmAction([recordId], action, button));
@@ -51,10 +50,9 @@
     return grid;
   }
   function saveCommentDraft() {
-    if (activeDialog?.id === 'approvalDetails' && activeRecordId) commentDrafts.set(activeRecordId, $('performanceApprovalComments').value);
+    if (PendingApprovalPage.active && $('performanceApprovalComments') && activeRecordId && !$('approvalDetails').hidden) commentDrafts.set(activeRecordId, $('performanceApprovalComments').value);
   }
   function closeDialog(restore = true) {
-    saveCommentDraft();
     if (activeDialog) { activeDialog.hidden = true; activeDialog.classList.remove('active'); }
     background.forEach(({ element, inert }) => { element.inert = inert; });
     background = []; activeDialog = null;
@@ -106,11 +104,7 @@
     }
     return files.childElementCount ? files : 'No attachments';
   }
-  function showDetails(record, trigger) {
-    record = store.getPending().find(item => item.id === record?.id);
-    if (!record) return;
-    saveCommentDraft();
-    activeRecordId = record.id;
+  function renderDetails(record) {
     $('approvalDetailsTitle').textContent = `${names[record.category]} Approval`;
     const body = $('approvalDetailsBody');
     body.replaceChildren(node('h3', '', 'Employee Details'), table([
@@ -157,15 +151,13 @@
     input.rows = 2; input.maxLength = 2000; input.placeholder = 'Add approver remarks (optional)...'; input.value = commentDrafts.get(record.id) || '';
     comments.append(label, input); body.append(comments);
     $('approvalDetailsActions').replaceChildren(detailActionButtons(record.id));
-    openDialog('approvalDetails', trigger);
     body.scrollTop = 0;
   }
   function showMenu(record, trigger) {
     activeRecordId = record.id;
     openDialog('performanceApprovalMenu', trigger);
   }
-  function showWorkflow() {
-    const record = store.getPending().find(item => item.id === activeRecordId); if (!record) return;
+  function renderWorkflow(record) {
     $('performanceApprovalWorkflowTitle').textContent = `${names[record.category]} Workflow`;
     const employee = node('div', 'payroll-approval-workflow-person'); employee.append(person(record));
     $('performanceApprovalWorkflowRequest').replaceChildren(field('Reference #', record.id), employee, field('Status', recordDetailStatus.create('Pending Approval')), field(record.category === 'goal-plan' ? 'Session' : 'Period', record.category === 'goal-plan' ? record.session : record.period));
@@ -181,14 +173,12 @@
       const assignment = node('li'); assignment.append(field('Backup Approver Assigned', date(record.backupApprover.assignedAt)), node('span', '', record.backupApprover.name));
       $('performanceApprovalWorkflowAudit').append(assignment);
     }
-    openDialog('performanceApprovalWorkflow');
     $('performanceApprovalWorkflow').querySelector('.payroll-approval-workflow-body').scrollTop = 0;
   }
   function cancelDialog() {
     if (activeDialog?.id === 'approvalConfirm' && pendingAction?.fromDetails) {
-      const id = pendingAction.ids[0]; commentDrafts.set(id, $('approvalComments').value); pendingAction = null;
-      const record = store.getPending().find(item => item.id === id);
-      if (record) { showDetails(record, returnFocus); return; }
+      $('performanceApprovalComments').value = $('approvalComments').value;
+      saveCommentDraft();
     }
     pendingAction = null;
     closeDialog();
@@ -198,7 +188,7 @@
     ids = ids.filter(id => available.has(id));
     if (!ids.length) return;
     if (!['approve', 'resubmit', 'reject'].includes(action)) return;
-    const fromDetails = activeDialog?.id === 'approvalDetails';
+    const fromDetails = PendingApprovalPage.active;
     saveCommentDraft();
     pendingAction = { ids, action, fromDetails };
     $('approvalConfirmTitle').textContent = `${actions[action]} Request${ids.length === 1 ? '' : 's'}`;
@@ -233,6 +223,7 @@
     visible.forEach(record => {
       const card = node('article', 'approval-request-card');
       card.dataset.requestId = record.id;
+      card.dataset.approvalId = record.id;
       const header = node('header', 'payroll-approval-card-header');
       const check = node('input', 'approval-card-checkbox');
       check.type = 'checkbox';
@@ -261,7 +252,7 @@
         fields.push(['Overall Score', record.overallScore], ['Score Grade', record.scoreGrade]);
       }
       if (record.backupApprover) fields.push(['Backup Approver', record.backupApprover.name]);
-      body.append(createApprovalCardDetails(fields), createApprovalCardActions('approvalAction'));
+      body.append(PendingApprovalPage.link(record.id, createApprovalCardDetails(fields)), createApprovalCardActions('approvalAction'));
       card.append(header, body);
       queue.append(card);
     });
@@ -285,7 +276,7 @@
     if (updateUrl) {
       const url = new URL(location.href);
       url.searchParams.set('tab', category);
-      history.replaceState(null, '', url);
+      history.replaceState(history.state, '', url);
     }
     render();
   }
@@ -301,8 +292,8 @@
   });
   $('performanceApprovalFilterTrigger').addEventListener('click', filter.open);
   $('performanceApprovalSelectAll').addEventListener('change', event => { selected = new Set(event.target.checked ? visible.map(record => record.id) : []); syncSelection(); });
-  $('performanceApprovalViewDetails').addEventListener('click', () => showDetails(store.getPending().find(record => record.id === activeRecordId), returnFocus));
-  $('performanceApprovalViewWorkflow').addEventListener('click', showWorkflow);
+  $('performanceApprovalViewDetails').addEventListener('click', () => PendingApprovalPage.open('details', activeRecordId, returnFocus));
+  $('performanceApprovalViewWorkflow').addEventListener('click', () => PendingApprovalPage.open('workflow', activeRecordId, returnFocus));
   $('performanceApprovalQueue').addEventListener('click', event => {
     const button = event.target.closest('button[data-approval-action]');
     if (button) confirmAction([button.closest('[data-request-id]').dataset.requestId], button.dataset.approvalAction, button);
@@ -320,11 +311,13 @@
     catch {
       $('approvalConfirmError').textContent = 'Unable to save this decision. Please try again.'; $('approvalConfirmError').hidden = false; return;
     }
+    activeRecordId = null;
     ids.forEach(id => commentDrafts.delete(id));
     pendingAction = null;
     selected.clear();
     render();
     closeDialog();
+    PendingApprovalPage.back();
     if (typeof showToast === 'function') showToast(`${{ approve: 'Approved', resubmit: 'Sent for resubmission:', reject: 'Rejected' }[action]} ${count} request${count === 1 ? '' : 's'}.`);
   });
   document.querySelectorAll('[data-close-approval]').forEach(button => button.addEventListener('click', cancelDialog));
@@ -344,10 +337,26 @@
     $('performanceApprovalBack').href = `../index.html?scope=team&theme=${theme}`;
     const url = new URL(location.href);
     url.searchParams.set('theme', theme);
-    history.replaceState(null, '', url);
+    history.replaceState(history.state, '', url);
   }
   new MutationObserver(syncTheme).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
-  window.addEventListener('popstate', () => setCategory(new URLSearchParams(location.search).get('tab'), false));
   syncTheme();
   setCategory(category);
+  PendingApprovalPage.register({
+    render(view, id) {
+      const record = store.getPending().find(item => item.id === id);
+      if (!record) return false;
+      closeDialog(false);
+      if (category !== record.category) setCategory(record.category, false);
+      activeRecordId = id;
+      if (view === 'details') renderDetails(record);
+      else renderWorkflow(record);
+      return true;
+    },
+    onLeave() {
+      saveCommentDraft();
+      pendingAction = null;
+      closeDialog(false);
+    }
+  });
 })();

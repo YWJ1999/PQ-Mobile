@@ -7,73 +7,21 @@
       content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
     />
     <title>PeopleHCM - Team Attendance</title>
+  <link rel="stylesheet" href="../../../css/pending-approval-page.css">
+  <script src="../../../js/pending-approval-page.js"></script>
     <script src="../../../js/components.js"></script>
 <script>
       // ATTENDANCE PENDING APPROVAL THREE-DOTS & MODAL HANDLERS
       let currentAttendanceSelectedData = null;
 
+      function attendanceApprovalId(item) {
+        return item.docRef || [item.category, item.id, item.startDate].join('/');
+      }
+
       function openAttendanceThreeDotsMenu(btn, id) {
-        const card = btn ? btn.closest('.approval-request-card') : null;
-        const selectedRecord = (typeof staffDatabase !== 'undefined' && staffDatabase.pending_approval)
-          ? staffDatabase.pending_approval.find(item => String(item.id) === String(id))
-          : null;
-        let name = 'Afifah Nasir';
-        let empId = id || '#004177';
-        let dept = 'Quality Assurance • TIMES SQUARE BRANCH';
-        let type = 'Final OT Request';
-        let otType = 'OT 1.5 BEFORE WORK';
-        let reason = 'Operations';
-        let dates = 'Wed, 25/02/2026';
-        let duration = '2.0 Hours';
-        let remark = 'Urgent operational OT required for emergency release testing and production sync.';
-
-        let category = card ? (card.getAttribute('data-category') || currentStaffApprovalCategory) : currentStaffApprovalCategory;
-
-        if (card) {
-          const nameEl = card.querySelector('div[style*="font-size: 14.5px"]');
-          if (nameEl) name = nameEl.textContent.trim();
-
-          const subEl = card.querySelector('div[style*="font-size: 11px"]');
-          if (subEl) dept = subEl.textContent.trim();
-
-          type = card.dataset.type || card.dataset.otType || type;
-
-          const customOtType = card.getAttribute('data-ot-type');
-          if (customOtType) {
-            otType = customOtType;
-          } else if (name && (name.toLowerCase().includes('tan') || name.toLowerCase().includes('alex'))) {
-            otType = 'OT 1.5 BEFORE WORK';
-          } else if (name && (name.toLowerCase().includes('lim') || name.toLowerCase().includes('sarah'))) {
-            otType = 'Rest OT';
-          } else if (type && (type.includes('1.5') || type.includes('BEFORE WORK') || type.includes('Rest'))) {
-            otType = type;
-          }
-
-          const remarkRow = [...card.querySelectorAll('.approval-card-details dt')].find(term => /^Remarks?$/.test(term.textContent));
-          if (remarkRow) remark = remarkRow.nextElementSibling.textContent.trim();
-        }
-
-        currentAttendanceSelectedData = selectedRecord ? {
-          ...selectedRecord,
-          empId: selectedRecord.id && selectedRecord.id.startsWith('#') ? selectedRecord.id : '#' + selectedRecord.id,
-          dates: selectedRecord.startDate === selectedRecord.endDate
-            ? selectedRecord.startDate
-            : `${selectedRecord.startDate} - ${selectedRecord.endDate}`,
-          docRef: selectedRecord.docRef || 'VAT' + Math.floor(10000000 + Math.random() * 90000000)
-        } : {
-          name: name,
-          empId: empId.startsWith('#') ? empId : '#' + empId,
-          dept: dept,
-          type: type,
-          category: category,
-          otType: otType,
-          reason: reason,
-          dates: dates,
-          duration: duration,
-          remark: remark,
-          docRef: 'VAT' + Math.floor(10000000 + Math.random() * 90000000)
-        };
-
+        const key = btn?.closest('[data-approval-id]')?.dataset.approvalId;
+        currentAttendanceSelectedData = staffDatabase.pending_approval.find(item => key ? attendanceApprovalId(item) === key : item.id === id);
+        if (!currentAttendanceSelectedData) return;
         const nameEl = document.getElementById('attendanceThreeDotsName');
         if (nameEl) nameEl.textContent = currentAttendanceSelectedData.name + ' - Request Options';
 
@@ -98,7 +46,7 @@
           overlay.style.pointerEvents = 'none';
           const sheet = overlay.querySelector('.indicators-sheet');
           if (sheet) sheet.style.transform = 'translateY(100%)';
-          setTimeout(() => { overlay.style.display = 'none'; }, 250);
+          overlay.style.display = 'none';
         }
       }
 
@@ -212,11 +160,18 @@
         group.append(clockPanel, table, comments);
       }
 
-      function triggerAttendanceViewDetails() {
-        closeAttendanceThreeDotsMenu();
+      function openSelectedAttendanceApproval(view) {
         if (!currentAttendanceSelectedData) return;
+        const id = attendanceApprovalId(currentAttendanceSelectedData);
+        PendingApprovalPage.open(view, id, document.querySelector('[data-approval-id="' + CSS.escape(id) + '"] button[title="Options"]'));
+      }
 
-        const data = currentAttendanceSelectedData;
+      function triggerAttendanceViewDetails() {
+        openSelectedAttendanceApproval('details');
+      }
+
+      function renderAttendanceApprovalDetails(record) {
+        const data = { ...record, empId: record.id, dates: record.startDate === record.endDate ? record.startDate : [record.startDate, record.endDate].filter(Boolean).join(' - ') };
         const setVal = (id, val) => {
           const el = document.getElementById(id);
           if (!el) return;
@@ -323,81 +278,23 @@
           }
         }
 
-        setTimeout(() => {
-          const overlay = document.getElementById('attendanceDetailsModalOverlay');
-          if (overlay) {
-            overlay.style.display = 'flex';
-            overlay.style.pointerEvents = 'auto';
-            void overlay.offsetWidth;
-            overlay.style.opacity = '1';
-            overlay.classList.add('active');
-            const card = overlay.querySelector('.details-popout-card');
-            if (card) {
-              card.style.transform = 'scale(1)';
-            }
-          }
-        }, 150);
       }
 
-      function closeAttendanceDetailsModal(event) {
-        if (event && event.target && event.target.id !== 'attendanceDetailsModalOverlay' && !event.target.closest('button[title="Back"]') && !event.target.classList.contains('sheet-close-btn')) {
-          return;
-        }
-        const overlay = document.getElementById('attendanceDetailsModalOverlay');
-        if (overlay) {
-          overlay.style.opacity = '0';
-          overlay.style.pointerEvents = 'none';
-          overlay.classList.remove('active');
-          const card = overlay.querySelector('.details-popout-card');
-          if (card) {
-            card.style.transform = 'scale(0.95)';
-          }
-        }
+      function closeAttendanceDetailsModal() {
+        PendingApprovalPage.back();
       }
 
       function handleAttendanceDetailAction(actionName) {
-        if (typeof showToast === 'function') {
-          showToast(`Request ${actionName} action completed`);
-        }
-        const overlay = document.getElementById('attendanceDetailsModalOverlay');
-        if (overlay) {
-          overlay.style.opacity = '0';
-          overlay.style.pointerEvents = 'none';
-          overlay.classList.remove('active');
-          const card = overlay.querySelector('.details-popout-card');
-          if (card) {
-            card.style.transform = 'scale(0.95)';
-          }
-        }
+        decideAttendanceRequests(actionName.toLowerCase(), [currentAttendanceSelectedData]);
+        PendingApprovalPage.back();
       }
 
       function triggerAttendanceViewWorkflow() {
-        closeAttendanceThreeDotsMenu();
-        setTimeout(() => {
-          const overlay = document.getElementById('attendanceWorkflowModalOverlay');
-          if (overlay) {
-            overlay.style.display = 'flex';
-            overlay.style.pointerEvents = 'auto';
-            void overlay.offsetWidth;
-            overlay.style.opacity = '1';
-            const sheet = overlay.querySelector('.indicators-sheet');
-            if (sheet) sheet.style.transform = 'translateY(0)';
-          }
-        }, 200);
+        openSelectedAttendanceApproval('workflow');
       }
 
-      function closeAttendanceWorkflowModal(event) {
-        if (event && event.target && event.target.id !== 'attendanceWorkflowModalOverlay' && !event.target.classList.contains('sheet-close-btn')) {
-          return;
-        }
-        const overlay = document.getElementById('attendanceWorkflowModalOverlay');
-        if (overlay) {
-          overlay.style.opacity = '0';
-          overlay.style.pointerEvents = 'none';
-          const sheet = overlay.querySelector('.indicators-sheet');
-          if (sheet) sheet.style.transform = 'translateY(100%)';
-          setTimeout(() => { overlay.style.display = 'none'; }, 250);
-        }
+      function closeAttendanceWorkflowModal() {
+        PendingApprovalPage.back();
       }
 
     </script>
@@ -3297,16 +3194,15 @@
     </div>
 
     <!-- ATTENDANCE VIEW DETAILS MODAL (POP OUT - MATCHING USER SCREENSHOT) -->
-    <div class="indicators-overlay" id="attendanceDetailsModalOverlay" onclick="closeAttendanceDetailsModal(event)" style="position: absolute; inset: 0; z-index: 1000; display: none; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1); border-radius: 44px; overflow: hidden; background: rgba(15, 23, 42, 0.65); backdrop-filter: blur(8px); padding: 16px;">
-      <div class="details-popout-card" onclick="event.stopPropagation()" style="width: 92%; max-width: 380px; height: 82%; max-height: 85%; background: var(--bg-sheet); display: flex; flex-direction: column; border-radius: 24px; overflow: hidden; box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4); border: 1px solid var(--border-subtle); transform: scale(0.94); transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);">
-        
-        <!-- Purple Top Header Bar matching standard header color -->
-        <div style="background: linear-gradient(135deg, #4c1d95 0%, #6d28d9 50%, #7c3aed 100%); color: #ffffff; padding: 14px 18px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; box-shadow: 0 8px 24px rgba(76, 29, 149, 0.28); z-index: 10;">
-          <div style="display: flex; align-items: center; gap: 10px;">
-            <h2 id="attDetailHeaderTitle" style="font-size: 17.5px; font-weight: 800; color: #ffffff; margin: 0; letter-spacing: -0.2px;">Attendance Request Approval</h2>
+    <main id="attendanceDetailsModalOverlay" class="approval-record-page" data-approval-view="details" aria-labelledby="attDetailHeaderTitle" hidden>
+      <div class="approval-record-layout">
+        <header class="approval-page-header">
+          <phone-status-bar time="9:41"></phone-status-bar>
+          <div class="approval-page-heading">
+            <button type="button" data-approval-back aria-label="Back to pending approvals"></button>
+            <h1 id="attDetailHeaderTitle" tabindex="-1">Attendance Request Approval</h1>
           </div>
-          <button type="button" onclick="closeAttendanceDetailsModal(event)" class="sheet-close-btn" title="Close" style="background: rgba(255, 255, 255, 0.2); border: none; color: #ffffff; width: 28px; height: 28px; border-radius: 50%; font-size: 13px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.2s;"><i class="fa-solid fa-xmark"></i></button>
-        </div>
+        </header>
 
         <!-- Scrollable Details Content List as Table matching leave.html -->
         <div style="flex: 1; overflow-y: auto; padding: 14px 16px 14px 16px; display: flex; flex-direction: column; gap: 14px; scrollbar-width: none; background: var(--bg-sheet);">
@@ -3445,26 +3341,19 @@
         </div>
 
       </div>
-    </div>
+    </main>
 
     <!-- ATTENDANCE VIEW WORKFLOW MODAL (INSIDE PHONE CONTAINER) -->
-    <div class="indicators-overlay" id="attendanceWorkflowModalOverlay" onclick="closeAttendanceWorkflowModal(event)" style="position: absolute; inset: 0; z-index: 999; display: none; align-items: flex-end; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; border-radius: 44px; overflow: hidden; background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(6px);">
-      <div class="indicators-sheet" onclick="event.stopPropagation()" style="width: 100%; max-height: 85%; overflow-y: auto; background: var(--bg-card); border-top-left-radius: 28px; border-top-right-radius: 28px; padding: 20px 18px 24px; box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.5); border: 1px solid var(--border-subtle); transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);">
-        <div class="sheet-handle" style="width: 36px; height: 4px; background: var(--border-subtle); border-radius: 2px; margin: 0 auto 14px; opacity: 0.8;"></div>
-        
-        <!-- Header -->
-        <div class="sheet-header" style="border-bottom: 1px solid var(--border-subtle); padding-bottom: 12px; margin-bottom: 14px; display: flex; align-items: center; justify-content: space-between;">
-          <div style="display: flex; align-items: center; gap: 10px;">
-            <div style="width: 34px; height: 34px; border-radius: 10px; background: linear-gradient(135deg, rgba(124, 58, 237, 0.25) 0%, rgba(99, 102, 241, 0.2) 100%); display: flex; align-items: center; justify-content: center; font-size: 15px; border: 1px solid rgba(124, 58, 237, 0.35); color: var(--purple-primary);">
-              <i class="fa-solid fa-diagram-project"></i>
-            </div>
-            <div>
-              <h3 style="font-size: 17.5px; font-weight: 800; color: var(--text-primary); margin: 0;">Attendance Workflow</h3>
-              <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">3-Level Approval Audit Trail</div>
-            </div>
+    <main id="attendanceWorkflowModalOverlay" class="approval-record-page" data-approval-view="workflow" aria-labelledby="attendanceWorkflowModalOverlayTitle" hidden>
+      <div class="approval-record-layout">
+        <header class="approval-page-header">
+          <phone-status-bar time="9:41"></phone-status-bar>
+          <div class="approval-page-heading">
+            <button type="button" data-approval-back aria-label="Back to pending approvals"></button>
+            <h1 id="attendanceWorkflowModalOverlayTitle" tabindex="-1">Attendance Workflow</h1>
           </div>
-          <button class="sheet-close-btn" onclick="closeAttendanceWorkflowModal()" style="width: 28px; height: 28px; border-radius: 50%; background: var(--bg-input); border: 1px solid var(--border-subtle); color: var(--text-muted); font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center; cursor: pointer;"><i class="fa-solid fa-xmark"></i></button>
-        </div>
+        </header>
+        <div class="approval-workflow-content">
 
         <div style="display: flex; flex-direction: column; gap: 14px;">
           <!-- Level 1 Step -->
@@ -3505,8 +3394,9 @@
             Close Workflow
           </button>
         </div>
+              </div>
       </div>
-    </div>
+    </main>
 
 
   </div>
@@ -4085,7 +3975,7 @@
           if (remarkText) fields.push(['Remarks', remarkText]);
 
           return `
-            <div class="approval-request-card" id="pendingCard_${idx}" data-category="${item.category || ''}" data-type="${typeStr}" data-ot-type="${typeStr}" style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 20px; overflow: hidden; box-shadow: var(--shadow-card); transition: all 0.2s ease; text-align: left;">
+            <div class="approval-request-card" id="pendingCard_${idx}" data-approval-id="${attendanceApprovalId(item)}" data-category="${item.category || ''}" data-type="${typeStr}" data-ot-type="${typeStr}" style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 20px; overflow: hidden; box-shadow: var(--shadow-card); transition: all 0.2s ease; text-align: left;">
               
               <!-- Record header -->
               <div class="approval-record-header" style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
@@ -4109,7 +3999,7 @@
               </div>
 
               <div class="approval-card-body">
-                ${createApprovalCardDetails(fields).outerHTML}
+                ${PendingApprovalPage.link(attendanceApprovalId(item), createApprovalCardDetails(fields)).outerHTML}
 
                 <!-- Approval actions -->
                 <div class="pending-action-grid">
@@ -4269,7 +4159,7 @@
             if (item.remark) fields.push(['Remark', item.remark]);
 
             return `
-              <div class="approval-request-card" id="staffApprovalCard_${idx}" data-ot-type="${typeStr}" style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 20px; overflow: hidden; box-shadow: var(--shadow-card); transition: all 0.2s ease; margin-bottom: 14px; text-align: left;">
+              <div class="approval-request-card" id="staffApprovalCard_${idx}" data-approval-id="${attendanceApprovalId(item)}" data-ot-type="${typeStr}" style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 20px; overflow: hidden; box-shadow: var(--shadow-card); transition: all 0.2s ease; margin-bottom: 14px; text-align: left;">
                 
                 <!-- Record header -->
                 <div class="approval-record-header" style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
@@ -4294,7 +4184,7 @@
                 </div>
 
                 <div class="approval-card-body">
-                  ${createApprovalCardDetails(fields).outerHTML}
+                  ${PendingApprovalPage.link(attendanceApprovalId(item), createApprovalCardDetails(fields)).outerHTML}
 
                 <!-- Approval actions -->
                 <div class="pending-action-grid">
@@ -4541,6 +4431,18 @@
         } else if (view === 'verification') {
           openStaffListModal('Attendance Verification', 'attendance_verification');
         }
+        PendingApprovalPage.register({
+          render(view, id) {
+            const record = staffDatabase.pending_approval.find(item => attendanceApprovalId(item) === id);
+            if (!record) return false;
+            closeAttendanceThreeDotsMenu();
+            if (document.getElementById('StaffListModalOverlay').style.display === 'flex') closeStaffListModal();
+            if (currentViewSection !== 'pending_approval' || currentStaffApprovalCategory !== record.category) showPendingApprovalPage(record.category);
+            currentAttendanceSelectedData = record;
+            if (view === 'details') renderAttendanceApprovalDetails(record);
+            return true;
+          }
+        });
       });
     </script>
   </body>

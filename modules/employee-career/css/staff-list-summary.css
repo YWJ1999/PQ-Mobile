@@ -1,17 +1,130 @@
-/* Two-column statistic cards follow the Attendance Hours Summary presentation. */
-#staffListSummaryAsAt { font-size: 14px; font-weight: 700; line-height: 1.4; }
 .staff-list-trend-heading { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 10px; }
 .staff-list-trend-heading small { margin-bottom: 0; }
 .staff-list-view-summary { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 7px 13px; border: 1px solid var(--purple-border); border-radius: 12px; background: var(--purple-subtle); color: var(--purple-text); font-size: 12px; font-weight: 800; white-space: nowrap; }
-.staff-list-summary-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
-.staff-list-summary-card { --summary-bg: rgba(59,130,246,.12); --summary-border: rgba(96,165,250,.25); --summary-color: #60a5fa; --summary-percent: var(--summary-color); --summary-title: #bfdbfe; --summary-soft: var(--tag-blue-bg); --summary-shadow: rgba(59,130,246,.06); display: flex; flex-direction: column; align-items: stretch; gap: 12px; min-width: 0; min-height: 126px; padding: 14px; border: 1px solid var(--summary-border); border-radius: 18px; background: var(--summary-bg); color: var(--summary-title); text-align: left; box-shadow: 0 4px 14px var(--summary-shadow); }
-.staff-list-summary-card[data-tone="green"] { --summary-bg: var(--bento-mint-bg); --summary-border: var(--bento-mint-border); --summary-color: var(--bento-mint-icon); --summary-title: var(--bento-mint-title); --summary-soft: var(--tag-green-bg); --summary-shadow: rgba(16,185,129,.06); }
-.staff-list-summary-card[data-tone="purple"] { --summary-bg: linear-gradient(135deg,var(--bg-card) 0%,rgba(124,58,237,.06) 100%); --summary-border: var(--purple-border); --summary-color: var(--purple-primary); --summary-percent: var(--purple-text); --summary-title: var(--text-primary); --summary-soft: var(--tag-violet-bg); --summary-shadow: rgba(124,58,237,.06); }
-[data-theme="light"] .staff-list-summary-card[data-tone="blue"] { --summary-bg: linear-gradient(145deg,#eff6ff 0%,#dbeafe 100%); --summary-border: #bfdbfe; --summary-color: #1d4ed8; --summary-title: #1e3a8a; }
-.staff-list-summary-card-header { display: flex; align-items: center; gap: 9px; min-width: 0; }
-.staff-list-summary-card-icon { display: grid; place-items: center; flex: 0 0 36px; width: 36px; height: 36px; border-radius: 50%; background: var(--summary-soft); color: var(--summary-color); font-size: 15px; }
-.staff-list-summary-card-values { display: flex; flex-direction: column; align-items: center; gap: 3px; margin-top: auto; min-height: 45px; text-align: center; }
-.staff-list-summary-card-count { color: var(--summary-title); font-size: 24px; line-height: .95; font-weight: 850; letter-spacing: -.7px; font-variant-numeric: tabular-nums; }
-.staff-list-summary-card-percent { color: var(--summary-percent); font-size: 15px; line-height: 1; font-weight: 800; letter-spacing: -.2px; font-variant-numeric: tabular-nums; white-space: nowrap; }
-.staff-list-summary-card-title { font-size: 13px; font-weight: 700; line-height: 1.3; text-wrap: balance; overflow-wrap: anywhere; }
-@media print { #staffListSummaryView, .staff-list-view-summary { display: none !important; } }
+
+.staff-overview-groups {
+  display: grid;
+  gap: 16px;
+}
+
+.staff-overview-group {
+  --overview-icon-bg: var(--tag-violet-bg);
+  --overview-icon-color: var(--tag-violet-text);
+}
+.staff-overview-group[data-group="review"] {
+  --overview-icon-bg: var(--tag-amber-bg);
+  --overview-icon-color: var(--tag-amber-text);
+}
+.staff-overview-group[data-group="other"] {
+  --overview-icon-bg: var(--tag-blue-bg);
+  --overview-icon-color: var(--tag-blue-text);
+}
+
+.staff-overview-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0 2px 7px;
+}
+.staff-overview-heading h2 {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+}
+.staff-overview-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: var(--tag-amber-bg);
+  color: color-mix(in srgb, var(--tag-amber-text) 62%, var(--text-primary));
+  font-size: 10.5px;
+  font-weight: 800;
+}
+.staff-overview-status[data-status="clear"] {
+  background: var(--tag-green-bg);
+  color: color-mix(in srgb, var(--tag-green-text) 62%, var(--text-primary));
+}
+
+.staff-overview-card {
+  padding: 4px 8px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 18px;
+  background: var(--bg-card);
+  box-shadow: var(--shadow-card);
+}
+.staff-overview-columns,
+.staff-overview-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 3rem 2.75rem 10px;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  padding-inline: 6px;
+  font-variant-numeric: tabular-nums;
+}
+.staff-overview-columns {
+  min-height: 22px;
+  color: var(--text-muted);
+  text-align: center;
+  font-size: 10.5px;
+  font-weight: 800;
+}
+.staff-overview-columns > :first-child { grid-column: 2; }
+
+.staff-overview-row {
+  min-height: 44px;
+  padding-block: 6px;
+  border: 0;
+  border-top: 1px solid var(--border-divider);
+  background: transparent;
+  color: var(--text-primary);
+  text-align: left;
+  font-size: 13px;
+}
+.staff-overview-row[data-staff-category="active"] {
+  border-radius: 10px;
+  border-color: transparent;
+  background: var(--record-summary-background);
+}
+.staff-overview-row[data-staff-category="active"] .staff-overview-count { color: var(--purple-text); }
+.staff-overview-row:hover,
+.staff-overview-row:focus-visible { background: var(--bg-card-hover); }
+.staff-list-page .staff-overview-row:focus-visible { outline-offset: -2px; }
+.staff-overview-row:active { background: var(--purple-subtle); }
+
+.staff-overview-label {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-width: 0;
+  font-weight: 700;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+.staff-overview-icon {
+  flex: 0 0 29px;
+  padding-block: 7px;
+  border-radius: 9px;
+  background: var(--overview-icon-bg);
+  color: var(--overview-icon-color);
+  text-align: center;
+  font-size: 13px;
+}
+.staff-overview-count { text-align: center; font-size: 16px; font-weight: 800; }
+.staff-overview-percent {
+  padding: 3px 0;
+  border-radius: 7px;
+  background: var(--bg-input);
+  color: var(--text-secondary);
+  text-align: center;
+  font-size: 11px;
+  font-weight: 700;
+}
+.staff-overview-chevron { color: var(--text-muted); font-size: 10px; }
+@media print { #staffListSummaryView, #staffListSummaryAsAt, .staff-list-view-summary { display: none !important; } }

@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>PeopleHCM - Payroll Pending Approval</title>
+  <link rel="stylesheet" href="../../../css/pending-approval-page.css">
+  <script src="../../../js/pending-approval-page.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -64,24 +66,26 @@
         </div>
       </section>
     </div>
-    <div id="payrollPendingDetails" class="payroll-approval-overlay" hidden>
-      <section class="payroll-approval-panel" role="dialog" aria-modal="true" aria-labelledby="payrollPendingDetailsTitle">
-        <header class="payroll-approval-details-header">
-          <h2 id="payrollPendingDetailsTitle">Tax Relief Detail</h2>
-          <button type="button" class="payroll-approval-close" data-close-payroll-sheet aria-label="Close approval details"><i class="fa-solid fa-circle-xmark" aria-hidden="true"></i></button>
+    <main id="payrollPendingDetails" class="approval-record-page" data-approval-view="details" aria-labelledby="payrollPendingDetailsTitle" hidden>
+      <section class="approval-record-layout">
+        <header class="approval-page-header">
+          <phone-status-bar time="9:41"></phone-status-bar>
+          <div class="approval-page-heading">
+            <button type="button" data-approval-back aria-label="Back to pending approvals"></button>
+            <h1 id="payrollPendingDetailsTitle" tabindex="-1">Tax Relief Detail</h1>
+          </div>
         </header>
         <div class="payroll-approval-details-body"><table class="payroll-approval-table" id="payrollPendingDetailsTable"><tbody></tbody></table></div>
         <footer class="payroll-approval-details-footer pending-action-grid"></footer>
       </section>
-    </div>
-    <div id="payrollPendingWorkflow" class="payroll-approval-overlay" hidden>
-      <section class="payroll-approval-panel payroll-approval-workflow" role="dialog" aria-modal="true" aria-labelledby="payrollPendingWorkflowTitle">
-        <header class="payroll-approval-workflow-header">
-          <div class="payroll-approval-handle" aria-hidden="true"></div>
-          <div class="payroll-approval-workflow-heading">
-            <i class="fa-solid fa-diagram-project payroll-approval-workflow-icon" aria-hidden="true"></i>
-            <div><h2 id="payrollPendingWorkflowTitle">Approval Workflow</h2><p>Approval status &amp; history</p></div>
-            <button type="button" class="payroll-approval-close" data-close-payroll-sheet aria-label="Close workflow"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
+    </main>
+    <main id="payrollPendingWorkflow" class="approval-record-page" data-approval-view="workflow" aria-labelledby="payrollPendingWorkflowTitle" hidden>
+      <section class="approval-record-layout">
+        <header class="approval-page-header">
+          <phone-status-bar time="9:41"></phone-status-bar>
+          <div class="approval-page-heading">
+            <button type="button" data-approval-back aria-label="Back to pending approvals"></button>
+            <h1 id="payrollPendingWorkflowTitle" tabindex="-1">Approval Workflow</h1>
           </div>
         </header>
         <div class="payroll-approval-workflow-body">
@@ -95,9 +99,9 @@
             <ul id="payrollPendingWorkflowAudit"></ul>
           </section>
         </div>
-        <footer class="payroll-approval-workflow-footer"><button type="button" class="action-btn-cancel" data-close-payroll-sheet><i class="fa-solid fa-xmark" aria-hidden="true"></i>Close Workflow</button></footer>
+        <footer class="payroll-approval-workflow-footer"><button type="button" class="action-btn-cancel" data-approval-back><i class="fa-solid fa-xmark" aria-hidden="true"></i>Close Workflow</button></footer>
       </section>
-    </div>
+    </main>
   </div>
 </body>
 </html>

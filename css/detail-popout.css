@@ -25,6 +25,7 @@
 .record-detail-status[data-status="rejected"] { --detail-status-fill: var(--record-rejected-accent, #dc2626); }
 
 .detail-popout-overlay,
+.approval-record-page,
 .record-detail-table {
   --detail-surface: rgba(22, 21, 46, 0.65);
   --detail-label-surface: rgba(255, 255, 255, 0.06);
@@ -45,7 +46,7 @@
   overflow: hidden !important;
   box-sizing: border-box !important;
 }
-[data-theme="light"] :is(.detail-popout-overlay, .record-detail-table) {
+[data-theme="light"] :is(.detail-popout-overlay, .approval-record-page, .record-detail-table) {
   --detail-surface: #fff;
   --detail-label-surface: #f1f5f9;
   --detail-border: #e2e8f0;

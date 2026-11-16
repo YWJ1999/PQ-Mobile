@@ -3,8 +3,8 @@ const path = require('node:path');
 const { pathToFileURL } = require('node:url');
 const puppeteer = require('puppeteer');
 const url = pathToFileURL(path.resolve(__dirname, '../modules/employee-career/options/team/staff-list.html')).href;
-const labels = ['Active Staff', 'Probationary', 'Key Level 3', 'Key Level 2', 'Key Level 1', 'Blacklisted', 'Permit Expiring', 'Contract Expiring', 'Exit Notice', 'Resigned', 'Unverified', 'Unapproved'];
-const expected = [['#A', '#B'], ['#A'], ['#A'], ['#B'], ['#C'], ['#A'], ['#A'], ['#B'], ['#B'], ['#C'], ['#A'], ['#A']];
+const labels = ['Active Staff', 'Probationary', 'Unapproved', 'Unverified', 'Permit Expiring', 'Contract Expiring', 'Exit Notice', 'Resigned', 'Blacklisted'];
+const expected = [['#A', '#B'], ['#A'], ['#A'], ['#A'], ['#A'], ['#B'], ['#B'], ['#C'], ['#A']];
 const openSummary = async page => {
   if (await page.$eval('#staffListTableView', n => !n.hidden)) await page.click('#staffListViewChart');
   if (await page.$eval('#staffListTrendView', n => !n.hidden)) await page.click('#staffListBack');
@@ -46,25 +46,26 @@ const openSummary = async page => {
       assert.equal(actionLayout.aligned, true, 'View Trend and View Summary must share the same alignment');
       await page.click('#staffListBack');
       await apply({ staffListFilterAsAt: '2026-10-06' });
-      for (const width of [360, 390, 450]) {
+      for (const width of [320, 360, 390, 450]) {
         await page.setViewport({ width, height: 950 });
         await openSummary(page);
         assert.equal(await page.$eval('#staffListSummaryView', n => n.hidden), false);
-        assert.equal(await page.$eval('#staffListTitle', n => n.textContent), 'Staff Listing Summary');
-        assert.equal(await page.$eval('#staffListStatisticsTitle', n => n.textContent), 'Staff Statistics');
-        assert.equal(await page.$eval('#staffListSummaryAsAt', n => n.textContent), 'As At 06/10/2026');
-        assert.equal(await page.$('#staffListSummaryFilterTrigger'), null, 'Statistics is an informational card');
-        assert.equal(await page.$$eval('.staff-list-statistics-card button, .staff-list-statistics-card i', nodes => nodes.length), 0);
-        assert.equal(await page.$eval('.staff-list-statistics-card', n => getComputedStyle(n).borderRadius), '16px');
-        assert.deepEqual(await page.$$eval('[data-staff-category] .staff-list-summary-card-title', nodes => nodes.map(n => n.textContent)), labels);
-        assert.deepEqual(await page.$$eval('[data-staff-category] .staff-list-summary-card-count', nodes => nodes.map(n => Number(n.textContent))), [2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
-        assert.deepEqual(await page.$$eval('[data-staff-category] .staff-list-summary-card-percent', nodes => nodes.map(n => n.textContent)), ['67%', ...Array(11).fill('33%')]);
+        assert.equal(await page.$eval('#staffListTitle', n => n.textContent), 'Staff Overview');
+        assert.equal(await page.$eval('#staffListSummaryAsAt', n => !n.hidden && n.textContent), 'As at 06 Oct 2026');
+        assert.deepEqual(await page.$$eval('.staff-overview-group h2', nodes => nodes.map(n => n.textContent)), ['Workforce', 'Review & expiry', 'Other statuses']);
+        assert.deepEqual(await page.$$eval('.staff-overview-group', nodes => nodes.map(n => n.querySelectorAll('button').length)), [2, 4, 3]);
+        assert.equal(await page.$eval('.staff-overview-status', n => n.textContent), 'Needs review');
+        assert.deepEqual(await page.$$eval('[data-staff-category] .staff-overview-label', nodes => nodes.map(n => n.textContent)), labels);
+        assert.deepEqual(await page.$$eval('.staff-overview-count', nodes => nodes.map(n => Number(n.textContent))), [2, ...Array(8).fill(1)]);
+        assert.deepEqual(await page.$$eval('.staff-overview-percent', nodes => nodes.map(n => n.textContent)), ['67%', ...Array(8).fill('33%')]);
+        assert.ok(await page.$$eval('.staff-overview-row', nodes => nodes.every(n => n.getBoundingClientRect().height >= 44)));
         assert.ok(await page.$eval('main', n => n.scrollWidth <= n.clientWidth + 1));
         for (let i = 0; i < labels.length; i++) {
           const card = (await page.$$('[data-staff-category]'))[i];
           await card.click();
           assert.equal(await page.$eval('#staffListTableView', n => n.hidden), false);
           assert.equal(await page.$eval('#staffListTitle', n => n.textContent), 'Staff List');
+          assert.equal(await page.$eval('#staffListSummaryAsAt', n => n.hidden), true);
           assert.deepEqual(await page.$$eval('#staffListTable tbody tr', nodes => nodes.map(n => n.cells[0].textContent)), expected[i]);
           assert.match(await page.$eval('#staffListFilterSummary', n => n.textContent), new RegExp(labels[i]));
           await page.click('#staffListViewChart');
@@ -81,12 +82,16 @@ const openSummary = async page => {
         assert.equal(await page.evaluate(() => document.activeElement.id), 'staffListViewSummary');
         await page.click('#staffListBack');
       }
+      for (const [level, employee] of [[1, '#C'], [2, '#B'], [3, '#A']]) {
+        await apply({staffListFilterCategory: 'key-level-' + level});
+        assert.deepEqual(await page.$$eval('#staffListTable tbody tr', nodes => nodes.map(n => n.cells[0].textContent)), [employee]);
+      }
       await openSummary(page);
       await page.click('[data-staff-category="active"]');
       await apply({ staffListFilterBranch: 'North', staffListFilterCategory: '' });
       await openSummary(page);
       assert.equal(await page.$eval('#staffListSummaryView', n => n.hidden), false, 'Summary keeps filters chosen from Staff List');
-      assert.deepEqual(await page.$$eval('[data-staff-category] .staff-list-summary-card-count', nodes => nodes.map(n => Number(n.textContent))), [1, 1, 1, 0, 1, 1, 1, 0, 0, 1, 1, 1]);
+      assert.deepEqual(await page.$$eval('[data-staff-category] .staff-overview-count', nodes => nodes.map(n => Number(n.textContent))), [1, 1, 1, 1, 1, 0, 0, 1, 1]);
       await page.click('[data-staff-category="contract-expiring"]');
       assert.equal(await page.$$eval('#staffListTable tbody tr', nodes => nodes.length), 0);
       assert.equal(await page.$eval('#staffListEmpty', n => n.hidden), false);
@@ -94,7 +99,8 @@ const openSummary = async page => {
       assert.deepEqual(await page.$$eval('#staffListTable tbody tr', nodes => nodes.map(n => n.cells[0].textContent)), ['#C'], 'Summary cards must preserve the organization filter');
       await apply({ staffListFilterKeyword: 'no staff' });
       await openSummary(page);
-      assert.ok(await page.$$eval('[data-staff-category]', nodes => nodes.every(n => n.querySelector('.staff-list-summary-card-percent').textContent === '0%')));
+      assert.equal(await page.$('.staff-overview-status'), null, 'Empty results must not report All clear');
+      assert.ok(await page.$$eval('[data-staff-category]', nodes => nodes.every(n => n.querySelector('.staff-overview-percent').textContent === '0%')));
     }
     const preview = await browser.newPage();
     preview.on('pageerror', error => errors.push(error.message));
@@ -104,11 +110,12 @@ const openSummary = async page => {
       await preview.click('#staffListViewChart');
       await preview.screenshot({ path: path.join(__dirname, `employee_career_staff_list_summary_entry_${theme}.png`) });
       await openSummary(preview);
+      assert.equal(await preview.$eval('.staff-overview-status', n => n.textContent), 'All clear');
       await preview.screenshot({ path: path.join(__dirname, `employee_career_staff_list_summary_${theme}.png`) });
       await preview.$eval('main', n => { n.scrollTop = n.scrollHeight; });
       await preview.screenshot({ path: path.join(__dirname, `employee_career_staff_list_summary_bottom_${theme}.png`) });
     }
     assert.deepEqual(errors, []);
-    console.log('PASS: Staff List Summary has all 12 categories, counts/percentages match table results, no Show All button, back navigation, organization filters, chart consistency, empty results, both themes and three widths.');
+    console.log('PASS: Nine grouped staff statuses, counts, percentages, drill-downs, review badges, key-level filters and navigation passed in both themes at four widths.');
   } finally { await browser.close(); }
 })().catch(error => { console.error(error); process.exitCode = 1; });

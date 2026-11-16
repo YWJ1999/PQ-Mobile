@@ -63,7 +63,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     const close = node('button', 'action-btn-cancel', 'Cancel');
     close.type = 'button';
-    close.dataset.closeWorkplaceApproval = '';
+    close.dataset.approvalBack = '';
     grid.append(close);
     return grid;
   }
@@ -96,6 +96,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   function renderCard(item) {
     const card = node('article', 'approval-request-card');
+    card.dataset.approvalId = item.id;
     card.dataset.itemId = item.id;
     const header = node('header', 'payroll-approval-card-header');
     const checkbox = node('input', 'approval-card-checkbox');
@@ -115,9 +116,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     header.append(checkbox, identity(item.employeeName, item.empNo), menu);
     const body = node('div', 'approval-card-body payroll-approval-card-body');
-    const review = node('div', 'workplace-approval-review');
-    review.tabIndex = 0;
-    review.setAttribute('role', 'button');
+    const review = PendingApprovalPage.link(item.id);
+    review.classList.add('workplace-approval-review');
     review.setAttribute('aria-label', 'View details for ' + item.reference);
     const status = node('span', 'payroll-approval-status');
     status.append(icon('fa-hourglass-half'), node('span', '', recordReviewStatusLabel(item.status)));
@@ -128,8 +128,6 @@ document.addEventListener('DOMContentLoaded', () => {
       : [['Visit Date', date(item.visitDate)], ['Visit Time', `${item.startTime} – ${item.endTime}`], ['Total Guest', String(item.totalGuest)]];
     header.querySelector('.payroll-employee-copy').append(reference);
     review.append(createApprovalCardDetails([['Submit Date', date(item.submitDate)], ...rows]));
-    review.addEventListener('click', () => openDetails(item.id, review));
-    review.addEventListener('keydown', event => { if (['Enter', ' '].includes(event.key)) { event.preventDefault(); openDetails(item.id, review); } });
     body.append(review, createApprovalCardActions('approvalAction'));
     PendingApprovalBackup.showAssignment(body.lastElementChild, { scope: 'workplace', id: item.id });
     card.append(header, body);
@@ -203,10 +201,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function sectionTitle(section, title) {
     section.replaceChildren(node('h4', 'claim-detail-section-title', title));
   }
-  function openDetails(id, trigger) {
-    const item = store.getPending().find(row => row.id === id);
-    if (!item) return;
-    currentId = id;
+  function renderDetails(item) {
     const config = item.kind === 'inventory-request' ? tabConfig.inventory : tabConfig['guest-visit'];
     $('workplaceApprovalDetailsTitle').textContent = config.detailsTitle;
     const general = $('approvalPanel-general');
@@ -272,12 +267,9 @@ document.addEventListener('DOMContentLoaded', () => {
     $('workplaceApprovalComments').replaceChildren(commentLabel, comments);
     $('workplaceApprovalDetailActions').replaceChildren(...detailActionButtons().children);
     message('workplaceApprovalDetailFeedback', '');
-    openSheet('workplaceApprovalDetails', trigger);
     general.parentElement.scrollTop = 0;
   }
-  function openWorkflow() {
-    const item = store.list().find(row => row.id === currentId);
-    if (!item) return;
+  function renderWorkflow(item) {
     const body = $('workplaceApprovalWorkflowBody');
     const request = node('section', 'payroll-approval-workflow-request');
     const employee = identity(item.employeeName, item.empNo);
@@ -292,7 +284,6 @@ document.addEventListener('DOMContentLoaded', () => {
     audit.append(node('h3', '', 'Audit History'));
     item.audit.forEach(event => audit.append(node('p', 'workplace-approval-comment-label', `${event.action === 'submitted' ? 'Submitted' : event.action} · ${date(event.at)}`)));
     body.replaceChildren(request, steps, audit);
-    openSheet('workplaceApprovalWorkflow', opener);
   }
   function act(button) {
     const action = button.dataset.approvalAction;
@@ -301,13 +292,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const card = button.closest('[data-item-id]');
     const ids = inDetails || inMenu ? [currentId] : card ? [card.dataset.itemId] : [...selected];
     if (!ids.length) return;
-    if (action === 'approve' && !inDetails && ids.length === 1) { openDetails(ids[0], button); return; }
+    if (action === 'approve' && !inDetails && ids.length === 1) { PendingApprovalPage.open('details', ids[0], button); return; }
     const options = {};
     if (inDetails) {
       options.comments = $('approvalComments').value;
     }
     try {
       const count = store.act(ids, action, options);
+      PendingApprovalPage.back();
       closeSheet(false);
       selected.clear();
       render();
@@ -337,8 +329,8 @@ document.addEventListener('DOMContentLoaded', () => {
   });
   $('workplacePendingFilterTrigger').addEventListener('click', filter.open);
   $('workplacePendingSelectAll').addEventListener('change', event => { visible.forEach(row => { if (event.target.checked) selected.add(row.id); else selected.delete(row.id); }); render(); });
-  $('workplacePendingViewDetails').addEventListener('click', () => openDetails(currentId, opener));
-  $('workplacePendingViewWorkflow').addEventListener('click', openWorkflow);
+  $('workplacePendingViewDetails').addEventListener('click', () => PendingApprovalPage.open('details', currentId, opener));
+  $('workplacePendingViewWorkflow').addEventListener('click', () => PendingApprovalPage.open('workflow', currentId, opener));
   $('workplaceApprovalReview').addEventListener('submit', event => event.preventDefault());
   document.addEventListener('click', event => {
     const button = event.target.closest('[data-approval-action]');
@@ -361,4 +353,16 @@ document.addEventListener('DOMContentLoaded', () => {
     if (event.key === 'peoplehcm:workplace:pending-approval:v1' || event.key === null) { closeSheet(); render(); }
   });
   render();
+  PendingApprovalPage.register({
+    render(view, id) {
+      const item = store.getPending().find(record => record.id === id);
+      if (!item) return false;
+      closeSheet(false);
+      setActiveTab(item.kind === 'inventory-request' ? 'inventory' : 'guest-visit');
+      currentId = id;
+      if (view === 'details') renderDetails(item);
+      else renderWorkflow(item);
+      return true;
+    }
+  });
 });

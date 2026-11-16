@@ -38,7 +38,15 @@
             <div class="employee-career-field"><label for="requestPeriod">Request Period</label><input id="requestPeriod" class="employee-career-control" type="month"></div>
             <div class="employee-career-field"><label for="requestType">Type</label><select id="requestType" class="employee-career-control"><option>Unbudgeted</option><option>Budgeted</option><option>Replacement</option></select></div>
           </div>
-          <div class="employee-career-field"><label for="requestManpowerPlan">Manpower Plan #</label><input id="requestManpowerPlan" class="employee-career-control" type="text" placeholder="Enter manpower plan reference"></div>
+          <div class="employee-career-field">
+            <label for="requestManpowerPlan">Manpower Plan #</label>
+            <select id="requestManpowerPlan" name="manpowerPlanNo" class="employee-career-control">
+              <option value="">Select Manpower Plan</option>
+              <option>MP-2026-001</option>
+              <option>MP-2026-002</option>
+              <option>MP-2026-008</option>
+            </select>
+          </div>
           <div class="employee-career-field"><label for="requestDescription">Description</label><textarea id="requestDescription" class="employee-career-control" placeholder="Describe the requested role"></textarea></div>
           <div class="employee-career-form-grid">
             <div class="employee-career-field employee-career-field--wide"><label for="requestCompany">Company</label><select id="requestCompany" class="employee-career-control"><option value="">Select Company</option><option>PeopleHCM Malaysia</option><option>PeopleHCM Services</option><option>PeopleHCM Technology</option></select></div>
@@ -65,7 +73,7 @@
           <div id="requestAttachments" class="form-attachment-list" aria-live="polite"></div>
         </fieldset>
         </div>
-        <div class="employee-career-form-actions">
+        <div class="employee-career-form-actions form-action-row">
           <a class="form-cancel-btn" data-option-back href="../../index.html?scope=team"><i class="fa-solid fa-xmark" aria-hidden="true"></i><span>Cancel</span></a>
           <button class="employee-career-button primary" id="staffRequestSubmit" type="submit"><span>Submit</span><i class="fa-solid fa-paper-plane" aria-hidden="true"></i></button>
         </div>

@@ -1,5 +1,6 @@
 :root{--ec-accent:#7c3aed;--ec-soft:rgba(124,58,237,.12)}
 body.employee-career-page,body.employee-career-option-page{font-family:'Plus Jakarta Sans',sans-serif}
+.employee-career-page > .phone-container { overflow: clip; }
 .employee-career-header{position:relative;z-index:3;color:#fff;background:radial-gradient(circle at 82% 8%,rgba(255,255,255,.18),transparent 28%),linear-gradient(135deg,#5820b8 0%,#7c3aed 58%,#9333ea 100%);border-radius:0 0 24px 24px;box-shadow:0 12px 30px rgba(88,32,184,.22)}
 .employee-career-header-row{min-height:78px;padding:8px 16px 18px;display:grid;grid-template-columns:42px minmax(0,1fr) 42px;align-items:center}
 .employee-career-back,.employee-career-header-spacer{width:38px;height:38px}
@@ -29,19 +30,84 @@ body.employee-career-page,body.employee-career-option-page{font-family:'Plus Jak
 .employee-career-expiry-icon{display:inline-flex;align-items:center;justify-content:center;flex:0 0 30px;width:30px;height:30px;border-radius:10px;background:rgba(255,255,255,.16);color:#fff;font-size:15px}
 .employee-career-expiry-header h2{flex:1;min-width:0;margin:0;color:#fff;font-size:12.5px;font-weight:800;line-height:1.5}
 .employee-career-expiry>.employee-career-expiry-header{gap:6px;margin:0 0 10px;padding:0;background:none}
-.employee-career-expiry>.employee-career-expiry-header .employee-career-expiry-icon{display:inline-flex;width:auto;height:auto;flex:0 0 auto;border-radius:0;background:transparent;color:var(--text-muted);font-size:11.5px}
 .employee-career-expiry>.employee-career-expiry-header h2{color:var(--text-muted);font-size:11.5px;line-height:1.4;letter-spacing:.5px;text-transform:uppercase}
-.employee-career-expiry-card{overflow:hidden;border:1px solid var(--border-subtle);border-radius:20px;background:var(--bg-card);box-shadow:var(--shadow-sm)}
-.employee-career-expiry-table{width:100%;table-layout:fixed;border-collapse:collapse;color:var(--text-primary);font-size:11px;line-height:1.5}
-.employee-career-expiry-table .expiry-type-col{width:17%}.employee-career-expiry-table .expiry-description-col{width:35%}.employee-career-expiry-table .expiry-days-col{width:21%}.employee-career-expiry-table .expiry-date-col{width:27%}
-.employee-career-expiry-table th{padding:11px 6px;color:var(--text-muted);font-size:10px;font-weight:800;text-align:left}
-.employee-career-expiry-table td{padding:12px 6px;border-top:1px solid var(--border-subtle);vertical-align:middle;font-weight:600;overflow-wrap:anywhere}
-.employee-career-expiry-table tbody tr:nth-child(even){background:var(--bg-card-hover)}
-.employee-career-expiry-table th:first-child,.employee-career-expiry-table td:first-child{padding-left:10px}
-.employee-career-expiry-table th:last-child,.employee-career-expiry-table td:last-child{padding-right:10px}
-.employee-career-expiry-table th:nth-child(n+3),.employee-career-expiry-table td:nth-child(n+3){text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
-.employee-career-expiry-table td:first-child{color:var(--text-secondary);font-size:10.5px;white-space:nowrap}
-.employee-career-expiry-table .expiry-overdue{color:var(--status-action-text);font-weight:800}
+.employee-career-expiry-summary {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  padding: 2px;
+  border: 1px solid var(--purple-border, var(--border-subtle));
+  border-radius: 14px;
+  background: var(--bg-card);
+  box-shadow: var(--shadow-sm);
+}
+.employee-career-expiry-summary button {
+  position: relative;
+  display: grid;
+  align-content: center;
+  gap: 3px;
+  min-height: 54px;
+  padding: 4px 2px;
+  border: 0;
+  border-radius: 11px;
+  background: transparent;
+  color: var(--text-primary);
+  font: inherit;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1.25;
+  cursor: pointer;
+}
+.employee-career-expiry-summary button + button::before {
+  content: "";
+  position: absolute;
+  inset: 15% auto 15% 0;
+  border-left: 1px solid var(--border-subtle);
+}
+.employee-career-expiry-summary strong { color: var(--purple-text); font-size: 20px; font-weight: 800; font-variant-numeric: tabular-nums; }
+.employee-career-expiry-summary .is-empty strong { color: var(--text-muted); }
+.employee-career-expiry-summary button:not(.is-current):hover { background: var(--ec-soft); }
+.employee-career-expiry-summary .is-current { background: linear-gradient(135deg, #7c3aed, #6d28d9); color: #fff; }
+.employee-career-expiry-summary .is-current strong { color: inherit; }
+.employee-career-expiry-summary .is-current::before, .employee-career-expiry-summary .is-current + button::before { display: none; }
+.employee-career-expiry-summary button:focus-visible { z-index: 1; outline: 2px solid var(--purple-text); outline-offset: 2px; }
+.employee-career-expiry-empty { margin: 0; padding: 18px; color: var(--text-muted); text-align: center; font-size: 13px; }
+#employeeCareerExpiryDetails .employee-career-sheet {
+  display: flex;
+  flex-direction: column;
+  min-height: min(540px, 68%);
+  max-height: 85%;
+  overflow: hidden;
+  padding: 10px 16px max(24px, env(safe-area-inset-bottom));
+  background: var(--bg-sheet);
+}
+#employeeCareerExpiryDetails .employee-career-sheet-handle {
+  flex: none;
+  width: 35px;
+  height: 3px;
+  margin: 0 auto 18px;
+  background: var(--text-caption);
+}
+#employeeCareerExpiryDetails .employee-career-sheet-header {
+  position: static;
+  flex: none;
+  align-items: flex-start;
+  padding: 0 0 14px;
+  background: transparent;
+}
+#employeeCareerExpiryDetailTitle { margin: 4px 0 8px; font-size: 18px; }
+#employeeCareerExpiryDetails .employee-career-sheet-close { background: transparent; border: 0; }
+#employeeCareerExpiryCards:not([hidden]) {
+  display: grid;
+  grid-auto-rows: max-content;
+  gap: 12px;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+#employeeCareerExpiryCards .insight-detail-metric-header h3 { font-size: 14px; line-height: 1.4; overflow-wrap: anywhere; }
+.expiry-record-type { margin-top: 2px; color: #f1eaff; font-size: 11.5px; line-height: 1.4; }
+#employeeCareerExpiryCards dd { margin: 0; font-size: clamp(16px, 4.5vw, 20px); font-weight: 800; font-variant-numeric: tabular-nums; }
+#employeeCareerExpiryCards .is-overdue .expiry-record-days { color: var(--status-action-text); }
 .employee-career-sheet-header{display:flex;align-items:center;justify-content:space-between;gap:14px}
 .employee-career-sheet-header span{display:block;margin-bottom:3px;color:var(--text-muted);font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
 .employee-career-sheet-header h2{margin:0;color:var(--text-primary);font-size:17px;font-weight:800}

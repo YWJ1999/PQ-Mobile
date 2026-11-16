@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>PeopleHCM - Pending Approval</title>
+  <link rel="stylesheet" href="../../../css/pending-approval-page.css">
+  <script src="../../../js/pending-approval-page.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -66,9 +68,15 @@
         </div>
       </section>
     </div>
-    <div id="workplaceApprovalDetails" class="payroll-approval-overlay" hidden>
-      <form id="workplaceApprovalReview" class="payroll-approval-panel" role="dialog" aria-modal="true" aria-labelledby="workplaceApprovalDetailsTitle" novalidate>
-        <header class="payroll-approval-details-header"><h2 id="workplaceApprovalDetailsTitle">Guest Visit Request Approval</h2><button type="button" class="payroll-approval-close" data-close-workplace-approval aria-label="Close approval details"><i class="fa-solid fa-circle-xmark" aria-hidden="true"></i></button></header>
+    <main id="workplaceApprovalDetails" class="approval-record-page" data-approval-view="details" aria-labelledby="workplaceApprovalDetailsTitle" hidden>
+      <form id="workplaceApprovalReview" class="approval-record-layout" novalidate>
+        <header class="approval-page-header">
+          <phone-status-bar time="9:41"></phone-status-bar>
+          <div class="approval-page-heading">
+            <button type="button" data-approval-back aria-label="Back to pending approvals"></button>
+            <h1 id="workplaceApprovalDetailsTitle" tabindex="-1">Guest Visit Request Approval</h1>
+          </div>
+        </header>
         <div class="payroll-approval-details-body">
           <section id="approvalPanel-general" class="claim-detail-section" aria-label="General"></section>
           <section id="approvalPanel-guest" class="claim-detail-section" aria-label="Guest"></section>
@@ -79,14 +87,20 @@
         </div>
         <footer id="workplaceApprovalDetailActions" class="payroll-approval-details-footer pending-action-grid"></footer>
       </form>
-    </div>
-    <div id="workplaceApprovalWorkflow" class="payroll-approval-overlay" hidden>
-      <section class="payroll-approval-panel payroll-approval-workflow" role="dialog" aria-modal="true" aria-labelledby="workplaceApprovalWorkflowTitle">
-        <header class="payroll-approval-workflow-header"><div class="payroll-approval-handle" aria-hidden="true"></div><div class="payroll-approval-workflow-heading"><i class="fa-solid fa-diagram-project payroll-approval-workflow-icon" aria-hidden="true"></i><div><h2 id="workplaceApprovalWorkflowTitle">Approval Workflow</h2><p>Approval status &amp; history</p></div><button type="button" class="payroll-approval-close" data-close-workplace-approval aria-label="Close workflow"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button></div></header>
+    </main>
+    <main id="workplaceApprovalWorkflow" class="approval-record-page" data-approval-view="workflow" aria-labelledby="workplaceApprovalWorkflowTitle" hidden>
+      <section class="approval-record-layout">
+        <header class="approval-page-header">
+          <phone-status-bar time="9:41"></phone-status-bar>
+          <div class="approval-page-heading">
+            <button type="button" data-approval-back aria-label="Back to pending approvals"></button>
+            <h1 id="workplaceApprovalWorkflowTitle" tabindex="-1">Approval Workflow</h1>
+          </div>
+        </header>
         <div id="workplaceApprovalWorkflowBody" class="payroll-approval-workflow-body"></div>
-        <footer class="payroll-approval-workflow-footer"><button type="button" class="action-btn-cancel" data-close-workplace-approval>Close Workflow</button></footer>
+        <footer class="payroll-approval-workflow-footer"><button type="button" class="action-btn-cancel" data-approval-back>Close Workflow</button></footer>
       </section>
-    </div>
+    </main>
   </div>
 </body>
 </html>

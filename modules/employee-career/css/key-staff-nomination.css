@@ -2,11 +2,6 @@
 .nomination-required { color: var(--red, #ef4444); }
 .nomination-employee-id { display: block; margin-top: 5px; margin-bottom: 4px; color: var(--text-muted); opacity: .8; font: 700 11.5px monospace, sans-serif; }
 .nomination-draft-status { margin: 0 0 12px; color: var(--text-muted); font-size: 12px; line-height: 1.5; }
-.key-staff-nomination-page .nomination-save-draft { min-height: 44px; padding: 12px 18px; border: 1px solid var(--purple-border); border-radius: 24px; background: var(--purple-subtle); color: var(--purple-text); font-size: 13px; font-weight: 800; white-space: nowrap; }
-[data-theme="dark"] .key-staff-nomination-page .nomination-save-draft {
-  background: #111024;
-  border-color: #29263d;
-  color: #f8fafc;
-  box-shadow: 0 5px 16px rgba(3, 2, 12, .22);
-}
+.key-staff-nomination-page .employee-career-form-actions { gap: 8px; }
+.key-staff-nomination-page .employee-career-form-actions > :is(.form-cancel-btn, .employee-career-button) { padding-inline: 2%; }
 .key-staff-nomination-page .employee-career-control[aria-invalid="true"] { border-color: var(--red, #ef4444); }

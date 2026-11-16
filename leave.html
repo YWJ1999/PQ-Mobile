@@ -6,6 +6,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>PeopleHCM - Leave Apply</title>
+  <link rel="stylesheet" href="css/pending-approval-page.css">
+  <script src="js/pending-approval-page.js"></script>
   <script src="js/components.js"></script>
   <script src="js/app.js" defer></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -3681,7 +3683,7 @@
         </div>
 
         <!-- STICKY / BOTTOM ACTION FOOTER (Matching Screenshot 2 Draft & Submit Buttons) -->
-        <div style="display: flex; align-items: center; justify-content: flex-end; gap: 12px; margin-top: 10px;">
+        <div class="form-action-row" style="margin-top: 10px;">
 
           <button type="button" class="form-cancel-btn" data-page-form-cancel
             onclick="showLeaveSection('viewApplyLeave')">
@@ -3690,18 +3692,14 @@
           </button>
 
           <!-- Draft Button -->
-          <button type="button"
-            onclick="if(typeof showToast==='function') showToast('💾 Leave application saved to drafts!');"
-            style="padding: 12px 20px; border-radius: 20px; background: var(--bg-card); border: 1px solid var(--border-subtle); color: var(--text-primary); font-size: 13.5px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 8px; box-shadow: var(--shadow-sm); transition: transform 0.2s;"
-            onmousedown="this.style.transform='scale(0.95)'" onmouseup="this.style.transform='scale(1)'">
+          <button type="button" class="form-primary-btn"
+            onclick="if(typeof showToast==='function') showToast('💾 Leave application saved to drafts!');">
             <i class="fa-solid fa-floppy-disk"></i>
             Draft
           </button>
 
           <!-- Submit Button -->
-          <button type="button" onclick="submitLeaveApplicationForm()"
-            style="padding: 12px 32px; border-radius: 24px; background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%); color: #ffffff; font-size: 14px; font-weight: 800; border: none; cursor: pointer; box-shadow: 0 4px 16px rgba(124, 58, 237, 0.4); display: flex; align-items: center; gap: 8px; transition: transform 0.2s;"
-            onmousedown="this.style.transform='scale(0.95)'" onmouseup="this.style.transform='scale(1)'">
+          <button type="button" class="form-primary-btn" onclick="submitLeaveApplicationForm()">
             <span>Submit</span>
             <i class="fa-solid fa-paper-plane"></i>
           </button>
@@ -3894,7 +3892,7 @@
         </div>
 
         <!-- STICKY / BOTTOM ACTION FOOTER (Draft & Submit Buttons) -->
-        <div style="display: flex; align-items: center; justify-content: flex-end; gap: 12px; margin-top: 10px;">
+        <div class="form-action-row" style="margin-top: 10px;">
 
           <button type="button" class="form-cancel-btn" data-page-form-cancel
             onclick="showLeaveSection('viewLeaveHub')">
@@ -3903,19 +3901,15 @@
           </button>
 
           <!-- Draft Button -->
-          <button type="button"
-            onclick="if(typeof showToast==='function') showToast('💾 Credit Leave saved to drafts!');"
-            style="padding: 12px 20px; border-radius: 20px; background: var(--bg-card); border: 1px solid var(--border-subtle); color: var(--text-primary); font-size: 13.5px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 8px; box-shadow: var(--shadow-sm); transition: transform 0.2s;"
-            onmousedown="this.style.transform='scale(0.95)'" onmouseup="this.style.transform='scale(1)'">
+          <button type="button" class="form-primary-btn"
+            onclick="if(typeof showToast==='function') showToast('💾 Credit Leave saved to drafts!');">
             <i class="fa-solid fa-floppy-disk"></i>
             Draft
           </button>
 
           <!-- Submit Button -->
-          <button type="button"
-            onclick="if(typeof showToast==='function') showToast('✅ Credit Leave Submitted!'); showLeaveSection('viewMyLeaveHistory');"
-            style="padding: 12px 32px; border-radius: 24px; background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%); color: #ffffff; font-size: 14px; font-weight: 800; border: none; cursor: pointer; box-shadow: 0 4px 16px rgba(124, 58, 237, 0.4); display: flex; align-items: center; gap: 8px; transition: transform 0.2s;"
-            onmousedown="this.style.transform='scale(0.95)'" onmouseup="this.style.transform='scale(1)'">
+          <button type="button" class="form-primary-btn"
+            onclick="if(typeof showToast==='function') showToast('✅ Credit Leave Submitted!'); showLeaveSection('viewMyLeaveHistory');">
             <span>Submit</span>
             <i class="fa-solid fa-paper-plane"></i>
           </button>
@@ -4491,16 +4485,14 @@
         </div>
 
         <!-- STICKY / BOTTOM ACTION FOOTER (Matching Leave Layout) -->
-        <div style="display: flex; align-items: center; justify-content: flex-end; gap: 12px; margin-top: 10px;">
+        <div class="form-action-row" style="justify-content: flex-end; margin-top: 10px;">
           <button type="button" class="form-cancel-btn" data-page-form-cancel
             onclick="showLeaveSection('viewLeaveHub')">
             <i class="fa-solid fa-xmark"></i>
             <span>Cancel</span>
           </button>
           <!-- Submit Button -->
-          <button type="button" onclick="if(typeof showToast==='function') showToast('✅ Time Off Submitted!'); showLeaveSection('viewMyLeaveHistory');"
-            style="padding: 12px 32px; border-radius: 24px; background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%); color: #ffffff; font-size: 14px; font-weight: 800; border: none; cursor: pointer; box-shadow: 0 4px 16px rgba(124, 58, 237, 0.4); display: flex; align-items: center; gap: 8px; transition: transform 0.2s;"
-            onmousedown="this.style.transform='scale(0.95)'" onmouseup="this.style.transform='scale(1)'">
+          <button type="button" class="form-primary-btn" onclick="if(typeof showToast==='function') showToast('✅ Time Off Submitted!'); showLeaveSection('viewMyLeaveHistory');">
             Submit
             <i class="fa-solid fa-paper-plane"></i>
           </button>
@@ -5492,7 +5484,7 @@
         <div id="teamApprovalsListContainer" style="display: flex; flex-direction: column; gap: 16px;">
 
           <!-- CARD 1: Afifah Nasir -->
-          <div class="approval-request-card" id="approvalCard1" data-category="leave" data-name="Afifah Nasir" data-empno="004177" data-type="Annual Leave" data-submit-date="23 Feb 2026" data-start="2026-02-23" data-end="2026-02-25" data-days="3" style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 20px; overflow: hidden; box-shadow: var(--shadow-card); transition: all 0.2s ease;">
+          <div class="approval-request-card" id="approvalCard1" data-category="leave" data-name="Afifah Nasir" data-empno="004177" data-type="Annual Leave" data-submit-date="23 Feb 2026" data-start="2026-02-23" data-end="2026-02-25" data-days="3" style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 20px; overflow: hidden; box-shadow: var(--shadow-card); transition: all 0.2s ease;" data-approval-id="VLV000000000790" data-request="{&quot;applicant&quot;:&quot;Afifah Nasir&quot;,&quot;type&quot;:&quot;Annual Leave&quot;,&quot;dates&quot;:&quot;23 Feb 2026 - 25 Feb 2026&quot;,&quot;duration&quot;:&quot;3 Days&quot;,&quot;reason&quot;:&quot;Personnel Issues&quot;,&quot;docRef&quot;:&quot;VLV000000000790&quot;,&quot;docStatus&quot;:&quot;Pending Approval&quot;,&quot;employee&quot;:&quot;Afifah Nasir • Emp #004177&quot;,&quot;branch&quot;:&quot;TIMES SQUARE BRANCH&quot;,&quot;department&quot;:&quot;Quality Assurance&quot;,&quot;leaveYear&quot;:&quot;2026&quot;,&quot;cutoffPeriod&quot;:&quot;01/01/2026 – 31/12/2026&quot;,&quot;submitter&quot;:&quot;Afifah Nasir&quot;,&quot;submitDate&quot;:&quot;23 Feb 2026&quot;,&quot;fromDate&quot;:&quot;23 Feb 2026&quot;,&quot;toDate&quot;:&quot;25 Feb 2026&quot;,&quot;leaveDays&quot;:&quot;3.000&quot;,&quot;mcChitNo&quot;:&quot;&quot;,&quot;reliever&quot;:&quot;Benjamin Lee (On Behalf)&quot;,&quot;remark&quot;:&quot;Urgent personnel emergency leave for home repair &amp; family assistance.&quot;,&quot;attachment&quot;:&quot;supporting_emergency_docs.pdf&quot;,&quot;advanceLeave&quot;:&quot;No&quot;,&quot;shortNotice&quot;:&quot;Yes&quot;}">
             
             <!-- Record header -->
             <div class="approval-record-header" style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
@@ -5514,7 +5506,7 @@
               <div style="display: flex; align-items: center; gap: 8px;">
                 <!-- Sleek Mini 3-Dots Button -->
                 <div class="approval-status-badge is-pending" data-approval-status="pending"><i class="fa-solid fa-hourglass-half" aria-hidden="true"></i><span>Pending Approval</span></div>
-                <button type="button" onclick="openApprovalThreeDotsMenu('Afifah Nasir', 'Annual Leave', '23 Feb 2026 - 25 Feb 2026', '3 Days', 'Personnel Issues', { docRef: 'VLV000000000790', docStatus: 'Pending Approval', employee: 'Afifah Nasir • Emp #004177', branch: 'TIMES SQUARE BRANCH', department: 'Quality Assurance', leaveYear: '2026', cutoffPeriod: '01/01/2026 – 31/12/2026', submitter: 'Afifah Nasir', submitDate: '23 Feb 2026', fromDate: '23 Feb 2026', toDate: '25 Feb 2026', duration: '3 Days', leaveDays: '3.000', mcChitNo: '', reliever: 'Benjamin Lee (On Behalf)', remark: 'Urgent personnel emergency leave for home repair & family assistance.', attachment: 'supporting_emergency_docs.pdf', advanceLeave: 'No', shortNotice: 'Yes' })" title="Options" style="width: 26px; height: 26px; border-radius: 50%; background: rgba(255, 255, 255, 0.2); border: 1px solid rgba(255, 255, 255, 0.35); color: #ffffff; display: flex; align-items: center; justify-content: center; cursor: pointer; backdrop-filter: blur(4px);">
+                <button type="button" onclick="openLeaveApprovalOptions(this)" title="Options" style="width: 26px; height: 26px; border-radius: 50%; background: rgba(255, 255, 255, 0.2); border: 1px solid rgba(255, 255, 255, 0.35); color: #ffffff; display: flex; align-items: center; justify-content: center; cursor: pointer; backdrop-filter: blur(4px);">
                   <i class="fa-solid fa-ellipsis-vertical" style="font-size: 13px;"></i>
                 </button>
                 
@@ -5523,14 +5515,14 @@
 
             <!-- 2. Card Content Body -->
             <div class="approval-card-body">
-              <dl class="approval-card-details">
+              <a class="approval-record-link" href="#approval/details/VLV000000000790"><dl class="approval-card-details">
                 <div><dt>Type</dt> <dd>Annual Leave (Unplanned)</dd></div>
                 <div><dt>Reason</dt> <dd>Personnel Issues</dd></div>
                 <div><dt>Date Start</dt> <dd><time datetime="2026-02-23">Tue, 23/02/2026</time></dd></div>
                 <div><dt>Date End</dt> <dd><time datetime="2026-02-25">Thu, 25/02/2026</time></dd></div>
                 <div><dt>Duration</dt> <dd>3 Days</dd></div>
                 <div><dt>Remark</dt> <dd>Urgent personnel emergency leave for home repair &amp; family assistance.</dd></div>
-              </dl>
+              </dl></a>
               <div class="pending-action-grid">
                 <button type="button" class="action-btn-resubmit" onclick="singleResubmitCard('approvalCard1', 'Afifah Nasir')">
                   <i class="fa-solid fa-rotate-left" style="font-size: 11px;"></i> Resubmit
@@ -5548,7 +5540,7 @@
 
 
           <!-- CARD 2: Hailizam bin Mohamed -->
-          <div class="approval-request-card" id="approvalCard2" data-category="leave" data-name="Hailizam bin Mohamed" data-empno="007216" data-type="Medical Leave" data-submit-date="12 Sep 2026" data-start="2026-09-12" data-end="2026-09-12" data-days="1" style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 20px; overflow: hidden; box-shadow: var(--shadow-card); transition: all 0.2s ease;">
+          <div class="approval-request-card" id="approvalCard2" data-category="leave" data-name="Hailizam bin Mohamed" data-empno="007216" data-type="Medical Leave" data-submit-date="12 Sep 2026" data-start="2026-09-12" data-end="2026-09-12" data-days="1" style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 20px; overflow: hidden; box-shadow: var(--shadow-card); transition: all 0.2s ease;" data-approval-id="VLV000000000791" data-request="{&quot;applicant&quot;:&quot;Hailizam bin Mohamed&quot;,&quot;type&quot;:&quot;Medical Leave&quot;,&quot;dates&quot;:&quot;12 Sep 2026&quot;,&quot;duration&quot;:&quot;1 Day&quot;,&quot;reason&quot;:&quot;Medical Checkup (MC Attached)&quot;,&quot;docRef&quot;:&quot;VLV000000000791&quot;,&quot;docStatus&quot;:&quot;Pending Approval&quot;,&quot;employee&quot;:&quot;Hailizam bin Mohamed • Emp #007216&quot;,&quot;branch&quot;:&quot;TIMES SQUARE BRANCH&quot;,&quot;department&quot;:&quot;Operations&quot;,&quot;leaveYear&quot;:&quot;2026&quot;,&quot;cutoffPeriod&quot;:&quot;01/01/2026 – 31/12/2026&quot;,&quot;submitter&quot;:&quot;Hailizam bin Mohamed&quot;,&quot;submitDate&quot;:&quot;12 Sep 2026&quot;,&quot;fromDate&quot;:&quot;12 Sep 2026&quot;,&quot;toDate&quot;:&quot;12 Sep 2026&quot;,&quot;leaveDays&quot;:&quot;1.000&quot;,&quot;mcChitNo&quot;:&quot;MC-12312123&quot;,&quot;reliever&quot;:&quot;Sarah Jenkins&quot;,&quot;remark&quot;:&quot;Medical Checkup (MC Attached)&quot;,&quot;attachment&quot;:&quot;clinic_mc_slip.jpg&quot;,&quot;advanceLeave&quot;:&quot;No&quot;,&quot;shortNotice&quot;:&quot;No&quot;}">
             
             <!-- Record header -->
             <div class="approval-record-header" style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
@@ -5569,7 +5561,7 @@
               <!-- Right: Sleek Mini 3-Dots Button & Pending Pill Tag -->
               <div style="display: flex; align-items: center; gap: 8px;">
                 <div class="approval-status-badge is-pending" data-approval-status="pending"><i class="fa-solid fa-hourglass-half" aria-hidden="true"></i><span>Pending Approval</span></div>
-                <button type="button" onclick="openApprovalThreeDotsMenu('Hailizam bin Mohamed', 'Medical Leave', '12 Sep 2026', '1 Day', 'Medical Checkup (MC Attached)', { docRef: 'VLV000000000791', docStatus: 'Pending Approval', employee: 'Hailizam bin Mohamed • Emp #007216', branch: 'TIMES SQUARE BRANCH', department: 'Operations', leaveYear: '2026', cutoffPeriod: '01/01/2026 – 31/12/2026', submitter: 'Hailizam bin Mohamed', submitDate: '12 Sep 2026', fromDate: '12 Sep 2026', toDate: '12 Sep 2026', duration: '1 Day', leaveDays: '1.000', mcChitNo: 'MC-12312123', reliever: 'Sarah Jenkins', remark: 'Medical Checkup (MC Attached)', attachment: 'clinic_mc_slip.jpg', advanceLeave: 'No', shortNotice: 'No' })" title="Options" style="width: 26px; height: 26px; border-radius: 50%; background: rgba(255, 255, 255, 0.2); border: 1px solid rgba(255, 255, 255, 0.35); color: #ffffff; display: flex; align-items: center; justify-content: center; cursor: pointer; backdrop-filter: blur(4px);">
+                <button type="button" onclick="openLeaveApprovalOptions(this)" title="Options" style="width: 26px; height: 26px; border-radius: 50%; background: rgba(255, 255, 255, 0.2); border: 1px solid rgba(255, 255, 255, 0.35); color: #ffffff; display: flex; align-items: center; justify-content: center; cursor: pointer; backdrop-filter: blur(4px);">
                   <i class="fa-solid fa-ellipsis-vertical" style="font-size: 13px;"></i>
                 </button>
                 
@@ -5578,14 +5570,14 @@
 
             <!-- 2. Card Content Body -->
             <div class="approval-card-body">
-              <dl class="approval-card-details">
+              <a class="approval-record-link" href="#approval/details/VLV000000000791"><dl class="approval-card-details">
                 <div><dt>Type</dt> <dd>Medical Leave (MC Verified)</dd></div>
                 <div><dt>Reason</dt> <dd>Medical Checkup</dd></div>
                 <div><dt>Date Start</dt> <dd><time datetime="2026-09-12">Sat, 12/09/2026</time></dd></div>
                 <div><dt>Date End</dt> <dd><time datetime="2026-09-12">Sat, 12/09/2026</time></dd></div>
                 <div><dt>Duration</dt> <dd>1 Day</dd></div>
                 <div><dt>Remark</dt> <dd>Routine hospital specialist appointment &amp; panel clinic receipt attached.</dd></div>
-              </dl>
+              </dl></a>
               <div class="pending-action-grid">
                 <button type="button" class="action-btn-resubmit" onclick="singleResubmitCard('approvalCard2', 'Hailizam')">
                   <i class="fa-solid fa-rotate-left" style="font-size: 11px;"></i> Resubmit
@@ -5602,7 +5594,7 @@
           </div>
 
           <!-- CARD 3: Nurfarhana binti Mohamad Yusoff -->
-          <div class="approval-request-card" id="approvalCard3" data-category="leave" data-name="Nurfarhana binti Mohamad Yusoff" data-empno="008004" data-type="Annual Leave" data-submit-date="10 Sep 2026" data-start="2026-09-15" data-end="2026-09-16" data-days="2" style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 20px; overflow: hidden; box-shadow: var(--shadow-card); transition: all 0.2s ease;">
+          <div class="approval-request-card" id="approvalCard3" data-category="leave" data-name="Nurfarhana binti Mohamad Yusoff" data-empno="008004" data-type="Annual Leave" data-submit-date="10 Sep 2026" data-start="2026-09-15" data-end="2026-09-16" data-days="2" style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 20px; overflow: hidden; box-shadow: var(--shadow-card); transition: all 0.2s ease;" data-approval-id="VLV000000000792" data-request="{&quot;applicant&quot;:&quot;Nurfarhana binti Mohamad&quot;,&quot;type&quot;:&quot;Annual Leave&quot;,&quot;dates&quot;:&quot;15 Sep 2026 - 16 Sep 2026&quot;,&quot;duration&quot;:&quot;2 Days&quot;,&quot;reason&quot;:&quot;Family Vacation&quot;,&quot;docRef&quot;:&quot;VLV000000000792&quot;,&quot;docStatus&quot;:&quot;Resubmitted&quot;,&quot;employee&quot;:&quot;Nurfarhana binti Mohamad • Emp #008004&quot;,&quot;branch&quot;:&quot;SUNWAY BRANCH&quot;,&quot;department&quot;:&quot;FINANCE &amp; BANKING&quot;,&quot;leaveYear&quot;:&quot;2026&quot;,&quot;cutoffPeriod&quot;:&quot;01/01/2026 – 31/12/2026&quot;,&quot;submitter&quot;:&quot;Nurfarhana binti Mohamad&quot;,&quot;submitDate&quot;:&quot;10 Sep 2026&quot;,&quot;fromDate&quot;:&quot;15 Sep 2026&quot;,&quot;toDate&quot;:&quot;16 Sep 2026&quot;,&quot;leaveDays&quot;:&quot;2.000&quot;,&quot;mcChitNo&quot;:&quot;&quot;,&quot;reliever&quot;:&quot;Ahmad Rafy&quot;,&quot;remark&quot;:&quot;Scheduled family vacation trip to Penang.&quot;,&quot;attachment&quot;:&quot;flight_itinerary.pdf&quot;,&quot;advanceLeave&quot;:&quot;No&quot;,&quot;shortNotice&quot;:&quot;No&quot;}">
             
             <div class="approval-record-header" style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
               <div style="display: flex; align-items: center; gap: 12px;">
@@ -5618,7 +5610,7 @@
 
               <div style="display: flex; align-items: center; gap: 8px;">
                 <div class="approval-status-badge is-resubmitted" data-approval-status="resubmitted"><i class="fa-solid fa-rotate-left" aria-hidden="true"></i><span>Resubmitted</span></div>
-                <button type="button" onclick="openApprovalThreeDotsMenu('Nurfarhana binti Mohamad', 'Annual Leave', '15 Sep 2026 - 16 Sep 2026', '2 Days', 'Family Vacation', { docRef: 'VLV000000000792', docStatus: 'Resubmitted', employee: 'Nurfarhana binti Mohamad • Emp #008004', branch: 'SUNWAY BRANCH', department: 'FINANCE & BANKING', leaveYear: '2026', cutoffPeriod: '01/01/2026 – 31/12/2026', submitter: 'Nurfarhana binti Mohamad', submitDate: '10 Sep 2026', fromDate: '15 Sep 2026', toDate: '16 Sep 2026', duration: '2 Days', leaveDays: '2.000', mcChitNo: '', reliever: 'Ahmad Rafy', remark: 'Scheduled family vacation trip to Penang.', attachment: 'flight_itinerary.pdf', advanceLeave: 'No', shortNotice: 'No' })" title="Options" style="width: 26px; height: 26px; border-radius: 50%; background: rgba(255, 255, 255, 0.2); border: 1px solid rgba(255, 255, 255, 0.35); color: #ffffff; display: flex; align-items: center; justify-content: center; cursor: pointer; backdrop-filter: blur(4px);">
+                <button type="button" onclick="openLeaveApprovalOptions(this)" title="Options" style="width: 26px; height: 26px; border-radius: 50%; background: rgba(255, 255, 255, 0.2); border: 1px solid rgba(255, 255, 255, 0.35); color: #ffffff; display: flex; align-items: center; justify-content: center; cursor: pointer; backdrop-filter: blur(4px);">
                   <i class="fa-solid fa-ellipsis-vertical" style="font-size: 13px;"></i>
                 </button>
                 
@@ -5626,14 +5618,14 @@
             </div>
 
             <div class="approval-card-body">
-              <dl class="approval-card-details">
+              <a class="approval-record-link" href="#approval/details/VLV000000000792"><dl class="approval-card-details">
                 <div><dt>Type</dt> <dd>Annual Leave (Planned)</dd></div>
                 <div><dt>Reason</dt> <dd>Family Vacation</dd></div>
                 <div><dt>Date Start</dt> <dd><time datetime="2026-09-15">Tue, 15/09/2026</time></dd></div>
                 <div><dt>Date End</dt> <dd><time datetime="2026-09-16">Wed, 16/09/2026</time></dd></div>
                 <div><dt>Duration</dt> <dd>2 Days</dd></div>
                 <div><dt>Remark</dt> <dd>Scheduled family vacation trip to Penang with flight tickets attached.</dd></div>
-              </dl>
+              </dl></a>
               <div class="pending-action-grid">
                 <button type="button" class="action-btn-resubmit" onclick="singleResubmitCard('approvalCard3', 'Nurfarhana')">
                   <i class="fa-solid fa-rotate-left" style="font-size: 11px;"></i> Resubmit
@@ -5649,7 +5641,7 @@
           </div>
 
           <!-- CARD 4: Alex Tan Chin Hock -->
-          <div class="approval-request-card" id="approvalCard4" data-category="leave" data-name="Alex Tan Chin Hock" data-empno="009102" data-type="Emergency Leave" data-submit-date="29 Sep 2026" data-start="2026-09-29" data-end="2026-09-29" data-days="1" style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 20px; overflow: hidden; box-shadow: var(--shadow-card); transition: all 0.2s ease;">
+          <div class="approval-request-card" id="approvalCard4" data-category="leave" data-name="Alex Tan Chin Hock" data-empno="009102" data-type="Emergency Leave" data-submit-date="29 Sep 2026" data-start="2026-09-29" data-end="2026-09-29" data-days="1" style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 20px; overflow: hidden; box-shadow: var(--shadow-card); transition: all 0.2s ease;" data-approval-id="VLV000000000793" data-request="{&quot;applicant&quot;:&quot;Alex Tan Chin Hock&quot;,&quot;type&quot;:&quot;Emergency Leave&quot;,&quot;dates&quot;:&quot;29 Sep 2026&quot;,&quot;duration&quot;:&quot;1 Day&quot;,&quot;reason&quot;:&quot;Urgent Home Repair&quot;,&quot;docRef&quot;:&quot;VLV000000000793&quot;,&quot;docStatus&quot;:&quot;Pending Approval&quot;,&quot;employee&quot;:&quot;Alex Tan Chin Hock • Emp #009102&quot;,&quot;branch&quot;:&quot;TIMES SQUARE BRANCH&quot;,&quot;department&quot;:&quot;TECH &amp; IT&quot;,&quot;leaveYear&quot;:&quot;2026&quot;,&quot;cutoffPeriod&quot;:&quot;01/01/2026 – 31/12/2026&quot;,&quot;submitter&quot;:&quot;Alex Tan Chin Hock&quot;,&quot;submitDate&quot;:&quot;29 Sep 2026&quot;,&quot;fromDate&quot;:&quot;29 Sep 2026&quot;,&quot;toDate&quot;:&quot;29 Sep 2026&quot;,&quot;leaveDays&quot;:&quot;1.000&quot;,&quot;mcChitNo&quot;:&quot;&quot;,&quot;reliever&quot;:&quot;None Assigned&quot;,&quot;remark&quot;:&quot;Sudden water pipe burst at apartment requiring urgent repair.&quot;,&quot;attachment&quot;:&quot;repair_invoice.pdf&quot;,&quot;advanceLeave&quot;:&quot;No&quot;,&quot;shortNotice&quot;:&quot;Yes&quot;}">
             
             <div class="approval-record-header" style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
               <div style="display: flex; align-items: center; gap: 12px;">
@@ -5665,7 +5657,7 @@
 
               <div style="display: flex; align-items: center; gap: 8px;">
                 <div class="approval-status-badge is-pending" data-approval-status="pending"><i class="fa-solid fa-hourglass-half" aria-hidden="true"></i><span>Pending Approval</span></div>
-                <button type="button" onclick="openApprovalThreeDotsMenu('Alex Tan Chin Hock', 'Emergency Leave', '29 Sep 2026', '1 Day', 'Urgent Home Repair', { docRef: 'VLV000000000793', docStatus: 'Pending Approval', employee: 'Alex Tan Chin Hock • Emp #009102', branch: 'TIMES SQUARE BRANCH', department: 'TECH & IT', leaveYear: '2026', cutoffPeriod: '01/01/2026 – 31/12/2026', submitter: 'Alex Tan Chin Hock', submitDate: '29 Sep 2026', fromDate: '29 Sep 2026', toDate: '29 Sep 2026', duration: '1 Day', leaveDays: '1.000', mcChitNo: '', reliever: 'None Assigned', remark: 'Sudden water pipe burst at apartment requiring urgent repair.', attachment: 'repair_invoice.pdf', advanceLeave: 'No', shortNotice: 'Yes' })" title="Options" style="width: 26px; height: 26px; border-radius: 50%; background: rgba(255, 255, 255, 0.2); border: 1px solid rgba(255, 255, 255, 0.35); color: #ffffff; display: flex; align-items: center; justify-content: center; cursor: pointer; backdrop-filter: blur(4px);">
+                <button type="button" onclick="openLeaveApprovalOptions(this)" title="Options" style="width: 26px; height: 26px; border-radius: 50%; background: rgba(255, 255, 255, 0.2); border: 1px solid rgba(255, 255, 255, 0.35); color: #ffffff; display: flex; align-items: center; justify-content: center; cursor: pointer; backdrop-filter: blur(4px);">
                   <i class="fa-solid fa-ellipsis-vertical" style="font-size: 13px;"></i>
                 </button>
                 
@@ -5673,14 +5665,14 @@
             </div>
 
             <div class="approval-card-body">
-              <dl class="approval-card-details">
+              <a class="approval-record-link" href="#approval/details/VLV000000000793"><dl class="approval-card-details">
                 <div><dt>Type</dt> <dd>Emergency Leave (Urgent)</dd></div>
                 <div><dt>Reason</dt> <dd>Urgent Home Repair</dd></div>
                 <div><dt>Date Start</dt> <dd><time datetime="2026-09-29">Tue, 29/09/2026</time></dd></div>
                 <div><dt>Date End</dt> <dd><time datetime="2026-09-29">Tue, 29/09/2026</time></dd></div>
                 <div><dt>Duration</dt> <dd>1 Day</dd></div>
                 <div><dt>Remark</dt> <dd>Sudden water pipe burst at apartment requiring urgent repair.</dd></div>
-              </dl>
+              </dl></a>
               <div class="pending-action-grid">
                 <button type="button" class="action-btn-resubmit" onclick="singleResubmitCard('approvalCard4', 'Alex Tan')">
                   <i class="fa-solid fa-rotate-left" style="font-size: 11px;"></i> Resubmit
@@ -5699,7 +5691,7 @@
                LEAVE CREDIT CARDS (data-category="credit")
                ========================================== -->
           <!-- CARD CREDIT 1: Farhan binti rahmat -->
-          <div class="approval-request-card" id="approvalCardCredit1" data-category="credit" data-name="Farhan binti rahmat" data-empno="EBB12" data-type="Working on Public Holiday" data-submit-date="12 Jul 2024" data-start="2024-07-03" data-end="2024-07-03" data-days="1" style="display: none; background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 20px; overflow: hidden; box-shadow: var(--shadow-card); transition: all 0.2s ease;">
+          <div class="approval-request-card" id="approvalCardCredit1" data-category="credit" data-name="Farhan binti rahmat" data-empno="EBB12" data-type="Working on Public Holiday" data-submit-date="12 Jul 2024" data-start="2024-07-03" data-end="2024-07-03" data-days="1" style="display: none; background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 20px; overflow: hidden; box-shadow: var(--shadow-card); transition: all 0.2s ease;" data-approval-id="LVR000000000589" data-request="{&quot;applicant&quot;:&quot;Farhan binti rahmat&quot;,&quot;type&quot;:&quot;REPLACEMENT LEAVE&quot;,&quot;dates&quot;:&quot;3 Jul 2024&quot;,&quot;duration&quot;:&quot;1.000 Day&quot;,&quot;reason&quot;:&quot;OTHERS&quot;,&quot;isCredit&quot;:true,&quot;docRef&quot;:&quot;LVR000000000589&quot;,&quot;docStatus&quot;:&quot;Pending Approval&quot;,&quot;employee&quot;:&quot;EBB12 - Farhan binti rahmat&quot;,&quot;creditLeave&quot;:&quot;REPLACEMENT LEAVE&quot;,&quot;offsetLeave&quot;:&quot;&quot;,&quot;creditType&quot;:&quot;Working on Public Holiday&quot;,&quot;submitter&quot;:&quot;EBB12 - Farhan binti rahmat&quot;,&quot;submitDate&quot;:&quot;12 Jul 2024&quot;,&quot;fromDate&quot;:&quot;3 Jul 2024&quot;,&quot;toDate&quot;:&quot;3 Jul 2024&quot;,&quot;creditDays&quot;:&quot;1.000&quot;,&quot;effectiveDate&quot;:&quot;4 Jul 2024&quot;,&quot;remark&quot;:&quot;Worked Overtime for adhoc request&quot;,&quot;attachment&quot;:&quot;5fae9b25c05f463990e88cb6dc4c96b0.jpg&quot;}">
             
             <div class="approval-record-header" style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
               <div style="display: flex; align-items: center; gap: 12px;">
@@ -5715,7 +5707,7 @@
 
               <div style="display: flex; align-items: center; gap: 8px;">
                 <div class="approval-status-badge is-pending" data-approval-status="pending"><i class="fa-solid fa-hourglass-half" aria-hidden="true"></i><span>Pending Approval</span></div>
-                <button type="button" onclick="openApprovalThreeDotsMenu('Farhan binti rahmat', 'REPLACEMENT LEAVE', '3 Jul 2024', '1.000 Day', 'OTHERS', { isCredit: true, docRef: 'LVR000000000589', docStatus: 'Pending Approval', employee: 'EBB12 - Farhan binti rahmat', creditLeave: 'REPLACEMENT LEAVE', offsetLeave: '', creditType: 'Working on Public Holiday', submitter: 'EBB12 - Farhan binti rahmat', submitDate: '12 Jul 2024', fromDate: '3 Jul 2024', toDate: '3 Jul 2024', creditDays: '1.000', effectiveDate: '4 Jul 2024', reason: 'OTHERS', remark: 'Worked Overtime for adhoc request', attachment: '5fae9b25c05f463990e88cb6dc4c96b0.jpg' })" title="Options" style="width: 26px; height: 26px; border-radius: 50%; background: rgba(255, 255, 255, 0.2); border: 1px solid rgba(255, 255, 255, 0.35); color: #ffffff; display: flex; align-items: center; justify-content: center; cursor: pointer; backdrop-filter: blur(4px);">
+                <button type="button" onclick="openLeaveApprovalOptions(this)" title="Options" style="width: 26px; height: 26px; border-radius: 50%; background: rgba(255, 255, 255, 0.2); border: 1px solid rgba(255, 255, 255, 0.35); color: #ffffff; display: flex; align-items: center; justify-content: center; cursor: pointer; backdrop-filter: blur(4px);">
                   <i class="fa-solid fa-ellipsis-vertical" style="font-size: 13px;"></i>
                 </button>
                 
@@ -5723,7 +5715,7 @@
             </div>
 
             <div class="approval-card-body">
-              <dl class="approval-card-details">
+              <a class="approval-record-link" href="#approval/details/LVR000000000589"><dl class="approval-card-details">
                 <div><dt>Credit Type</dt> <dd>Working on Public Holiday</dd></div>
                 <div data-credit-leave-summary><dt data-credit-leave-label>Credit Leave</dt> <dd data-credit-leave-value>Replacement Leave</dd></div>
                 <div><dt>Reason</dt> <dd>OTHERS</dd></div>
@@ -5731,7 +5723,7 @@
                 <div><dt>Effective Date</dt> <dd>4 Jul 2024</dd></div>
                 <div><dt>Credit</dt> <dd>+1.000 Day</dd></div>
                 <div><dt>Remark</dt> <dd>Worked Overtime for adhoc request</dd></div>
-              </dl>
+              </dl></a>
               <div class="pending-action-grid">
                 <button type="button" class="action-btn-resubmit" onclick="singleResubmitCard('approvalCardCredit1', 'Farhan binti rahmat')">
                   <i class="fa-solid fa-rotate-left" style="font-size: 11px;"></i> Resubmit
@@ -5747,7 +5739,7 @@
           </div>
 
           <!-- CARD CREDIT 2: Priya Raman -->
-          <div class="approval-request-card" id="approvalCardCredit2" data-category="credit" data-name="Priya Raman" data-empno="003890" data-type="Holiday Standby Credit" data-submit-date="01 May 2026" data-start="2026-05-01" data-end="2026-05-01" data-days="1" style="display: none; background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 20px; overflow: hidden; box-shadow: var(--shadow-card); transition: all 0.2s ease;">
+          <div class="approval-request-card" id="approvalCardCredit2" data-category="credit" data-name="Priya Raman" data-empno="003890" data-type="Holiday Standby Credit" data-submit-date="01 May 2026" data-start="2026-05-01" data-end="2026-05-01" data-days="1" style="display: none; background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 20px; overflow: hidden; box-shadow: var(--shadow-card); transition: all 0.2s ease;" data-approval-id="VCR000000000413" data-request="{&quot;applicant&quot;:&quot;Priya Raman&quot;,&quot;type&quot;:&quot;Holiday Standby Credit&quot;,&quot;dates&quot;:&quot;01 May 2026&quot;,&quot;duration&quot;:&quot;+8.0 Hours (+1 Day)&quot;,&quot;reason&quot;:&quot;Holiday Cloud Standby&quot;,&quot;isCredit&quot;:true,&quot;creditLeave&quot;:&quot;REPLACEMENT LEAVE&quot;,&quot;creditType&quot;:&quot;Holiday Standby Credit&quot;,&quot;creditDays&quot;:&quot;1.000&quot;,&quot;effectiveDate&quot;:&quot;31 Dec 2026&quot;,&quot;effectiveDateLabel&quot;:&quot;Credit Expiry&quot;,&quot;docRef&quot;:&quot;VCR000000000413&quot;,&quot;docStatus&quot;:&quot;Resubmitted&quot;,&quot;employee&quot;:&quot;Priya Raman • Emp #003890&quot;,&quot;branch&quot;:&quot;TIMES SQUARE BRANCH&quot;,&quot;department&quot;:&quot;Cloud Infrastructure&quot;,&quot;leaveYear&quot;:&quot;2026&quot;,&quot;cutoffPeriod&quot;:&quot;01/01/2026 – 31/12/2026&quot;,&quot;submitter&quot;:&quot;Priya Raman&quot;,&quot;submitDate&quot;:&quot;01 May 2026&quot;,&quot;fromDate&quot;:&quot;01 May 2026&quot;,&quot;toDate&quot;:&quot;01 May 2026&quot;,&quot;leaveDays&quot;:&quot;1.000&quot;,&quot;mcChitNo&quot;:&quot;&quot;,&quot;reliever&quot;:&quot;None Required&quot;,&quot;remark&quot;:&quot;Labor Day holiday standby and emergency cluster failover monitoring.&quot;,&quot;attachment&quot;:&quot;standby_roster_log.pdf&quot;,&quot;advanceLeave&quot;:&quot;No&quot;,&quot;shortNotice&quot;:&quot;No&quot;}">
             
             <div class="approval-record-header" style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
               <div style="display: flex; align-items: center; gap: 12px;">
@@ -5763,7 +5755,7 @@
 
               <div style="display: flex; align-items: center; gap: 8px;">
                 <div class="approval-status-badge is-resubmitted" data-approval-status="resubmitted"><i class="fa-solid fa-rotate-left" aria-hidden="true"></i><span>Resubmitted</span></div>
-                <button type="button" onclick="openApprovalThreeDotsMenu('Priya Raman', 'Holiday Standby Credit', '01 May 2026', '+8.0 Hours (+1 Day)', 'Holiday Cloud Standby', { isCredit: true, creditLeave: 'REPLACEMENT LEAVE', creditType: 'Holiday Standby Credit', creditDays: '1.000', effectiveDate: '31 Dec 2026', effectiveDateLabel: 'Credit Expiry', docRef: 'VCR000000000413', docStatus: 'Resubmitted', employee: 'Priya Raman • Emp #003890', branch: 'TIMES SQUARE BRANCH', department: 'Cloud Infrastructure', leaveYear: '2026', cutoffPeriod: '01/01/2026 – 31/12/2026', submitter: 'Priya Raman', submitDate: '01 May 2026', fromDate: '01 May 2026', toDate: '01 May 2026', duration: '+8.0 Hours (+1 Day)', leaveDays: '1.000', mcChitNo: '', reliever: 'None Required', remark: 'Labor Day holiday standby and emergency cluster failover monitoring.', attachment: 'standby_roster_log.pdf', advanceLeave: 'No', shortNotice: 'No' })" title="Options" style="width: 26px; height: 26px; border-radius: 50%; background: rgba(255, 255, 255, 0.2); border: 1px solid rgba(255, 255, 255, 0.35); color: #ffffff; display: flex; align-items: center; justify-content: center; cursor: pointer; backdrop-filter: blur(4px);">
+                <button type="button" onclick="openLeaveApprovalOptions(this)" title="Options" style="width: 26px; height: 26px; border-radius: 50%; background: rgba(255, 255, 255, 0.2); border: 1px solid rgba(255, 255, 255, 0.35); color: #ffffff; display: flex; align-items: center; justify-content: center; cursor: pointer; backdrop-filter: blur(4px);">
                   <i class="fa-solid fa-ellipsis-vertical" style="font-size: 13px;"></i>
                 </button>
                 
@@ -5771,7 +5763,7 @@
             </div>
 
             <div class="approval-card-body">
-              <dl class="approval-card-details">
+              <a class="approval-record-link" href="#approval/details/VCR000000000413"><dl class="approval-card-details">
                 <div><dt>Credit Type</dt> <dd>Holiday Standby Credit</dd></div>
                 <div data-credit-leave-summary><dt data-credit-leave-label>Credit Leave</dt> <dd data-credit-leave-value>Replacement Leave</dd></div>
                 <div><dt>Reason</dt> <dd>Holiday Cloud Standby</dd></div>
@@ -5779,7 +5771,7 @@
                 <div><dt>Credit Expiry</dt> <dd>Thu, 31/12/2026</dd></div>
                 <div><dt>Credit</dt> <dd>+8.0 Hours</dd></div>
                 <div><dt>Remark</dt> <dd>Labor Day holiday standby and emergency cluster failover monitoring.</dd></div>
-              </dl>
+              </dl></a>
               <div class="pending-action-grid">
                 <button type="button" class="action-btn-resubmit" onclick="singleResubmitCard('approvalCardCredit2', 'Priya Raman')">
                   <i class="fa-solid fa-rotate-left" style="font-size: 11px;"></i> Resubmit
@@ -5798,7 +5790,7 @@
                OFFTIME CARDS (data-category="offtime")
                ========================================== -->
           <!-- CARD OFFTIME 1: Siti Nurhaliza -->
-          <div class="approval-request-card" id="approvalCardOfftime1" data-category="offtime" data-name="Siti Nurhaliza" data-empno="006734" data-type="Personal Time Off" data-submit-date="23 Sep 2026" data-start="2026-09-23" data-end="2026-09-23" data-days="0.31" style="display: none; background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 20px; overflow: hidden; box-shadow: var(--shadow-card); transition: all 0.2s ease;">
+          <div class="approval-request-card" id="approvalCardOfftime1" data-category="offtime" data-name="Siti Nurhaliza" data-empno="006734" data-type="Personal Time Off" data-submit-date="23 Sep 2026" data-start="2026-09-23" data-end="2026-09-23" data-days="0.31" style="display: none; background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 20px; overflow: hidden; box-shadow: var(--shadow-card); transition: all 0.2s ease;" data-approval-id="VOT000000000281" data-request="{&quot;applicant&quot;:&quot;Siti Nurhaliza&quot;,&quot;type&quot;:&quot;Personal Time Off&quot;,&quot;dates&quot;:&quot;23 Sep 2026&quot;,&quot;duration&quot;:&quot;2.5 Hours&quot;,&quot;reason&quot;:&quot;Urgent Family Care&quot;,&quot;docRef&quot;:&quot;VOT000000000281&quot;,&quot;docStatus&quot;:&quot;Pending Approval&quot;,&quot;employee&quot;:&quot;Siti Nurhaliza • Emp #006734&quot;,&quot;branch&quot;:&quot;TIMES SQUARE BRANCH&quot;,&quot;department&quot;:&quot;Product &amp; Design&quot;,&quot;leaveYear&quot;:&quot;2026&quot;,&quot;cutoffPeriod&quot;:&quot;01/01/2026 – 31/12/2026&quot;,&quot;submitter&quot;:&quot;Siti Nurhaliza&quot;,&quot;submitDate&quot;:&quot;23 Sep 2026&quot;,&quot;fromDate&quot;:&quot;23 Sep 2026&quot;,&quot;toDate&quot;:&quot;23 Sep 2026&quot;,&quot;leaveDays&quot;:&quot;0.313&quot;,&quot;mcChitNo&quot;:&quot;&quot;,&quot;reliever&quot;:&quot;Rachel Lee&quot;,&quot;remark&quot;:&quot;Emergency visit to school clinic for child health concern.&quot;,&quot;attachment&quot;:&quot;school_clinic_notice.pdf&quot;,&quot;advanceLeave&quot;:&quot;No&quot;,&quot;shortNotice&quot;:&quot;Yes&quot;}">
             
             <div class="approval-record-header" style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
               <div style="display: flex; align-items: center; gap: 12px;">
@@ -5814,7 +5806,7 @@
 
               <div style="display: flex; align-items: center; gap: 8px;">
                 <div class="approval-status-badge is-pending" data-approval-status="pending"><i class="fa-solid fa-hourglass-half" aria-hidden="true"></i><span>Pending Approval</span></div>
-                <button type="button" onclick="openApprovalThreeDotsMenu('Siti Nurhaliza', 'Personal Time Off', '23 Sep 2026', '2.5 Hours (14:30 - 17:00)', 'Urgent Family Care', { docRef: 'VOT000000000281', docStatus: 'Pending Approval', employee: 'Siti Nurhaliza • Emp #006734', branch: 'TIMES SQUARE BRANCH', department: 'Product & Design', leaveYear: '2026', cutoffPeriod: '01/01/2026 – 31/12/2026', submitter: 'Siti Nurhaliza', submitDate: '23 Sep 2026', fromDate: '23 Sep 2026', toDate: '23 Sep 2026', duration: '2.5 Hours', leaveDays: '0.313', mcChitNo: '', reliever: 'Rachel Lee', remark: 'Emergency visit to school clinic for child health concern.', attachment: 'school_clinic_notice.pdf', advanceLeave: 'No', shortNotice: 'Yes' })" title="Options" style="width: 26px; height: 26px; border-radius: 50%; background: rgba(255, 255, 255, 0.2); border: 1px solid rgba(255, 255, 255, 0.35); color: #ffffff; display: flex; align-items: center; justify-content: center; cursor: pointer; backdrop-filter: blur(4px);">
+                <button type="button" onclick="openLeaveApprovalOptions(this)" title="Options" style="width: 26px; height: 26px; border-radius: 50%; background: rgba(255, 255, 255, 0.2); border: 1px solid rgba(255, 255, 255, 0.35); color: #ffffff; display: flex; align-items: center; justify-content: center; cursor: pointer; backdrop-filter: blur(4px);">
                   <i class="fa-solid fa-ellipsis-vertical" style="font-size: 13px;"></i>
                 </button>
                 
@@ -5822,14 +5814,14 @@
             </div>
 
             <div class="approval-card-body">
-              <dl class="approval-card-details">
+              <a class="approval-record-link" href="#approval/details/VOT000000000281"><dl class="approval-card-details">
                 <div><dt>Type</dt> <dd>Personal Time Off</dd></div>
                 <div><dt>Reason</dt> <dd>Urgent Family Care</dd></div>
                 <div><dt>Date</dt> <dd>Wed, 23/09/2026</dd></div>
                 <div><dt>Time Off</dt> <dd>14:30 – 17:00</dd></div>
                 <div><dt>Duration</dt> <dd>2.5 Hours</dd></div>
                 <div><dt>Remark</dt> <dd>Emergency visit to school clinic for child health concern.</dd></div>
-              </dl>
+              </dl></a>
               <div class="pending-action-grid">
                 <button type="button" class="action-btn-resubmit" onclick="singleResubmitCard('approvalCardOfftime1', 'Siti Nurhaliza')">
                   <i class="fa-solid fa-rotate-left" style="font-size: 11px;"></i> Resubmit
@@ -5845,7 +5837,7 @@
           </div>
 
           <!-- CARD OFFTIME 2: Marcus Tan -->
-          <div class="approval-request-card" id="approvalCardOfftime2" data-category="offtime" data-name="Marcus Tan" data-empno="008129" data-type="Medical Time Off" data-submit-date="24 Sep 2026" data-start="2026-09-24" data-end="2026-09-24" data-days="0.25" style="display: none; background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 20px; overflow: hidden; box-shadow: var(--shadow-card); transition: all 0.2s ease;">
+          <div class="approval-request-card" id="approvalCardOfftime2" data-category="offtime" data-name="Marcus Tan" data-empno="008129" data-type="Medical Time Off" data-submit-date="24 Sep 2026" data-start="2026-09-24" data-end="2026-09-24" data-days="0.25" style="display: none; background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 20px; overflow: hidden; box-shadow: var(--shadow-card); transition: all 0.2s ease;" data-approval-id="VOT000000000282" data-request="{&quot;applicant&quot;:&quot;Marcus Tan&quot;,&quot;type&quot;:&quot;Medical Time Off&quot;,&quot;dates&quot;:&quot;24 Sep 2026&quot;,&quot;duration&quot;:&quot;2.0 Hours&quot;,&quot;reason&quot;:&quot;Dental Specialist Appointment&quot;,&quot;docRef&quot;:&quot;VOT000000000282&quot;,&quot;docStatus&quot;:&quot;Pending Approval&quot;,&quot;employee&quot;:&quot;Marcus Tan • Emp #008129&quot;,&quot;branch&quot;:&quot;TIMES SQUARE BRANCH&quot;,&quot;department&quot;:&quot;IT Enterprise&quot;,&quot;leaveYear&quot;:&quot;2026&quot;,&quot;cutoffPeriod&quot;:&quot;01/01/2026 – 31/12/2026&quot;,&quot;submitter&quot;:&quot;Marcus Tan&quot;,&quot;submitDate&quot;:&quot;24 Sep 2026&quot;,&quot;fromDate&quot;:&quot;24 Sep 2026&quot;,&quot;toDate&quot;:&quot;24 Sep 2026&quot;,&quot;leaveDays&quot;:&quot;0.250&quot;,&quot;mcChitNo&quot;:&quot;&quot;,&quot;reliever&quot;:&quot;None Assigned&quot;,&quot;remark&quot;:&quot;Scheduled orthodontic checkup at specialist dental clinic.&quot;,&quot;attachment&quot;:&quot;dental_appointment_card.jpg&quot;,&quot;advanceLeave&quot;:&quot;No&quot;,&quot;shortNotice&quot;:&quot;No&quot;}">
             
             <div class="approval-record-header" style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
               <div style="display: flex; align-items: center; gap: 12px;">
@@ -5861,7 +5853,7 @@
 
               <div style="display: flex; align-items: center; gap: 8px;">
                 <div class="approval-status-badge is-pending" data-approval-status="pending"><i class="fa-solid fa-hourglass-half" aria-hidden="true"></i><span>Pending Approval</span></div>
-                <button type="button" onclick="openApprovalThreeDotsMenu('Marcus Tan', 'Medical Time Off', '24 Sep 2026', '2.0 Hours (10:00 - 12:00)', 'Dental Specialist Appointment', { docRef: 'VOT000000000282', docStatus: 'Pending Approval', employee: 'Marcus Tan • Emp #008129', branch: 'TIMES SQUARE BRANCH', department: 'IT Enterprise', leaveYear: '2026', cutoffPeriod: '01/01/2026 – 31/12/2026', submitter: 'Marcus Tan', submitDate: '24 Sep 2026', fromDate: '24 Sep 2026', toDate: '24 Sep 2026', duration: '2.0 Hours', leaveDays: '0.250', mcChitNo: '', reliever: 'None Assigned', remark: 'Scheduled orthodontic checkup at specialist dental clinic.', attachment: 'dental_appointment_card.jpg', advanceLeave: 'No', shortNotice: 'No' })" title="Options" style="width: 26px; height: 26px; border-radius: 50%; background: rgba(255, 255, 255, 0.2); border: 1px solid rgba(255, 255, 255, 0.35); color: #ffffff; display: flex; align-items: center; justify-content: center; cursor: pointer; backdrop-filter: blur(4px);">
+                <button type="button" onclick="openLeaveApprovalOptions(this)" title="Options" style="width: 26px; height: 26px; border-radius: 50%; background: rgba(255, 255, 255, 0.2); border: 1px solid rgba(255, 255, 255, 0.35); color: #ffffff; display: flex; align-items: center; justify-content: center; cursor: pointer; backdrop-filter: blur(4px);">
                   <i class="fa-solid fa-ellipsis-vertical" style="font-size: 13px;"></i>
                 </button>
                 
@@ -5869,14 +5861,14 @@
             </div>
 
             <div class="approval-card-body">
-              <dl class="approval-card-details">
+              <a class="approval-record-link" href="#approval/details/VOT000000000282"><dl class="approval-card-details">
                 <div><dt>Type</dt> <dd>Medical Time Off</dd></div>
                 <div><dt>Reason</dt> <dd>Dental Checkup</dd></div>
                 <div><dt>Date</dt> <dd>Thu, 24/09/2026</dd></div>
                 <div><dt>Time Off</dt> <dd>10:00 – 12:00</dd></div>
                 <div><dt>Duration</dt> <dd>2.0 Hours</dd></div>
                 <div><dt>Remark</dt> <dd>Scheduled orthodontic checkup at specialist dental clinic.</dd></div>
-              </dl>
+              </dl></a>
               <div class="pending-action-grid">
                 <button type="button" class="action-btn-resubmit" onclick="singleResubmitCard('approvalCardOfftime2', 'Marcus Tan')">
                   <i class="fa-solid fa-rotate-left" style="font-size: 11px;"></i> Resubmit
@@ -5892,7 +5884,7 @@
           </div>
 
           <!-- CARD OFFTIME 3: Kavitha Murugan -->
-          <div class="approval-request-card" id="approvalCardOfftime3" data-category="offtime" data-name="Kavitha Murugan" data-empno="007452" data-type="Official Affairs Time Off" data-submit-date="25 Sep 2026" data-start="2026-09-25" data-end="2026-09-25" data-days="0.19" style="display: none; background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 20px; overflow: hidden; box-shadow: var(--shadow-card); transition: all 0.2s ease;">
+          <div class="approval-request-card" id="approvalCardOfftime3" data-category="offtime" data-name="Kavitha Murugan" data-empno="007452" data-type="Official Affairs Time Off" data-submit-date="25 Sep 2026" data-start="2026-09-25" data-end="2026-09-25" data-days="0.19" style="display: none; background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 20px; overflow: hidden; box-shadow: var(--shadow-card); transition: all 0.2s ease;" data-approval-id="VOT000000000283" data-request="{&quot;applicant&quot;:&quot;Kavitha Murugan&quot;,&quot;type&quot;:&quot;Official Affairs Time Off&quot;,&quot;dates&quot;:&quot;25 Sep 2026&quot;,&quot;duration&quot;:&quot;1.5 Hours&quot;,&quot;reason&quot;:&quot;Government Office Submission&quot;,&quot;docRef&quot;:&quot;VOT000000000283&quot;,&quot;docStatus&quot;:&quot;Pending Approval&quot;,&quot;employee&quot;:&quot;Kavitha Murugan • Emp #007452&quot;,&quot;branch&quot;:&quot;TIMES SQUARE BRANCH&quot;,&quot;department&quot;:&quot;Legal &amp; Compliance&quot;,&quot;leaveYear&quot;:&quot;2026&quot;,&quot;cutoffPeriod&quot;:&quot;01/01/2026 – 31/12/2026&quot;,&quot;submitter&quot;:&quot;Kavitha Murugan&quot;,&quot;submitDate&quot;:&quot;25 Sep 2026&quot;,&quot;fromDate&quot;:&quot;25 Sep 2026&quot;,&quot;toDate&quot;:&quot;25 Sep 2026&quot;,&quot;leaveDays&quot;:&quot;0.188&quot;,&quot;mcChitNo&quot;:&quot;&quot;,&quot;reliever&quot;:&quot;None Assigned&quot;,&quot;remark&quot;:&quot;Urgent physical submission of statutory compliance documents at SSM office.&quot;,&quot;attachment&quot;:&quot;ssm_filing_acknowledgment.pdf&quot;,&quot;advanceLeave&quot;:&quot;No&quot;,&quot;shortNotice&quot;:&quot;No&quot;}">
             
             <div class="approval-record-header" style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
               <div style="display: flex; align-items: center; gap: 12px;">
@@ -5908,7 +5900,7 @@
 
               <div style="display: flex; align-items: center; gap: 8px;">
                 <div class="approval-status-badge is-pending" data-approval-status="pending"><i class="fa-solid fa-hourglass-half" aria-hidden="true"></i><span>Pending Approval</span></div>
-                <button type="button" onclick="openApprovalThreeDotsMenu('Kavitha Murugan', 'Official Affairs Time Off', '25 Sep 2026', '1.5 Hours (15:30 - 17:00)', 'Government Office Submission', { docRef: 'VOT000000000283', docStatus: 'Pending Approval', employee: 'Kavitha Murugan • Emp #007452', branch: 'TIMES SQUARE BRANCH', department: 'Legal & Compliance', leaveYear: '2026', cutoffPeriod: '01/01/2026 – 31/12/2026', submitter: 'Kavitha Murugan', submitDate: '25 Sep 2026', fromDate: '25 Sep 2026', toDate: '25 Sep 2026', duration: '1.5 Hours', leaveDays: '0.188', mcChitNo: '', reliever: 'None Assigned', remark: 'Urgent physical submission of statutory compliance documents at SSM office.', attachment: 'ssm_filing_acknowledgment.pdf', advanceLeave: 'No', shortNotice: 'No' })" title="Options" style="width: 26px; height: 26px; border-radius: 50%; background: rgba(255, 255, 255, 0.2); border: 1px solid rgba(255, 255, 255, 0.35); color: #ffffff; display: flex; align-items: center; justify-content: center; cursor: pointer; backdrop-filter: blur(4px);">
+                <button type="button" onclick="openLeaveApprovalOptions(this)" title="Options" style="width: 26px; height: 26px; border-radius: 50%; background: rgba(255, 255, 255, 0.2); border: 1px solid rgba(255, 255, 255, 0.35); color: #ffffff; display: flex; align-items: center; justify-content: center; cursor: pointer; backdrop-filter: blur(4px);">
                   <i class="fa-solid fa-ellipsis-vertical" style="font-size: 13px;"></i>
                 </button>
                 
@@ -5916,14 +5908,14 @@
             </div>
 
             <div class="approval-card-body">
-              <dl class="approval-card-details">
+              <a class="approval-record-link" href="#approval/details/VOT000000000283"><dl class="approval-card-details">
                 <div><dt>Type</dt> <dd>Official Affairs</dd></div>
                 <div><dt>Reason</dt> <dd>SSM Submission</dd></div>
                 <div><dt>Date</dt> <dd>Fri, 25/09/2026</dd></div>
                 <div><dt>Time Off</dt> <dd>15:30 – 17:00</dd></div>
                 <div><dt>Duration</dt> <dd>1.5 Hours</dd></div>
                 <div><dt>Remark</dt> <dd>Urgent physical submission of statutory compliance documents at SSM office.</dd></div>
-              </dl>
+              </dl></a>
               <div class="pending-action-grid">
                 <button type="button" class="action-btn-resubmit" onclick="singleResubmitCard('approvalCardOfftime3', 'Kavitha Murugan')">
                   <i class="fa-solid fa-rotate-left" style="font-size: 11px;"></i> Resubmit
@@ -6263,13 +6255,11 @@
         </div>
 
         <!-- ACTION FOOTER BUTTONS (RIGHT ALIGNED) -->
-        <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 18px; padding: 0 16px;">
-          <button type="button" onclick="if(typeof showToast==='function') showToast('💾 Saved to Drafts');"
-            style="padding: 9px 18px; border-radius: 10px; background: var(--purple-primary); color: #ffffff; font-size: 13px; font-weight: 700; border: none; cursor: pointer; box-shadow: var(--shadow-sm);">
+        <div class="form-action-row" style="justify-content: flex-end; margin-top: 18px; padding: 0 16px;">
+          <button type="button" class="form-primary-btn" onclick="if(typeof showToast==='function') showToast('💾 Saved to Drafts');">
             Save Draft
           </button>
-          <button type="button" onclick="submitLeaveApplicationForm()"
-            style="padding: 9px 22px; border-radius: 10px; background: var(--purple-primary); color: #ffffff; font-size: 13px; font-weight: 700; border: none; cursor: pointer; box-shadow: var(--shadow-sm);">
+          <button type="button" class="form-primary-btn" onclick="submitLeaveApplicationForm()">
             Submit
           </button>
         </div>
@@ -6321,7 +6311,7 @@
     </div>
 
     <!-- VIEW DETAILS MODAL -->
-    <div class="indicators-overlay" id="approvalDetailsModalOverlay" onclick="closeApprovalDetailsModal(event)" style="display: none;">
+    <main id="approvalDetailsModalOverlay" class="approval-record-page" data-approval-view="details" aria-labelledby="approvalDetailsModalHeaderTitle" hidden>
       <style>
         #approvalDetailsModalOverlay .details-modal-body::-webkit-scrollbar {
           width: 4px;
@@ -6487,28 +6477,14 @@
           font-weight: 600;
         }
       </style>
-      <div class="indicators-sheet" onclick="event.stopPropagation()" style="max-height: calc(100% - 24px); height: calc(100% - 24px); padding: 0 !important; overflow: hidden !important; display: flex; flex-direction: column; border-radius: 28px 28px 0 0; background: var(--bg-sheet);">
-        
-        <!-- Sticky Header Bar: Purple Gradient filling sheet curve natively -->
-        <div style="background: linear-gradient(135deg, #7c3aed 0%, #4c1d95 100%) !important; color: #ffffff !important; padding: 12px 18px 14px 18px; border-radius: 28px 28px 0 0; display: flex; flex-direction: column; gap: 8px; flex-shrink: 0; box-shadow: 0 4px 12px rgba(0,0,0,0.25); z-index: 10;">
-          <!-- Handle pill -->
-          <div style="width: 36px; height: 4px; background: rgba(255, 255, 255, 0.4); border-radius: 4px; margin: 0 auto;"></div>
-
-          <div style="display: flex; align-items: center; justify-content: space-between;">
-            <div style="display: flex; align-items: center; gap: 10px;">
-              <button type="button" onclick="closeApprovalDetailsModal()" title="Back" style="background: rgba(255, 255, 255, 0.2); border: none; color: #ffffff; width: 30px; height: 30px; border-radius: 50%; font-size: 20px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; line-height: 1; transition: background 0.2s;">
-                ‹
-              </button>
-              <div>
-                <h3 id="approvalDetailsModalHeaderTitle" style="font-size: 16px; font-weight: 800; color: #ffffff; margin: 0; letter-spacing: -0.2px; line-height: 1.2;">Leave Approval</h3>
-                <div id="approvalDetailsModalHeaderSub" style="font-size: 11px; font-weight: 600; color: rgba(255, 255, 255, 0.85); margin-top: 2px;">Review leave application details</div>
-              </div>
-            </div>
-            <button type="button" onclick="closeApprovalDetailsModal()" class="sheet-close-btn" title="Close" style="background: rgba(255, 255, 255, 0.2); border: none; color: #ffffff; width: 28px; height: 28px; border-radius: 50%; font-size: 14px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.2s;">
-              ✕
-            </button>
+      <div class="approval-record-layout">
+        <header class="approval-page-header">
+          <phone-status-bar time="9:41"></phone-status-bar>
+          <div class="approval-page-heading">
+            <button type="button" data-approval-back aria-label="Back to pending approvals"></button>
+            <h1 id="approvalDetailsModalHeaderTitle" tabindex="-1">Leave Approval</h1>
           </div>
-        </div>
+        </header>
 
         <!-- Scrollable Form Body -->
         <div class="details-modal-body" style="flex: 1 1 auto; overflow-y: auto; padding: 14px 16px 24px 16px; display: flex; flex-direction: column; gap: 14px; min-height: 0;">
@@ -6731,33 +6707,19 @@
         </div>
 
       </div>
-    </div>
+    </main>
 
     <!-- VIEW WORKFLOW INFORMATION MODAL (PREMIUM ULTRA-ELEVATED) -->
-    <div class="indicators-overlay" id="approvalWorkflowModalOverlay" onclick="closeApprovalWorkflowModal(event)" style="display: none;">
-      <div class="indicators-sheet" onclick="event.stopPropagation()" style="max-height: calc(100% - 24px); overflow-y: auto; padding-bottom: 24px; border-top-left-radius: 24px; border-top-right-radius: 24px; backdrop-filter: blur(16px);">
-        <div class="sheet-handle" style="width: 40px; height: 5px; border-radius: 99px; background: rgba(148, 163, 184, 0.35); margin: 8px auto 4px auto;"></div>
-        
-        <!-- Premium Header Strip -->
-        <div class="sheet-header" style="border-bottom: 1px solid var(--border-subtle); padding: 10px 18px 14px 18px; margin-bottom: 14px;">
-          <div class="sheet-title" style="display: flex; flex-direction: column; gap: 4px;">
-            <div style="display: flex; align-items: center; justify-content: space-between;">
-              <div style="display: flex; align-items: center; gap: 10px;">
-                <div style="width: 34px; height: 34px; border-radius: 10px; background: linear-gradient(135deg, rgba(124, 58, 237, 0.25) 0%, rgba(99, 102, 241, 0.2) 100%); display: flex; align-items: center; justify-content: center; font-size: 16px; border: 1px solid rgba(124, 58, 237, 0.35); box-shadow: 0 4px 12px rgba(124, 58, 237, 0.15);">
-                  🔀
-                </div>
-                <div>
-                  <h3 style="font-size: 17.5px; font-weight: 800; color: var(--text-primary); letter-spacing: -0.3px; margin: 0;">Workflow Information</h3>
-                  <div style="display: flex; align-items: center; gap: 6px; margin-top: 2px;">
-                    <span style="font-size: 10.5px; font-weight: 700; color: var(--purple-primary); background: var(--purple-subtle); padding: 1.5px 7px; border-radius: 6px; border: 1px solid var(--purple-border);">3-Level Approval</span>
-                    <span style="font-size: 11px; color: var(--text-muted);">Real-time audit history</span>
-                  </div>
-                </div>
-              </div>
-            </div>
+    <main id="approvalWorkflowModalOverlay" class="approval-record-page" data-approval-view="workflow" aria-labelledby="approvalWorkflowModalOverlayTitle" hidden>
+      <div class="approval-record-layout">
+        <header class="approval-page-header">
+          <phone-status-bar time="9:41"></phone-status-bar>
+          <div class="approval-page-heading">
+            <button type="button" data-approval-back aria-label="Back to pending approvals"></button>
+            <h1 id="approvalWorkflowModalOverlayTitle" tabindex="-1">Workflow Information</h1>
           </div>
-          <button class="sheet-close-btn" onclick="closeApprovalWorkflowModal()" style="width: 28px; height: 28px; border-radius: 50%; background: var(--bg-input); border: 1px solid var(--border-subtle); color: var(--text-muted); font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center; cursor: pointer;">✕</button>
-        </div>
+        </header>
+        <div class="approval-workflow-content">
 
         <div style="padding: 0 16px; display: flex; flex-direction: column; gap: 14px;">
           
@@ -7098,8 +7060,9 @@
             Close Workflow
           </button>
         </div>
+              </div>
       </div>
-    </div>
+    </main>
 
 
     <!-- CALENDAR DATE DETAILS BOTTOM SHEET DRAWER -->
@@ -10835,37 +10798,16 @@
       if (closeAfterApply) closeTeamApprovalsFilterModal();
     }
 
-    let currentSelectedApprovalData = {
-      applicant: 'Kathleen lee chee dee',
-      type: 'HOSPITALIZATION LEAVE',
-      dates: '11 May 2026',
-      duration: 'Full Day',
-      reason: 'Medical Rest & Recovery',
-      docRef: 'VLV000000000790',
-      docStatus: 'Pending Approval',
-      employee: 'EBB21 - Kathleen lee chee dee',
-      branch: 'TIMES SQUARE BRANCH',
-      department: 'HUMAN RESOURCE',
-      leaveYear: '2026',
-      cutoffPeriod: '01/01/2026 - 31/12/2026',
-      submitter: 'EBB21 - Kathleen lee chee dee',
-      submitDate: '12 May 2026',
-      fromDate: '11 May 2026',
-      toDate: '11 May 2026',
-      leaveDays: '1.000',
-      mcChitNo: '12312123',
-      reliever: '',
-      attachment: 'lighthouse-clip-art-png.png'
-    };
+    let currentSelectedApprovalData = null;
 
-    function openApprovalThreeDotsMenu(applicant, type, dates, duration, reason, extraData = {}) {
+    function leaveApprovalData({ applicant, type, dates, duration, reason, ...extraData }) {
       const timeRangeMatch = String(duration || '').match(/\(([^()]+)\)/);
       const parsedTimeRange = timeRangeMatch ? timeRangeMatch[1].split(/\s*-\s*/) : [];
       const inferredOffTime = extraData.isOffTime === true
         || (typeof currentApprovalCategory !== 'undefined' && currentApprovalCategory === 'offtime')
         || String(extraData.docRef || '').startsWith('VOT')
         || String(type || '').toLowerCase().includes('time off');
-      currentSelectedApprovalData = {
+      return {
         applicant: applicant || 'Afifah Nasir',
         type: type || 'Annual Leave',
         dates: dates || '23 Feb 2026 - 25 Feb 2026',
@@ -10905,6 +10847,15 @@
         approverRemarks: extraData.approverRemarks || '\u2014'
       };
 
+    }
+
+    function openLeaveApprovalOptions(button) {
+      const data = JSON.parse(button.closest('[data-approval-id]').dataset.request);
+      openApprovalThreeDotsMenu(data.applicant, data.type, data.dates, data.duration, data.reason, data);
+    }
+
+    function openApprovalThreeDotsMenu(applicant, type, dates, duration, reason, extraData = {}) {
+      currentSelectedApprovalData = leaveApprovalData({ applicant, type, dates, duration, reason, ...extraData });
       const nameEl = document.getElementById('threeDotsApplicantName');
       if (nameEl) nameEl.innerText = `${applicant} • Request Options`;
 
@@ -10923,7 +10874,7 @@
       const overlay = document.getElementById('approvalThreeDotsMenuOverlay');
       if (overlay) {
         overlay.classList.remove('active');
-        setTimeout(() => { overlay.style.display = 'none'; }, 250);
+        overlay.style.display = 'none';
       }
     }
 
@@ -10941,136 +10892,135 @@
       }
     }
 
-    function triggerViewDetailsFromMenu() {
-      closeApprovalThreeDotsMenu();
-      setTimeout(() => {
-        const data = currentSelectedApprovalData || {};
+    function openSelectedLeaveApproval(view) {
+      const id = currentSelectedApprovalData?.docRef;
+      if (id) PendingApprovalPage.open(view, id, document.querySelector('[data-approval-id="' + CSS.escape(id) + '"] button[title="Options"]'));
+    }
 
-        const setElText = (id, val) => {
-          const el = document.getElementById(id);
-          if (el) el.innerText = (val !== undefined && val !== null) ? val : '';
+    function triggerViewDetailsFromMenu() {
+      openSelectedLeaveApproval('details');
+    }
+
+    function renderLeaveApprovalDetails(data) {
+      const setElText = (id, val) => {
+        const el = document.getElementById(id);
+        if (el) el.innerText = (val !== undefined && val !== null) ? val : '';
+      };
+
+      const isCredit = data.isCredit || (typeof currentApprovalCategory !== 'undefined' && currentApprovalCategory === 'credit') || (data.docRef && data.docRef.startsWith('LVR')) || (data.type && data.type.toLowerCase().includes('credit'));
+      const isOffTime = !isCredit && (data.isOffTime || (data.docRef && data.docRef.startsWith('VOT')) || (data.type && data.type.toLowerCase().includes('time off')));
+
+      const titleEl = document.getElementById('approvalDetailsModalHeaderTitle');
+      const stdView = document.getElementById('standardLeaveDetailsView');
+      const timeOffView = document.getElementById('timeOffDetailsView');
+      const lcView = document.getElementById('leaveCreditDetailsView');
+      const actionFooter = document.getElementById('approvalDetailsFooter');
+
+      if (isCredit) {
+        if (titleEl) titleEl.innerText = 'Leave Credit Approval';
+        if (stdView) stdView.style.display = 'none';
+        if (timeOffView) timeOffView.style.display = 'none';
+        if (lcView) lcView.style.display = 'flex';
+        if (actionFooter) actionFooter.style.display = 'block';
+
+        // Populate Leave Credit fields according to user screenshot
+        setElText('lcDetailsDocRef', data.docRef || 'LVR000000000589');
+        document.getElementById('lcDetailsDocStatus').replaceChildren(recordDetailStatus.create(data.docStatus || 'Pending Approval'));
+        setElText('lcDetailsEmployee', data.employee || 'EBB12 - Farhan binti rahmat');
+        setElText('lcDetailsCreditLeave', data.creditLeave || 'REPLACEMENT LEAVE');
+        setElText('lcDetailsOffsetLeave', data.offsetLeave || '');
+        setElText('lcDetailsCreditType', data.creditType || 'Working on Public Holiday');
+        setElText('lcDetailsSubmitter', data.submitter || 'EBB12 - Farhan binti rahmat');
+        setElText('lcDetailsSubmitDate', data.submitDate || '12 Jul 2024');
+        setElText('lcDetailsFromDate', data.fromDate || '3 Jul 2024');
+        setElText('lcDetailsToDate', data.toDate || '3 Jul 2024');
+        setElText('lcDetailsCreditDays', data.creditDays || data.leaveDays || '1.000');
+        setElText('lcDetailsEffectiveDateLabel', `${data.effectiveDateLabel || 'Effective Date'}:`);
+        setElText('lcDetailsEffectiveDate', data.effectiveDate || '4 Jul 2024');
+        setElText('lcDetailsReason', data.reason || 'OTHERS');
+        setElText('lcDetailsRemark', data.remark || 'Worked Overtime for adhoc request');
+        setElText('lcDetailsAttachment', data.attachment || '5fae9b25c05f463990e88cb6dc4c96b0.jpg');
+
+        const commentInput = document.getElementById('lcApproverComments');
+        if (commentInput) commentInput.value = '';
+      } else if (isOffTime) {
+        if (titleEl) titleEl.innerText = 'Time Off Approval';
+        if (stdView) stdView.style.display = 'none';
+        if (timeOffView) timeOffView.style.display = 'flex';
+        if (lcView) lcView.style.display = 'none';
+        if (actionFooter) actionFooter.style.display = 'block';
+
+        document.getElementById('timeOffDetailsDocStatus').replaceChildren(recordDetailStatus.create(data.docStatus || 'Pending Approval'));
+        setElText('timeOffDetailsDate', data.date || data.fromDate || data.dates || '\u2014');
+        setElText('timeOffDetailsStartTime', data.startTime || '\u2014');
+        setElText('timeOffDetailsEndTime', data.endTime || '\u2014');
+        setElText('timeOffDetailsHours', data.hours || data.duration || '\u2014');
+        setElText('timeOffDetailsReason', data.reason && data.reason.trim() ? data.reason : '\u2014');
+        setElText('timeOffDetailsRemarks', data.remark && data.remark.trim() ? data.remark : '\u2014');
+        setElText('timeOffDetailsApproverRemarks', data.approverRemarks && data.approverRemarks.trim() ? data.approverRemarks : '\u2014');
+      } else {
+        if (titleEl) titleEl.innerText = 'Leave Approval';
+        if (stdView) stdView.style.display = 'flex';
+        if (timeOffView) timeOffView.style.display = 'none';
+        if (lcView) lcView.style.display = 'none';
+        if (actionFooter) actionFooter.style.display = 'block';
+
+        setElText('detailsDocRef', data.docRef || 'VLV000000000790');
+        document.getElementById('detailsDocStatus').replaceChildren(recordDetailStatus.create(data.docStatus || 'Pending Approval'));
+        const employeeValue = String(data.employee || `${data.applicant || 'Afifah Nasir'} • Emp #004177`).trim();
+        const employeeBulletMatch = employeeValue.match(/^(.*?)\s*•\s*(?:Emp\s*)?#?([A-Z0-9-]+)$/i);
+        const employeeDashMatch = employeeValue.match(/^#?([A-Z0-9-]+)\s+-\s+(.+)$/i);
+        const employeeName = employeeBulletMatch ? employeeBulletMatch[1] : employeeDashMatch ? employeeDashMatch[2] : employeeValue;
+        const employeeId = employeeBulletMatch ? employeeBulletMatch[2] : employeeDashMatch ? employeeDashMatch[1] : '';
+        setElText('detailsEmployeeName', employeeName);
+        setElText('detailsEmployeeId', employeeId ? `#${employeeId.replace(/^#/, '')}` : '—');
+        setElText('detailsBranch', data.branch || 'TIMES SQUARE BRANCH');
+        setElText('detailsDepartment', data.department || 'Quality Assurance');
+        setElText('detailsLeaveYear', data.leaveYear || '2026');
+        setElText('detailsLeaveType', data.type ? data.type.toUpperCase() : 'ANNUAL LEAVE');
+        setElText('detailsCutoffPeriod', data.cutoffPeriod || '01/01/2026 – 31/12/2026');
+        setElText('detailsSubmitter', data.submitter || data.applicant || 'Afifah Nasir');
+        setElText('detailsSubmitDate', data.submitDate || '23 Feb 2026');
+        setElText('detailsFromDate', data.fromDate || '23 Feb 2026');
+        setElText('detailsToDate', data.toDate || '25 Feb 2026');
+        setElText('detailsDuration', data.duration || '3 Days');
+        setElText('detailsLeaveDays', data.leaveDays || '3.000');
+
+        setElText('detailsMcChitNo', data.mcChitNo && data.mcChitNo !== '-' ? data.mcChitNo : '—');
+        setElText('detailsReliever', data.reliever && data.reliever.trim() ? data.reliever : '—');
+        setElText('detailsReasonText', data.reason && data.reason.trim() ? data.reason : '—');
+
+        setElText('detailsAttachmentName', data.attachment || 'leave_request_attachment.pdf');
+
+        const commentInput = document.getElementById('approvalActionCommentsInput');
+        if (commentInput) commentInput.value = '';
+
+        // Render Yes/No Badges for Advance Leave and Short Notice
+        const formatYesNo = (val) => {
+          const isYes = (val === true || String(val).toLowerCase() === 'yes' || String(val).toLowerCase() === 'y');
+          return isYes ? '<span class="badge-status-yes">Yes</span>' : '<span class="badge-status-no">No</span>';
         };
 
-        const isCredit = data.isCredit || (typeof currentApprovalCategory !== 'undefined' && currentApprovalCategory === 'credit') || (data.docRef && data.docRef.startsWith('LVR')) || (data.type && data.type.toLowerCase().includes('credit'));
-        const isOffTime = !isCredit && (data.isOffTime || (data.docRef && data.docRef.startsWith('VOT')) || (data.type && data.type.toLowerCase().includes('time off')));
+        const advEl = document.getElementById('detailsAdvanceLeaveContainer');
+        if (advEl) advEl.innerHTML = formatYesNo(data.advanceLeave || 'No');
 
-        const titleEl = document.getElementById('approvalDetailsModalHeaderTitle');
-        const subTitleEl = document.getElementById('approvalDetailsModalHeaderSub');
-        const stdView = document.getElementById('standardLeaveDetailsView');
-        const timeOffView = document.getElementById('timeOffDetailsView');
-        const lcView = document.getElementById('leaveCreditDetailsView');
-        const actionFooter = document.getElementById('approvalDetailsFooter');
-
-        if (isCredit) {
-          if (titleEl) titleEl.innerText = 'Leave Credit Approval';
-          if (subTitleEl) subTitleEl.innerText = 'Review leave credit application details';
-          if (stdView) stdView.style.display = 'none';
-          if (timeOffView) timeOffView.style.display = 'none';
-          if (lcView) lcView.style.display = 'flex';
-          if (actionFooter) actionFooter.style.display = 'block';
-
-          // Populate Leave Credit fields according to user screenshot
-          setElText('lcDetailsDocRef', data.docRef || 'LVR000000000589');
-          document.getElementById('lcDetailsDocStatus').replaceChildren(recordDetailStatus.create(data.docStatus || 'Pending Approval'));
-          setElText('lcDetailsEmployee', data.employee || 'EBB12 - Farhan binti rahmat');
-          setElText('lcDetailsCreditLeave', data.creditLeave || 'REPLACEMENT LEAVE');
-          setElText('lcDetailsOffsetLeave', data.offsetLeave || '');
-          setElText('lcDetailsCreditType', data.creditType || 'Working on Public Holiday');
-          setElText('lcDetailsSubmitter', data.submitter || 'EBB12 - Farhan binti rahmat');
-          setElText('lcDetailsSubmitDate', data.submitDate || '12 Jul 2024');
-          setElText('lcDetailsFromDate', data.fromDate || '3 Jul 2024');
-          setElText('lcDetailsToDate', data.toDate || '3 Jul 2024');
-          setElText('lcDetailsCreditDays', data.creditDays || data.leaveDays || '1.000');
-          setElText('lcDetailsEffectiveDateLabel', `${data.effectiveDateLabel || 'Effective Date'}:`);
-          setElText('lcDetailsEffectiveDate', data.effectiveDate || '4 Jul 2024');
-          setElText('lcDetailsReason', data.reason || 'OTHERS');
-          setElText('lcDetailsRemark', data.remark || 'Worked Overtime for adhoc request');
-          setElText('lcDetailsAttachment', data.attachment || '5fae9b25c05f463990e88cb6dc4c96b0.jpg');
-
-          const commentInput = document.getElementById('lcApproverComments');
-          if (commentInput) commentInput.value = '';
-        } else if (isOffTime) {
-          if (titleEl) titleEl.innerText = 'Time Off Approval';
-          if (subTitleEl) subTitleEl.innerText = 'Review time off request details';
-          if (stdView) stdView.style.display = 'none';
-          if (timeOffView) timeOffView.style.display = 'flex';
-          if (lcView) lcView.style.display = 'none';
-          if (actionFooter) actionFooter.style.display = 'block';
-
-          document.getElementById('timeOffDetailsDocStatus').replaceChildren(recordDetailStatus.create(data.docStatus || 'Pending Approval'));
-          setElText('timeOffDetailsDate', data.date || data.fromDate || data.dates || '\u2014');
-          setElText('timeOffDetailsStartTime', data.startTime || '\u2014');
-          setElText('timeOffDetailsEndTime', data.endTime || '\u2014');
-          setElText('timeOffDetailsHours', data.hours || data.duration || '\u2014');
-          setElText('timeOffDetailsReason', data.reason && data.reason.trim() ? data.reason : '\u2014');
-          setElText('timeOffDetailsRemarks', data.remark && data.remark.trim() ? data.remark : '\u2014');
-          setElText('timeOffDetailsApproverRemarks', data.approverRemarks && data.approverRemarks.trim() ? data.approverRemarks : '\u2014');
-        } else {
-          if (titleEl) titleEl.innerText = 'Leave Approval';
-          if (subTitleEl) subTitleEl.innerText = 'Review leave application details';
-          if (stdView) stdView.style.display = 'flex';
-          if (timeOffView) timeOffView.style.display = 'none';
-          if (lcView) lcView.style.display = 'none';
-          if (actionFooter) actionFooter.style.display = 'block';
-
-          setElText('detailsDocRef', data.docRef || 'VLV000000000790');
-          document.getElementById('detailsDocStatus').replaceChildren(recordDetailStatus.create(data.docStatus || 'Pending Approval'));
-          const employeeValue = String(data.employee || `${data.applicant || 'Afifah Nasir'} • Emp #004177`).trim();
-          const employeeBulletMatch = employeeValue.match(/^(.*?)\s*•\s*(?:Emp\s*)?#?([A-Z0-9-]+)$/i);
-          const employeeDashMatch = employeeValue.match(/^#?([A-Z0-9-]+)\s+-\s+(.+)$/i);
-          const employeeName = employeeBulletMatch ? employeeBulletMatch[1] : employeeDashMatch ? employeeDashMatch[2] : employeeValue;
-          const employeeId = employeeBulletMatch ? employeeBulletMatch[2] : employeeDashMatch ? employeeDashMatch[1] : '';
-          setElText('detailsEmployeeName', employeeName);
-          setElText('detailsEmployeeId', employeeId ? `#${employeeId.replace(/^#/, '')}` : '—');
-          setElText('detailsBranch', data.branch || 'TIMES SQUARE BRANCH');
-          setElText('detailsDepartment', data.department || 'Quality Assurance');
-          setElText('detailsLeaveYear', data.leaveYear || '2026');
-          setElText('detailsLeaveType', data.type ? data.type.toUpperCase() : 'ANNUAL LEAVE');
-          setElText('detailsCutoffPeriod', data.cutoffPeriod || '01/01/2026 – 31/12/2026');
-          setElText('detailsSubmitter', data.submitter || data.applicant || 'Afifah Nasir');
-          setElText('detailsSubmitDate', data.submitDate || '23 Feb 2026');
-          setElText('detailsFromDate', data.fromDate || '23 Feb 2026');
-          setElText('detailsToDate', data.toDate || '25 Feb 2026');
-          setElText('detailsDuration', data.duration || '3 Days');
-          setElText('detailsLeaveDays', data.leaveDays || '3.000');
-
-          setElText('detailsMcChitNo', data.mcChitNo && data.mcChitNo !== '-' ? data.mcChitNo : '—');
-          setElText('detailsReliever', data.reliever && data.reliever.trim() ? data.reliever : '—');
-          setElText('detailsReasonText', data.reason && data.reason.trim() ? data.reason : '—');
-
-          setElText('detailsAttachmentName', data.attachment || 'leave_request_attachment.pdf');
-
-          const commentInput = document.getElementById('approvalActionCommentsInput');
-          if (commentInput) commentInput.value = '';
-
-          // Render Yes/No Badges for Advance Leave and Short Notice
-          const formatYesNo = (val) => {
-            const isYes = (val === true || String(val).toLowerCase() === 'yes' || String(val).toLowerCase() === 'y');
-            return isYes ? '<span class="badge-status-yes">Yes</span>' : '<span class="badge-status-no">No</span>';
-          };
-
-          const advEl = document.getElementById('detailsAdvanceLeaveContainer');
-          if (advEl) advEl.innerHTML = formatYesNo(data.advanceLeave || 'No');
-
-          const shortEl = document.getElementById('detailsShortNoticeContainer');
-          if (shortEl) shortEl.innerHTML = formatYesNo(data.shortNotice || 'No');
-        }
-
-        const overlay = document.getElementById('approvalDetailsModalOverlay');
-        if (overlay) {
-          overlay.style.display = 'flex';
-          void overlay.offsetHeight;
-          overlay.classList.add('active');
-        }
-      }, 200);
+        const shortEl = document.getElementById('detailsShortNoticeContainer');
+        if (shortEl) shortEl.innerHTML = formatYesNo(data.shortNotice || 'No');
+      }
     }
 
     function handleSingleApprovalAction(actionType) {
       const applicant = currentSelectedApprovalData ? currentSelectedApprovalData.applicant : 'Employee';
       const comments = document.getElementById('approvalActionCommentsInput')?.value || '';
       
+      const card = document.querySelector('[data-approval-id="' + CSS.escape(currentSelectedApprovalData.docRef) + '"]');
+      if (card) {
+        card.dataset.handled = 'true';
+        card.style.display = 'none';
+        updateCategoryTabCounts();
+      }
       closeApprovalDetailsModal();
-      
+
       if (typeof showToast === 'function') {
         let message = `Action '${actionType}' submitted for ${applicant}`;
         if (comments) message += ` ("${comments}")`;
@@ -11080,15 +11030,8 @@
       }
     }
 
-    function closeApprovalDetailsModal(event) {
-      if (event && event.target && event.target.id !== 'approvalDetailsModalOverlay' && !event.target.classList.contains('sheet-close-btn')) {
-        return;
-      }
-      const overlay = document.getElementById('approvalDetailsModalOverlay');
-      if (overlay) {
-        overlay.classList.remove('active');
-        setTimeout(() => { overlay.style.display = 'none'; }, 250);
-      }
+    function closeApprovalDetailsModal() {
+      PendingApprovalPage.back();
     }
 
     function toggleLevelApproversList(levelId) {
@@ -11105,30 +11048,28 @@
     }
 
     function triggerViewWorkflowFromMenu() {
-      closeApprovalThreeDotsMenu();
-      setTimeout(() => {
-        const wfApplicant = document.getElementById('wfApplicantName');
-        if (wfApplicant) wfApplicant.innerText = currentSelectedApprovalData.applicant;
+      openSelectedLeaveApproval('workflow');
+    }
 
-        const overlay = document.getElementById('approvalWorkflowModalOverlay');
-        if (overlay) {
-          overlay.style.display = 'flex';
-          void overlay.offsetHeight;
-          overlay.classList.add('active');
+    function closeApprovalWorkflowModal() {
+      PendingApprovalPage.back();
+    }
+
+    document.addEventListener('approval-list-return', updateBatchApprovalCount);
+    window.addEventListener('DOMContentLoaded', () => PendingApprovalPage.register({
+      render(view, id) {
+        const card = document.querySelector('#teamApprovalsListContainer [data-approval-id="' + CSS.escape(id) + '"]');
+        if (card?.dataset.handled === 'true' || (!card && currentSelectedApprovalData?.docRef !== id)) return false;
+        closeApprovalThreeDotsMenu();
+        if (card) {
+          if (!document.getElementById('viewTeamApprovals').getClientRects().length) showLeaveSection('viewTeamApprovals');
+          if (currentApprovalCategory !== card.dataset.category) switchApprovalCategory(card.dataset.category);
+          currentSelectedApprovalData = leaveApprovalData(JSON.parse(card.dataset.request));
         }
-      }, 200);
-    }
-
-    function closeApprovalWorkflowModal(event) {
-      if (event && event.target && event.target.id !== 'approvalWorkflowModalOverlay' && !event.target.classList.contains('sheet-close-btn')) {
-        return;
+        if (view === 'details') renderLeaveApprovalDetails(currentSelectedApprovalData);
+        return true;
       }
-      const overlay = document.getElementById('approvalWorkflowModalOverlay');
-      if (overlay) {
-        overlay.classList.remove('active');
-        setTimeout(() => { overlay.style.display = 'none'; }, 250);
-      }
-    }
+    }));
 
     let currentCardIndex = 0;
     const cardIds = ['swipeCard1', 'swipeCard2'];

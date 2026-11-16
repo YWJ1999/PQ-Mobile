@@ -912,6 +912,10 @@
   let currentSelectedClaimData = null;
 
   function openClaimThreeDotsMenu(btn, itemId) {
+    if (!document.getElementById('claimThreeDotsMenuOverlay')) {
+      triggerClaimViewDetails(itemId);
+      return;
+    }
     let item = teamQueue.find(q => String(q.id) === String(itemId));
     const card = btn ? btn.closest('pending-approval-card, .approval-request-card') : null;
     
@@ -991,7 +995,7 @@
       overlay.style.pointerEvents = 'none';
       const sheet = overlay.querySelector('.indicators-sheet');
       if (sheet) sheet.style.transform = 'translateY(100%)';
-      setTimeout(() => { overlay.style.display = 'none'; }, 250);
+      overlay.style.display = 'none';
     }
   }
 
@@ -1587,20 +1591,19 @@
   function renderAdvanceClaimDetail(d) { return renderUnifiedClaimDetail(d); }
   function renderExpenseClaimDetail(d) { return renderUnifiedClaimDetail(d); }
 
-  function triggerClaimViewDetails(itemId) {
-    closeClaimThreeDotsMenu();
-
-    if (itemId !== undefined && itemId !== null) {
-      const found = teamQueue.find(q => String(q.id) === String(itemId)) ||
-                    (window.MOCK_TEAM_APPROVALS || []).find(q => String(q.id) === String(itemId));
-      if (found) {
-        currentSelectedClaimData = found;
-      }
+  function triggerClaimViewDetails(id = currentSelectedClaimData?.id) {
+    if (id == null) return;
+    if (document.getElementById('claimDetailsModalOverlay')) {
+      PendingApprovalPage.open('details', id, document.getElementById('team-card-' + id)?.querySelector('.approval-record-link'));
+    } else {
+      const url = new URL('pending-approval.html', location.href);
+      url.searchParams.set('theme', getCurrentTheme());
+      url.hash = 'approval/details/' + encodeURIComponent(id);
+      location.href = url.href;
     }
+  }
 
-    if (!currentSelectedClaimData) return;
-    const data = currentSelectedClaimData;
-
+  function renderClaimDetails(data) {
     const optName = data.optionName || 'Benefit Claim';
     const optLower = optName.toLowerCase();
 
@@ -1624,8 +1627,6 @@
 
     const titleEl = document.getElementById('claimDetailHeaderTitle');
     if (titleEl) titleEl.textContent = headerTitleText;
-    const subTitleEl = document.getElementById('claimDetailHeaderSub');
-    if (subTitleEl) subTitleEl.textContent = `Review ${headerTitleText.replace(' Approval', '').toLowerCase()} request details`;
 
     const bodyEl = document.getElementById('claimDetailsDynamicBody');
     if (bodyEl) {
@@ -1634,13 +1635,6 @@
 
     const commentInput = document.getElementById('claimDetailApproverComments');
     if (commentInput) commentInput.value = '';
-
-    const overlay = document.getElementById('claimDetailsModalOverlay');
-    if (overlay) {
-      overlay.style.display = 'flex';
-      void overlay.offsetHeight;
-      overlay.classList.add('active');
-    }
   }
 
   function updateMedSubTabsUI(tabName) {
@@ -1651,15 +1645,8 @@
     // Kept for backward compatibility
   }
 
-  function closeClaimDetailsModal(event) {
-    if (event && event.target && event.target.id !== 'claimDetailsModalOverlay' && !event.target.closest('#claimDetailBackBtn') && !event.target.classList.contains('sheet-close-btn') && !event.target.closest('.sheet-close-btn')) {
-      return;
-    }
-    const overlay = document.getElementById('claimDetailsModalOverlay');
-    if (overlay) {
-      overlay.classList.remove('active');
-      setTimeout(() => { overlay.style.display = 'none'; }, 250);
-    }
+  function closeClaimDetailsModal() {
+    PendingApprovalPage.back();
   }
 
   function actionTeamClaimFromModal(id, action) {
@@ -1698,32 +1685,12 @@
   }
 
   function triggerClaimViewWorkflow() {
-    closeClaimThreeDotsMenu();
-    setTimeout(() => {
-      const overlay = document.getElementById('claimWorkflowModalOverlay');
-      if (overlay) {
-        overlay.style.display = 'flex';
-        overlay.style.pointerEvents = 'auto';
-        void overlay.offsetWidth;
-        overlay.style.opacity = '1';
-        const sheet = overlay.querySelector('.indicators-sheet');
-        if (sheet) sheet.style.transform = 'translateY(0)';
-      }
-    }, 200);
+    const id = currentSelectedClaimData?.id;
+    if (id != null) PendingApprovalPage.open('workflow', id, document.getElementById('team-card-' + id)?.querySelector('.three-dots-btn'));
   }
 
-  function closeClaimWorkflowModal(event) {
-    if (event && event.target && event.target.id !== 'claimWorkflowModalOverlay' && !event.target.classList.contains('sheet-close-btn') && !event.target.closest('.sheet-close-btn')) {
-      return;
-    }
-    const overlay = document.getElementById('claimWorkflowModalOverlay');
-    if (overlay) {
-      overlay.style.opacity = '0';
-      overlay.style.pointerEvents = 'none';
-      const sheet = overlay.querySelector('.indicators-sheet');
-      if (sheet) sheet.style.transform = 'translateY(100%)';
-      setTimeout(() => { overlay.style.display = 'none'; }, 250);
-    }
+  function closeClaimWorkflowModal() {
+    PendingApprovalPage.back();
   }
 
   /**
@@ -1804,6 +1771,16 @@
   const selectAllPending = document.getElementById('claimsSelectAllPending');
   if (selectAllPending) {
     renderTeamQueue();
+    PendingApprovalPage.register({
+      render(view, id) {
+        const item = teamQueue.find(record => String(record.id) === id);
+        if (!item) return false;
+        closeClaimThreeDotsMenu();
+        currentSelectedClaimData = item;
+        if (view === 'details') renderClaimDetails(item);
+        return true;
+      }
+    });
     mountPendingApprovalSelection(document.getElementById('teamApprovalsQueue'), selectAllPending, (action, boxes) => {
       const ids = new Set(boxes.map(box => box.closest('.approval-request-card').dataset.itemId));
       const message = formatBulkApprovalResult(action, ids.size, 'claim');

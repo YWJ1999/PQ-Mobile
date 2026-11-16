@@ -16,6 +16,8 @@ const file = pathToFileURL(path.resolve(__dirname, '../modules/employee-career/o
     assert.deepEqual(await page.$$eval('#careerPendingTabs [role="tab"]', nodes => nodes.map(node => node.textContent)), ['CV Change Request', 'Staff Engagement'], 'Pending Approval exposes the new Staff Engagement tab');
     await page.click('[data-career-pending-type="Staff Engagement"]');
     assert.equal(await page.$eval('#careerPendingCount', node => node.textContent), '1', 'The sample engagement is visible without test injection');
+    assert.equal(await page.$eval('#careerPendingQueue .approval-card-submitted', node => node.textContent), 'Submit Date: 12/10/2026');
+    assert.equal(await page.$eval('#careerPendingQueue .approval-card-details dd', node => node.textContent), '08/10/2026');
     await page.click('.career-pending-review');
     assert.equal(await page.$eval('#careerPendingDetailsTable tr:last-child td', node => node.textContent), 'No attachments');
 

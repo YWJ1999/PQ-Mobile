@@ -30,6 +30,7 @@ const url = file => pathToFileURL(path.resolve(__dirname, '..', file)).href;
       const card = await page.$eval('.approval-request-card', n => ({
         text: n.textContent.replace(/\s+/g, ' ').trim(),
         idBelowName: n.querySelector('.employee-name').nextElementSibling?.classList.contains('employee-id'),
+        submitDate: n.querySelector('.approval-card-submitted')?.textContent,
         details: [...n.querySelectorAll('.career-pending-review .approval-card-details > div')].map(field => ({
           label: field.querySelector('dt')?.textContent.trim(),
           value: field.querySelector('dd')?.textContent.trim()
@@ -45,10 +46,10 @@ const url = file => pathToFileURL(path.resolve(__dirname, '..', file)).href;
         assert.ok(card.text.includes(value), 'Card includes ' + value);
       }
       assert.equal(card.idBelowName, true);
+      assert.equal(card.submitDate, 'Submit Date: 13/10/2026');
       assert.deepEqual(card.details, [
-        { label: 'Submitted Date', value: '13/10/2026' },
         { label: 'Reference #', value: 'ECR00000000000000563' }
-      ], 'The area below the purple header contains only Submitted Date and Reference #');
+      ], 'Reference # appears below the submit date');
       assert.equal(card.hasStatusRow, false, 'The card no longer repeats a Pending Approval status row');
       assert.equal(card.hasBackupAssignment, false, 'The card details stay limited to the two requested fields');
       assert.equal((card.text.match(/13\/10\/2026/g) || []).length, 1);

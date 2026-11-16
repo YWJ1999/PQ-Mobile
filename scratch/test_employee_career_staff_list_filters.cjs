@@ -3,7 +3,7 @@ const path = require('node:path');
 const { pathToFileURL } = require('node:url');
 const puppeteer = require('puppeteer');
 const url = pathToFileURL(path.resolve('modules/employee-career/options/team/staff-list.html')).href;
-const labels = ['Search Keyword', 'Company', 'Branch', 'Division', 'Department', 'Section', 'Cost Center', 'Grade', 'Job', 'Skill Group', 'Hire Date', 'YOS', 'Type'];
+const labels = ['Search Keyword', 'Staff Category', 'Company', 'Branch', 'Division', 'Department', 'Section', 'Cost Center', 'Grade', 'Job', 'Skill Group', 'Hire Date', 'YOS', 'Type'];
 
 (async () => {
   const browser = await puppeteer.launch({headless: true, executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe', args: ['--allow-file-access-from-files']});
@@ -96,6 +96,6 @@ const labels = ['Search Keyword', 'Company', 'Branch', 'Division', 'Department',
       assert.deepEqual(errors, []);
       await page.close();
     }
-    console.log('PASS: 13 staff filter labels, all organization dimensions, hire/YOS ranges and inclusive bounds, combined filters, validation/reset/cancel, chart/trend/summary consistency, both themes and short mobile screens.');
+    console.log('PASS: 14 staff filter labels, all organization dimensions, hire/YOS ranges and inclusive bounds, combined filters, validation/reset/cancel, chart/trend/summary consistency, both themes and short mobile screens.');
   } finally { await browser.close(); }
 })().catch(error => {console.error(error); process.exitCode = 1;});

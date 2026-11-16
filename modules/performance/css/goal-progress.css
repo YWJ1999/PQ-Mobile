@@ -92,13 +92,12 @@
 .goal-progress-form-error { margin: 14px 0 0; padding: 10px 12px; border: 1px solid rgba(239,68,68,.2); border-radius: 10px; background: rgba(239,68,68,.08); color: #ef4444; font-size: 12px; font-weight: 600; line-height: 1.5; }
 .goal-progress-page-actions { display: flex; align-items: center; justify-content: flex-end; gap: 8px; margin-top: 18px; }
 .goal-progress-entry-actions { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 24px; }
-.goal-progress-primary, .goal-progress-secondary { display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: 44px; padding: 11px 15px; border-radius: 999px; font: inherit; font-size: 12px; font-weight: 800; white-space: nowrap; cursor: pointer; }
+.goal-progress-primary { display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: 44px; padding: 11px 15px; border-radius: 999px; font: inherit; font-size: 12px; font-weight: 800; white-space: nowrap; cursor: pointer; }
 .goal-progress-primary { border: 1.5px solid transparent; background: linear-gradient(135deg,#7c3aed,#6d28d9); box-shadow: 0 4px 18px rgba(124,58,237,.35); color: #fff; }
-.goal-progress-secondary { border: 1.5px solid var(--border-subtle); background: var(--bg-card); color: var(--text-primary); }
-.goal-progress-page :is(.goal-progress-primary,.goal-progress-secondary,.goal-progress-new,.goal-progress-row-action) { transition: transform .2s ease, filter .2s ease, background-color .2s ease; }
-.goal-progress-page :is(.goal-progress-primary,.goal-progress-secondary,.goal-progress-new,.goal-progress-row-action):hover { filter: brightness(1.08); }
+.goal-progress-page :is(.goal-progress-primary,.goal-progress-new,.goal-progress-row-action) { transition: transform .2s ease, filter .2s ease, background-color .2s ease; }
+.goal-progress-page :is(.goal-progress-primary,.goal-progress-new,.goal-progress-row-action):hover { filter: brightness(1.08); }
 .goal-progress-row-action:hover { background: var(--bg-input); }
-.goal-progress-page :is(.goal-progress-primary,.goal-progress-secondary,.goal-progress-new,.goal-progress-row-action):active { transform: scale(.96); }
+.goal-progress-page :is(.goal-progress-primary,.goal-progress-new,.goal-progress-row-action):active { transform: scale(.96); }
 .goal-progress-page input[type="date"] { color-scheme: light; }
 [data-theme="dark"] .goal-progress-page input[type="date"] { color-scheme: dark; }
 @media (max-width: 380px) {

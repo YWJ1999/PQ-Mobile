@@ -56,7 +56,7 @@ async function setField(page, selector, value) {
         await page.goto(formPageUrl(theme), { waitUntil: 'domcontentloaded' });
         assert.equal(await page.$eval('#performanceGoalTitle', node => node.textContent.trim()), 'Performance Goal');
         assert.equal(await page.evaluate(() => document.documentElement.dataset.theme), theme);
-        assert.deepEqual(await page.evaluate((activeTheme) => {
+        assert.deepEqual(await page.evaluate(() => {
           const content = document.querySelector('.performance-goal-content');
           const form = document.querySelector('.performance-goal-form');
           const formHeader = document.querySelector('.performance-goal-form-header');
@@ -76,11 +76,12 @@ async function setField(page, selector, value) {
             actionsAreEqual: buttonRects.length === 2 && Math.abs(buttonRects[0].width - buttonRects[1].width) <= 1 && buttonRects.every(rect => rect.height >= 44),
             cancelUsesStandardStyle: buttons[0].classList.contains('form-cancel-btn')
               && cancelStyle.borderRadius === '999px'
-              && cancelStyle.backgroundImage === 'none'
-              && cancelStyle.backgroundColor === (activeTheme === 'light' ? formStyle.backgroundColor : 'rgb(23, 21, 41)'),
+              && cancelStyle.backgroundImage.includes('rgb(124, 58, 237)')
+              && cancelStyle.backgroundImage.includes('rgb(109, 40, 217)')
+              && cancelStyle.color === 'rgb(255, 255, 255)',
             noHorizontalOverflow: content.scrollWidth <= content.clientWidth + 1 && document.documentElement.scrollWidth <= innerWidth
           };
-        }, theme), {
+        }), {
           hasInnerHeader: false,
           startsWithGoalTitle: true,
           formIsPageCard: true,

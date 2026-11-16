@@ -20,10 +20,10 @@
 .project-form-sub-label { display: block; margin-bottom: 6px; color: var(--text-caption); font-size: 11.5px; font-weight: 600; }
 .project-form-actions { display: flex; align-items: center; justify-content: flex-end; flex-wrap: wrap; gap: 12px; margin-top: 18px; }
 .project-form-actions.project-entry-actions { justify-content: space-between; }
-.project-form-page :is(.btn-submit-primary, .btn-draft-bright, .btn-step-back) { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 11px 20px; border-radius: 999px; font-size: 13.5px; font-weight: 800; white-space: nowrap; cursor: pointer; transition: transform 180ms ease; }
+.project-form-page :is(.btn-submit-primary, .btn-step-back) { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 11px 20px; border-radius: 999px; font-size: 13.5px; font-weight: 800; white-space: nowrap; cursor: pointer; transition: transform 180ms ease; }
 .project-form-page .btn-submit-primary { border: 0; color: #fff; background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%); box-shadow: 0 4px 18px rgba(124, 58, 237, 0.35); }
-.project-form-page :is(.btn-draft-bright, .btn-step-back) { border: 1.5px solid var(--border-subtle); background: var(--bg-card); color: var(--text-primary); box-shadow: var(--shadow-sm); }
-.project-form-page :is(.btn-submit-primary, .btn-draft-bright, .btn-step-back):active { transform: scale(0.97); }
+.project-form-page .btn-step-back { border: 1.5px solid var(--border-subtle); background: var(--bg-card); color: var(--text-primary); box-shadow: var(--shadow-sm); }
+.project-form-page :is(.btn-submit-primary, .btn-step-back):active { transform: scale(0.97); }
 .project-form-feedback { padding: 12px 14px; margin-top: 14px; border-radius: 12px; background: var(--purple-subtle); border: 1px solid var(--purple-border); color: var(--purple-text); font-size: 12px; font-weight: 700; line-height: 1.5; }
 .project-form-feedback.is-error { color: #ef4444; background: rgba(239, 68, 68, 0.08); border-color: rgba(239, 68, 68, 0.25); }
 .project-form-page [hidden] { display: none !important; }
@@ -221,7 +221,7 @@
   .project-form-page .form-card { padding: 18px 14px; }
   .project-form-page .project-activities-card { padding: 0; }
   .project-form-page .form-ctrl { padding: 12px 10px; font-size: 12.5px; }
-  .project-form-page :is(.btn-submit-primary, .btn-draft-bright, .btn-step-back) { padding: 11px 16px; font-size: 12.5px; }
+  .project-form-page :is(.btn-submit-primary, .btn-step-back) { padding: 11px 16px; font-size: 12.5px; }
   .project-form-page .project-add-activity { padding: 0; }
   .project-activity-top { padding: 14px 12px; }
   .project-activity-heading { gap: 8px; }
@@ -231,5 +231,5 @@
   .project-activity-hours { font-size: 14px; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .project-form-page :is(.form-ctrl, .btn-submit-primary, .btn-draft-bright, .btn-step-back, .slider, .slider::before, .project-assignee-chevron) { transition: none; }
+  .project-form-page :is(.form-ctrl, .btn-submit-primary, .btn-step-back, .slider, .slider::before, .project-assignee-chevron) { transition: none; }
 }

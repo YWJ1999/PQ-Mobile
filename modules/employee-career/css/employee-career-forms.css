@@ -59,9 +59,8 @@
 .employee-career-form-page .employee-career-upload-button:last-child { color: var(--text-primary); }
 .employee-career-upload-button:active .employee-career-upload-icon { transform: scale(.94); }
 .employee-career-form-page .employee-career-form-actions { display: flex; align-items: center; justify-content: flex-end; flex-wrap: wrap; gap: 12px; margin-top: 18px; }
-.employee-career-form-page .form-cancel-btn { text-decoration: none; }
-.employee-career-form-page .employee-career-button.primary { min-height: 44px; padding: 11px 20px; border: 0; border-radius: 999px; gap: 8px; font-size: 13.5px; white-space: nowrap; box-shadow: 0 4px 18px rgba(124, 58, 237, .35); }
-.employee-career-form-page .employee-career-button.primary:active { transform: scale(.97); }
+.employee-career-form-page :is(.form-cancel-btn, .employee-career-button.primary) { min-height: 44px; padding: 11px 20px; border: 0; border-radius: 999px; gap: 8px; background: var(--primary-action-background); font-size: 13.5px; line-height: 1.25; white-space: nowrap; box-shadow: 0 4px 18px rgba(124, 58, 237, .35); }
+.employee-career-form-page :is(.form-cancel-btn, .employee-career-button.primary):active { transform: scale(.97); }
 .career-plan-page .employee-career-form-grid { grid-template-columns: 1fr; gap: 0; }
 .career-plan-page .career-plan-profile-grid { margin-bottom: 2px; }
 .career-plan-page .employee-career-readonly {
@@ -127,7 +126,7 @@
 .employee-career-team-form-page .employee-career-fieldset legend { margin-bottom: 12px; }
 .employee-career-team-form-page .employee-career-upload-actions { gap: 32px; padding: 12px 0; }
 .employee-career-team-form-page .employee-career-form-actions { margin-top: 10px; }
-.employee-career-team-form-page .employee-career-button.primary { padding: 12px 32px; border-radius: 24px; background: linear-gradient(135deg,#7c3aed 0%,#6d28d9 100%); font-size: 14px; box-shadow: 0 4px 16px rgba(124,58,237,.4); }
+.employee-career-team-form-page :is(.form-cancel-btn, .employee-career-button.primary) { padding: 12px 32px; border-radius: 24px; font-size: 14px; box-shadow: 0 4px 16px rgba(124,58,237,.4); }
 .employee-career-team-form-page input[type="month"] { color-scheme: dark; }
 [data-theme="light"] .employee-career-team-form-page input[type="month"] { color-scheme: light; }
 .employee-career-team-form-page label.employee-career-switch-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 0; padding: 10px 14px; border: 1px solid var(--border-subtle); border-radius: 14px; background: var(--bg-input); color: var(--text-primary); cursor: pointer; }

@@ -71,26 +71,13 @@
       </section>
       <section id="employeeCareerExpiry" class="employee-career-expiry" aria-labelledby="employeeCareerExpiryTitle" hidden>
         <header class="employee-career-expiry-header">
-          <span class="employee-career-expiry-icon" aria-hidden="true"><i class="fa-solid fa-id-card"></i></span>
-          <h2 id="employeeCareerExpiryTitle">License, Exam and Membership Expiry</h2>
+          <h2 id="employeeCareerExpiryTitle">Expiry Overview</h2>
         </header>
-        <div class="employee-career-expiry-card">
-          <table class="employee-career-expiry-table" aria-labelledby="employeeCareerExpiryTitle">
-            <colgroup><col class="expiry-type-col"><col class="expiry-description-col"><col class="expiry-days-col"><col class="expiry-date-col"></colgroup>
-            <thead><tr><th scope="col">Type</th><th scope="col">Description</th><th scope="col">DueDay</th><th scope="col">Expiry</th></tr></thead>
-            <tbody>
-              <tr><td>License</td><td>Sample Description 1</td><td class="expiry-overdue">-5,381</td><td class="expiry-overdue"><time datetime="2012-01-18">18/01/2012</time></td></tr>
-              <tr><td>License</td><td>Sample Description 2</td><td class="expiry-overdue">-5,321</td><td class="expiry-overdue"><time datetime="2012-03-18">18/03/2012</time></td></tr>
-              <tr><td>Exam</td><td>6 SIGMA BLACK BELT LEVEL</td><td class="expiry-overdue">-3,207</td><td class="expiry-overdue"><time datetime="2017-12-31">31/12/2017</time></td></tr>
-              <tr><td>License</td><td>PILOT LICENSE</td><td class="expiry-overdue">-2,842</td><td class="expiry-overdue"><time datetime="2018-12-31">31/12/2018</time></td></tr>
-              <tr><td>License</td><td>FIREARM LICENSE</td><td class="expiry-overdue">-2,111</td><td class="expiry-overdue"><time datetime="2020-12-31">31/12/2020</time></td></tr>
-              <tr><td>Event</td><td>Typhoid Vaccine Booster Dose</td><td class="expiry-overdue">-1,333</td><td class="expiry-overdue"><time datetime="2023-02-17">17/02/2023</time></td></tr>
-              <tr><td>Event</td><td>Passport Expiry</td><td class="expiry-overdue">-214</td><td class="expiry-overdue"><time datetime="2026-03-12">12/03/2026</time></td></tr>
-              <tr><td>Event</td><td>Contract Expiry</td><td class="expiry-overdue">-211</td><td class="expiry-overdue"><time datetime="2026-03-15">15/03/2026</time></td></tr>
-              <tr><td>Event</td><td>Medical Checkup Due</td><td class="expiry-overdue">-205</td><td class="expiry-overdue"><time datetime="2026-03-21">21/03/2026</time></td></tr>
-              <tr><td>Member</td><td>OTHERS</td><td>2,911,793</td><td><time datetime="9998-12-31">31/12/9998</time></td></tr>
-            </tbody>
-          </table>
+        <div class="employee-career-expiry-summary" role="group" aria-labelledby="employeeCareerExpiryTitle">
+          <button type="button" data-expiry-group="expired" aria-haspopup="dialog" aria-controls="employeeCareerExpiryDetails"><strong></strong><span>Expired</span></button>
+          <button type="button" data-expiry-group="week" aria-haspopup="dialog" aria-controls="employeeCareerExpiryDetails"><strong></strong><span>Due ≤7 days</span></button>
+          <button type="button" data-expiry-group="month" aria-haspopup="dialog" aria-controls="employeeCareerExpiryDetails"><strong></strong><span>Due 8–30 days</span></button>
+          <button type="button" data-expiry-group="valid" aria-haspopup="dialog" aria-controls="employeeCareerExpiryDetails"><strong></strong><span>Valid</span></button>
         </div>
       </section>
       <section id="employeeCareerHeadcountActions" class="employee-career-headcount-actions" data-career-scope="team" aria-labelledby="employeeCareerWorkforceTitle" hidden>
@@ -120,6 +107,29 @@
         </div>
       </section>
     </main>
+    <div id="employeeCareerExpiryDetails" class="employee-career-sheet-overlay" aria-hidden="true">
+      <section class="employee-career-sheet" role="dialog" aria-modal="true" aria-labelledby="employeeCareerExpiryDetailTitle">
+        <div class="employee-career-sheet-handle" aria-hidden="true"></div>
+        <header class="employee-career-sheet-header">
+          <div class="sheet-title"><h2 id="employeeCareerExpiryDetailTitle"></h2><p id="employeeCareerExpiryDetailCount"></p></div>
+          <button type="button" class="employee-career-sheet-close" aria-label="Close expiry records"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
+        </header>
+        <div id="employeeCareerExpiryCards" tabindex="0" role="region" aria-labelledby="employeeCareerExpiryDetailTitle"></div>
+        <p class="employee-career-expiry-empty" hidden>No records in this category.</p>
+        <template id="employeeCareerExpiryCard">
+          <article class="insight-detail-metric">
+            <header class="insight-detail-metric-header">
+              <span class="insight-detail-metric-icon" aria-hidden="true"><i class="fa-solid"></i></span>
+              <div><h3></h3><p class="expiry-record-type"></p></div>
+            </header>
+            <dl class="insight-detail-metric-body">
+              <div><dt class="insight-detail-value-label">Expiry date</dt><dd><time></time></dd></div>
+              <div class="insight-detail-change-column"><dt class="insight-detail-value-label"></dt><dd class="expiry-record-days"></dd></div>
+            </dl>
+          </article>
+        </template>
+      </section>
+    </div>
     <div id="employeeCareerAllOptions" class="employee-career-sheet-overlay" aria-hidden="true">
       <section class="employee-career-sheet" role="dialog" aria-modal="true" aria-labelledby="employeeCareerAllOptionsTitle">
         <div class="employee-career-sheet-handle" aria-hidden="true"></div>

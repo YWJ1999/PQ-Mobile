@@ -191,16 +191,19 @@
   }
 
   function normalize(overlay, selector, closeFunction) {
-    const panel = overlay.querySelector(selector);
+    const isPage = overlay.hasAttribute('data-approval-view');
+    const panel = overlay.querySelector(isPage ? ':scope > .approval-record-layout' : selector);
     const title = panel?.querySelector('h1,h2,h3');
     if (!panel || !title) return;
     const header = directChild(title, panel);
     const body = [...panel.children].find(node => node !== header && !node.matches('style,script,footer,[class*="handle"]') && !node.querySelector('.pending-action-grid'));
     if (!header || !body) return;
-    addClass(overlay, 'detail-popout-overlay');
-    addClass(panel, 'detail-popout-panel');
+    if (!isPage) {
+      addClass(overlay, 'detail-popout-overlay');
+      addClass(panel, 'detail-popout-panel');
+      normalizeHeader(header, title);
+    }
     addClass(body, 'detail-popout-body');
-    normalizeHeader(header, title);
     normalizeFields(body);
     normalizeAttachments(body);
     normalizeFields(body);

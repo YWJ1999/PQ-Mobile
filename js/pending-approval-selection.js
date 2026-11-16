@@ -25,6 +25,7 @@ function mountPendingApprovalSelection(queue, selectAll, decide) {
     sync();
   });
   queue.addEventListener('change', sync);
+  document.addEventListener('approval-list-return', sync);
   new MutationObserver(sync).observe(queue, { childList: true });
   bar.addEventListener('click', event => {
     const button = event.target.closest('button[data-decision]');

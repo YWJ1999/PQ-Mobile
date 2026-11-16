@@ -75,8 +75,7 @@
 .staff-attendance-page .staff-follow-up-field textarea { min-height: 110px; resize: vertical; font-weight: 500; line-height: 1.5; }
 .staff-attendance-page .staff-follow-up-actions { display: flex; align-items: center; justify-content: flex-end; flex-shrink: 0; gap: 8px; padding: 16px; background: var(--bg-phone); }
 .staff-attendance-page .staff-follow-up-actions button { display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: 44px; padding: 10px 14px; border-radius: 999px; cursor: pointer; font-size: 13px; font-weight: 800; line-height: 1; white-space: nowrap; }
-.staff-attendance-page .staff-follow-up-actions .attendance-form-cancel { border: 1px solid var(--border-subtle); background: var(--bg-card); color: var(--text-primary); box-shadow: var(--shadow-sm); }
-.staff-attendance-page .staff-follow-up-actions .attendance-form-submit { border: 0; padding-inline: 20px; background: linear-gradient(135deg,#7c3aed 0%,#6d28d9 100%); color: #fff; box-shadow: 0 4px 12px rgba(124,58,237,.28); }
+.staff-attendance-page .staff-follow-up-actions :is(.attendance-form-cancel, .attendance-form-submit) { border: 0; padding-inline: 20px; background: var(--primary-action-background); color: #fff; box-shadow: 0 4px 12px rgba(124,58,237,.28); }
 .staff-attendance-page .staff-follow-up-actions button:active { transform: scale(.97); }
 .staff-attendance-page .staff-follow-up-actions button:focus-visible { outline: 3px solid var(--purple-primary); outline-offset: 3px; }
 .staff-attendance-page .staff-details-table { width: 100%; border-collapse: collapse; font-size: 12px; }

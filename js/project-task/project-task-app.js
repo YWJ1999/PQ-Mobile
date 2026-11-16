@@ -266,7 +266,7 @@
     const theme = getCurrentTheme();
     const url = new URL(window.location.href);
     url.searchParams.set('theme', theme);
-    window.history.replaceState(null, '', url);
+    window.history.replaceState(history.state, '', url);
     for (const link of document.querySelectorAll('.project-option, .project-team-action-card, .project-dashboard-status-card')) {
       const target = new URL(link.href);
       target.searchParams.set('theme', theme);
@@ -287,7 +287,7 @@
     }
     const url = new URL(window.location.href);
     url.searchParams.set('scope', selected);
-    window.history.replaceState(null, '', url);
+    window.history.replaceState(history.state, '', url);
   }
 
   function initPendingApprovalActions() {
@@ -341,7 +341,7 @@
       if (!card) return;
       const action = button.dataset.projectApprovalAction;
       const comments = inDetails ? document.getElementById('projectApprovalApproverComments').value.trim() : '';
-      if (decide([card], action, comments) && inDetails) details.querySelector('[data-close-project-approval]').click();
+      if (decide([card], action, comments) && inDetails) PendingApprovalPage.back();
     });
   }
 
@@ -405,26 +405,32 @@
         openOverlay(menu, button);
       });
     });
-    document.getElementById('projectApprovalViewDetails').addEventListener('click', event => {
-      fillDetails();
-      closeOverlay(false);
-      openOverlay(details, currentMenuTrigger || event.currentTarget);
-    });
-    document.getElementById('projectApprovalViewWorkflow').addEventListener('click', event => {
-      document.getElementById('projectApprovalWorkflowReference').textContent = value('reference');
-      document.getElementById('projectApprovalWorkflowName').textContent = value('employeeName');
-      document.getElementById('projectApprovalWorkflowEmployeeId').textContent = value('employeeId');
-      const backup = PendingApprovalBackup.assigned('timesheet', value('reference'));
-      const assignment = document.getElementById('projectApprovalWorkflowBackup');
-      assignment.hidden = !backup;
-      assignment.textContent = backup ? 'Backup approver · ' + backup.name : '';
-      closeOverlay(false);
-      openOverlay(workflow, currentMenuTrigger || event.currentTarget);
+    for (const [id, view] of [['projectApprovalViewDetails', 'details'], ['projectApprovalViewWorkflow', 'workflow']]) {
+      document.getElementById(id).addEventListener('click', () => PendingApprovalPage.open(view, value('reference'), currentMenuTrigger));
+    }
+    PendingApprovalPage.register({
+      render(view, id) {
+        currentCard = document.querySelector('.project-approval-card[data-reference="' + CSS.escape(id) + '"]');
+        if (!currentCard) return false;
+        closeOverlay(false);
+        if (view === 'details') {
+          fillDetails();
+        } else {
+          document.getElementById('projectApprovalWorkflowReference').textContent = value('reference');
+          document.getElementById('projectApprovalWorkflowName').textContent = value('employeeName');
+          document.getElementById('projectApprovalWorkflowEmployeeId').textContent = value('employeeId');
+          const backup = PendingApprovalBackup.assigned('timesheet', id);
+          const assignment = document.getElementById('projectApprovalWorkflowBackup');
+          assignment.hidden = !backup;
+          assignment.textContent = backup ? 'Backup approver · ' + backup.name : '';
+        }
+        return true;
+      }
     });
     document.querySelectorAll('[data-close-project-approval]').forEach(button => button.addEventListener('click', () => closeOverlay()));
-    [menu, details, workflow].forEach(overlay => overlay.addEventListener('click', event => {
-      if (event.target === overlay) closeOverlay();
-    }));
+    menu.addEventListener('click', event => {
+      if (event.target === menu) closeOverlay();
+    });
     document.addEventListener('keydown', event => {
       if (!activeOverlay) return;
       if (event.key === 'Escape') {
@@ -519,8 +525,8 @@
   document.addEventListener('DOMContentLoaded', () => {
     setTheme(getCurrentTheme());
     syncThemeNavigation();
-    initPendingApprovalSheets();
     initPendingApprovalActions();
+    initPendingApprovalSheets();
     initTeamProjectDetails();
     initCalendarTimesheetDetails();
     document.addEventListener('click', event => {

@@ -35,7 +35,6 @@
 .evaluation-item-page .goal-form-field textarea:not([readonly]) { min-height: 112px; overflow: auto; resize: vertical; }
 .evaluation-rating-scale { margin: 6px 0 0 2px; color: var(--text-muted); font-size: 10.5px; line-height: 1.4; }
 .performance-evaluation-page .goal-form-grid.evaluation-edit-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-.evaluation-item-page .goal-form-footer .goal-form-cancel { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 11px 14px; border-radius: 999px; font-size: 12.5px; font-weight: 800; text-decoration: none; }
 .performance-evaluation-page .evaluation-repeat-section { margin-top: 24px; margin-bottom: 24px; border: 0; border-radius: 0; background: transparent; box-shadow: none; -webkit-backdrop-filter: none; backdrop-filter: none; }
 .performance-evaluation-page .evaluation-repeat-section > .performance-goal-form-header { padding: 0 2px 12px; border-radius: 0; }
 .evaluation-repeat-section .self-evaluation-items { gap: 14px; }

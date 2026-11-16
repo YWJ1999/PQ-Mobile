@@ -42,7 +42,7 @@
     entries.forEach(([action, label]) => {
       const button = node('button', 'action-btn-' + action);
       button.type = 'button';
-      if (action === 'cancel') button.setAttribute('data-close-career-sheet', '');
+      if (action === 'cancel') button.setAttribute('data-approval-back', '');
       else button.dataset.careerApprovalAction = action;
       button.append(node('span', '', label));
       grid.append(button);
@@ -60,6 +60,7 @@
   function renderCard(item) {
     const isEngagement = item.type === 'Staff Engagement';
     const card = node('article', 'approval-request-card');
+    card.dataset.approvalId = item.id;
     card.dataset.careerRequestId = item.id;
     const header = node('header', 'payroll-approval-card-header');
     const checkbox = node('input', 'approval-card-checkbox');
@@ -76,16 +77,13 @@
     header.append(checkbox, identity(item.employeeName, item.empNo, isEngagement ? null : item.position),
       node('span', 'payroll-approval-status', 'Pending Approval'), menu);
     const body = node('div', 'approval-card-body payroll-approval-card-body');
-    const review = node('div', 'career-pending-review');
-    review.tabIndex = 0;
-    review.setAttribute('role', 'button');
+    const review = PendingApprovalPage.link(item.id);
+    review.classList.add('career-pending-review');
     review.setAttribute('aria-label', `View ${item.type || 'request'} details for ${item.employeeName}`);
-    const summary = isEngagement
+    const details = isEngagement
       ? [['Interview Date', date(item.interviewDate)], ['Position', item.position]]
-      : [['Submitted Date', date(item.submitDate)], ['Reference #', item.reference || item.id]];
-    review.append(createApprovalCardDetails(summary));
-    review.addEventListener('click', () => openDetails(item.id, review));
-    review.addEventListener('keydown', event => { if (['Enter', ' '].includes(event.key)) { event.preventDefault(); openDetails(item.id, review); } });
+      : [['Reference #', item.reference || item.id]];
+    review.append(createApprovalCardDetails([['Submit Date', date(item.submitDate)], ...details]));
     body.append(review);
     body.append(createApprovalCardActions('careerApprovalAction'));
     card.append(header, body);
@@ -160,30 +158,12 @@
     });
     return files;
   }
-  function openDetails(id, trigger) {
-    currentId = id;
-    const item = current();
-    if (!item) return;
+  function renderDetails(item) {
     const isEngagement = item.type === 'Staff Engagement';
     const overlay = $('careerPendingDetails');
-    const presentation = [
-      [overlay, 'detail-popout-overlay'],
-      [overlay.querySelector('.payroll-approval-panel'), 'detail-popout-panel'],
-      [overlay.querySelector('.payroll-approval-details-header'), 'detail-popout-header'],
-      [$('careerPendingDetailsTitle'), 'detail-popout-title'],
-      [overlay.querySelector('.payroll-approval-close'), 'detail-popout-close'],
-      [overlay.querySelector('.payroll-approval-details-body'), 'detail-popout-body'],
-      [$('careerPendingDetailsActions'), 'detail-popout-footer']
-    ];
-    presentation.forEach(([element, className]) => element.classList.toggle(className, isEngagement));
     overlay.classList.toggle('career-pending-engagement-details', isEngagement);
-    let subtitle = $('careerPendingDetailsSubtitle');
-    if (!subtitle) {
-      subtitle = node('p', 'detail-popout-subtitle', 'Review staff engagement details');
-      subtitle.id = 'careerPendingDetailsSubtitle';
-      $('careerPendingDetailsTitle').after(subtitle);
-    }
-    subtitle.hidden = !isEngagement;
+    overlay.querySelector('.payroll-approval-details-body').classList.toggle('detail-popout-body', isEngagement);
+    $('careerPendingDetailsActions').classList.toggle('detail-popout-footer', isEngagement);
     $('careerPendingDetailsTitle').textContent = item.approvalTitle || `${item.type || 'Request'} Approval`;
     const body = $('careerPendingDetails').querySelector('.payroll-approval-details-body');
     body.replaceChildren();
@@ -258,11 +238,8 @@
     $('careerPendingDetailsActions').replaceChildren(detailActionButtons(isEngagement));
     body.scrollTop = 0;
     body.querySelector('.cv-history-detail-scroll')?.scrollTo(0, 0);
-    openSheet('careerPendingDetails', trigger);
   }
-  function openWorkflow() {
-    const item = current();
-    if (!item) return;
+  function renderWorkflow(item) {
     $('careerPendingWorkflowRequest').replaceChildren(field('Document Reference', item.reference || item.id), identity(item.employeeName, item.empNo), field('Request Type', item.type));
     $('careerPendingWorkflowSteps').replaceChildren(...(item.workflow || []).map(step => {
       const entry = node('li', 'payroll-approval-workflow-step');
@@ -279,7 +256,6 @@
       return entry;
     }));
     if (!item.audit?.length) $('careerPendingWorkflowAudit').append(node('li', 'career-pending-note', 'No audit history available.'));
-    openSheet('careerPendingWorkflow');
   }
   function decide(action, ids) {
     const items = records.filter(item => item.status === 'pending' && ids.includes(item.id));
@@ -287,6 +263,7 @@
     const status = { approve: 'approved', resubmit: 'resubmit', reject: 'rejected' }[action];
     if (!status) return;
     items.forEach(item => { item.status = status; selected.delete(item.id); });
+    PendingApprovalPage.back();
     closeSheet();
     render();
     showToast(`${items.length} ${items.length === 1 ? 'request' : 'requests'} ${action === 'resubmit' ? 'returned for resubmission' : status}.`);
@@ -334,8 +311,8 @@
     }));
     $('careerPendingFilterTrigger').addEventListener('click', filter.open);
     $('careerPendingSelectAll').addEventListener('change', event => { visible.forEach(item => { if (event.target.checked) selected.add(item.id); else selected.delete(item.id); }); render(); });
-    $('careerPendingViewDetails').addEventListener('click', () => openDetails(currentId));
-    $('careerPendingViewWorkflow').addEventListener('click', openWorkflow);
+    $('careerPendingViewDetails').addEventListener('click', () => PendingApprovalPage.open('details', currentId, opener));
+    $('careerPendingViewWorkflow').addEventListener('click', () => PendingApprovalPage.open('workflow', currentId, opener));
     $('careerPendingBack').addEventListener('click', () => { const url = new URL($('careerPendingBack').href); url.searchParams.set('theme', document.documentElement.dataset.theme); $('careerPendingBack').href = url.href; });
     document.addEventListener('click', event => {
       if (event.target.closest('[data-close-career-sheet]') || event.target === sheet) { closeSheet(); return; }
@@ -370,13 +347,13 @@
       if (bulk) decide(bulk.dataset.careerBulkAction, [...selected]);
     });
     document.addEventListener('keydown', event => {
-      if (!sheet) return;
+      if (!sheet && !PendingApprovalPage.active) return;
       if (event.target.closest('[data-qualification-tab]') && window.EmployeeCareerCVHistoryDetails) {
         window.EmployeeCareerCVHistoryDetails.qualificationKeydown(event, $('careerPendingDetails').querySelector('.payroll-approval-details-body'));
       } else if (event.target.closest('[data-cv-tab]') && window.EmployeeCareerCVHistoryDetails) {
         window.EmployeeCareerCVHistoryDetails.keydown(event, $('careerPendingDetails').querySelector('.payroll-approval-details-body'));
       }
-      if (event.key === 'Escape') { event.preventDefault(); closeSheet(); }
+      if (sheet && event.key === 'Escape') { event.preventDefault(); closeSheet(); }
       if (event.key === 'Tab' && sheet) {
         const controls = [...sheet.querySelectorAll('button, input, textarea, a')].filter(element => !element.disabled && element.getClientRects().length);
         const first = controls[0], last = controls.at(-1);
@@ -385,6 +362,21 @@
       }
     });
     setCategory(category, false);
+    PendingApprovalPage.register({
+      render(view, id) {
+        const item = records.find(record => record.id === id && record.status === 'pending');
+        if (!item) return false;
+        closeSheet(false);
+        if (category !== item.type) setCategory(item.type, false);
+        currentId = id;
+        if (view === 'details') renderDetails(item);
+        else renderWorkflow(item);
+        return true;
+      },
+      onLeave() {
+        document.querySelector('.cv-family-member-dialog[open]')?.close();
+      }
+    });
   }
   document.readyState === 'loading' ? document.addEventListener('DOMContentLoaded', init) : init();
 })();

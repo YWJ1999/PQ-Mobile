@@ -228,15 +228,22 @@
     activeReviewRecord = record;
     const values = {
       staffFeedbackReviewEmployeeId: employeeNumber(record),
-      staffFeedbackReviewName: record.name || '—',
-      staffFeedbackReviewType: record.type || '—',
-      staffFeedbackReviewCategory: record.category || '—',
-      staffFeedbackReviewFeedbackTitle: record.title || '—',
+      staffFeedbackReviewName: record.name,
+      staffFeedbackReviewType: record.type,
+      staffFeedbackReviewCategory: record.category,
+      staffFeedbackReviewFeedbackTitle: record.title,
       staffFeedbackReviewDate1: formatDate(record.feedbackDate1 ?? record.date),
       staffFeedbackReviewDate2: formatDate(record.feedbackDate2),
-      staffFeedbackReviewReference1: record.reference1 || '—'
+      staffFeedbackReviewReference1: record.reference1,
+      staffFeedbackReviewReference2: record.reference2,
+      staffFeedbackReviewNote: record.feedbackNote ?? record.note ?? record.feedback,
+      staffFeedbackReviewRemarks: record.feedbackRemarks ?? record.remarks,
+      staffFeedbackReviewSubmitDate: formatDate(record.submitDate),
+      staffFeedbackReviewReviewerComment: record.reviewerComment,
+      staffFeedbackReviewReviewedBy: record.reviewedBy,
+      staffFeedbackReviewReviewedDate: formatDate(record.reviewedDate)
     };
-    Object.entries(values).forEach(([id, value]) => { $(id).value = value; });
+    Object.entries(values).forEach(([id, value]) => { $(id).value = value == null || value === '' ? '—' : value; });
     $('staffFeedbackReward').value = record.reward || '';
     $('staffFeedbackRating').value = record.rating == null ? '' : String(record.rating);
     $('staffFeedbackComments').value = record.reviewerComment || '';

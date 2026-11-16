@@ -41,9 +41,6 @@
       card.setAttribute('aria-controls', 'staffWhereaboutDetails');
       const header = element('header', 'staff-whereabout-card-header');
       header.append(element('h3', 'staff-whereabout-name', row.name), element('span', 'staff-whereabout-emp-no', '#' + row.empNo));
-      const arrow = element('i', 'fa-solid fa-chevron-right staff-whereabout-card-chevron');
-      arrow.setAttribute('aria-hidden', 'true');
-      header.append(arrow);
       const body = element('dl', 'staff-whereabout-card-body');
       body.id = `staffWhereaboutSummary${index}`;
       card.setAttribute('aria-describedby', body.id);

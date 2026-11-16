@@ -12,17 +12,10 @@ const cancelMarker = 'data-page-form-cancel';
 const appCss = read('css/app.css');
 expect(appCss.includes('.form-cancel-btn'), 'Shared form cancel button style is missing');
 const cancelStyle = appCss.match(/\.form-cancel-btn:not\(\[disabled\]\)\s*\{([\s\S]*?)\}/)?.[1] || '';
-expect(cancelStyle.includes('background: #171529'), 'Form Cancel must use the approved dark neutral background');
-expect(cancelStyle.includes('border: 1px solid #302d46'), 'Form Cancel must use the approved dark neutral border');
-expect(cancelStyle.includes('color: #f8fafc'), 'Form Cancel must use the approved light text color');
+expect(cancelStyle.includes('background: var(--primary-action-background)'), 'Form Cancel must use the shared purple action gradient');
+expect(cancelStyle.includes('color: #fff'), 'Form Cancel must use white text');
 expect(!/margin-right\s*:\s*auto/i.test(cancelStyle), 'Form Cancel must stay grouped beside Draft and primary actions');
 expect(!/(#f43f5e|251, 113, 133|190, 24, 93)/i.test(cancelStyle), 'Form Cancel must not use the red or pink danger palette');
-const lightCancelSelector = '[data-theme="light"] .form-cancel-btn:not([disabled])';
-const lightCancelStart = appCss.indexOf(lightCancelSelector);
-const lightCancelStyle = lightCancelStart < 0 ? '' : appCss.slice(lightCancelStart, appCss.indexOf('}', lightCancelStart));
-expect(lightCancelStyle.includes('background: var(--bg-card) !important'), 'Light Form Cancel must use the white theme card background');
-expect(lightCancelStyle.includes('border-color: var(--border-subtle) !important'), 'Light Form Cancel must use the theme border');
-expect(lightCancelStyle.includes('color: var(--text-primary) !important'), 'Light Form Cancel must use dark theme text');
 
 const attachmentStyle = appCss.match(/\/\* FORM ATTACHMENT ACTIONS \*\/([\s\S]*?)\/\* END FORM ATTACHMENT ACTIONS \*\//)?.[1] || '';
 expect(attachmentStyle.includes('width: 54px !important'), 'Form attachment icons must share a 54px width');
@@ -93,7 +86,7 @@ const payrollForms = [
 for (const form of payrollForms) {
   const html = read(form.path);
   expect((html.split(cancelMarker).length - 1) === 1, `${form.name} must have exactly one page Cancel button`);
-  expect(html.includes('btn-draft-bright') === form.draft, `${form.name} Draft button presence changed`);
+  expect(html.includes('<span>Save Draft</span>') === form.draft, `${form.name} Draft button presence changed`);
 }
 
 const priorPayJs = read('js/payroll/prior-pay-data.js');
@@ -112,7 +105,7 @@ const projectForms = [
 for (const form of projectForms) {
   const html = read(form.path);
   expect((html.split(cancelMarker).length - 1) === 1, `${form.name} must have exactly one page Cancel button`);
-  expect(html.includes('btn-draft-bright') === form.draft, `${form.name} Draft button presence changed`);
+  expect(html.includes('<span>Save Draft</span>') === form.draft, `${form.name} Draft button presence changed`);
 }
 
 console.log('All 17 form Cancel button checks passed.');

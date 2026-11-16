@@ -17,8 +17,7 @@
 .staff-whereabout-filter-summary button { display: grid; place-items: center; width: 44px; height: 44px; flex-shrink: 0; border: 1px solid var(--border-subtle); border-radius: 14px; color: var(--purple-text); background: var(--bg-input); }
 .staff-whereabout-records { display: grid; gap: 14px; }
 .staff-whereabout-card { border: 1px solid var(--border-subtle); border-radius: 18px; background: var(--bg-card); box-shadow: var(--shadow-sm); overflow: hidden; cursor: pointer; }
-.staff-whereabout-card-header { position: relative; padding: 12px 36px 10px 14px; background: linear-gradient(115deg, #5820b8, #7c3aed); }
-.staff-whereabout-card-chevron { position: absolute; top: 50%; right: 14px; transform: translateY(-50%); color: rgba(255, 255, 255, .8); font-size: 11px; }
+.staff-whereabout-card-header { padding: 12px 14px 10px; background: linear-gradient(115deg, #5820b8, #7c3aed); }
 .staff-whereabout-name { color: #fff; font-size: 14px; font-weight: 800; line-height: 1.45; overflow-wrap: anywhere; }
 .staff-whereabout-emp-no { display: block; margin-top: 3px; margin-bottom: 4px; color: rgba(255, 255, 255, .78); font: 700 11.5px monospace, sans-serif; }
 .staff-whereabout-card-body { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: 10px 12px; margin: 12px; padding: 10px 12px; border: 1px solid var(--border-subtle); border-radius: 12px; background: var(--bg-input); }

@@ -529,13 +529,12 @@
 
         </div>
 
-        <!-- BOTTOM ACTION FOOTER (MATCHING LEAVE.HTML CONSISTENT DRAFT & SUBMIT BUTTONS) -->
-        <div style="display: flex; align-items: center; justify-content: flex-end; gap: 12px; margin-top: 20px; padding-bottom: 24px;">
+        <div class="form-action-row" style="margin-top: 20px; padding-bottom: 24px;">
           <button type="button" class="form-cancel-btn" data-page-form-cancel onclick="handleBenefitBack()">
             <i class="fa-solid fa-xmark" style="font-size: 13px;"></i>
             <span>Cancel</span>
           </button>
-          <button type="button" onclick="submitBenefitClaimForm()" style="padding: 10px 24px; border-radius: 20px; background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%); color: #ffffff; font-size: 13.5px; font-weight: 800; border: none; cursor: pointer; box-shadow: 0 4px 16px rgba(124, 58, 237, 0.45); display: flex; align-items: center; gap: 8px; transition: transform 0.15s;" onmousedown="this.style.transform='scale(0.96)'" onmouseup="this.style.transform='scale(1)'">
+          <button type="button" class="form-primary-btn" onclick="submitBenefitClaimForm()">
             <span>Submit</span>
             <i class="fa-solid fa-paper-plane" style="font-size: 13px;"></i>
           </button>

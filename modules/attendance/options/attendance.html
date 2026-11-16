@@ -1206,30 +1206,15 @@
       align-items: center;
       justify-content: center;
       gap: 7px;
-      padding: 10px 14px;
+      padding: 10px 20px;
       border-radius: 999px;
       cursor: pointer;
       font-size: 13px;
       font-weight: 800;
       line-height: 1;
       white-space: nowrap;
-    }
-    .attendance-form-cancel {
-      border: 1px solid var(--border-subtle);
-      background: var(--bg-card);
-      color: var(--text-primary);
-      box-shadow: var(--shadow-sm);
-    }
-    .attendance-form-draft {
-      border: 1px solid var(--border-subtle);
-      background: var(--bg-card);
-      color: var(--text-primary);
-      box-shadow: var(--shadow-sm);
-    }
-    .attendance-form-submit {
       border: 0;
-      padding-inline: 20px;
-      background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+      background: var(--primary-action-background);
       color: #ffffff;
       box-shadow: 0 4px 12px rgba(124, 58, 237, 0.28);
     }
@@ -1237,6 +1222,11 @@
     .attendance-form-draft:active,
     .attendance-form-submit:active,
     .attendance-form-back:active { transform: scale(0.97); }
+    @media (max-width: 360px) {
+      .attendance-form-actions button { padding-inline: 10px; }
+    }
+    .clock-time-actions { display: flex; gap: 10px; margin-top: 4px; }
+    .clock-time-actions button { flex: 1; padding: 10px; border: 0; border-radius: 12px; background: var(--primary-action-background); color: #fff; font-size: 13px; font-weight: 800; cursor: pointer; }
       .card-input::placeholder {
         color: var(--text-muted);
         opacity: 0.5;
@@ -1608,7 +1598,7 @@
               </div>
             </div>
 
-            <div class="attendance-form-actions">
+            <div class="attendance-form-actions form-action-row">
               <button class="attendance-form-cancel" type="button" onclick="closeModal('shiftChangeModalOverlay', event)">
                 <i class="fa-solid fa-xmark" aria-hidden="true"></i><span>Cancel</span>
               </button>
@@ -1796,7 +1786,7 @@
            </div>
 
            <!-- Form Actions -->
-           <div class="attendance-feedback-actions attendance-form-actions" style="margin: 10px 4px 24px;">
+           <div class="attendance-feedback-actions attendance-form-actions form-action-row" style="margin: 10px 4px 24px;">
               <button type="button" class="attendance-form-cancel" onclick="closeModal('feedbackModalOverlay', event)">
                  <i class="fa-solid fa-xmark" aria-hidden="true"></i><span>Cancel</span>
               </button>
@@ -1873,9 +1863,9 @@
             <button type="button" onclick="setQuickTime('19:40')" style="background: var(--bg-input); border: 1px solid var(--border-subtle); border-radius: 8px; padding: 6px 10px; font-size: 11.5px; font-weight: 700; color: var(--text-primary); cursor: pointer;">19:40</button>
           </div>
           
-          <div style="display: flex; gap: 10px; margin-top: 4px;">
-            <button type="button" onclick="closeModal('fbTimeEditModalOverlay', event)" style="flex: 1; padding: 10px; background: transparent; border: 1px solid var(--border-subtle); color: var(--text-secondary); border-radius: 12px; font-weight: 700; font-size: 13px; cursor: pointer;">Cancel</button>
-            <button type="button" onclick="applyClockTimeEdit()" style="flex: 1; padding: 10px; background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%); color: #fff; border: none; border-radius: 12px; font-weight: 800; font-size: 13px; cursor: pointer;">Save Time</button>
+          <div class="clock-time-actions">
+            <button type="button" onclick="closeModal('fbTimeEditModalOverlay', event)">Cancel</button>
+            <button type="button" onclick="applyClockTimeEdit()">Save Time</button>
           </div>
         </div>
       </div>

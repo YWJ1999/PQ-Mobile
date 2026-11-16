@@ -443,12 +443,6 @@
   font-weight: 600;
   overflow-wrap: anywhere;
 }
-.pending-feedback-page .detail-popout-footer.detail-popout-actions button:first-child {
-  border-color: var(--detail-border) !important;
-  background: var(--detail-label-surface) !important;
-  color: var(--detail-text) !important;
-}
-.pending-feedback-page .detail-popout-footer.detail-popout-actions button:first-child i { color: var(--detail-text) !important; }
 
 .toast-msg {
   position: absolute;

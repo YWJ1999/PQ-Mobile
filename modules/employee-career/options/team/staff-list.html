@@ -22,7 +22,7 @@
     <phone-status-bar time="9:41"></phone-status-bar>
     <div class="employee-career-header-row">
       <a id="staffListBack" class="employee-career-back" data-option-back href="../../index.html?scope=team" aria-label="Back to Employee and Career"><i class="fa-solid fa-chevron-left" aria-hidden="true"></i></a>
-      <div class="employee-career-heading"><h1 id="staffListTitle">Staff List</h1></div>
+      <div class="employee-career-heading"><h1 id="staffListTitle">Staff List</h1><p id="staffListSummaryAsAt" hidden></p></div>
       <span class="employee-career-header-spacer"></span>
     </div>
   </header>
@@ -35,7 +35,7 @@
       <div class="staff-list-action-summary action-summary-bar record-summary-card">
         <div class="staff-list-summary-row">
           <record-chart-count><strong id="staffListTotalRecords" class="staff-list-summary-count record-summary-value">0</strong> <span class="staff-list-summary-label record-summary-label">Records</span></record-chart-count>
-          <button type="button" id="staffListViewChart" class="view-chart-btn record-chart-button"><i class="fa-solid fa-chart-simple" aria-hidden="true"></i><span>Chart</span></button>
+          <button type="button" id="staffListViewChart" class="view-chart-btn record-chart-button"><i class="fa-solid fa-chart-pie" aria-hidden="true"></i><span>View Chart</span></button>
         </div>
         <div class="staff-list-summary-row">
           <div class="staff-list-averages">
@@ -55,12 +55,8 @@
         <div id="staffListEmpty" class="staff-list-empty" hidden><i class="fa-solid fa-users" aria-hidden="true"></i><h2>No Staff Found</h2><p>Adjust the filters to find employees.</p></div>
       </div>
     </section>
-    <section id="staffListSummaryView" aria-label="Staff listing summary" hidden>
-      <div class="history-total-records-card staff-list-statistics-card" aria-labelledby="staffListStatisticsTitle">
-        <span id="staffListStatisticsTitle" class="history-total-records-label">Staff Statistics</span>
-        <strong id="staffListSummaryAsAt" class="history-total-records-value"></strong>
-      </div>
-      <div id="staffListSummaryCards" class="staff-list-summary-grid"></div>
+    <section id="staffListSummaryView" aria-label="Staff Overview" hidden>
+      <div id="staffListSummaryCards" class="staff-overview-groups"></div>
     </section>
     <section id="staffListChartView" aria-label="Staff analysis" hidden>
       <div class="staff-list-breakdown-card">
@@ -119,9 +115,9 @@
       <div class="standard-filter-handle" aria-hidden="true"></div>
       <header class="standard-filter-header"><h2 id="staffListFilterTitle">Filter</h2><div class="standard-filter-header-actions"><button type="button" id="staffListResetFilter" class="standard-filter-reset"><i class="fa-solid fa-rotate-left" aria-hidden="true"></i><span>Reset</span></button><button type="button" id="staffListCloseFilter" class="standard-filter-close" aria-label="Close staff filter"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button></div></header>
       <input id="staffListFilterAsAt" type="hidden">
-      <select id="staffListFilterCategory" hidden><option value="">All Staff</option></select>
       <div class="staff-list-filter-fields">
         <div><label for="staffListFilterKeyword">Search Keyword</label><input id="staffListFilterKeyword" type="search" placeholder="Employee Number or Name" maxlength="150"></div>
+        <div><label for="staffListFilterCategory">Staff Category</label><select id="staffListFilterCategory"><option value="">All Staff</option></select></div>
         <div><label for="staffListFilterCompany">Company</label><select id="staffListFilterCompany"></select></div>
         <div><label for="staffListFilterBranch">Branch</label><select id="staffListFilterBranch"></select></div>
         <div><label for="staffListFilterDivision">Division</label><select id="staffListFilterDivision"></select></div>
