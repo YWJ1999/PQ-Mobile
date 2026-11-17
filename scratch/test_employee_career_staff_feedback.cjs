@@ -92,41 +92,51 @@ const url = pathToFileURL(path.resolve(__dirname, '../modules/employee-career/op
       }
       await page.setViewport({ width: 390, height: 950 });
       await page.screenshot({ path: path.join(__dirname, `employee_career_staff_feedback_${theme}.png`) });
-      await page.click('.staff-feedback-details-trigger');
-     assert.equal(await page.$eval('#staffFeedbackDetailsOverlay', node => node.hidden), false);
+      await navigate('.staff-feedback-details-trigger');
+      assert.ok(new URL(page.url()).pathname.endsWith('/staff-feedback-details.html'));
+      assert.equal(new URL(page.url()).searchParams.get('record'), 'staff-feedback-1');
+      assert.equal(await page.$eval('html', node => node.dataset.theme), theme);
+      assert.equal(await page.$('#staffFeedbackDetailsOverlay'), null);
+      assert.equal(await page.evaluate(() => document.activeElement.id), 'staffFeedbackDetailsTitle');
       const detailStatus = await page.$$eval('#staffFeedbackDetailsTable tr', rows => {
         const row = rows.find(node => node.cells[0].textContent.trim() === 'Status');
         const badge = row.cells[1].querySelector('.record-detail-status');
         return { text: badge?.textContent.trim(), state: badge?.dataset.status };
       });
       assert.deepEqual(detailStatus, { text: 'Pending', state: 'pending' });
-      assert.equal(await page.$eval('main', node => node.inert), true);
+      assert.equal(await page.$eval('main', node => node.inert), false);
       await page.screenshot({ path: path.join(__dirname, `employee_career_staff_feedback_details_${theme}_top.png`) });
-      await page.$eval('#staffFeedbackDetailsOverlay .detail-popout-body', node => { node.scrollTop = node.scrollHeight; });
+      await page.$eval('main', node => { node.scrollTop = node.scrollHeight; });
       await page.screenshot({ path: path.join(__dirname, `employee_career_staff_feedback_details_${theme}_bottom.png`) });
-      await page.keyboard.press('Escape');
+      await navigate('#staffFeedbackDetailsBack');
       assert.equal(await page.evaluate(() => document.activeElement.classList.contains('staff-feedback-details-trigger')), true);
       await page.setViewport({ width: 360, height: 667 });
       await navigate('.staff-feedback-card:first-child .staff-feedback-review-button');
       assert.ok(page.url().includes('/staff-feedback-review.html'), 'Review opens a separate form page');
       assert.equal(await page.$('#staffFeedbackReviewOverlay'), null, 'Review uses a page rather than an overlay');
       assert.equal(await page.$('[role=dialog][aria-modal=true]'), null, 'The review form is not a dialog');
-      assert.deepEqual(await page.$$eval('.staff-feedback-review-actions a, .staff-feedback-review-actions button', nodes => nodes.map(node => node.textContent.trim())), ['Cancel', 'Submit']);
+      assert.deepEqual(await page.$$eval('.staff-feedback-review-actions a, .staff-feedback-review-actions button', nodes => nodes.map(node => node.textContent.trim())), ['Cancel', 'Submit Review']);
       assert.equal(await page.$eval('html', node => node.dataset.theme), theme);
       assert.deepEqual(await page.evaluate(() => {
         const active = document.activeElement;
         const rect = active.getBoundingClientRect();
         return { id: active.id, visible: rect.top >= 0 && rect.bottom <= innerHeight };
       }), { id: 'staffFeedbackReviewTitle', visible: true }, 'A short viewport opens Review with visible non-scrolling focus');
-      assert.ok(await page.$eval('#staffFeedbackReviewForm', node => {
+      assert.deepEqual(await page.$$eval('[role=tab]', tabs => tabs.map(tab => [tab.textContent.trim(), tab.getAttribute('aria-selected')])), [['Feedback', 'true'], ['Review', 'false']]);
+      assert.equal(await page.$eval('#staffFeedbackSubmitReview', node => node.getClientRects().length), 0);
+      assert.deepEqual(await page.$eval('.staff-feedback-review-identity', card => {
+        const name = card.querySelector('h2');
+        const id = name.nextElementSibling;
+        return [name.textContent, id.textContent, id.getBoundingClientRect().top >= name.getBoundingClientRect().bottom];
+      }), ['AHMAD RAFY BIN ZULKIPLE', '#004177', true]);
+      assert.equal(await page.$eval('#staffFeedbackReviewAttachments a', link => link.download), 'Flexible-hours-note.txt');
+      assert.ok(await page.$eval('#staffFeedbackPanel', node => {
         const rect = node.getBoundingClientRect();
         return rect.left >= 0 && rect.right <= innerWidth && node.scrollWidth <= node.clientWidth + 1;
       }), 'Review form stays within a 360px viewport');
-      const readOnlyDetails = await page.$$eval('#staffFeedbackReviewForm [readonly]', nodes => nodes.map(node => [node.labels[0].textContent.trim(), node.value]));
-      assert.deepEqual(readOnlyDetails.map(([label]) => label), ['Employee ID', 'Name', 'Type', 'Category', 'Title', 'Feedback Date 1', 'Feedback Date 2', 'Reference 1', 'Reference 2', 'Feedback Note', 'Feedback Remarks', 'Submit Date', 'Reviewer Comment', 'Reviewed By', 'Reviewed Date']);
+      const readOnlyDetails = await page.$$eval('#staffFeedbackPanel [readonly]', nodes => nodes.map(node => [node.labels[0].textContent.trim(), node.value]));
+      assert.deepEqual(readOnlyDetails.map(([label]) => label), ['Title', 'Type', 'Category', 'Feedback Date 1', 'Feedback Date 2', 'Reference 1', 'Reference 2', 'Feedback Note', 'Feedback Remarks', 'Submit Date']);
       assert.deepEqual(Object.fromEntries(readOnlyDetails), {
-        'Employee ID': '#004177',
-        'Name': 'AHMAD RAFY BIN ZULKIPLE',
         'Type': 'Suggestion',
         'Category': 'Policy',
         'Title': 'Flexible working hours',
@@ -136,11 +146,15 @@ const url = pathToFileURL(path.resolve(__dirname, '../modules/employee-career/op
         'Reference 2': '—',
         'Feedback Note': 'Could we allow a flexible start time for the morning shift? This would help staff manage their daily commute.',
         'Feedback Remarks': 'For consideration at the next team discussion.',
-        'Submit Date': '5 Oct 2026',
-        'Reviewer Comment': '—',
-        'Reviewed By': '—',
-        'Reviewed Date': '—'
+        'Submit Date': '5 Oct 2026'
       });
+      await page.focus('#staffFeedbackTab');
+      await page.keyboard.press('ArrowRight');
+      assert.equal(await page.evaluate(() => document.activeElement.id), 'staffReviewTab');
+      assert.equal(await page.$eval('#staffFeedbackPanel', node => node.hidden), true);
+      assert.deepEqual(await page.$$eval('#staffReviewPanel [readonly]', fields => fields.map(field => [field.labels[0].textContent, field.value])), [
+        ['Reviewer Comment', '—'], ['Reviewed By', '—'], ['Reviewed Date', '—'], ['Rating', '—'], ['Reward', '—'], ['Status', 'Pending']
+      ]);
       assert.ok(await page.$$eval('.staff-feedback-review-section', nodes => nodes.every(node => {
         const style = getComputedStyle(node);
         return style.borderTopStyle === 'solid' && style.borderRadius === '16px';
@@ -161,6 +175,11 @@ const url = pathToFileURL(path.resolve(__dirname, '../modules/employee-career/op
       assert.equal(await page.$eval('#staffFeedbackReviewError', node => node.textContent.trim()), 'Comments are required.');
       await assertReviewControlVisible('staffFeedbackComments');
       await page.type('#staffFeedbackComments', 'Reviewed and approved for follow-up.');
+      await page.click('#staffFeedbackTab');
+      await page.click('#staffReviewTab');
+      assert.deepEqual(await page.$$eval('#staffFeedbackReviewForm select, #staffFeedbackComments', fields => fields.map(field => field.value)), ['RM 50.00', '4', 'Reviewed and approved for follow-up.']);
+      assert.equal(await page.$eval('#staffFeedbackReviewReviewerComment', node => node.value), '—');
+      await page.focus('#staffFeedbackComments');
       await page.setViewport({ width: 390, height: 950 });
       assert.ok(await page.$eval('#staffFeedbackReviewName', node => node.scrollWidth <= node.clientWidth + 1), 'The employee name is fully readable at 390px');
       assert.ok(await page.evaluate(() => {
@@ -173,6 +192,10 @@ const url = pathToFileURL(path.resolve(__dirname, '../modules/employee-career/op
       assert.equal(new URL(page.url()).pathname.endsWith('/staff-feedback.html'), true);
       assert.equal(await page.$eval('.staff-feedback-card:first-child .staff-feedback-status', node => node.textContent.trim()), 'Responded');
       await navigate('.staff-feedback-card:first-child .staff-feedback-review-button');
+      await page.click('#staffReviewTab');
+      assert.deepEqual(await page.$$eval('#staffReviewPanel [readonly]', fields => fields.map(field => field.value)), [
+        'Reviewed and approved for follow-up.', 'Sarah Jenkins', await page.evaluate(() => new Date().toLocaleDateString('en-GB', {day:'numeric', month:'short', year:'numeric'})), '4', 'RM 50.00', 'Responded'
+      ]);
       assert.deepEqual(await page.evaluate(() => ({
         reward: document.getElementById('staffFeedbackReward').value,
         rating: document.getElementById('staffFeedbackRating').value,
@@ -192,6 +215,16 @@ const url = pathToFileURL(path.resolve(__dirname, '../modules/employee-career/op
       assert.equal(await page.evaluate(() => document.activeElement.id), 'staffFeedbackFilterTrigger');
       await apply({ staffFeedbackKeyword: '#004177' });
       assert.equal(await page.$$eval('.staff-feedback-card', nodes => nodes.length), 6);
+      const lastDetails = '.staff-feedback-card:last-child .staff-feedback-details-trigger';
+      await page.$eval(lastDetails, link => link.scrollIntoView({ block: 'center' }));
+      const listScroll = await page.$eval('main', node => node.scrollTop);
+      assert.ok(listScroll > 0);
+      await navigate(lastDetails);
+      assert.equal(new URL(page.url()).searchParams.get('record'), 'staff-feedback-51');
+      await navigate('#staffFeedbackDetailsBack');
+      assert.equal(await page.$eval('#staffFeedbackTotal', node => node.textContent), '6');
+      assert.equal(await page.$eval('main', node => node.scrollTop), listScroll);
+      assert.equal(await page.$eval(lastDetails, link => link === document.activeElement), true);
      await reset();
      await page.click('#staffFeedbackViewChart');
       assert.equal(await page.$eval('#staffFeedbackListView', node => node.hidden), true);
@@ -246,7 +279,8 @@ const url = pathToFileURL(path.resolve(__dirname, '../modules/employee-career/op
     await apply({ staffFeedbackKeyword: '#004177', staffFeedbackStartDate: '2026-09-02', staffFeedbackEndDate: '2026-09-18', staffFeedbackType: 'Suggestion', staffFeedbackCategory: 'Policy', staffFeedbackStatus: 'Pending' });
     assert.equal(await page.$eval('#staffFeedbackTotal', node => node.textContent), '1');
     assert.match(await page.$eval('.staff-feedback-card', node => node.innerText), /Ahmad Rafy/);
-    await page.click('.staff-feedback-details-trigger');
+    await navigate('.staff-feedback-details-trigger');
+    await page.reload({ waitUntil: 'networkidle0' });
     const details = await page.$$eval('#staffFeedbackDetailsTable tr', rows => Object.fromEntries(rows.map(row => [row.cells[0].textContent.trim(), row.cells[1].textContent.trim()])));
     assert.deepEqual(details, {
       'Emp #': '#004177', 'Name': 'Ahmad Rafy', 'Type': 'Suggestion', 'Category': 'Policy', 'Title': 'Shift suggestion',
@@ -256,10 +290,9 @@ const url = pathToFileURL(path.resolve(__dirname, '../modules/employee-career/op
     }, 'The clicked filtered record supplies every detail field, including zero values');
     assert.equal(await page.$$eval('#staffFeedbackDetailsTable a', nodes => nodes.length), 1, 'Unsafe attachment URLs do not become links');
     assert.match(await page.$eval('#staffFeedbackDetailsTable a', node => node.href), /staff-feedback-sample-note\.txt$/);
-    await page.keyboard.press('Tab');
-    await page.keyboard.press('Tab');
-    assert.equal(await page.evaluate(() => document.activeElement.id), 'staffFeedbackCloseDetails', 'Tab wraps inside details');
-    await page.keyboard.press('Escape');
+    await page.goBack({ waitUntil: 'networkidle0' });
+    assert.equal(await page.$eval('#staffFeedbackTotal', node => node.textContent), '1', 'Browser Back restores the filtered list');
+    assert.equal(await page.evaluate(() => document.activeElement.matches('.staff-feedback-details-trigger')), true);
    await page.click('#staffFeedbackViewChart');
    assert.equal(await page.$eval('#staffFeedbackChartTotal', node => node.textContent), '1');
     assert.deepEqual(await page.$$eval('.staff-feedback-legend-row', nodes => nodes.map(node => ({ label: node.children[0].textContent.trim(), count: node.children[1].textContent.trim(), percent: node.children[2].textContent.trim() }))), [{ label: 'Pending', count: '1', percent: '100.00%' }]);
@@ -268,19 +301,19 @@ const url = pathToFileURL(path.resolve(__dirname, '../modules/employee-career/op
     await page.click('#staffFeedbackBack');
    await reset();
     await page.$eval('.staff-feedback-card:nth-child(2) .staff-feedback-details-trigger', node => node.focus());
-    await page.keyboard.press('Enter');
+    await Promise.all([page.waitForNavigation(), page.keyboard.press('Enter')]);
     assert.match(await page.$eval('#staffFeedbackDetailsTable', node => node.innerText), /New chairs delivered/);
     assert.match(await page.$eval('#staffFeedbackDetailsTable', node => node.innerText), /Farah Hassan/);
     assert.equal(await page.$$eval('#staffFeedbackDetailsTable tr', rows => rows.find(row => row.cells[0].textContent.trim() === 'Status').cells[1].textContent.trim()), 'Responded');
     assert.equal(await page.$eval('#staffFeedbackDetailsTable tr:last-child td:last-child', node => node.textContent.trim()), 'No attachments');
-    await page.click('#staffFeedbackCloseDetails');
+    await navigate('#staffFeedbackDetailsBack');
     assert.equal(await page.evaluate(() => document.activeElement.matches('.staff-feedback-card:nth-child(2) .staff-feedback-details-trigger')), true);
     await page.$eval('.staff-feedback-card:nth-child(3) .staff-feedback-details-trigger', node => node.focus());
-    await page.keyboard.press('Space');
+    await Promise.all([page.waitForNavigation(), page.keyboard.press('Space')]);
     assert.match(await page.$eval('#staffFeedbackDetailsTable', node => node.innerText), /Yee seong liew/);
     assert.match(await page.$eval('#staffFeedbackDetailsTable', node => node.innerText), /Add earlier shifts/);
     assert.equal(await page.$eval('#staffFeedbackDetailsTable tr:nth-child(11) td:last-child', node => node.textContent.trim()), '—', 'Missing review data clears previous record values');
-    await page.keyboard.press('Escape');
+    await navigate('#staffFeedbackDetailsBack');
     await apply({ staffFeedbackStartDate: '2026-09-18', staffFeedbackEndDate: '2026-09-18' });
     assert.equal(await page.$eval('#staffFeedbackTotal', node => node.textContent), '2', 'Date boundaries are inclusive');
     await apply({ staffFeedbackStartDate: '2026-10-05', staffFeedbackEndDate: '2026-09-02' });
@@ -300,8 +333,12 @@ const url = pathToFileURL(path.resolve(__dirname, '../modules/employee-career/op
     await apply({ staffFeedbackKeyword: '#004177', staffFeedbackType: 'Suggestion', staffFeedbackCategory: 'Policy', staffFeedbackStatus: 'Pending' });
     assert.equal(await page.$eval('#staffFeedbackTotal', node => node.textContent), '1');
     await navigate('.staff-feedback-review-button');
-    assert.deepEqual(await page.$$eval('#staffFeedbackReviewForm [readonly]', nodes => nodes.slice(-7).map(node => node.value)),
-      ['External-42', 'Start at 8 or 9 AM.', 'For morning shifts.', '4 Sept 2026', 'Review next week.', 'Sarah Tan', '5 Sept 2026']);
+    assert.deepEqual(await page.$$eval('#staffFeedbackPanel [readonly]', nodes => nodes.slice(-4).map(node => node.value)),
+      ['External-42', 'Start at 8 or 9 AM.', 'For morning shifts.', '4 Sept 2026']);
+    assert.equal(await page.$$eval('#staffFeedbackReviewAttachments a', nodes => nodes.length), 1);
+    await page.click('#staffReviewTab');
+    assert.deepEqual(await page.$$eval('#staffReviewPanel [readonly]', nodes => nodes.map(node => node.value)),
+      ['Review next week.', 'Sarah Tan', '5 Sept 2026', '0', '0', 'Pending']);
     await page.select('#staffFeedbackReward', 'No Reward');
     await page.select('#staffFeedbackRating', '3');
     await navigate('#staffFeedbackSubmitReview');
@@ -310,6 +347,8 @@ const url = pathToFileURL(path.resolve(__dirname, '../modules/employee-career/op
     await reset();
     assert.equal(await page.$eval('#staffFeedbackTotal', node => node.textContent), '4');
     assert.equal(await page.$('.staff-feedback-card img'), null, 'Feedback titles are rendered as text');
+    await navigate('.staff-feedback-card:nth-child(2) .staff-feedback-review-button');
+    assert.equal(await page.$eval('#staffFeedbackReviewAttachments', node => node.textContent), 'No attachments');
     assert.deepEqual(errors, []);
     console.log('PASS: Staff Feedback history cards, clicked record details, all detail fields, safe attachments, zero and missing values, keyboard access, 60 records, six filters, charts, dates, responsive themes and focus restoration.');
   } finally { await browser.close(); }

@@ -43,6 +43,7 @@ const root = path.resolve(__dirname, '..');
         window.capturedReview = { ...event.detail, attachments: event.detail.attachments.map(file => ({ name: file.name, realFile: file instanceof File })) };
       }));
       await page.click('#selfReviewSubmit');
+      await page.waitForFunction(() => window.capturedReview);
       const captured = await page.evaluate(() => window.capturedReview);
       assert.equal(captured.empNo, 'EBB12');
       assert.equal(captured.reference, 'APP000000000233');

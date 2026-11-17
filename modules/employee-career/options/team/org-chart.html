@@ -31,29 +31,13 @@
     <main class="main-content employee-career-content">
       <section class="org-chart-summary filter-summary-bar" aria-label="Current organization chart filter">
         <div class="org-chart-summary-copy"><small>Current Filter</small><strong id="orgChartFilterSummary">All organization units and levels</strong></div>
-        <button type="button" id="orgChartFilterTrigger" class="org-chart-filter-trigger" aria-label="Open organization chart filter" aria-haspopup="dialog" aria-controls="orgChartFilterOverlay"><i class="fa-solid fa-sliders" aria-hidden="true"></i></button>
+        <button type="button" id="orgChartFilterTrigger" class="org-chart-filter-trigger standard-filter-summary-trigger" aria-label="Open organization chart filter" aria-haspopup="dialog" aria-expanded="false" aria-controls="orgChartFilterOverlay"><i class="fa-solid fa-sliders standard-filter-summary-trigger-glyph" aria-hidden="true"></i></button>
       </section>
 
-      <section id="orgChartSpacingControls" class="org-chart-spacing-controls" aria-label="Organization chart spacing controls">
-        <div class="org-chart-spacing-control">
-          <span class="org-chart-spacing-label">Mrg. X</span>
-          <div class="org-chart-stepper">
-            <button type="button" id="orgChartMarginXDecrease" aria-label="Decrease horizontal margin"><i class="fa-solid fa-minus" aria-hidden="true"></i></button>
-            <output id="orgChartMarginXValue" aria-live="polite">26</output>
-            <button type="button" id="orgChartMarginXIncrease" aria-label="Increase horizontal margin"><i class="fa-solid fa-plus" aria-hidden="true"></i></button>
-          </div>
-        </div>
-        <div class="org-chart-spacing-control">
-          <span class="org-chart-spacing-label">Mrg. Y</span>
-          <div class="org-chart-stepper">
-            <button type="button" id="orgChartMarginYDecrease" aria-label="Decrease vertical margin"><i class="fa-solid fa-minus" aria-hidden="true"></i></button>
-            <output id="orgChartMarginYValue" aria-live="polite">14</output>
-            <button type="button" id="orgChartMarginYIncrease" aria-label="Increase vertical margin"><i class="fa-solid fa-plus" aria-hidden="true"></i></button>
-          </div>
-        </div>
-      </section>
-
-      <div class="org-chart-meta"><span>Visible positions</span><strong id="orgChartVisibleCount">0</strong></div>
+      <div class="org-chart-meta record-summary-card">
+        <span class="record-summary-metric" role="status" aria-atomic="true"><span class="record-summary-label">Visible positions</span> <strong id="orgChartVisibleCount" class="record-summary-value">0</strong></span>
+        <button type="button" id="orgChartLayoutTrigger" class="org-chart-filter-trigger standard-filter-summary-trigger" aria-label="Open chart layout" title="Chart layout" aria-haspopup="dialog" aria-expanded="false" aria-controls="orgChartLayoutOverlay"><i class="fa-solid fa-sliders standard-filter-summary-trigger-glyph" aria-hidden="true"></i></button>
+      </div>
       <ul id="orgChartTree" class="org-chart-tree" aria-label="Organization hierarchy"></ul>
       <section id="orgChartEmpty" class="org-chart-empty" hidden>
         <i class="fa-solid fa-sitemap" aria-hidden="true"></i>
@@ -66,14 +50,42 @@
     <notification-sheet></notification-sheet>
     <favourite-sheet></favourite-sheet>
 
-    <div id="orgChartFilterOverlay" class="org-chart-filter-overlay standard-filter-sheet" hidden>
+    <div id="orgChartLayoutOverlay" class="org-chart-sheet standard-filter-sheet" hidden>
+      <section class="standard-filter-panel" role="dialog" aria-modal="true" aria-labelledby="orgChartLayoutTitle">
+        <div class="standard-filter-handle" aria-hidden="true"></div>
+        <header class="standard-filter-header">
+          <h2 id="orgChartLayoutTitle" tabindex="-1">Chart layout</h2>
+        </header>
+        <div id="orgChartSpacingControls" class="org-chart-spacing-controls">
+          <div class="org-chart-spacing-control">
+            <label for="orgChartMarginXValue" title="Horizontal spacing">Mrg. X</label>
+            <div class="org-chart-stepper">
+              <button type="button" id="orgChartMarginXDecrease" aria-label="Decrease horizontal spacing">−</button>
+              <output id="orgChartMarginXValue">26</output>
+              <button type="button" id="orgChartMarginXIncrease" aria-label="Increase horizontal spacing">+</button>
+            </div>
+          </div>
+          <div class="org-chart-spacing-control">
+            <label for="orgChartMarginYValue" title="Vertical spacing">Mrg. Y</label>
+            <div class="org-chart-stepper">
+              <button type="button" id="orgChartMarginYDecrease" aria-label="Decrease vertical spacing">−</button>
+              <output id="orgChartMarginYValue">14</output>
+              <button type="button" id="orgChartMarginYIncrease" aria-label="Increase vertical spacing">+</button>
+            </div>
+          </div>
+        </div>
+        <footer class="standard-filter-footer"><button type="button" id="orgChartLayoutDone" class="standard-filter-apply" data-close-chart-sheet>Done</button></footer>
+      </section>
+    </div>
+
+    <div id="orgChartFilterOverlay" class="org-chart-sheet standard-filter-sheet" hidden>
       <form id="orgChartFilterForm" class="standard-filter-panel" data-standard-filter-ready="true" role="dialog" aria-modal="true" aria-labelledby="orgChartFilterTitle">
         <div class="standard-filter-handle" aria-hidden="true"></div>
         <header class="standard-filter-header">
           <h2 id="orgChartFilterTitle">Filter</h2>
           <div class="standard-filter-header-actions">
             <button type="button" id="orgChartResetFilter" class="standard-filter-reset"><i class="fa-solid fa-rotate-left" aria-hidden="true"></i><span>Reset</span></button>
-            <button type="button" id="orgChartCloseFilter" class="standard-filter-close" aria-label="Close organization chart filter"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
+            <button type="button" id="orgChartCloseFilter" class="standard-filter-close" data-close-chart-sheet aria-label="Close organization chart filter"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
           </div>
         </header>
         <div class="org-chart-filter-fields">

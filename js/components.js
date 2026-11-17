@@ -3,6 +3,7 @@
    Zero build tool required. 100% offline & file:// compatible.
    ======================================================== */
 
+const previewUserName = 'Sarah Jenkins';
 const recordDeleteLabel = 'Delete Record';
 const recordDeleteLabelHTML = `<i class="fa-regular fa-trash-can" aria-hidden="true"></i><span>${recordDeleteLabel}</span>`;
 const recordCardActionLabels = {
@@ -303,7 +304,7 @@ class AppHeader extends HTMLElement {
 
         <div class="header-actions">
           <!-- User Profile Avatar -->
-          <div class="profile-wrap" title="Sarah Jenkins" onclick="openProfileDrawer()" style="cursor: pointer;">
+          <div class="profile-wrap" title="${previewUserName}" onclick="openProfileDrawer()" style="cursor: pointer;">
             <img class="profile-img"
               src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80"
               alt="Sarah">
@@ -329,11 +330,11 @@ class LeftProfileDrawer extends HTMLElement {
             <div class="drawer-avatar-wrap">
               <img class="drawer-avatar-img"
                 src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&auto=format&fit=crop&q=80"
-                alt="Sarah Jenkins">
+                alt="${previewUserName}">
               <div class="drawer-avatar-badge"></div>
             </div>
             <div class="drawer-user-info">
-              <div class="drawer-user-name">Sarah Jenkins</div>
+              <div class="drawer-user-name">${previewUserName}</div>
               <div class="drawer-employee-id">#EBB01</div>
               <div class="drawer-user-role">Senior Product Designer</div>
               <div class="drawer-user-email">sarah.j@peoplequest.com</div>

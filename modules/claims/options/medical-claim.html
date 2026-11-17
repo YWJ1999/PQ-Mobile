@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Claims - Medical Claim</title>
   <script src="../../../js/components.js"></script>
+  <script src="../../../js/claims/claim-request-store.js"></script>
+  <script src="../../../js/claims/claim-application-fields.js"></script>
   <script src="../../../js/app.js" defer></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -549,100 +551,7 @@
       <div class="view-container active" id="view-1-main">
         
         <!-- MAIN APPLICATION INFO CARD -->
-        <div class="form-card">
-          <div class="section-header-bar no-top-border">
-            <span class="section-title-accent"></span>
-            <span class="section-title-text">APPLICATION DETAILS</span>
-          </div>
-
-          <!-- Benefit Year : -->
-          <div class="field-group">
-            <label class="field-label">Benefit Year</label>
-            <input type="text" id="medicalBenefitYearInput" class="form-ctrl" value="2026" readonly />
-          </div>
-
-          <!-- Benefit Type : -->
-          <div class="field-group">
-            <label class="field-label">Benefit Type</label>
-            <input type="text" id="genBenefitTypeInput" class="form-ctrl" value="MEDICAL CLAIMS" readonly />
-          </div>
-
-          <!-- Entitled Balance & Usable Balance -->
-          <div class="field-group" style="display: flex; flex-direction: column; gap: 10px; margin-top: 4px; margin-bottom: 16px;">
-            <div style="display: flex; align-items: center; justify-content: space-between;">
-              <span class="field-label" style="margin-bottom: 0;">Entitled Balance</span>
-              <span id="entitledPillDisplay" class="dark-balance-pill">RM 800.00</span>
-            </div>
-            <div style="display: flex; align-items: center; justify-content: space-between;">
-              <span class="field-label" style="margin-bottom: 0;">Usable Balance</span>
-              <span id="usablePillDisplay" class="dark-balance-pill">RM 640.10</span>
-            </div>
-          </div>
-
-          <!-- Claim Period : -->
-          <div class="field-group">
-            <label class="field-label">Claim Period <span class="req">*</span></label>
-            <div style="display: grid; grid-template-columns: 1fr 1.2fr; gap: 10px;">
-              <div class="select-wrapper">
-                <select id="mClaimYear" class="form-ctrl">
-                  <option value="2026" selected>2026</option>
-                  <option value="2025">2025</option>
-                </select>
-              </div>
-              <div class="select-wrapper">
-                <select id="mClaimMonth" class="form-ctrl">
-                  <option value="September" selected>September</option>
-                  <option value="August">August</option>
-                  <option value="July">July</option>
-                </select>
-              </div>
-            </div>
-          </div>
-
-          <!-- Receipt Date : -->
-          <div class="field-group">
-            <label class="field-label">Receipt Date <span class="req">*</span></label>
-            <input type="date" id="mReceiptDate" class="form-ctrl" value="2026-09-23" />
-          </div>
-
-          <!-- Receipt No. : -->
-          <div class="field-group">
-            <label class="field-label">Receipt No.</label>
-            <input type="text" id="mReceiptNoInput" class="form-ctrl" value="REC-88310" placeholder="Enter receipt number" />
-          </div>
-
-          <!-- Claim Total -->
-          <div class="field-group">
-            <label class="field-label">Claim Total (RM)</label>
-            <input type="text" id="mClaimTotalInput" class="form-ctrl" value="0.00" readonly />
-          </div>
-
-          <!-- Remark : -->
-          <div class="field-group">
-            <label class="field-label">Remark</label>
-            <input type="text" id="mRemarkInput" class="form-ctrl" placeholder="Enter remark..." />
-          </div>
-        <!-- GENERAL ATTACHMENTS -->
-          <label class="field-label form-section-heading" style="font-size: 13.5px; font-weight: 800; color: var(--text-primary); margin-bottom: 12px; display: block;">Upload Attachment</label>
-
-          <div style="display: flex; align-items: center; justify-content: center; gap: 36px; padding: 8px 0;">
-            <div style="display: flex; flex-direction: column; align-items: center; gap: 8px; cursor: pointer;" onclick="triggerFileUpload('main')">
-              <div style="width: 54px; height: 54px; border-radius: 50%; background: rgba(124, 58, 237, 0.12); border: 1px solid rgba(124, 58, 237, 0.3); display: flex; align-items: center; justify-content: center; color: var(--purple-primary); font-size: 18px;">
-                <i class="fa-solid fa-file-arrow-up"></i>
-              </div>
-              <span style="font-size: 12.5px; font-weight: 700; color: var(--purple-primary);">Select File(s)</span>
-            </div>
-
-            <div style="display: flex; flex-direction: column; align-items: center; gap: 8px; cursor: pointer;" onclick="triggerFileUpload('main')">
-              <div style="width: 54px; height: 54px; border-radius: 50%; background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%); display: flex; align-items: center; justify-content: center; color: #ffffff; font-size: 18px; box-shadow: 0 6px 18px rgba(124, 58, 237, 0.45);">
-                <i class="fa-solid fa-camera"></i>
-              </div>
-              <span style="font-size: 12.5px; font-weight: 800; color: var(--text-primary);">Take Picture</span>
-            </div>
-          </div>
-
-          <div id="mainChipsList" class="attachment-upload-list"></div>
-        </div>
+        <template id="claimApplicationFields"></template>
 
         <!-- BOTTOM ACTION BUTTONS -->
         <div class="claim-step-actions form-action-row">
@@ -830,6 +739,7 @@
 
   <!-- STATE MANAGEMENT & DRILL-DOWN NAVIGATION SCRIPT -->
   <script>
+    ClaimApplicationFields.mount('Medical Claim');
     let medicalPageMode = 'entitlement';
 
     // Global Unified Form Data
@@ -1174,7 +1084,7 @@
                   <div class="medical-data-row">
                     <span class="medical-data-label">Attachment</span>
                     <div style="display: flex; flex-wrap: wrap; gap: 6px;">
-                      ${(item.attachments && item.attachments.length > 0 ? item.attachments : ['xxxx.jpg']).map(att => `
+                      ${(item.attachments || []).map(att => `
                         <div class="file-chip" style="background: rgba(124,58,237,0.08); border: 1px solid rgba(124,58,237,0.2); padding: 4px 8px; border-radius: 8px; font-size: 10.5px; font-weight: 700; color: var(--purple-primary); display: flex; align-items: center; gap: 4px;">
                           <i class="fa-solid fa-paperclip"></i> ${att}
                         </div>
@@ -1474,15 +1384,9 @@
         const currency = document.getElementById('detCurrencySelect')?.value || 'MYR';
         const forexRate = parseFloat(document.getElementById('detForexRateInput')?.value || 1);
         const localAmount = parseFloat(document.getElementById('detLocalAmountInput')?.value || 0);
-        const existingAttachments = typeof editIdx === 'number' && editIdx >= 0
-          ? formData.expenseItems[editIdx]?.attachments
-          : null;
-        const detailChips = Array.from(document.querySelectorAll('#detailChipsList .file-chip'))
+        const attachments = Array.from(document.querySelectorAll('#detailChipsList .file-chip'))
           .map(chip => chip.dataset.fileName || chip.textContent.trim())
           .filter(Boolean);
-        const attachments = detailChips.length > 0
-          ? detailChips
-          : (existingAttachments && existingAttachments.length > 0 ? existingAttachments : ['xxxx.jpg']);
 
         const newItem = { receiptNo, expenseType, amt, currency, forexRate, localAmount, attachments };
         if (typeof editIdx === 'number' && editIdx >= 0) {
@@ -1565,6 +1469,7 @@
     }
 
     function submitMedicalClaim() {
+      if (!ClaimApplicationFields.submit('Medical Claim', { medicalItems: formData.treatmentItems, detailItems: formData.expenseItems })) return;
       if (typeof showToast === 'function') {
         showToast('🚀 Medical Claim submitted successfully!');
       } else {

@@ -24,15 +24,15 @@ async function open(page, relative, query = '') {
 
 async function assertEmployeeCards(page, category) {
   const cards = await page.$$eval('#teamHistoryList .history-card-item', nodes => nodes.map(node => ({
-    id: node.querySelector('.team-history-employee-id')?.textContent.trim() || '',
-    adjacent: Boolean(node.querySelector('.team-history-employee-name + .team-history-employee-id')),
+    employee: node.querySelector('.team-history-employee-identity')?.textContent.trim(),
+    position: node.querySelector('.team-history-employee-identity + .team-history-employee-position')?.textContent.trim(),
     hasDetails: Boolean(node.querySelector('.history-card-details')),
     status: node.querySelector('.status-pill')?.textContent.trim() || ''
   })));
   assert.equal(cards.length, 2, `${category} has two provisional records`);
   cards.forEach(card => {
-    assert.match(card.id, /^#[A-Z0-9-]+$/, `${category} employee number is prefixed with #`);
-    assert.equal(card.adjacent, true, `${category} employee number sits directly below the name`);
+    assert.match(card.employee, /^[A-Z0-9-]+ - .+$/, `${category} shows the employee number before the name`);
+    assert.ok(card.position && card.position !== '—', `${category} shows the employee's position below their name`);
     assert.equal(card.hasDetails, true, `${category} uses the bordered history detail block`);
     assert.notEqual(card.status, '', `${category} displays a status`);
   });
@@ -40,10 +40,8 @@ async function assertEmployeeCards(page, category) {
 
 async function assertConfirmationCards(page) {
   const cards = await page.$$eval('#teamHistoryList .history-card-item', nodes => nodes.map(node => ({
-    name: node.querySelector('.team-history-employee-name')?.textContent.trim() || '',
-    id: node.querySelector('.team-history-employee-id')?.textContent.trim() || '',
-    adjacent: Boolean(node.querySelector('.team-history-employee-name + .team-history-employee-id')),
-    reference: node.querySelector('.team-history-record-ref')?.textContent.trim() || '',
+    employee: node.querySelector('.team-history-employee-identity')?.textContent.trim(),
+    position: node.querySelector('.team-history-employee-identity + .team-history-employee-position')?.textContent.trim(),
     status: node.querySelector('.status-pill')?.textContent.trim() || '',
     tone: node.dataset.status || '',
     labels: [...node.querySelectorAll('.history-card-row > span')].map(label => label.textContent.trim()),
@@ -52,13 +50,13 @@ async function assertConfirmationCards(page) {
 
   assert.deepEqual(cards, [
     {
-      name: 'Aina Rahman', id: '#EBB01', adjacent: true, reference: '',
+      employee: 'EBB01 - Aina Rahman', position: 'People Operations Executive',
       status: 'To Resubmit', tone: 'resubmit',
       labels: ['Recommendation', 'Submitted', 'Adjustment'],
       values: ['Confirm Employment', '4 Oct 2026', 'RM 300.00']
     },
     {
-      name: 'Daniel Wong', id: '#EBB02', adjacent: true, reference: '',
+      employee: 'EBB02 - Daniel Wong', position: 'Product Designer',
       status: 'To Resubmit', tone: 'resubmit',
       labels: ['Recommendation', 'Submitted', 'Adjustment'],
       values: ['Further Review', '12 Oct 2026', 'No Adjustment']
@@ -109,6 +107,7 @@ async function confirmationDetailSnapshot(page) {
     assert.equal(historyEntry.disabled, false);
     assert.match(historyEntry.href, /options\/team\/history\.html\?theme=light$/);
 
+    await page.waitForFunction(() => document.activeElement.matches('#employeeCareerAllOptions .employee-career-sheet-close'));
     await Promise.all([
       page.waitForNavigation({ waitUntil: 'domcontentloaded' }),
       page.click('#employeeCareerAllOptionsGrid [data-option-id=team-history]')
@@ -161,11 +160,15 @@ async function confirmationDetailSnapshot(page) {
       ariaHidden: node.getAttribute('aria-hidden')
     })), { hidden: false, ariaHidden: 'false' }, 'Clicking a confirmation card opens its detail popout');
     assert.equal(await page.evaluate(() => document.activeElement?.id), 'teamConfirmationCloseDetails', 'Detail close button receives focus');
+    assert.equal(await page.$$eval('.team-history-detail-overlay .detail-popout-header', headers =>
+      headers.every(header => header.childElementCount === 2 && header.firstElementChild.matches('h2') && header.lastElementChild.matches('button'))
+    ), true, 'Each Team History detail header contains its title and close button');
     assert.equal(await page.$eval('#teamConfirmationDetailsOverlay', overlay => [...overlay.parentElement.children]
       .filter(node => node !== overlay)
       .every(node => node.inert)), true, 'Detail popout makes background content inert');
     assert.deepEqual(await confirmationDetailSnapshot(page), [
       { label: 'Reference #', value: 'SC-2026-0015' },
+      { label: 'Status', value: 'To Resubmit' },
       { label: 'Emp #', value: '#EBB01' },
       { label: 'Name', value: 'Aina Rahman' },
       { label: 'Position', value: 'People Operations Executive' },
@@ -262,14 +265,15 @@ async function confirmationDetailSnapshot(page) {
     assert.equal(await page.$eval('#teamHistoryRecordCount', node => node.textContent.trim()), '1', 'Submitted date filter updates Total Records');
     assert.equal(await page.$eval('#teamConfirmationFilterSummary', node => node.textContent.trim()), '12 Oct 2026 - 12 Oct 2026');
     assert.deepEqual(
-      await page.$$eval('#teamHistoryList .team-history-employee-name', nodes => nodes.map(node => node.textContent.trim())),
-      ['Daniel Wong'],
+      await page.$$eval('#teamHistoryList .team-history-employee-identity', nodes => nodes.map(node => node.textContent.trim())),
+      ['EBB02 - Daniel Wong'],
       'Submitted date filter includes records that sit exactly on both boundaries'
     );
     await page.click('[data-confirmation-id="SC-2026-0016"]');
     const danielDetails = await confirmationDetailSnapshot(page);
-    assert.deepEqual(danielDetails.filter((_, index) => [0, 1, 2, 13].includes(index)), [
+    assert.deepEqual(danielDetails.filter((_, index) => [0, 1, 2, 3, 14].includes(index)), [
       { label: 'Reference #', value: 'SC-2026-0016' },
+      { label: 'Status', value: 'To Resubmit' },
       { label: 'Emp #', value: '#EBB02' },
       { label: 'Name', value: 'Daniel Wong' },
       { label: 'Attachment', value: 'No attachments' }
@@ -320,21 +324,10 @@ async function confirmationDetailSnapshot(page) {
       assert.equal(await page.$eval('#teamConfirmationFilterBar', node => node.hidden), true, `${label} does not display the Staff Confirmation filter`);
       assert.equal(await page.$$eval('#teamHistoryList [data-confirmation-id]', nodes => nodes.length), 0, `${label} cards remain non-confirmation records`);
 
-      if (key === 'staff-request') {
-        assert.equal(await page.$$eval('#teamHistoryList .history-card-item', nodes => nodes.length), 2);
-        assert.equal(await page.$$eval('#teamHistoryList .team-history-employee-id', nodes => nodes.length), 0, 'Staff Request does not fabricate employee IDs');
-        assert.deepEqual(
-          await page.$$eval('#teamHistoryList .team-history-request-ref', nodes => nodes.map(node => node.textContent.trim())),
-          ['Ref: SR-2026-0012', 'Ref: SR-2026-0011']
-        );
-        assert.equal(await page.$$eval('#teamHistoryList .history-card-details', nodes => nodes.length), 2);
-      } else if (key === 'staff-engagement') {
+      await assertEmployeeCards(page, label);
+      if (key === 'staff-engagement') {
         assert.equal(await page.$$eval('#teamHistoryList [data-engagement-id]', nodes => nodes.length), 2, 'Staff Engagement cards open their own details');
-        assert.equal(await page.$$eval('#teamHistoryList .team-history-employee-id', nodes => nodes.length), 0, 'Interviewer cards do not display the employee ID of another person');
-        assert.deepEqual(await page.$$eval('#teamHistoryList .team-history-employee-name', nodes => nodes.map(node => node.textContent.trim())), ['Lee', '—']);
         assert.equal(await page.$eval('#teamEngagementFilterBar', node => node.hidden), false);
-      } else {
-        await assertEmployeeCards(page, label);
       }
     }
 

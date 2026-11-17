@@ -178,8 +178,8 @@ async function closeDetails(page) {
       assert.deepEqual(
         await page.$$eval('[data-detail-section="work-plan"] .project-history-detail-row > span:first-child', labels => labels.map(label => label.textContent.trim())),
         [
-          'Reference #', 'Task Category', 'Sub Task', 'Project', 'Milestone',
-          'Schedule From', 'Schedule To', 'Status', 'Assignee', 'Est. Complete',
+          'Reference #', 'Status', 'Task Category', 'Sub Task', 'Project', 'Milestone',
+          'Schedule From', 'Schedule To', 'Assignee', 'Est. Complete',
           'Act. Complete', 'Allocated Hour', 'Actual Hour', 'Priority',
           'Completion %', 'Remarks', 'Hours', 'OT Hours', 'Reassign?',
           'Reassign Remarks', 'Reassign To', 'Reassign Date', 'Attachments'
@@ -210,7 +210,7 @@ async function closeDetails(page) {
       assert.equal(await page.$eval('#projectHistoryDetailTitle', title => title.textContent.trim()), 'Timesheet Details');
       assert.deepEqual(
         await page.$$eval('[data-detail-section="timesheet-summary"] .project-history-detail-row > span:first-child', labels => labels.map(label => label.textContent.trim())),
-        ['Reference #', 'Date', 'Remark', 'Status', 'Normal Hours', 'OT Hours']
+        ['Reference #', 'Status', 'Date', 'Remark', 'Normal Hours', 'OT Hours']
       );
       assert.equal(await page.$eval('.project-history-detail-subtitle', title => title.textContent.trim()), 'Work Details');
       assert.deepEqual(

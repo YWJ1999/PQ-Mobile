@@ -27,7 +27,7 @@ const puppeteer = require('puppeteer');
         await page.screenshot({ path: path.resolve(__dirname, `${kind}-highlight-table-${theme}-${width}.png`) });
         await page.click(body + ' [data-highlight-hours]');
         await page.waitForSelector('#highlightDetailsModal', { visible: true });
-        assert.equal(await page.$eval('#highlightDetailEmpNo', node => node.textContent), kind === 'overtime' ? '#1122333' : '#000008');
+        assert.equal(await page.$('#highlightDetailEmpNo'), null);
         assert.equal(await page.$$eval('.leave-highlight-detail-record', nodes => nodes.length), 5);
         if (kind === 'overtime') {
           assert.deepEqual(await page.$$eval('.leave-highlight-detail-record [data-field="hours"]', nodes => nodes.map(node => node.textContent)), ['2.50', '2.00', '0.50', '2.00', '0.50']);

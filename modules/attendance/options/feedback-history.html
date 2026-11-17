@@ -41,6 +41,23 @@
       </div>
     </header>
 
+    <template id="recordColourKey">
+      <h3>Attendance exceptions</h3>
+      <ul class="record-key-list attendance-exception-key">
+        <li data-status="after-ceased"><span aria-hidden="true"></span>After Employment End Date</li>
+        <li data-status="before-hire"><span aria-hidden="true"></span>Before Employment Start Date</li>
+        <li data-status="early-out"><span aria-hidden="true"></span>Early Departure</li>
+        <li data-status="holiday-absent"><span aria-hidden="true"></span>Holiday Absence</li>
+        <li data-status="late-in"><span aria-hidden="true"></span>Late Arrival</li>
+        <li data-status="on-leave"><span aria-hidden="true"></span>On Leave</li>
+        <li data-status="odd-clocking"><span aria-hidden="true"></span>Unpaired Clock Entry</li>
+        <li data-status="undefined-shift"><span aria-hidden="true"></span>Undefined Shift</li>
+        <li data-status="no-shift-group"><span aria-hidden="true"></span>Missing Shift Group</li>
+        <li data-status="unapproved-ot"><span aria-hidden="true"></span>Unapproved OT</li>
+        <li data-status="invalid-clock-sequence"><span aria-hidden="true"></span>Invalid Clock Sequence</li>
+        <li data-status="time-off"><span aria-hidden="true"></span>Time Off</li>
+      </ul>
+    </template>
     <main class="main-content">
       <section class="pending-feedback-summary" aria-label="Pending feedback summary">
         <div>
@@ -74,7 +91,7 @@
       </article>
 
       <article class="history-card-item pending-feedback-record"
-        data-status="missing-clock-out" data-date="15 Sep 2026" data-shift="8.30AM&ndash;5.30PM (W01)"
+        data-status="odd-clocking" data-date="15 Sep 2026" data-shift="8.30AM&ndash;5.30PM (W01)"
         data-times="07:38" data-normal-hours="0.00" data-ot-hours="0.00" data-exception="Missing Clock Out"
         onclick="openAttendanceDetails(this, this.querySelector('.pending-feedback-details-trigger'))">
         <div class="history-card-header">
@@ -83,7 +100,7 @@
             <div class="history-card-ref">Tue 15 Sep 2026</div>
           </button>
           <div class="attendance-history-card-end">
-            <span class="card-status-badge"><i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i>Missing Clock Out</span>
+            <span class="card-status-badge"><i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i>Unpaired Clock Entry</span>
           </div>
         </div>
         <div class="history-card-details">

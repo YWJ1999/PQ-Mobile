@@ -17,6 +17,8 @@
   <link rel="stylesheet" href="../../../css/form-section-headings.css">
   <script src="../../../js/components.js"></script>
   <script src="../../../js/app.js" defer></script>
+  <script src="../js/performance-request-form.js" defer></script>
+  <script src="../js/performance-submissions.js" defer></script>
   <script src="../js/goal-plan-data.js" defer></script>
   <script src="../js/goal-plan.js" defer></script>
 </head>
@@ -34,30 +36,7 @@
 
     <main class="main-content performance-content goal-plan-content">
       <div id="goalPlanGeneral">
-        <section class="goal-plan-employee-form" aria-labelledby="goalPlanEmployeeHeading">
-          <h2 id="goalPlanEmployeeHeading" class="form-section-heading">Employee Details</h2>
-          <div class="goal-form-field"><label for="goalPlanEmployeeName">Name</label><input id="goalPlanEmployeeName" type="text" readonly></div>
-          <div class="goal-form-field"><label for="goalPlanPosition">Position</label><input id="goalPlanPosition" type="text" readonly></div>
-          <div class="goal-form-field"><label for="goalPlanDepartment">Department</label><input id="goalPlanDepartment" type="text" readonly></div>
-          <div class="goal-form-field"><label for="goalPlanSupervisorName">Supervisor</label><input id="goalPlanSupervisorName" type="text" readonly></div>
-          <div class="goal-form-field"><label for="goalPlanReportingName">Reporting To</label><input id="goalPlanReportingName" type="text" readonly></div>
-          <div class="goal-form-grid">
-            <div class="goal-form-field"><label for="goalPlanPeriod">Period</label><input id="goalPlanPeriod" type="text" readonly></div>
-            <div class="goal-form-field"><label for="goalPlanAppraisalType">Appraisal Type</label><input id="goalPlanAppraisalType" type="text" readonly></div>
-          </div>
-        </section>
-        <section class="goal-plan-sections" aria-label="Goal Plan details">
-          <button type="button" class="goal-plan-section-card" data-plan-section="goals">
-            <span class="goal-plan-section-icon" aria-hidden="true"><i class="fa-solid fa-bullseye"></i></span>
-            <span class="goal-plan-section-copy"><strong class="goal-plan-section-name">Performance Goal</strong><small id="goalPlanGoalsSummary">0 items added</small></span>
-            <span class="goal-plan-section-link">Details <i class="fa-solid fa-chevron-right" aria-hidden="true"></i></span>
-          </button>
-          <button type="button" class="goal-plan-section-card" data-plan-section="competencies">
-            <span class="goal-plan-section-icon" aria-hidden="true"><i class="fa-solid fa-award"></i></span>
-            <span class="goal-plan-section-copy"><strong class="goal-plan-section-name">Competency</strong><small id="goalPlanCompetenciesSummary">0 items added</small></span>
-            <span class="goal-plan-section-link">Details <i class="fa-solid fa-chevron-right" aria-hidden="true"></i></span>
-          </button>
-        </section>
+        <div id="performanceRequestFields"></div>
         <aside class="goal-plan-footer form-action-row" aria-label="Goal Plan actions">
           <a id="goalPlanCancel" class="form-cancel-btn goal-plan-cancel-action" href="../index.html?scope=individual"><i class="fa-solid fa-xmark" aria-hidden="true"></i><span>Cancel</span></a>
           <button type="button" id="goalPlanSaveDraft" class="goal-plan-primary-action"><i class="fa-solid fa-floppy-disk" aria-hidden="true"></i><span>Draft</span></button>

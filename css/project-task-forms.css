@@ -207,6 +207,10 @@
 .project-activity-data-row:last-child { border-bottom: 0; padding-bottom: 0; }
 .project-activity-data-row > span:first-child { color: var(--text-muted); font-weight: 600; }
 .project-activity-data-row > span:last-child { font-weight: 800; overflow-wrap: anywhere; }
+#projectApprovalRequest { min-width: 0; }
+#projectApprovalRequest .form-card:last-child { margin-bottom: 0; }
+#projectApprovalRequest .project-review-value,
+#projectApprovalRequest .project-activity-data-row > span:last-child { white-space: pre-wrap; overflow-wrap: anywhere; }
 .project-form-page .toggle-option-card { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 10px 14px; min-height: 46px; background: var(--bg-input); border: 1px solid var(--border-subtle); border-radius: 14px; }
 .project-form-page .toggle-option-label { font-size: 13px; font-weight: 700; }
 .project-form-page .custom-toggle { position: relative; display: inline-block; width: 44px; height: 24px; flex-shrink: 0; cursor: pointer; }

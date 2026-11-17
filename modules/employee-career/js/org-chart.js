@@ -3,6 +3,7 @@
   const $ = id => document.getElementById(id);
   const defaults = { keyword: '', unit: '', maximumLevel: '', skipVacant: 'no' };
   const state = { filters: { ...defaults }, marginX: 26, marginY: 14 };
+  let activeSheet, sheetTrigger;
 
   function element(tag, className, text) {
     const node = document.createElement(tag);
@@ -140,19 +141,26 @@
     document.querySelector('phone-bottom-nav').inert = inert;
   }
 
-  function openFilter() {
-    setControls(state.filters);
-    $('orgChartFilterOverlay').hidden = false;
-    $('orgChartFilterOverlay').classList.add('is-open');
+  function openSheet(trigger, initialFocus) {
+    if (activeSheet) return;
+    activeSheet = $(trigger.getAttribute('aria-controls'));
+    sheetTrigger = trigger;
+    trigger.setAttribute('aria-expanded', 'true');
+    activeSheet.hidden = false;
+    activeSheet.classList.add('is-open');
     setBackgroundInert(true);
-    $('orgChartFilterKeyword').focus();
+    initialFocus.focus({ preventScroll: true });
   }
 
-  function closeFilter() {
-    $('orgChartFilterOverlay').hidden = true;
-    $('orgChartFilterOverlay').classList.remove('is-open');
+  function closeSheet() {
+    if (!activeSheet) return;
+    activeSheet.hidden = true;
+    activeSheet.classList.remove('is-open');
+    activeSheet = null;
     setBackgroundInert(false);
-    $('orgChartFilterTrigger').focus({ preventScroll: true });
+    sheetTrigger.setAttribute('aria-expanded', 'false');
+    sheetTrigger.focus({ preventScroll: true });
+    sheetTrigger = null;
   }
 
   function applyFilter(event) {
@@ -164,7 +172,7 @@
       skipVacant: $('orgChartFilterSkipVacant').value
     };
     render();
-    closeFilter();
+    closeSheet();
   }
 
   function init() {
@@ -174,19 +182,33 @@
     setControls(defaults);
     setSpacing();
     render();
-    $('orgChartFilterTrigger').addEventListener('click', openFilter);
-    $('orgChartCloseFilter').addEventListener('click', closeFilter);
+    $('orgChartFilterTrigger').addEventListener('click', event => {
+      setControls(state.filters);
+      openSheet(event.currentTarget, $('orgChartFilterKeyword'));
+    });
+    $('orgChartLayoutTrigger').addEventListener('click', event => openSheet(event.currentTarget, $('orgChartLayoutTitle')));
+    document.querySelectorAll('.org-chart-sheet').forEach(sheet => sheet.addEventListener('click', event => {
+      if (event.target === sheet || event.target.closest('[data-close-chart-sheet]')) closeSheet();
+    }));
     $('orgChartResetFilter').addEventListener('click', () => setControls(defaults));
     $('orgChartFilterForm').addEventListener('submit', applyFilter);
-    $('orgChartFilterOverlay').addEventListener('click', event => { if (event.target === event.currentTarget) closeFilter(); });
     $('orgChartMarginXDecrease').addEventListener('click', () => changeSpacing('x', -2));
     $('orgChartMarginXIncrease').addEventListener('click', () => changeSpacing('x', 2));
     $('orgChartMarginYDecrease').addEventListener('click', () => changeSpacing('y', -2));
     $('orgChartMarginYIncrease').addEventListener('click', () => changeSpacing('y', 2));
     document.addEventListener('keydown', event => {
-      if (event.key === 'Escape' && !$('orgChartFilterOverlay').hidden) {
+      if (!activeSheet) return;
+      if (event.key === 'Escape') {
         event.preventDefault();
-        closeFilter();
+        closeSheet();
+      } else if (event.key === 'Tab') {
+        const controls = activeSheet.querySelectorAll('button:enabled, select:enabled');
+        const first = controls[0], last = controls[controls.length - 1];
+        const focused = document.activeElement;
+        if (!activeSheet.contains(focused) || (event.shiftKey ? focused === first || focused.tabIndex < 0 : focused === last)) {
+          event.preventDefault();
+          (event.shiftKey ? last : first).focus();
+        }
       }
     });
   }

@@ -5,24 +5,51 @@
   const submittedMigrationKey = 'peoplehcm:workplace:history:cancelled-to-submitted:v1';
   const kinds = ['guest-visit', 'letter-request', 'inventory-request'];
   const statuses = ['submitted', 'resubmit', 'approved', 'rejected', 'draft', 'cancelled'];
+  const referencePrefixes = { 'guest-visit': 'FGV', 'letter-request': 'DRQ', 'inventory-request': 'IRQ' };
+  const currentEmployee = { empNo: '#EBB12', name: 'Farhan binti rahmat' };
+  function localDate(now) {
+    return [now.getFullYear(), String(now.getMonth() + 1).padStart(2, '0'), String(now.getDate()).padStart(2, '0')].join('-');
+  }
+  function referenceNumber(row, fields = Object.fromEntries(row.fields)) {
+    const explicit = ['Reference #', 'Reference No.', 'Reference'].map(key => fields[key]).find(value => String(value || '').trim());
+    if (explicit) return explicit;
+    if (row.id.startsWith('sample-')) return '—';
+    const seed = String(row.id || row.createdAt || row.date || row.title);
+    let hash = 2166136261;
+    for (let index = 0; index < seed.length; index++) {
+      hash ^= seed.charCodeAt(index);
+      hash = Math.imul(hash, 16777619);
+    }
+    const timestamp = Number.isFinite(Date.parse(row.createdAt)) ? String(Date.parse(row.createdAt)) : '';
+    const digits = (timestamp + String(hash >>> 0).padStart(10, '0')).slice(-13).padStart(13, '0');
+    return (referencePrefixes[row.kind] || 'REQ') + digits;
+  }
   function validRecord(row) {
     return row && kinds.includes(row.kind) && statuses.includes(row.status)
       && typeof row.id === 'string' && typeof row.title === 'string' && typeof row.date === 'string'
       && Array.isArray(row.fields) && row.fields.every(field => Array.isArray(field) && field.length === 2 && field.every(value => typeof value === 'string'));
   }
-  function list() {
+  function list(guestDecisions) {
     const raw = localStorage.getItem(key);
     if (!raw) return [];
     const records = JSON.parse(raw);
     if (!Array.isArray(records)) throw new Error('Invalid Workplace history data.');
-    return records.filter(validRecord)
-      .sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt)));
+    const rows = records.filter(validRecord);
+    if (rows.some(row => row.guestVisit && row.status === 'submitted')) {
+      const decisions = guestDecisions || window.WorkplacePendingStore?.guestDecisions() || new Map();
+      rows.forEach(row => {
+        const decision = decisions.get(row.id);
+        if (row.status === 'submitted' && decision && decision.guestRevision === row.guestVisit?.revision) row.status = decision.status;
+      });
+    }
+    return rows.sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt)));
   }
   function save(input) {
     if (!kinds.includes(input.kind)) throw new Error('Unsupported Workplace history category.');
     if (!/^\d{4}-\d{2}-\d{2}$/.test(input.date) || !Array.isArray(input.fields)) throw new Error('Invalid Workplace history record.');
     const rows = list();
     const existing = rows.find(row => row.id === input.id && row.kind === input.kind);
+    if (existing?.guestVisit && !['submitted', 'resubmit', 'draft'].includes(existing.status)) throw new Error('This visit has already been decided.');
     const record = {
       id: existing?.id || crypto.randomUUID(),
       kind: input.kind,
@@ -32,6 +59,12 @@
       createdAt: existing?.createdAt || new Date().toISOString(),
       fields: input.fields.map(([label, value]) => [String(label), String(value ?? '')])
     };
+    if (input.kind === 'guest-visit' && input.guestVisit) {
+      const now = new Date();
+      record.guestVisit = { ...input.guestVisit, employeeName: currentEmployee.name, empNo: currentEmployee.empNo.replace(/^#/, ''),
+        revision: crypto.randomUUID(), submitDate: localDate(now), submittedAt: now.toISOString() };
+      record.fields.push(['Submit Date', record.guestVisit.submitDate]);
+    }
     localStorage.setItem(key, JSON.stringify([record, ...rows.filter(row => row.id !== record.id)]));
     return record;
   }
@@ -78,7 +111,12 @@
     record.status = status;
     if (status === 'submitted') {
       const now = new Date();
-      const submitDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+      const submitDate = localDate(now);
+      if (record.guestVisit) {
+        record.guestVisit.revision = crypto.randomUUID();
+        record.guestVisit.submittedAt = now.toISOString();
+        record.guestVisit.submitDate = submitDate;
+      }
       let hasSubmitDate = false;
       record.fields = record.fields.map(([label, value]) => {
         if (!['submit date', 'submitted date'].includes(label.trim().toLowerCase())) return [label, value];
@@ -90,5 +128,5 @@
     localStorage.setItem(key, JSON.stringify(rows));
     return record;
   }
-  window.WorkplaceHistoryStore = { list, save, counts, ensureSamples, migrateCancelledToSubmitted, setStatus };
+  window.WorkplaceHistoryStore = { list, save, counts, ensureSamples, migrateCancelledToSubmitted, setStatus, currentEmployee, referenceNumber };
 })();

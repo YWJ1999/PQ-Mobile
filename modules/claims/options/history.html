@@ -5,6 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>PeopleHCM - Claim History</title>
   <script src="../../../js/components.js"></script>
+  <script src="../../../js/claims/claim-request-store.js"></script>
+  <script src="../../../js/claims/claim-application-fields.js"></script>
+  <script src="../../../js/claims/claim-review.js"></script>
+  <link rel="stylesheet" href="../../../css/claim-request-review.css">
   <script src="../../../js/claims/claims-config.js"></script>
   <script src="../../../js/app.js" defer></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -801,6 +805,16 @@
       }
     });
 
+    function savedClaimHistory(tab) {
+      return ClaimRequestStore.list()
+        .filter(item => !tab || (item.historyTab || 'benefit') === tab)
+        .map(item => ({
+          ...item, id: item.docRef, empName: item.userName, claimPeriod: item.period, benefitYear: item.entitlementYear ?? item.benefitYear,
+          dateFrom: item.claimDateFrom || '—', dateTo: item.claimDateTo || '—', amount: item.amountText || item.amount?.toFixed(2) || '—',
+          quantity: item.claimQuantity || '—', remark: item.remarks, subtype: item.benefitType
+        }));
+    }
+
     function getHistoryStatus(item) {
       const status = String(item.status || 'submitted').trim().toLowerCase();
       const key = status === 'pending' ? 'submitted' : status;
@@ -918,6 +932,7 @@
       if (headerTitle) headerTitle.textContent = activeStatusFilter ? `${statusTitle} Claim History` : catMeta.title;
 
       let items = activeStatusFilter ? STATUS_HISTORY_RECORDS : (HISTORY_DATA[activeTabKey] || []);
+      items = [...savedClaimHistory(activeStatusFilter ? null : activeTabKey), ...items];
       if (activeStatusFilter) {
         items = items.filter(item => activeStatusFilter === 'submitted' ? ['submitted', 'pending'].includes(item.status) : item.status === activeStatusFilter);
       }
@@ -985,7 +1000,9 @@
         let detailsBlock = '';
         const statusRow = '';
 
-        if (activeTabKey === 'ot') {
+        if (item.savedClaim && !item.savedBenefit) {
+          detailsBlock = '<div class="history-card-fields" data-saved-claim-fields></div>';
+        } else if (activeTabKey === 'ot') {
           const timeDisplay = item.otTime || item.time || '18:00 - 00:00';
           const hoursDisplay = `${item.quantity || item.hours || '6.0'} Hours`;
           detailsBlock = `
@@ -1097,7 +1114,7 @@
           <div class="history-card-header">
             <div class="history-card-heading">
               <div class="history-card-title-row">
-                <h4 class="history-card-title">${cardTitle}</h4>
+                <h4 class="history-card-title"></h4>
               </div>
               <div class="history-card-ref">Ref: ${item.id}</div>
             </div>
@@ -1108,6 +1125,22 @@
           <div class="history-card-details">${detailsBlock}</div>
           ${actionHtml}
         `;
+        card.querySelector('.history-card-title').textContent = item.savedClaim ? item.title : cardTitle;
+        const savedFields = card.querySelector('[data-saved-claim-fields]');
+        if (savedFields) {
+          const fields = [['Claim Period', periodDisplay], ['Date', datesDisplay]];
+          if (item.optionName === 'OT Claim') fields.push(['OT Hours', item.hours]);
+          else if (item.optionName !== 'Travel Request') fields.push(['Claim Total', item.amount]);
+          for (const [label, value] of fields) {
+            const row = document.createElement('div');
+            const name = document.createElement('span');
+            const amount = document.createElement('span');
+            name.textContent = label;
+            amount.textContent = value;
+            row.append(name, amount);
+            savedFields.append(row);
+          }
+        }
         card.querySelector('.status-pill').append(document.createTextNode(' ' + displayStatus.text));
         container.appendChild(card);
       });
@@ -1115,6 +1148,19 @@
 
     function handleHistoryCancel(event, itemId) {
       event.stopPropagation();
+      const saved = ClaimRequestStore.list().find(item => item.docRef === itemId);
+      if (saved) {
+        try {
+          ClaimRequestStore.decide([saved.id], 'cancel');
+        } catch {
+          showToast('Could not cancel the claim. Please check its status.');
+          return;
+        }
+        closeDetailsModal();
+        renderClaimHistoryList();
+        showToast('Claim cancelled.');
+        return;
+      }
       if (typeof showToast === 'function') {
         showToast(`Cancel selected for ${itemId}`);
       }
@@ -1135,7 +1181,7 @@
 
       container.innerHTML = '';
       CATEGORIES.forEach(cat => {
-        const itemsCount = (HISTORY_DATA[cat.id] || []).length;
+        const itemsCount = (HISTORY_DATA[cat.id] || []).length + savedClaimHistory(cat.id).length;
         const isActive = cat.id === activeTabKey;
 
         const card = document.createElement('div');
@@ -1165,12 +1211,7 @@
       }
     }
 
-    // Modal 2: Open Claim Details Modal (Exact replica of User Screenshots 1 & 2)
-    function openClaimDetailsModal(item) {
-      const modal = document.getElementById('detailsModalOverlay');
-      const container = document.getElementById('claimDetailsModalContainer');
-      if (!modal || !container) return;
-
+    function legacyHistoryDetails(item) {
       const isMedical = activeTabKey === 'medical' || (item.id && item.id.startsWith('CMD')) || Boolean(item.medicalType);
       const isTravelRequest = activeTabKey === 'travelRequest' || (activeTabKey === 'travel' && item.historyDetailType === 'travel-request');
       const detailStatus = recordDetailStatus.html(getHistoryStatus(item).text);
@@ -1501,6 +1542,7 @@
           bodyHtml = `
             ${detailTable([
               ['Reference #', item.id],
+              ['Status', detailStatus],
               ['Benefit Year', item.benefitYear],
               ['Claim Period', item.claimPeriod],
               ['Benefit Type', item.benefitType],
@@ -1511,7 +1553,6 @@
               ['Project', item.project],
               ['Cost Center', item.costCenter],
               ['Purpose', item.purpose],
-              ['Status', detailStatus],
               ['Remark', item.remark]
             ])}
             ${detailSection('Claim Details', [
@@ -1531,9 +1572,9 @@
           bodyHtml = `
             ${detailTable([
               ['Reference #', item.id],
+              ['Status', detailStatus],
               ['Emp #', item.empNo ? `#${item.empNo}` : '—'],
               ['Name', item.empName],
-              ['Status', detailStatus],
               ['Period', item.claimPeriod],
               ['Cost Center', item.costCenter],
               ['Start Date', item.dateFrom || item.date],
@@ -1612,6 +1653,11 @@
         }
       } else {
         // Benefit Claim & General Claim Details Layout (Matching Screenshot 1)
+        const text = value => {
+          const span = document.createElement('span');
+          span.textContent = value ?? '';
+          return span.innerHTML;
+        };
         const renderCellVal = (val, isGrayBarIfEmpty = false) => {
           if (val === undefined || val === null || val === '') {
             if (isGrayBarIfEmpty) {
@@ -1632,11 +1678,11 @@
         };
 
         let attachmentDisplay = `<span style="color: var(--text-muted);">No Attachments</span>`;
-        if (item.attachments) {
+        if (item.attachments?.length) {
           attachmentDisplay = `
             <div style="display: flex; align-items: center; gap: 6px; color: var(--purple-primary); font-weight: 600; text-decoration: none;">
               <i class="fa-solid fa-file-image"></i>
-              <span>${item.attachments}</span>
+              <span>${text(Array.isArray(item.attachments) ? item.attachments.join(', ') : item.attachments)}</span>
             </div>
           `;
         }
@@ -1645,9 +1691,9 @@
           <table style="width: 100%; border-collapse: collapse; font-family: sans-serif; font-size: 11.5px;">
             <tbody>
               ${renderRow('Reference #', item.id || 'CBF000000000220')}
+              ${renderRow('Status', detailStatus)}
               ${renderRow('Emp#', item.empNo ? `#${item.empNo}` : '#EBB12')}
               ${renderRow('Name', item.empName || 'Farhan binti rahmat')}
-              ${renderRow('Status', detailStatus)}
               ${renderRow('Currency', item.currency || 'USD')}
               ${renderRow('Amount', item.amount || '12.00')}
               ${renderRow('Quantity', item.quantity || '5.00')}
@@ -1655,10 +1701,11 @@
               ${renderRow('Start Date', item.dateFrom || item.date || '9 Sep 2026')}
               ${renderRow('End Date', item.dateTo || item.date || '9 Sep 2026')}
               ${renderRow('Benefit Year', item.benefitYear || '2026')}
-              ${renderRow('Receipt No.', item.receiptNo || '5555555')}
-              ${renderRow('Other Reference', item.otherRef, true)}
-              ${renderRow('Purpose', item.purpose || 'Test')}
-              ${renderRow('Remark', item.remark, true)}
+              ${renderRow('Receipt No.', text(item.receiptNo || (item.savedBenefit ? '—' : '5555555')))}
+              ${renderRow('Other Reference', text(item.otherRef), true)}
+              ${renderRow('Purpose', text(item.purpose || (item.savedBenefit ? '—' : 'Test')))}
+              ${renderRow('Remark', text(item.remark), true)}
+              ${item.savedBenefit && item.approverComment ? renderRow('Approver Action Comments', text(item.approverComment)) : ''}
               ${renderRow('Cancellation Remark', item.cancellationRemark, true)}
               ${renderRow('Attachments', attachmentDisplay)}
               ${renderRow('Upload Files', item.uploadFiles || attachmentDisplay)}
@@ -1667,6 +1714,21 @@
         `;
       }
 
+      return { headerTitle, bodyHtml };
+    }
+
+    function openClaimDetailsModal(item) {
+      const modal = document.getElementById('detailsModalOverlay');
+      const container = document.getElementById('claimDetailsModalContainer');
+      if (!modal || !container) return;
+      const { headerTitle, bodyHtml } = item.savedClaim && !item.savedBenefit
+        ? { headerTitle: item.optionName, bodyHtml: `<div data-saved-claim-review>
+            <table class="record-detail-table"><tbody>
+              <tr><th scope="row" class="detail-popout-label">Reference #</th><td class="detail-popout-value" data-claim-reference></td></tr>
+              <tr><th scope="row" class="detail-popout-label">Status</th><td class="detail-popout-value" data-claim-status></td></tr>
+            </tbody></table>
+          </div>` }
+        : legacyHistoryDetails(item);
       container.innerHTML = `
         <div style="background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%); padding: 14px 16px; display: flex; align-items: center; justify-content: space-between;">
           <h3 style="font-size: 16px; font-weight: 800; color: #ffffff; text-transform: uppercase; margin: 0; letter-spacing: 0.3px;">${headerTitle}</h3>
@@ -1680,6 +1742,19 @@
         ${renderClaimHistoryActions(item, 'detail')}
       `;
 
+      const savedReview = container.querySelector('[data-saved-claim-review]');
+      if (savedReview) {
+        savedReview.querySelector('[data-claim-reference]').textContent = item.id;
+        savedReview.querySelector('[data-claim-status]').append(recordDetailStatus.create(getHistoryStatus(item).text));
+        savedReview.append(ClaimReview.create(item));
+        if (item.approverComment) {
+          const label = document.createElement('strong');
+          label.textContent = 'Approver Action Comments';
+          const comment = document.createElement('p');
+          comment.textContent = item.approverComment;
+          savedReview.append(label, comment);
+        }
+      }
       modal.classList.add('active');
     }
 
@@ -1756,6 +1831,13 @@
 
       display.textContent = `${startStr} – ${endStr} • ${typeStr}`;
     }
+
+    window.addEventListener('storage', event => {
+      if (event.key === ClaimRequestStore.key || event.key === null) {
+        closeDetailsModal();
+        renderClaimHistoryList();
+      }
+    });
 
     // Initialize Page
     document.addEventListener('DOMContentLoaded', () => {

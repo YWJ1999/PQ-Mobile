@@ -182,10 +182,11 @@
     statusValue.append(recordDetailStatus.create(record.status));
     statusField.append(statusLabel, statusValue);
     documentFields.append(statusField, field('evaluationDocumentDate', 'Document Date', record.documentDate));
-    general.replaceChildren(field('evaluationName', 'Name', employee.name), field('evaluationPosition', 'Position', employee.position),
+    general.replaceChildren(field('evaluationRef', 'Evaluation Ref#', record.evaluationRef), documentFields,
+      field('evaluationName', 'Name', employee.name), field('evaluationPosition', 'Position', employee.position),
       field('evaluationDepartment', 'Department', employee.department), field('evaluationSupervisor', 'Supervisor', employee.supervisor?.name),
-      field('evaluationReportTo', 'Report To', employee.reportingTo?.name), field('evaluationRef', 'Evaluation Ref#', record.evaluationRef),
-      period, documentFields, field('evaluationRemark', 'Remark', record.remark, true));
+      field('evaluationReportTo', 'Report To', employee.reportingTo?.name), period,
+      field('evaluationRemark', 'Remark', record.remark, true));
 
     $('evaluationGoalsSummary').textContent = (record.goals || []).length + ' items';
     $('evaluationCompetenciesSummary').textContent = (record.competencies || []).length + ' items';

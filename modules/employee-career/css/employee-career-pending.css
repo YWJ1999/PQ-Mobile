@@ -584,6 +584,59 @@
   box-shadow: 0 0 0 3px var(--purple-subtle);
 }
 
+#careerPendingDetails.change-request-page .approval-page-heading {
+  display: grid;
+  grid-template-columns: 36px minmax(0, 1fr) 36px;
+  column-gap: 4px;
+  text-align: center;
+}
+
+#careerPendingDetails.change-request-page h1 { font-size: clamp(15px, 4vw, 18px); }
+#careerPendingDetails .cv-stepper { flex: none; }
+
+#careerPendingDetails .cv-history-detail-panel {
+  padding: 18px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 20px;
+  background: var(--bg-card);
+  box-shadow: var(--shadow-card);
+}
+
+#careerPendingDetails .cv-history-panel-title {
+  margin-bottom: 16px;
+  font-size: 18px;
+}
+
+#careerPendingDetails .cv-history-fields:has(> .cv-approval-field) {
+  display: grid;
+  gap: 16px;
+  overflow: visible;
+  border: 0;
+  background: transparent;
+}
+
+.cv-approval-field { min-width: 0; }
+.cv-approval-field dd { margin: 5px 0 0; }
+.cv-approval-field textarea[readonly] {
+  display: block;
+  field-sizing: content;
+  resize: none;
+  font-family: inherit;
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+.cv-approval-field textarea[readonly]:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 2px;
+}
+#careerPendingDetails .cv-approval-field .cv-history-field-changed textarea {
+  border-color: var(--purple-border);
+  color: var(--text-primary);
+}
+#careerPendingDetails .cv-history-request-summary { margin: 24px 0 0; }
+#careerPendingDetails .cv-history-qualification-card-panel { padding: 14px; }
+#careerPendingDetails .cv-history-contact-group + .cv-history-contact-group { margin-top: 24px; }
+
 @media (max-width: 380px) {
   .career-pending-page .cv-history-navigation {
     padding: 10px 10px 8px;

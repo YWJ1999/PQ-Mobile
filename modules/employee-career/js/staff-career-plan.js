@@ -2,13 +2,14 @@
   const $ = id => document.getElementById(id);
   const data = Array.isArray(window.EMPLOYEE_CAREER_STAFF_PLAN_DATA) ? window.EMPLOYEE_CAREER_STAFF_PLAN_DATA : [];
   const colors = ['#8b5cf6', '#10b981', '#3b82f6', '#f59e0b', '#ec4899', '#14b8a6', '#f97316'];
-  const defaults = {
-    keyword: '',
-    targetYear: '',
-    branch: '',
-    department: ''
+  const organizationFields = ['company', 'branch', 'department', 'costCenter'];
+  const filterKeys = ['keyword', ...organizationFields];
+  const query = new URLSearchParams(location.search);
+  const savedFilters = history.state?.careerPlanList?.filters;
+  const state = {
+    filters: Object.fromEntries(filterKeys.map(key => [key, savedFilters?.[key] ?? query.get(key) ?? ''])),
+    rows: [...data], metric: 'branch', view: 'list'
   };
-  const state = { filters: { ...defaults }, rows: [...data], metric: 'branch', view: 'list' };
   const metrics = {
     branch: { label: 'Branch', value: row => row.branch },
     department: { label: 'Department', value: row => row.department },
@@ -30,21 +31,19 @@
     return new Date(`${value}T00:00:00`).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
   }
 
-  function option(select, label, value = label) {
-    select.add(new Option(label, value));
+  function targetYear(row) {
+    return String(row.targetYear || row.targetDate || '').slice(0, 4);
   }
 
-  function populateSelect(select, placeholder, values, selected = '') {
-    select.replaceChildren(new Option(placeholder, ''));
-    values.forEach(value => option(select, value));
-    select.value = selected;
+  function planKey(row) {
+    return String(row.id ?? `${row.empNo}:${row.planDate}`);
   }
 
-  function profileUrl(row) {
-    const url = new URL('../../../../me.html', location.href);
-    url.searchParams.set('employee', row.empNo);
-    url.searchParams.set('theme', document.documentElement.dataset.theme === 'light' ? 'light' : 'dark');
-    return url.href;
+  function pageUrl(file) {
+    const url = new URL(file, location.href);
+    url.searchParams.set('theme', document.documentElement.dataset.theme);
+    Object.entries(state.filters).forEach(([key, value]) => { if (value) url.searchParams.set(key, value); });
+    return url;
   }
 
   function detail(label, value) {
@@ -58,19 +57,25 @@
     cards.replaceChildren();
     state.rows.forEach(row => {
       const card = node('a', 'history-card-item staff-career-plan-card');
-      card.href = profileUrl(row);
-      card.setAttribute('aria-label', `Open CV for ${row.name}, ${row.empNo}`);
+      const key = planKey(row);
+      const url = pageUrl('staff-career-plan-details.html');
+      url.searchParams.set('record', key);
+      card.href = url.href;
+      card.id = 'plan-' + key;
+      card.setAttribute('aria-label', `View career plan for ${row.name}, #${row.empNo}`);
+      card.addEventListener('click', event => {
+        history.replaceState({ careerPlanList: { filters: state.filters, cardId: card.id, scroll: document.querySelector('main').scrollTop, keyboard: event.detail === 0 } }, '');
+      });
 
       const header = node('span', 'staff-career-plan-card-header');
-      const identity = node('span', 'staff-career-plan-identity');
-      identity.append(node('strong', 'staff-career-plan-name', row.name), node('span', 'staff-career-plan-employee-id', `#${row.empNo}`));
-      header.append(identity);
+      const subtitle = node('span', 'staff-career-plan-subtitle', row.position);
+      subtitle.append(' · ', node('span', 'staff-career-plan-employee-id', `#${row.empNo}`));
+      header.append(node('strong', 'staff-career-plan-name', row.name), subtitle);
 
       const details = node('dl', 'staff-career-plan-details');
       details.append(
-        detail('Branch', row.branch),
         detail('Department', row.department),
-        detail('Position', row.position),
+        detail('Branch', row.branch),
         detail('Sex', row.sex),
         detail('Age', String(row.age))
       );
@@ -82,21 +87,16 @@
   }
 
   function filterSummary() {
-    const parts = [];
-    if (state.filters.keyword) parts.push(state.filters.keyword);
-    if (state.filters.targetYear) parts.push(state.filters.targetYear);
-    if (state.filters.branch) parts.push(state.filters.branch);
-    if (state.filters.department) parts.push(state.filters.department);
-    $('staffCareerPlanFilterSummary').textContent = parts.join(' · ');
+    const summary = Object.values(state.filters).filter(Boolean).join(' · ') || 'All staff';
+    $('staffCareerPlanFilterSummary').textContent = summary;
+    $('staffCareerPlanChartFilterSummary').textContent = summary;
   }
 
   function applyRows() {
     const keyword = state.filters.keyword.toLowerCase().replace(/^#/, '');
     state.rows = data.filter(row => (
       (!keyword || `${row.empNo} ${row.name}`.toLowerCase().includes(keyword)) &&
-      (!state.filters.targetYear || row.targetDate.slice(0, 4) === state.filters.targetYear) &&
-      (!state.filters.branch || row.branch === state.filters.branch) &&
-      (!state.filters.department || row.department === state.filters.department)
+      organizationFields.every(key => !state.filters[key] || row[key] === state.filters[key])
     ));
     renderCards();
     filterSummary();
@@ -120,7 +120,6 @@
     $('staffCareerPlanChartTitle').textContent = `Career plans by ${metric.label.toLowerCase()}`;
     $('staffCareerPlanChartColumn').textContent = metric.label;
     $('staffCareerPlanChartTotal').textContent = total;
-    $('staffCareerPlanChartPeriod').textContent = state.filters.targetYear || 'All Target Years';
     $('staffCareerPlanChartNote').textContent = total ? `Distribution of ${total} filtered career ${total === 1 ? 'plan' : 'plans'}` : 'No career plans match the current filter';
     $('staffCareerPlanChartSegments').replaceChildren();
     $('staffCareerPlanChartLegend').replaceChildren();
@@ -162,64 +161,104 @@
   }
 
   function setFilterControls(filters) {
-    $('staffCareerPlanFilterKeyword').value = filters.keyword;
-    $('staffCareerPlanFilterTargetYear').value = filters.targetYear;
-    $('staffCareerPlanFilterBranch').value = filters.branch;
-    $('staffCareerPlanFilterDepartment').value = filters.department;
+    const controls = $('staffCareerPlanFilterForm').elements;
+    for (const key of filterKeys) controls.namedItem(key).value = filters[key];
   }
 
-  function setFilterInert(inert) {
+  function setBackgroundInert(inert) {
     document.querySelector('main').inert = inert;
     document.querySelector('.employee-career-header').inert = inert;
     document.querySelector('phone-bottom-nav').inert = inert;
+  }
+
+  function initDetails() {
+    const row = data.find(plan => planKey(plan) === query.get('record'));
+    const back = $('staffCareerPlanDetailsBack');
+    const url = pageUrl('staff-career-plan.html');
+    if (!row) { location.replace(url.href); return; }
+    url.searchParams.set('selected', planKey(row));
+    back.href = url.href;
+    const nav = window.navigation;
+    const source = nav?.currentEntry ? nav.entries()[nav.currentEntry.index - 1]?.url : document.referrer;
+    const previous = source && new URL(source);
+    if (previous && previous.origin === url.origin && previous.pathname === url.pathname && history.length > 1) {
+      back.addEventListener('click', event => {
+        if (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
+        if ((previous.searchParams.get('theme') || 'dark') !== document.documentElement.dataset.theme) return;
+        event.preventDefault();
+        history.back();
+      });
+    }
+    const names = String(row.name || '').trim().split(/\s+/);
+    $('staffCareerPlanInitials').textContent = (names[0].slice(0, 1) + (names.length > 1 ? names.at(-1).slice(0, 1) : '')).toUpperCase();
+    $('staffCareerPlanDetailName').textContent = row.name;
+    $('staffCareerPlanDetailEmployeeId').textContent = `#${row.empNo}`;
+    $('staffCareerPlanDetailPosition').textContent = row.position || '—';
+    $('staffCareerPlanDetailDepartment').textContent = row.department || '—';
+    $('staffCareerPlanDetailJob').textContent = row.nextPosition || '—';
+    $('staffCareerPlanDetailYear').textContent = targetYear(row) || '—';
+    $('staffCareerPlanDetailGoal').textContent = row.careerGoal || 'Not provided';
+    $('staffCareerPlanDetailNotes').textContent = row.developmentNotes || row.developmentNeeds || 'Not provided';
+    document.title = `Career Plan – ${row.name} | PeopleHCM`;
   }
 
   function openFilter() {
     setFilterControls(state.filters);
     $('staffCareerPlanFilterOverlay').hidden = false;
     $('staffCareerPlanFilterOverlay').classList.add('is-open');
-    setFilterInert(true);
+    setBackgroundInert(true);
     $('staffCareerPlanFilterKeyword').focus();
   }
 
   function closeFilter() {
     $('staffCareerPlanFilterOverlay').hidden = true;
     $('staffCareerPlanFilterOverlay').classList.remove('is-open');
-    setFilterInert(false);
+    setBackgroundInert(false);
     $('staffCareerPlanFilterTrigger').focus();
-  }
-
-  function readFilterControls() {
-    return {
-      keyword: $('staffCareerPlanFilterKeyword').value.trim(),
-      targetYear: $('staffCareerPlanFilterTargetYear').value,
-      branch: $('staffCareerPlanFilterBranch').value,
-      department: $('staffCareerPlanFilterDepartment').value
-    };
   }
 
   function applyFilter(event) {
     event.preventDefault();
-    const filters = readFilterControls();
-
+    const filters = Object.fromEntries(new FormData(event.currentTarget));
+    filters.keyword = filters.keyword.trim();
     state.filters = filters;
+    history.replaceState({ careerPlanList: { filters } }, '');
     applyRows();
     closeFilter();
   }
 
   function init() {
-    populateSelect($('staffCareerPlanFilterTargetYear'), 'All Target Years', [...new Set(data.map(row => row.targetDate.slice(0, 4)))].sort());
-    populateSelect($('staffCareerPlanFilterBranch'), 'All Branches', unique('branch'));
-    populateSelect($('staffCareerPlanFilterDepartment'), 'All Departments', unique('department'));
-    setFilterControls(defaults);
+    new MutationObserver(() => {
+      document.querySelectorAll('.staff-career-plan-card, #staffCareerPlanDetailsBack').forEach(link => {
+        const url = new URL(link.href);
+        url.searchParams.set('theme', document.documentElement.dataset.theme);
+        link.href = url.href;
+      });
+    }).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+    if ($('staffCareerPlanDetailsBack')) { initDetails(); return; }
+    const previous = history.state?.careerPlanList;
+    const form = $('staffCareerPlanFilterForm');
+    for (const key of organizationFields) {
+      const select = form.elements.namedItem(key);
+      for (const value of unique(key)) select.add(new Option(value, value));
+    }
+    setFilterControls(state.filters);
     applyRows();
+    const selected = $(previous?.cardId || 'plan-' + query.get('selected'));
+    if (selected) {
+      const list = document.querySelector('main');
+      if (previous) {
+        list.scrollTop = previous.scroll;
+        if (previous.keyboard) selected.focus({ preventScroll: true });
+      } else {
+        list.scrollTop += Math.max(0, selected.getBoundingClientRect().bottom - list.getBoundingClientRect().bottom);
+      }
+    }
 
     $('staffCareerPlanFilterTrigger').addEventListener('click', openFilter);
     $('staffCareerPlanCloseFilter').addEventListener('click', closeFilter);
-    $('staffCareerPlanResetFilter').addEventListener('click', () => {
-        setFilterControls(defaults);
-    });
-    $('staffCareerPlanFilterForm').addEventListener('submit', applyFilter);
+    $('staffCareerPlanResetFilter').addEventListener('click', () => form.reset());
+    form.addEventListener('submit', applyFilter);
     $('staffCareerPlanFilterOverlay').addEventListener('click', event => { if (event.target === event.currentTarget) closeFilter(); });
     $('staffCareerPlanViewChart').addEventListener('click', () => { renderChart(); showView('chart'); $('staffCareerPlanChartMetric').focus(); });
     $('staffCareerPlanChartMetric').addEventListener('change', event => { state.metric = event.target.value; renderChart(); });

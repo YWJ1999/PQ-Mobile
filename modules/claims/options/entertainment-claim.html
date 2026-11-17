@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Claims - Entertainment Claim</title>
   <script src="../../../js/components.js"></script>
+  <script src="../../../js/claims/claim-request-store.js"></script>
+  <script src="../../../js/claims/claim-application-fields.js"></script>
   <script src="../../../js/app.js" defer></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -572,186 +574,7 @@
       <div class="view-container active" id="view-1-main">
         
         <!-- MAIN APPLICATION INFO CARD -->
-        <div class="form-card">
-          <div class="section-header-bar no-top-border">
-            <span class="section-title-accent"></span>
-            <span class="section-title-text">GENERAL DETAILS</span>
-          </div>
-
-                    <!-- Claim Period : -->
-          <div class="field-group">
-            <label class="field-label">Claim Period</label>
-            <div style="display: grid; grid-template-columns: 1fr 1.2fr; gap: 10px;">
-              <div class="select-wrapper">
-                <select id="v1ClaimPeriodYear" class="form-ctrl">
-                  <option value="2026" selected>2026</option>
-                  <option value="2025">2025</option>
-                </select>
-              </div>
-              <div class="select-wrapper">
-                <select id="v1ClaimPeriodMonth" class="form-ctrl">
-                  <option value="September" selected>September</option>
-                  <option value="August">August</option>
-                  <option value="July">July</option>
-                </select>
-              </div>
-            </div>
-          </div>
-
-          <!-- Travelling & Mileage Claim # : -->
-          <div class="field-group">
-            <label class="field-label">Travelling &amp; Mileage Claim #</label>
-            <div class="select-wrapper">
-              <select id="travelClaimNoSelect" class="form-ctrl">
-                <option value="" selected>- Select -</option>
-                <option value="TRV-2026-001">TRV-2026-001 (Penang Client Visit)</option>
-                <option value="TRV-2026-002">TRV-2026-002 (JB Business Trip)</option>
-              </select>
-            </div>
-          </div>
-
-          <!-- Benefit Type : -->
-          <div class="field-group">
-            <label class="field-label">Benefit Type</label>
-            <div class="select-wrapper">
-              <select id="benefitTypeSelect" class="form-ctrl">
-                <option value="" selected>Select Benefit</option>
-                <option value="CLIENT ENTERTAINMENT">CLIENT ENTERTAINMENT</option>
-                <option value="BUSINESS DINING & MEAL">BUSINESS DINING &amp; MEAL</option>
-                <option value="CORPORATE GIFT">CORPORATE GIFT</option>
-              </select>
-            </div>
-          </div>
-
-          <!-- Claim Date -->
-          <div class="field-group">
-            <label class="field-label">Claim Date</label>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-              <input type="date" id="claimStartDate" class="form-ctrl" value="2026-09-24" aria-label="Claim date from" />
-              <input type="date" id="claimEndDate" class="form-ctrl" value="2026-09-24" aria-label="Claim date to" />
-            </div>
-          </div>
-
-          <!-- Cost Centre : -->
-          <div class="field-group">
-            <label class="field-label">Cost Centre</label>
-            <div class="select-wrapper">
-              <select id="costCentreInput" class="form-ctrl">
-                <option value="MANAGEMENT" selected>MANAGEMENT</option>
-                <option value="ADMINISTRATION">ADMINISTRATION</option>
-                <option value="OPERATIONS">OPERATIONS</option>
-              </select>
-            </div>
-          </div>
-
-          <!-- Project : -->
-          <div class="field-group">
-            <label class="field-label">Project</label>
-            <div class="select-wrapper">
-              <select id="projectSelect" class="form-ctrl">
-                <option value="" selected>- Select Project -</option>
-                <option value="PROJ-01">Project Alpha</option>
-                <option value="PROJ-02">Enterprise Migration</option>
-              </select>
-            </div>
-          </div>
-
-          <!-- Entertained Person/Org : -->
-          <div class="field-group">
-            <label class="field-label">Entertained Person/Org</label>
-            <input type="text" id="entertainedPersonInput" class="form-ctrl" placeholder="" />
-          </div>
-
-          <!-- Place Entertained : -->
-          <div class="field-group">
-            <label class="field-label">Place Entertained</label>
-            <input type="text" id="placeEntertainedInput" class="form-ctrl" placeholder="" />
-          </div>
-
-          <!-- Purpose : -->
-          <div class="field-group">
-            <label class="field-label">Purpose</label>
-            <input type="text" id="purposeInput" class="form-ctrl" placeholder="" />
-          </div>
-
-          <!-- Currency : -->
-          <div class="field-group">
-            <label class="field-label">Currency</label>
-            <div class="select-wrapper">
-              <select id="currencyInput" class="form-ctrl">
-                <option value="RINGGIT MALAYSIA" selected>RINGGIT MALAYSIA</option>
-                <option value="US DOLLAR">US DOLLAR</option>
-                <option value="SINGAPORE DOLLAR">SINGAPORE DOLLAR</option>
-              </select>
-            </div>
-          </div>
-
-          <!-- Summary Stat Rows -->
-          <div class="entertainment-summary">
-            <div class="entertainment-summary-row">
-              <span class="entertainment-summary-label">Total Amount</span>
-              <span id="summaryTotalAmount" class="entertainment-summary-value">0.00</span>
-            </div>
-            <div class="entertainment-summary-row">
-              <span class="entertainment-summary-label">No of Internal Attendees</span>
-              <span id="summaryInternalPax" class="entertainment-summary-value">0</span>
-            </div>
-            <div class="entertainment-summary-row">
-              <span class="entertainment-summary-label">No of External Attendees</span>
-              <span id="summaryExternalPax" class="entertainment-summary-value">0</span>
-            </div>
-            <div class="entertainment-summary-row">
-              <span class="entertainment-summary-label">Avg Per Pax</span>
-              <span id="summaryAvgPax" class="entertainment-summary-value">0.00</span>
-            </div>
-          </div>
-
-          <!-- Board Approve : -->
-          <div class="field-group toggle-option-card">
-            <label class="toggle-option-label">Board Approve</label>
-            <label class="custom-toggle"><input type="checkbox" id="boardApproveCheck" /><span class="slider"></span></label>
-          </div>
-
-          <!-- Declaration For: -->
-          <div style="margin-top: 10px; margin-bottom: 12px;">
-            <div style="font-size: 12.5px; font-weight: 800; color: var(--text-primary); margin-bottom: 8px;">Declaration For</div>
-            <div style="display: flex; flex-direction: column; gap: 8px;">
-              <div class="toggle-option-card">
-                <label class="toggle-option-label">Gift/Ent</label>
-                <label class="custom-toggle"><input type="checkbox" id="giftEntCheck" /><span class="slider"></span></label>
-              </div>
-              <div class="toggle-option-card">
-                <label class="toggle-option-label">Trv/Hosp</label>
-                <label class="custom-toggle"><input type="checkbox" id="trvHospCheck" /><span class="slider"></span></label>
-              </div>
-            </div>
-          </div>
-
-          <!-- Remarks : -->
-          <div class="field-group" style="margin-bottom: 0;">
-            <label class="field-label">Remarks</label>
-            <input type="text" id="v1Remarks" class="form-ctrl" placeholder="" />
-          </div>
-
-          <div style="margin-top: 18px;">
-            <label class="field-label form-section-heading" style="font-size: 13px; font-weight: 700; color: var(--text-primary); margin-bottom: 10px;">Upload Attachment</label>
-            <div style="display: flex; align-items: center; justify-content: center; gap: 36px; padding: 8px 0;">
-              <div style="display: flex; flex-direction: column; align-items: center; gap: 8px; cursor: pointer;" onclick="triggerFileUpload('main')">
-                <div style="width: 50px; height: 50px; border-radius: 50%; background: rgba(124, 58, 237, 0.12); border: 1px solid rgba(124, 58, 237, 0.3); display: flex; align-items: center; justify-content: center; color: var(--purple-primary); font-size: 18px;">
-                  <i class="fa-solid fa-file-arrow-up"></i>
-                </div>
-                <span style="font-size: 12px; font-weight: 700; color: var(--purple-primary);">Select File(s)</span>
-              </div>
-              <div style="display: flex; flex-direction: column; align-items: center; gap: 8px; cursor: pointer;" onclick="triggerFileUpload('main')">
-                <div style="width: 50px; height: 50px; border-radius: 50%; background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%); display: flex; align-items: center; justify-content: center; color: #ffffff; font-size: 18px; box-shadow: 0 6px 18px rgba(124, 58, 237, 0.45);">
-                  <i class="fa-solid fa-camera"></i>
-                </div>
-                <span style="font-size: 12px; font-weight: 800; color: var(--text-primary);">Take Picture</span>
-              </div>
-            </div>
-            <div id="mainChipsList" class="attachment-upload-list"></div>
-          </div>
-        </div>
+        <template id="claimApplicationFields"></template>
 
         <!-- AGGREGATED SUMMARY ROW (Level 1 Total Claim & Drill-down Entry) -->
         <div class="category-summary-row" onclick="switchView('view-2-categories', 'Claim Categories')" style="background: linear-gradient(135deg, rgba(124, 58, 237, 0.12) 0%, rgba(109, 40, 217, 0.18) 100%); border: 1.5px solid rgba(124, 58, 237, 0.4); border-radius: 22px; padding: 18px; margin-bottom: 16px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 6px 20px rgba(124, 58, 237, 0.18); transition: transform 0.2s ease;">
@@ -942,6 +765,7 @@
 
   <!-- STATE MANAGEMENT & DRILL-DOWN NAVIGATION SCRIPT -->
   <script>
+    ClaimApplicationFields.mount('Entertainment Claim');
     const mockEmployees = {
       'EBB01': { name: 'Sarah Jenkins', empNo: 'EBB01', pos: 'Marketing Lead', comp: 'PeopleHCM Sdn Bhd', dept: 'Marketing' },
       '004177': { name: 'Marcus Tan', empNo: '004177', pos: 'Senior Engineer', comp: 'PeopleHCM Sdn Bhd', dept: 'Engineering' },
@@ -1838,6 +1662,8 @@
     }
 
     function submitEntertainmentClaim() {
+      if (!ClaimApplicationFields.submit('Entertainment Claim', { entertainmentDetails: formData.claimDetails.addedDetails, internalAttendees: formData.claimDetails.addedEmployees,
+        externalAttendees: formData.claimDetails.addedGuests, attachments: formData.mainAttachments })) return;
       if (typeof showToast === 'function') showToast('🚀 Entertainment Claim submitted successfully!');
       else alert('Entertainment Claim submitted successfully!');
       window.location.href = '../index.html';

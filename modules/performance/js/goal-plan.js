@@ -1,4 +1,5 @@
 (() => {
+  document.getElementById('performanceRequestFields').replaceWith(PerformanceRequestForm.appraisalFields(false));
   const source = window.PERFORMANCE_GOAL_PLAN;
   const $ = id => document.getElementById(id);
   const RETURN_TOKEN_PARAM = 'goalReturnToken';
@@ -31,12 +32,6 @@
     const element = node('i', `fa-solid ${name}`);
     element.setAttribute('aria-hidden', 'true');
     return element;
-  };
-  const formatNumber = value => Number(value).toFixed(2);
-  const formatCompactNumber = value => Number(value).toLocaleString('en-US', { maximumFractionDigits: 2 });
-  const formatDate = value => {
-    if (!value) return 'Not set';
-    return new Intl.DateTimeFormat('en-GB', { day: '2-digit', month: 'short', year: 'numeric', timeZone: 'UTC' }).format(new Date(`${value}T00:00:00Z`));
   };
   const selectedGoal = () => items().find(goal => goal.id === state.selectedId);
   const currentTheme = () => document.documentElement.dataset.theme === 'light' ? 'light' : 'dark';
@@ -172,52 +167,7 @@
   }
 
   function renderCard(goal) {
-    const card = node('article', 'goal-plan-card');
-    card.dataset.goalId = goal.id;
-    const header = node('header', 'goal-plan-card-header');
-    const toggle = node('button', 'goal-plan-item-toggle');
-    toggle.type = 'button';
-    toggle.setAttribute('aria-expanded', 'false');
-    toggle.setAttribute('aria-controls', `goal-item-${goal.id}`);
-    const itemIcon = node('span', 'goal-plan-item-icon');
-    itemIcon.append(icon(isCompetency() ? 'fa-award' : 'fa-bullseye'));
-    const weight = node('strong', 'goal-plan-item-weight', `${formatNumber(goal.weightage)}%`);
-    weight.setAttribute('aria-label', `Weightage ${formatNumber(goal.weightage)} percent`);
-    const chevron = icon('fa-chevron-down');
-    chevron.classList.add('goal-plan-item-chevron');
-    toggle.append(itemIcon, node('strong', 'goal-plan-card-title', goal.title), weight, chevron);
-    header.append(toggle);
-
-    const body = node('div', 'goal-plan-card-body goal-plan-item-details');
-    body.id = `goal-item-${goal.id}`;
-    body.hidden = true;
-    const rows = isCompetency() ? [
-      ['Title', goal.title],
-      ['Weightage', `${formatCompactNumber(goal.weightage)}%`],
-      ['Rating', `${formatCompactNumber(goal.rating)} / 5`],
-      ['Remark', goal.remark]
-    ] : [
-      ['Goal Title', goal.title],
-      ['Goal Type', goal.type],
-      ['Description', goal.description],
-      ['Target Description', goal.targetDescription],
-      ['Deadline', formatDate(goal.deadline)],
-      ['Weightage', `${formatNumber(goal.weightage)}%`],
-      ['Budget Hours', formatNumber(goal.budgetHours || 0)],
-      ['Remark', goal.remark]
-    ];
-    const fields = node('dl', 'goal-plan-item-fields');
-    rows.forEach(([label, value]) => {
-      const row = node('div', 'goal-plan-item-field');
-      row.append(node('dt', '', label), node('dd', '', value || '—'));
-      fields.append(row);
-    });
-    body.append(fields);
-    toggle.addEventListener('click', () => {
-      body.hidden = !body.hidden;
-      toggle.setAttribute('aria-expanded', String(!body.hidden));
-    });
-
+    const card = PerformanceRequestForm.itemCard(goal, section, false);
     const actions = node('div', 'goal-plan-card-actions');
     const update = node('button', 'goal-plan-card-update');
     update.type = 'button';
@@ -238,8 +188,7 @@
       });
       actions.append(remove);
     }
-    header.append(actions);
-    card.append(header, body);
+    card.querySelector('header').append(actions);
     return card;
   }
 
@@ -286,6 +235,12 @@
     }
     if (Math.abs(totalWeightage(state.goals) - 100) > .001 || Math.abs(totalWeightage(state.competencies) - 100) > .001) {
       showToast('Performance Goal and Competency weightage must each equal 100.00% before submitting.');
+      return;
+    }
+    try {
+      PerformanceSubmissions.appraisal('goal-plan', source, state.goals, state.competencies);
+    } catch {
+      showToast('Unable to save the submission. Your goal plan is still here.');
       return;
     }
     state.status = 'Submitted';

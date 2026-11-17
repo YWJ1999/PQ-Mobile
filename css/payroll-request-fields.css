@@ -1,0 +1,34 @@
+.payroll-request-fields .claim-form-card { border-radius: 24px; padding: 20px; margin-bottom: 20px; }
+.payroll-request-fields .claim-section-header { padding-bottom: 16px; margin-bottom: 20px; }
+.payroll-request-fields .claim-section-title { font-size: 16px; }
+.payroll-request-fields .claim-control { min-width: 0; border-radius: 12px; font-weight: 600; }
+.payroll-request-fields .claim-field-label { font-size: 12.5px; }
+.payroll-select { position: relative; }
+.payroll-select select { appearance: none; padding-right: 40px; cursor: pointer; }
+.payroll-select select option { background: var(--bg-input); color: var(--text-primary); }
+.payroll-select > i { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 11px; pointer-events: none; }
+.payroll-request-fields input[type="date"] { appearance: none; min-width: 0; color-scheme: dark; }
+html[data-theme="light"] .payroll-request-fields input[type="date"] { color-scheme: light; }
+.payroll-request-fields input[readonly] { color: var(--text-secondary); }
+.payroll-request-fields textarea.claim-control { min-height: 76px; line-height: 1.5; }
+.payroll-money { position: relative; }
+.payroll-money > span { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 12px; font-weight: 800; pointer-events: none; }
+.payroll-money input { padding-left: 42px; font-variant-numeric: tabular-nums; }
+.payroll-upload { margin-top: 5px; padding-top: 16px; border-top: 1px solid var(--border-subtle); }
+.payroll-upload h3 { font-size: 13px; font-weight: 700; margin-bottom: 16px; }
+.payroll-upload-actions { display: flex; justify-content: center; gap: 32px; padding: 4px 0 8px; }
+.payroll-upload-button { display: flex; flex-direction: column; align-items: center; gap: 8px; border: 0; background: none; color: var(--purple-text); font-size: 12px; font-weight: 700; cursor: pointer; }
+.payroll-upload-icon { width: 58px; height: 58px; display: grid; place-items: center; border-radius: 50%; border: 1px solid var(--purple-border); background: var(--purple-subtle); color: var(--purple-text); font-size: 20px; transition: transform .15s ease; }
+.payroll-upload-button.is-camera { color: var(--text-primary); }
+.payroll-upload-button.is-camera .payroll-upload-icon { background: linear-gradient(135deg, #7c3aed, #6d28d9); color: #fff; box-shadow: 0 6px 18px rgba(124,58,237,.3); }
+.payroll-upload-button:active .payroll-upload-icon { transform: scale(.94); }
+.payroll-file-list { display: grid; gap: 8px; margin-top: 10px; }
+.payroll-file-row { display: flex; align-items: center; gap: 9px; min-width: 0; padding: 10px; border-radius: 12px; background: var(--bg-input); border: 1px solid var(--border-subtle); }
+.payroll-file-row > i { color: var(--purple-text); font-size: 15px; }
+.payroll-file-name { flex: 1; min-width: 0; color: var(--text-primary); font-size: 11.5px; font-weight: 700; overflow-wrap: anywhere; text-decoration: none; }
+.payroll-file-name:hover { text-decoration: underline; }
+.payroll-file-remove { display: grid; place-items: center; width: 30px; height: 30px; flex: 0 0 30px; border: 0; border-radius: 9px; background: var(--purple-subtle); color: var(--purple-text); cursor: pointer; }
+
+.payroll-review-value { height: auto; white-space: pre-wrap; overflow-wrap: anywhere; }
+.payroll-request-fields .payroll-file-list { color: var(--text-muted); font-size: 12px; }
+#payrollPendingForm a.payroll-file-name { color: var(--purple-text); text-decoration: underline; }

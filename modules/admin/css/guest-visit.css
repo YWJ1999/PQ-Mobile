@@ -1,3 +1,10 @@
+guest-visit-fields { display: block; }
+guest-visit-fields[readonly] :is(.visit-choice, .visit-switch input) { cursor: default; }
+guest-visit-fields[readonly] .claim-control { background: var(--bg-input); color: var(--text-primary); }
+.visit-submission-meta { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 14px; margin: 0 0 16px; padding: 0 4px; }
+.visit-submission-meta > :first-child { grid-column: 1 / -1; }
+.visit-submission-meta dt { margin-bottom: 3px; color: var(--text-muted); font-size: 11px; font-weight: 700; }
+.visit-submission-meta dd { margin: 0; color: var(--text-primary); font-size: 12px; font-weight: 700; overflow-wrap: anywhere; }
 .guest-visit-page [hidden] { display: none !important; }
 .guest-visit-page .admin-content { padding: 18px 16px 106px; scroll-padding-block: 16px; }
 .guest-visit-page .claim-form-card { padding: 20px 18px; border-radius: 22px; margin-bottom: 16px; }

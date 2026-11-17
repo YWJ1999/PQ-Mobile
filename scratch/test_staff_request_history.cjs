@@ -3,7 +3,7 @@ const path = require('node:path');
 const {pathToFileURL} = require('node:url');
 const puppeteer = require('puppeteer');
 const url = pathToFileURL(path.resolve(__dirname, '../modules/employee-career/options/team/history.html')).href;
-const labels = ['Reference #', 'Request', 'Period', 'Type', 'Manpower Plan #', 'Description', 'Company', 'Branch', 'Department', 'Section', 'Location', 'Job', 'Access', 'Employment Type', 'Count', 'Required By', 'Reason', 'Remarks', 'Attachment'];
+const labels = ['Reference #', 'Status', 'Request', 'Period', 'Type', 'Manpower Plan #', 'Description', 'Company', 'Branch', 'Department', 'Section', 'Location', 'Job', 'Access', 'Employment Type', 'Count', 'Required By', 'Reason', 'Remarks', 'Attachment'];
 (async () => {
   const browser = await puppeteer.launch({headless:true, executablePath:'C:/Program Files/Google/Chrome/Application/chrome.exe', args:['--allow-file-access-from-files','--no-sandbox']});
   try {
@@ -17,27 +17,27 @@ const labels = ['Reference #', 'Request', 'Period', 'Type', 'Manpower Plan #', '
       await page.goto(url+'?category=staff-request&theme='+theme,{waitUntil:'load'});
       assert.ok(await page.$('#teamRequestFilterTrigger'), 'Staff Request has its own filter');
       assert.equal(await page.$eval('#teamRequestFilterBar',node=>node.hidden),false);
-      assert.deepEqual(await page.$$eval('#teamHistoryList .team-history-employee-name',nodes=>nodes.map(node=>node.textContent.trim())),['Aina Rahman','Daniel Wong'],'The initial preview cards show employee names before test fixtures are injected');
-      assert.equal(await page.$$eval('#teamHistoryList .team-history-employee-id',nodes=>nodes.length),0,'Request cards omit employee IDs');
+      assert.deepEqual(await page.$$eval('#teamHistoryList .team-history-employee-identity',nodes=>nodes.map(node=>node.textContent.trim())),['EBB01 - Aina Rahman','EBB02 - Daniel Wong'],'The initial preview cards show employee names before test fixtures are injected');
+      assert.deepEqual(await page.$$eval('#teamHistoryList .team-history-employee-position',nodes=>nodes.map(node=>node.textContent.trim())),['People Operations Executive','Product Designer']);
       assert.deepEqual(await page.$$eval('#teamHistoryList .history-card-row',nodes=>nodes.slice(0,3).map(node=>node.firstElementChild.textContent.trim())),['Request Date','Require Date','Reason']);
       assert.deepEqual(await page.$$eval('#teamHistoryList .status-pill',nodes=>nodes.map(node=>node.textContent.trim())),['Approved','Approved']);
       // Rich records are injected only into this browser to exercise real rendering/filtering without inventing production data.
       await page.evaluate(()=>{
         const records=window.EMPLOYEE_CAREER_TEAM_HISTORY_DATA['staff-request'];
-        Object.assign(records[0],{employeeName:'Request Owner A',empNo:'DO-NOT-DISPLAY',request:'Senior Executive',requestDate:'2026-10-04',company:'PeopleHCM Malaysia',branch:'Kuala Lumpur',requestType:'Budgeted',manpowerPlanNo:'MP-2026-008',description:'Recruit additional capacity.',section:'Operations',location:'Head Office',access:'Manager',employmentType:'Permanent',count:0,reason:'Expansion',remarks:'First line\nSecond line',attachments:[{name:'plan.pdf',url:'https://example.com/plan.pdf'},{name:'unsafe.txt',url:'javascript:alert(1)'}]});
-        Object.assign(records[1],{employeeName:'Request Owner B',request:'Product Support Specialist',requestDate:'2026-09-10',company:'PeopleHCM Services',branch:'Penang',requestType:'Replacement',reason:'Replacement'});
+        Object.assign(records[0],{employeeName:'Request Owner A',empNo:'##0077',request:'Senior Executive',requestDate:'2026-10-04',company:'PeopleHCM Malaysia',branch:'Kuala Lumpur',requestType:'Budgeted',manpowerPlanNo:'MP-2026-008',description:'Recruit additional capacity.',section:'Operations',location:'Head Office',access:'Manager',employmentType:'Permanent',count:0,reason:'Expansion',remarks:'First line\nSecond line',attachments:[{name:'plan.pdf',url:'https://example.com/plan.pdf'},{name:'unsafe.txt',url:'javascript:alert(1)'}]});
+        Object.assign(records[1],{employeeName:'Request Owner B',empNo:'',request:'Product Support Specialist',requestDate:'2026-09-10',company:'PeopleHCM Services',branch:'Penang',requestType:'Replacement',reason:'Replacement'});
       });
       await page.click('[data-team-history-kind="staff-exit"]');
       await page.click('[data-team-history-kind="staff-request"]');
       const original=await page.evaluate(()=>JSON.stringify(window.EMPLOYEE_CAREER_TEAM_HISTORY_DATA['staff-request']));
-      const names=()=>page.$$eval('#teamHistoryList .team-history-employee-name',nodes=>nodes.map(node=>node.textContent.trim()));
-      assert.deepEqual(await names(),['Request Owner A','Request Owner B']);
-      assert.deepEqual(await page.$$eval('#teamHistoryList .team-history-request-ref',nodes=>nodes.map(node=>node.textContent.trim())),['Ref: SR-2026-0012','Ref: SR-2026-0011']);
+      const names=()=>page.$$eval('#teamHistoryList .team-history-employee-identity',nodes=>nodes.map(node=>node.textContent.trim()));
+      assert.deepEqual(await names(),['0077 - Request Owner A','Request Owner B']);
+      assert.deepEqual(await page.$$eval('#teamHistoryList .history-card-row:last-child strong',nodes=>nodes.map(node=>node.textContent.trim())),['SR-2026-0012','SR-2026-0011']);
       assert.deepEqual(await page.$$eval('#teamHistoryList .history-card-row',nodes=>nodes.slice(0,3).map(node=>node.lastElementChild.textContent.trim())),['4 Oct 2026','1 Dec 2026','Expansion']);
       const first='[data-request-id="SR-2026-0012"]';
       await page.click(first);
       assert.deepEqual(await page.$$eval('#teamRequestDetailsRows th',nodes=>nodes.map(node=>node.textContent.trim())),labels);
-      assert.deepEqual(await page.$$eval('#teamRequestDetailsRows td',nodes=>nodes.slice(0,-1).map(node=>node.textContent.trim())),['SR-2026-0012','Senior Executive','Oct 2026','Budgeted','MP-2026-008','Recruit additional capacity.','PeopleHCM Malaysia','Kuala Lumpur','People Operations','Operations','Head Office','Senior Executive','Manager','Permanent','0','1 Dec 2026','Expansion','First line\nSecond line']);
+      assert.deepEqual(await page.$$eval('#teamRequestDetailsRows td',nodes=>nodes.slice(0,-1).map(node=>node.textContent.trim())),['SR-2026-0012','Approved','Senior Executive','Oct 2026','Budgeted','MP-2026-008','Recruit additional capacity.','PeopleHCM Malaysia','Kuala Lumpur','People Operations','Operations','Head Office','Senior Executive','Manager','Permanent','0','1 Dec 2026','Expansion','First line\nSecond line']);
       assert.equal(await page.$$eval('#teamRequestDetailsRows tr:last-child a',nodes=>nodes.length),1);
       assert.ok(await page.$eval('#teamRequestDetailsRows tr:last-child',node=>node.textContent.includes('unsafe.txt')));
       await page.keyboard.press('Escape');
@@ -55,8 +55,8 @@ const labels = ['Reference #', 'Request', 'Period', 'Type', 'Manpower Plan #', '
       await page.setViewport({width,height:844});
       await page.click('[data-request-id="SR-2026-0011"]');
       const missing=await page.$$eval('#teamRequestDetailsRows td',nodes=>nodes.map(node=>node.textContent.trim()));
-      assert.equal(missing[4],'—');
-      assert.equal(missing[9],'—');
+      assert.equal(missing[5],'—');
+      assert.equal(missing[10],'—');
       assert.equal(missing.at(-1),'No attachments');
       await page.click('#teamRequestCloseDetails');
       const fieldIds={periodFrom:'teamRequestPeriodFrom',periodTo:'teamRequestPeriodTo',company:'teamRequestCompany',department:'teamRequestDepartment',branch:'teamRequestBranch',job:'teamRequestJob',requestType:'teamRequestType'};
@@ -71,13 +71,13 @@ const labels = ['Reference #', 'Request', 'Period', 'Type', 'Manpower Plan #', '
       await page.screenshot({path:path.join(__dirname,`staff-request-filter-${theme}-${width}.png`)});
       await page.keyboard.press('Escape');
       for(const [values,expected] of [
-        [{periodFrom:'2026-10',periodTo:'2026-10'},['Request Owner A']],
+        [{periodFrom:'2026-10',periodTo:'2026-10'},['0077 - Request Owner A']],
         [{company:'PeopleHCM Services'},['Request Owner B']],
         [{department:'Customer Experience'},['Request Owner B']],
-        [{branch:'Kuala Lumpur'},['Request Owner A']],
+        [{branch:'Kuala Lumpur'},['0077 - Request Owner A']],
         [{job:'Product Support Specialist'},['Request Owner B']],
-        [{requestType:'Budgeted'},['Request Owner A']],
-        [{periodFrom:'2026-09',periodTo:'2026-10',company:'PeopleHCM Malaysia',department:'People Operations',branch:'Kuala Lumpur',job:'Senior Executive',requestType:'Budgeted'},['Request Owner A']],
+        [{requestType:'Budgeted'},['0077 - Request Owner A']],
+        [{periodFrom:'2026-09',periodTo:'2026-10',company:'PeopleHCM Malaysia',department:'People Operations',branch:'Kuala Lumpur',job:'Senior Executive',requestType:'Budgeted'},['0077 - Request Owner A']],
         [{company:'PeopleHCM Services',requestType:'Budgeted'},[]]
       ]) {await apply(values);assert.deepEqual(await names(),expected,JSON.stringify(values));}
       assert.equal(await page.$eval('#teamHistoryRecordCount',node=>node.textContent.trim()),'0');
@@ -93,12 +93,12 @@ const labels = ['Reference #', 'Request', 'Period', 'Type', 'Manpower Plan #', '
       await page.click('#teamRequestFilterTrigger');
       await page.select('#teamRequestCompany','PeopleHCM Services');
       await page.keyboard.press('Escape');
-      assert.deepEqual(await names(),['Request Owner A'],'Closing discards draft changes');
+      assert.deepEqual(await names(),['0077 - Request Owner A'],'Closing discards draft changes');
       await page.click('[data-team-history-kind="staff-confirmation"]');
       assert.equal(await page.$eval('#teamRequestFilterBar',node=>node.hidden),true);
       assert.equal(await page.$eval('#teamHistoryRecordCount',node=>node.textContent.trim()),'2');
       await page.click('[data-team-history-kind="staff-request"]');
-      assert.deepEqual(await names(),['Request Owner A'],'Request filters survive tab switches independently');
+      assert.deepEqual(await names(),['0077 - Request Owner A'],'Request filters survive tab switches independently');
       await page.click('#teamRequestFilterTrigger');
       await page.setViewport({width,height:568});
       await page.$eval('#teamRequestFilterForm .team-history-filter-fields',node=>{node.scrollTop=node.scrollHeight;});

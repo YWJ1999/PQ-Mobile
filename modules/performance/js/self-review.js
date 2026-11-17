@@ -1,5 +1,6 @@
 (() => {
   const $ = id => document.getElementById(id);
+  $('selfReviewFields').replaceWith(PerformanceRequestForm.selfReviewCard());
   const form = $('selfReviewForm');
   let attachments = [];
 
@@ -52,15 +53,28 @@
     });
   });
   form.addEventListener('input', () => { $('selfReviewStatus').hidden = true; });
-  form.addEventListener('submit', event => {
+  form.addEventListener('submit', async event => {
     event.preventDefault();
     const review = Object.fromEntries(new FormData(form));
     review.empNo = review.empNo.replace(/^#+/, '');
     review.comments = review.comments.trim();
     review.attachments = [...attachments];
-    // Match existing form previews: prepare real values/files for a future service integration.
-    form.dispatchEvent(new CustomEvent('selfreview:ready', { bubbles: true, detail: review }));
-    $('selfReviewStatus').textContent = 'Self review prepared for submission.';
+    const submit = $('selfReviewSubmit');
+    if (submit.disabled) return;
+    submit.disabled = true;
+    try {
+      const files = await Promise.all(review.attachments.map(PerformanceSubmissions.attachment));
+      PerformanceSubmissions.submit('self-review', {
+        ...review, employeeCategory: review.category, appraisalStatus: review.status,
+        supervisorComments: review.comments, attachments: files
+      });
+      form.dispatchEvent(new CustomEvent('selfreview:ready', { bubbles: true, detail: review }));
+      $('selfReviewStatus').textContent = 'Self Review submitted successfully.';
+    } catch {
+      $('selfReviewStatus').textContent = 'Unable to save the submission. Your comments and attachments are still here.';
+    } finally {
+      submit.disabled = false;
+    }
     $('selfReviewStatus').hidden = false;
   });
   new MutationObserver(syncBack).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });

@@ -20,7 +20,7 @@ const pageUrl = pathToFileURL(path.join(root, 'change-request.html')).href + '?t
     page.on('pageerror', error => errors.push(error.message));
     await page.setViewport({ width: 390, height: 950, deviceScaleFactor: 1 });
     await page.goto(pageUrl, { waitUntil: 'load' });
-    await page.click('#pill-qualification');
+    await page.click('#cv-step-qualification');
 
     for (const width of [320, 390]) {
       await page.setViewport({ width, height: 950 });
@@ -51,7 +51,7 @@ const pageUrl = pathToFileURL(path.join(root, 'change-request.html')).href + '?t
       return {
         editorMode: phone.classList.contains('qualification-editor-open'),
         headerTitle: document.getElementById('changeRequestHeaderTitle').textContent.trim(),
-        tabsHidden: getComputedStyle(document.querySelector('.change-scroller-wrapper')).display === 'none',
+        tabsHidden: document.querySelector('.cv-stepper').getClientRects().length === 0,
         listHidden: getComputedStyle(document.querySelector('.main-content')).display === 'none',
         editorDisplay: getComputedStyle(editor).display,
         editorPosition: getComputedStyle(editor).position,
@@ -80,23 +80,22 @@ const pageUrl = pathToFileURL(path.join(root, 'change-request.html')).href + '?t
     assert.deepEqual(await page.evaluate(() => ({
       editorMode: document.querySelector('.change-request-page').classList.contains('qualification-editor-open'),
       headerTitle: document.getElementById('changeRequestHeaderTitle').textContent.trim(),
-      activeTab: document.querySelector('.change-cat-pill.active').id
+      activeTab: document.querySelector('.cv-step.active').id
     })), {
       editorMode: false,
       headerTitle: 'CV Change Request',
-      activeTab: 'pill-qualification'
+      activeTab: 'cv-step-qualification'
     }, 'Header back returns from the editor to the Qualification list');
 
     await page.click('[data-qualification-index="0"] [data-expand-qualification]');
     assert.deepEqual(await page.$eval('[data-qualification-index="0"]', card => {
       const details = card.querySelector('.qualification-record-details');
-      const textbox = details.querySelector('textarea');
       return {
         expanded: details.hidden === false,
         surfaceMatchesCard: getComputedStyle(details).backgroundColor === getComputedStyle(card).backgroundColor,
         dividerStyle: getComputedStyle(details).borderTopStyle,
-        readOnly: textbox.readOnly,
-        details: textbox.value.split('\n')
+        readOnly: !details.querySelector('input, textarea, [contenteditable=true]'),
+        details: [...details.querySelectorAll('.qualification-detail-row')].map(row => [...row.children].map(part => part.textContent).join(': '))
       };
     }), {
       expanded: true,
@@ -112,12 +111,12 @@ const pageUrl = pathToFileURL(path.join(root, 'change-request.html')).href + '?t
         'Notes: Graduated with honours.',
         'Highest: Yes'
       ]
-    }, 'Expanded qualification details appear in one multiline textbox');
+    }, 'Expanded qualification details show the saved record');
     for (const width of [320, 390]) {
       await page.setViewport({ width, height: 950 });
-      assert.ok(await page.$eval('[data-qualification-index="0"] .qualification-record-details textarea', box =>
+      assert.ok(await page.$eval('[data-qualification-index="0"] .qualification-record-details', box =>
         box.scrollWidth <= box.clientWidth + 1 && box.scrollHeight <= box.clientHeight + 1),
-      'Qualification details wrap and fit the textbox at ' + width + 'px');
+      'Qualification details wrap and fit the card at ' + width + 'px');
     }
 
     await page.click('[data-qualification-index="1"] [data-edit-qualification]');
@@ -172,7 +171,7 @@ const pageUrl = pathToFileURL(path.join(root, 'change-request.html')).href + '?t
     await page.waitForFunction(() => getComputedStyle(document.getElementById('qualSheetOverlay')).display === 'none');
     assert.equal(await page.$eval('#qualSheetOverlay', node => getComputedStyle(node).display), 'none');
     await page.click('[data-qualification-index="1"] [data-expand-qualification]');
-    assert.match(await page.$eval('[data-qualification-index="1"] .qualification-record-details textarea', box => box.value), /^Status: Incomplete$/m);
+    assert.equal(await page.$eval('[data-qualification-index="1"] .qualification-detail-value', field => field.textContent), 'Incomplete');
     await page.click('[data-qualification-index="1"] [data-edit-qualification]');
     assert.equal(await page.$eval('#qualificationAttachments .form-attachment-file-name', node => node.textContent.trim()), 'diploma-certificate.pdf');
     assert.equal(await page.$eval('#input_qual_startdate', input => input.value), '2000-02-29');
@@ -202,7 +201,7 @@ const pageUrl = pathToFileURL(path.join(root, 'change-request.html')).href + '?t
     assert.equal(await page.$eval('[data-qualification-index="3"] [data-qualification-name]', node => node.textContent.trim()), 'Postgraduate Certificate');
     assert.equal(await page.$eval('[data-qualification-index="3"] [data-qualification-end]', node => node.textContent), '—');
     await page.click('[data-qualification-index="3"] [data-expand-qualification]');
-    const details = await page.$eval('[data-qualification-index="3"] .qualification-record-details textarea', box => box.value);
+    const details = await page.$$eval('[data-qualification-index="3"] .qualification-detail-row', rows => rows.map(row => [...row.children].map(part => part.textContent).join(': ')).join('\n'));
     assert.match(details, /^Status: Pursuing$/m);
     assert.ok(details.includes('Notes: ' + notes + '\nHighest: No'));
     await page.click('[data-qualification-index="3"] [data-edit-qualification]');
@@ -215,11 +214,16 @@ const pageUrl = pathToFileURL(path.join(root, 'change-request.html')).href + '?t
     assert.equal(await page.$$eval('[data-qualification-index]', nodes => nodes.length), 3);
     assert.equal(await page.$eval('#btnReviewSubmit', button => button.disabled), false);
     assert.ok(await page.$eval('#cat-qualification', section => section.scrollWidth <= section.clientWidth + 1), 'Qualification cards fit the mobile viewport');
-    await page.click('#pill-family');
+    await page.click('#cv-step-family');
     await page.click('#btnReviewSubmit');
     assert.match(await page.$eval('#diffSummaryList', node => node.textContent), /29 Feb 2000 – 28 Apr 2003/);
     await page.click('#btnConfirmSubmit');
     const saved = await page.evaluate(() => JSON.parse(localStorage.getItem('pq_change_request_history'))[0]);
+    await page.goto(pathToFileURL(path.join(root, 'modules/employee-career/options/pending-approval.html')).href + '#approval/details/' + saved.id);
+    await page.click('[data-cv-tab=qualification]');
+    await page.click('[data-qualification-card-toggle="1"]');
+    const proof = await page.$eval('[data-qualification-card-panel="1"] [data-cv-field=Attachments] textarea', field => [field.value, field.readOnly]);
+    assert.deepEqual(proof, ['diploma-certificate.pdf', true]);
     const change = saved.changes.find(change => change.fieldId === 'qual_update_qual-diploma');
     assert.match(change.oldVal, /11 Jun 2001 – 25 Apr 2003/);
     assert.match(change.newVal, /29 Feb 2000 – 28 Apr 2003/);

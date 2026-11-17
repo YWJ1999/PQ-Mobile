@@ -127,7 +127,8 @@ async function screenshot(page, name, bottom = false) {
         await screenshot(page, `project_timesheet_${theme}_${width}`);
       }
       await screenshot(page, `project_timesheet_${theme}_bottom`, true);
-      await page.click('#submitTimesheet');
+      await page.locator('#submitTimesheet').click();
+      await page.waitForFunction(() => document.querySelector('#timesheetFeedback').textContent === 'Timesheet saved.');
       const sheets = await page.evaluate(() => JSON.parse(localStorage.getItem('pq_project_timesheets')));
       assert.equal(sheets.length, 1);
       assert.equal(sheets[0].date, '2026-10-02');

@@ -1,0 +1,13 @@
+#leaveApprovalForm > [data-leave-form] { margin-bottom: 0 !important; }
+.leave-review-value {
+  padding: 12px 14px;
+  background: var(--bg-input);
+  border: 1px solid var(--border-subtle);
+  border-radius: 14px;
+  color: var(--text-primary);
+  font-size: 13px;
+  font-weight: 700;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.leave-review-flag { color: var(--text-primary); font-size: 13px; font-weight: 700; }

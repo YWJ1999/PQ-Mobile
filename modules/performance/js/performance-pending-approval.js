@@ -73,25 +73,16 @@
     overlay.classList.add('active');
     overlay.querySelector('button, textarea, input')?.focus({ preventScroll: true });
   }
-  function table(rows) {
-    const result = node('table', 'payroll-approval-table detail-popout-table');
-    const body = node('tbody');
-    rows.forEach(([label, value]) => {
-      const row = node('tr');
-      const heading = node('th', 'detail-popout-label', label);
-      heading.scope = 'row';
-      const content = node('td', 'detail-popout-value');
-      if (value instanceof Node) content.append(value);
-      else content.textContent = value == null || value === '' ? '—' : String(value);
-      row.append(heading, content);
-      body.append(row);
-    });
-    result.append(body);
-    return result;
-  }
   function attachmentsContent(record) {
     const files = node('div', 'payroll-approval-files');
     for (const file of record.attachments || []) {
+      if (typeof file.base64 === 'string') {
+        const entry = node('a', 'payroll-approval-file', file.name);
+        entry.href = 'data:application/octet-stream;base64,' + file.base64;
+        entry.download = file.name;
+        files.append(entry);
+        continue;
+      }
       let href;
       try {
         const url = new URL(file.href || file.url, location.href);
@@ -104,47 +95,105 @@
     }
     return files.childElementCount ? files : 'No attachments';
   }
-  function renderDetails(record) {
-    $('approvalDetailsTitle').textContent = `${names[record.category]} Approval`;
-    const body = $('approvalDetailsBody');
-    body.replaceChildren(node('h3', '', 'Employee Details'), table([
-      ['Employee', person(record)],
-      ['Job', record.position], ['Company', record.company],
-      ['Department', record.department], ['Branch', record.branch],
-      ...(record.category === 'self-review' ? [['Section', record.section]] : []),
-      ['Reporting To', record.reportingTo],
-      ...(record.backupApprover ? [['Backup Approver', person(record.backupApprover)]] : [])
-    ]), node('h3', '', 'Appraisal Details'), table([
-      ['Reference #', record.id], ['Status', recordDetailStatus.create('Pending Approval')], ['Submit Date', date(record.submittedAt)],
-      [record.category === 'goal-plan' ? 'Session' : 'Period', record.category === 'goal-plan' ? record.session : record.period], ['Appraisal Type', record.appraisalType],
-      ['Period Start', date(record.startDate)], ['Period End', date(record.endDate)]
-    ]));
-    if (record.category === 'goal-plan') {
-      for (const [title, entries] of [['Goals', record.goals], ['Competencies', record.competencies]]) {
-        body.append(node('h3', '', title));
-        if (!entries?.length) { body.append(node('p', 'performance-approval-note', `No ${title.toLowerCase()} submitted.`)); continue; }
-        entries.forEach((entry, index) => body.append(table([
-          [title === 'Goals' ? 'Goal' : 'Competency', `${index + 1}. ${entry.title}`], ['Weight', `${entry.weight}%`], ['Target', entry.target]
-        ])));
-        body.append(table([['Total Weight', `${entries.reduce((sum, entry) => sum + (Number(entry.weight) || 0), 0)}%`]]));
-      }
-    } else if (record.category === 'self-evaluation') {
-      body.append(node('h3', '', 'Self Evaluation'), table([
-        ['Goal Score', record.goalScore], ['Competency Score', record.competencyScore],
-        ['Overall Score', record.overallScore], ['Score Grade', record.scoreGrade],
-        ['Achievements', record.achievements], ['Development Areas', record.development]
-      ]));
-    } else {
-      body.append(node('h3', '', 'Self Review'), table([
-        ['Overall Score', record.overallScore], ['Score Grade', record.scoreGrade],
-        ['Employee Review', record.review], ['Development Plan', record.development]
-      ]));
+  function displayField(control, value) {
+    const output = node('div', 'performance-review-value ' + control.className);
+    const label = control.parentElement.querySelector('label');
+    label.removeAttribute('for');
+    label.id = control.id + 'Label';
+    output.id = control.id;
+    output.setAttribute('aria-labelledby', label.id);
+    if (value instanceof Node) output.append(value);
+    else output.textContent = value == null || value === '' ? '—' : value;
+    control.replaceWith(output);
+  }
+
+  function extraFields(parent, title, entries) {
+    const supplied = entries.filter(([, value]) => value != null && value !== '');
+    if (!supplied.length) return;
+    const section = node('section', 'goal-plan-employee-form');
+    section.append(node('h2', 'form-section-heading', title));
+    const fields = node('dl', 'performance-review-fields');
+    for (const [label, value] of supplied) {
+      const group = node('div');
+      const entry = node('dd', 'performance-review-value');
+      if (value instanceof Node) entry.append(value);
+      else entry.textContent = value;
+      group.append(node('dt', '', label), entry);
+      fields.append(group);
     }
-    body.append(node('h3', '', 'Remarks & Attachments'), table([
-      ['Remarks', record.remarks],
-      ...(record.category === 'self-review' ? [['Approver / Supervisor Comments', record.supervisorComments]] : []),
-      ['Attachment', attachmentsContent(record)]
-    ]));
+    section.append(fields);
+    parent.append(section);
+  }
+
+  function appraisalDetails(record, parent) {
+    const evaluation = record.category === 'self-evaluation';
+    const form = PerformanceRequestForm.appraisalFields(evaluation);
+    for (const input of form.querySelectorAll('[data-field]')) {
+      const key = input.dataset.field;
+      let value = record[key];
+      if (key === 'name') value = person(record);
+      if (key === 'supervisor' && value?.empNo) value = person(value);
+      if (key === 'reportingTo' && record.reportingEmployee?.empNo) value = person(record.reportingEmployee);
+      if (key === 'evaluationRef') value = record.evaluationRef || record.id;
+      displayField(input, value);
+    }
+    for (const button of form.querySelectorAll('.goal-plan-section-card')) {
+      const kind = button.dataset.planSection || button.dataset.evaluationSection;
+      const items = record[kind] || [];
+      const list = node('div', 'goal-plan-detail-card');
+      list.id = 'review-' + kind;
+      list.hidden = true;
+      const cards = node('div', 'goal-plan-cards');
+      cards.append(...items.map(item => PerformanceRequestForm.itemCard(item, kind, evaluation)));
+      if (!items.length) cards.append(node('p', 'performance-approval-note', 'No items submitted.'));
+      list.append(cards);
+      const weights = items.map(item => item.weightage ?? item.weight);
+      const total = weights.reduce((sum, weight) => sum + Number(weight || 0), 0);
+      button.querySelector('small').textContent = items.length + (items.length === 1 ? ' item' : ' items') +
+        (items.length && weights.every(weight => weight != null) ? ' · Total weight ' + Number(total.toFixed(2)) + '%' : '');
+      button.setAttribute('aria-expanded', 'false');
+      button.setAttribute('aria-controls', list.id);
+      button.addEventListener('click', () => {
+        list.hidden = !list.hidden;
+        button.setAttribute('aria-expanded', String(!list.hidden));
+      });
+      button.after(list);
+    }
+    parent.append(form);
+    extraFields(parent, 'Appraisal Details', [
+      ['Session', record.session], ['Company', record.company], ['Branch', record.branch],
+      ['Period Start', record.startDate && date(record.startDate)], ['Period End', record.endDate && date(record.endDate)],
+      ...(evaluation ? [['Goal Score', record.goalScore], ['Competency Score', record.competencyScore],
+        ['Overall Score', record.overallScore], ['Score Grade', record.scoreGrade], ['Achievements', record.achievements],
+        ['Development Areas', record.development]] : []),
+      ['Remarks', record.remarks], ['Attachment', record.attachments?.length ? attachmentsContent(record) : null]
+    ]);
+  }
+
+  function selfReviewDetails(record, parent) {
+    const card = PerformanceRequestForm.selfReviewCard();
+    const values = { ...record, empNo: '#' + record.empNo.replace(/^#+/, ''), reference: record.reference || record.id,
+      category: record.employeeCategory, status: record.appraisalStatus,
+      comments: record.supervisorComments ?? record.comments, assessmentFrom: record.assessmentFrom || (record.startDate && date(record.startDate)),
+      assessmentTo: record.assessmentTo || (record.endDate && date(record.endDate)) };
+    for (const control of card.querySelectorAll('[name]')) displayField(control, values[control.name]);
+    const files = card.querySelector('fieldset');
+    files.querySelectorAll('.employee-career-upload-actions, input').forEach(el => el.remove());
+    files.querySelector('.form-attachment-list').append(attachmentsContent(record));
+    parent.classList.add('employee-career-form-page', 'employee-career-team-form-page');
+    parent.append(card);
+    extraFields(parent, 'Review Details', [['Section', record.section], ['Reporting To', record.reportingTo],
+      ['Overall Score', record.overallScore], ['Score Grade', record.scoreGrade], ['Employee Review', record.review],
+      ['Development Plan', record.development], ['Remarks', record.remarks]]);
+  }
+
+  function renderDetails(record) {
+    $('approvalDetailsTitle').textContent = names[record.category] + ' Approval';
+    const body = $('approvalDetailsBody');
+    const request = node('div', 'performance-request-review');
+    if (record.category === 'self-review') selfReviewDetails(record, request);
+    else appraisalDetails(record, request);
+    body.replaceChildren(request);
     const comments = node('section', 'detail-popout-comments approval-comments-card');
     const label = node('label', '', 'Approver Remarks'); label.htmlFor = 'performanceApprovalComments';
     const input = node('textarea', 'detail-popout-comment-control'); input.id = label.htmlFor;
@@ -160,7 +209,7 @@
   function renderWorkflow(record) {
     $('performanceApprovalWorkflowTitle').textContent = `${names[record.category]} Workflow`;
     const employee = node('div', 'payroll-approval-workflow-person'); employee.append(person(record));
-    $('performanceApprovalWorkflowRequest').replaceChildren(field('Reference #', record.id), employee, field('Status', recordDetailStatus.create('Pending Approval')), field(record.category === 'goal-plan' ? 'Session' : 'Period', record.category === 'goal-plan' ? record.session : record.period));
+    $('performanceApprovalWorkflowRequest').replaceChildren(field('Reference #', record.id), employee, field('Status', recordDetailStatus.create('Pending Approval')), field(record.category === 'goal-plan' ? 'Session' : 'Period', record.category === 'goal-plan' ? record.session || record.period : record.period));
     const submitted = node('li', 'payroll-approval-workflow-step is-complete');
     submitted.append(field('Request Submitted', recordDetailStatus.create('Completed')), field('Submitted By', record.name), field('Submit Date', date(record.submittedAt)));
     const approval = node('li', 'payroll-approval-workflow-step is-active');
@@ -245,14 +294,14 @@
       const body = node('div', 'approval-card-body payroll-approval-card-body');
       const fields = [['Submitted', date(record.submittedAt)], ['Department', record.department]];
       if (record.category === 'goal-plan') {
-        fields.push(['Session', record.session]);
+        fields.push([record.session ? 'Session' : 'Period', record.session || record.period]);
       } else {
         fields.push(['Period', record.period]);
         if (record.category === 'self-review') fields.push(['Appraisal Type', record.appraisalType], ['Section', record.section]);
         fields.push(['Overall Score', record.overallScore], ['Score Grade', record.scoreGrade]);
       }
       if (record.backupApprover) fields.push(['Backup Approver', record.backupApprover.name]);
-      body.append(PendingApprovalPage.link(record.id, createApprovalCardDetails(fields)), createApprovalCardActions('approvalAction'));
+      body.append(PendingApprovalPage.link(record.id, createApprovalCardDetails(fields.filter(([, value]) => value != null && value !== ''))), createApprovalCardActions('approvalAction'));
       card.append(header, body);
       queue.append(card);
     });
@@ -342,6 +391,7 @@
   new MutationObserver(syncTheme).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
   syncTheme();
   setCategory(category);
+  window.addEventListener('pageshow', event => { if (event.persisted) render(); });
   PendingApprovalPage.register({
     render(view, id) {
       const record = store.getPending().find(item => item.id === id);

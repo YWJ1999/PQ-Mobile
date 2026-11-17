@@ -13,11 +13,15 @@
   <link rel="stylesheet" href="../../../css/theme.css">
   <link rel="stylesheet" href="../../../css/app.css">
   <link rel="stylesheet" href="../../../css/project-task.css">
+  <link rel="stylesheet" href="../../../css/project-task-forms.css">
+  <link rel="stylesheet" href="../../../css/form-section-headings.css">
   <link rel="stylesheet" href="../../../css/approval-actions.css">
   <script src="../../../js/components.js"></script>
   <script src="../../../js/app.js" defer></script>
   <script src="../../../js/pending-approval-selection.js" defer></script>
   <script src="../../../js/pending-approval-backup.js" defer></script>
+  <script src="../../../js/project-task/timesheet-requests.js" defer></script>
+  <script src="../../../js/project-task/timesheet-view.js" defer></script>
   <script src="../../../js/project-task/project-task-app.js" defer></script>
 </head>
 <body class="project-task-page project-approval-page unified-approval-actions">
@@ -43,78 +47,32 @@
         </label>
       </div>
       <section class="project-approval-list" id="projectTimesheetApprovalList" aria-label="Timesheet pending approvals">
-        <article class="project-approval-card" data-type="timesheet" data-reference="ETS00000002819" data-approval-id="ETS00000002819" data-document-reference="ETS00000002819" data-employee-id="#EBB12" data-employee-name="Farhan binti rahmat" data-status="Pending" data-document-status="Pending" data-date="30 Sep 2026" data-timesheet-date="30 Sep 2026" data-clock-times="08:30 &ndash; 17:30" data-normal-hours="7.50 hrs" data-normal-work-hours="7.50 hrs" data-ot-hours="1.00 hrs" data-remark="Client portal sprint progress update." data-activity-time="09:00 &ndash; 12:00" data-activity-title="Portal accessibility review" data-activity-project="Client Portal Upgrade" data-activity-task="Accessibility Sprint">
-          <header class="project-approval-card-banner">
-            <input type="checkbox" class="approval-card-checkbox" aria-label="Select ETS00000002819 for Farhan binti rahmat">
-            <span class="project-approval-employee-copy">
-              <strong class="project-approval-employee-name">Farhan binti rahmat</strong>
-              <span class="project-approval-employee-id">#EBB12</span>
-            </span>
-            <span class="project-approval-status"><i class="fa-solid fa-hourglass-half" aria-hidden="true"></i><span>Pending</span></span>
-            <button type="button" class="project-approval-menu-trigger" data-project-approval-menu aria-label="Options for ETS00000002819"><i class="fa-solid fa-ellipsis-vertical" aria-hidden="true"></i></button>
-          </header>
-          <div class="approval-card-body">
-            <a class="approval-record-link" href="#approval/details/ETS00000002819"><dl class="approval-card-details">
-              <div data-field="date"><dt>Timesheet Date</dt> <dd>30 Sep 2026</dd></div>
-              <div data-field="normal-hours"><dt>Normal Hours</dt> <dd>7.50 hrs</dd></div>
-              <div data-field="ot-hours"><dt>OT Hours</dt> <dd>1.00 hrs</dd></div>
-            </dl></a>
-            <div class="project-approval-actions pending-action-grid">
-              <button type="button" class="action-btn-resubmit" data-project-approval-action="resubmit"><i class="fa-solid fa-rotate-left" aria-hidden="true"></i><span>Resubmit</span></button>
-              <button type="button" class="action-btn-reject" data-project-approval-action="reject"><i class="fa-solid fa-xmark" aria-hidden="true"></i><span>Reject</span></button>
-              <button type="button" class="action-btn-approve" data-project-approval-action="approve"><i class="fa-solid fa-check" aria-hidden="true"></i><span>Approve</span></button>
-            </div>
-          </div>
-        </article>
-
-        <article class="project-approval-card" data-type="timesheet" data-reference="ETS00000002820" data-approval-id="ETS00000002820" data-document-reference="ETS00000002820" data-employee-id="#EBB27" data-employee-name="Aina Rahman" data-status="Pending" data-document-status="Pending" data-date="29 Sep 2026" data-timesheet-date="29 Sep 2026" data-clock-times="08:00 &ndash; 17:00" data-normal-hours="8.00 hrs" data-normal-work-hours="8.00 hrs" data-ot-hours="0.00 hrs" data-remark="Month-end timesheet submission." data-activity-time="13:30 &ndash; 17:00" data-activity-title="API integration review" data-activity-project="Payroll Modernisation" data-activity-task="Integration Testing">
-          <header class="project-approval-card-banner">
-            <input type="checkbox" class="approval-card-checkbox" aria-label="Select ETS00000002820 for Aina Rahman">
-            <span class="project-approval-employee-copy">
-              <strong class="project-approval-employee-name">Aina Rahman</strong>
-              <span class="project-approval-employee-id">#EBB27</span>
-            </span>
-            <span class="project-approval-status"><i class="fa-solid fa-hourglass-half" aria-hidden="true"></i><span>Pending</span></span>
-            <button type="button" class="project-approval-menu-trigger" data-project-approval-menu aria-label="Options for ETS00000002820"><i class="fa-solid fa-ellipsis-vertical" aria-hidden="true"></i></button>
-          </header>
-          <div class="approval-card-body">
-            <a class="approval-record-link" href="#approval/details/ETS00000002820"><dl class="approval-card-details">
-              <div data-field="date"><dt>Timesheet Date</dt> <dd>29 Sep 2026</dd></div>
-              <div data-field="normal-hours"><dt>Normal Hours</dt> <dd>8.00 hrs</dd></div>
-              <div data-field="ot-hours"><dt>OT Hours</dt> <dd>0.00 hrs</dd></div>
-            </dl></a>
-            <div class="project-approval-actions pending-action-grid">
-              <button type="button" class="action-btn-resubmit" data-project-approval-action="resubmit"><i class="fa-solid fa-rotate-left" aria-hidden="true"></i><span>Resubmit</span></button>
-              <button type="button" class="action-btn-reject" data-project-approval-action="reject"><i class="fa-solid fa-xmark" aria-hidden="true"></i><span>Reject</span></button>
-              <button type="button" class="action-btn-approve" data-project-approval-action="approve"><i class="fa-solid fa-check" aria-hidden="true"></i><span>Approve</span></button>
-            </div>
-          </div>
-        </article>
-
-        <article class="project-approval-card" data-type="timesheet" data-reference="ETS00000002821" data-approval-id="ETS00000002821" data-document-reference="ETS00000002821" data-employee-id="#EBB41" data-employee-name="Daniel Lee" data-status="Pending" data-document-status="Pending" data-date="28 Sep 2026" data-timesheet-date="28 Sep 2026" data-clock-times="09:00 &ndash; 17:30" data-normal-hours="6.50 hrs" data-normal-work-hours="6.50 hrs" data-ot-hours="2.00 hrs" data-remark="Overtime support for release preparation." data-activity-time="18:00 &ndash; 20:00" data-activity-title="Release readiness support" data-activity-project="Mobile Workforce" data-activity-task="Release Preparation">
-          <header class="project-approval-card-banner">
-            <input type="checkbox" class="approval-card-checkbox" aria-label="Select ETS00000002821 for Daniel Lee">
-            <span class="project-approval-employee-copy">
-              <strong class="project-approval-employee-name">Daniel Lee</strong>
-              <span class="project-approval-employee-id">#EBB41</span>
-            </span>
-            <span class="project-approval-status"><i class="fa-solid fa-hourglass-half" aria-hidden="true"></i><span>Pending</span></span>
-            <button type="button" class="project-approval-menu-trigger" data-project-approval-menu aria-label="Options for ETS00000002821"><i class="fa-solid fa-ellipsis-vertical" aria-hidden="true"></i></button>
-          </header>
-          <div class="approval-card-body">
-            <a class="approval-record-link" href="#approval/details/ETS00000002821"><dl class="approval-card-details">
-              <div data-field="date"><dt>Timesheet Date</dt> <dd>28 Sep 2026</dd></div>
-              <div data-field="normal-hours"><dt>Normal Hours</dt> <dd>6.50 hrs</dd></div>
-              <div data-field="ot-hours"><dt>OT Hours</dt> <dd>2.00 hrs</dd></div>
-            </dl></a>
-            <div class="project-approval-actions pending-action-grid">
-              <button type="button" class="action-btn-resubmit" data-project-approval-action="resubmit"><i class="fa-solid fa-rotate-left" aria-hidden="true"></i><span>Resubmit</span></button>
-              <button type="button" class="action-btn-reject" data-project-approval-action="reject"><i class="fa-solid fa-xmark" aria-hidden="true"></i><span>Reject</span></button>
-              <button type="button" class="action-btn-approve" data-project-approval-action="approve"><i class="fa-solid fa-check" aria-hidden="true"></i><span>Approve</span></button>
-            </div>
-          </div>
-        </article>
       </section>
+      <template id="projectApprovalCardTemplate">
+        <article class="project-approval-card" data-type="timesheet">
+          <header class="project-approval-card-banner">
+            <input type="checkbox" class="approval-card-checkbox">
+            <span class="project-approval-employee-copy">
+              <strong class="project-approval-employee-name"></strong>
+              <span class="project-approval-employee-id"></span>
+            </span>
+            <span class="project-approval-status"><i class="fa-solid fa-hourglass-half" aria-hidden="true"></i><span>Pending</span></span>
+            <button type="button" class="project-approval-menu-trigger" data-project-approval-menu><i class="fa-solid fa-ellipsis-vertical" aria-hidden="true"></i></button>
+          </header>
+          <div class="approval-card-body">
+            <a class="approval-record-link"><dl class="approval-card-details">
+              <div data-field="date"><dt>Timesheet Date</dt> <dd></dd></div>
+              <div data-field="normal-hours"><dt>Normal Hours</dt> <dd></dd></div>
+              <div data-field="ot-hours"><dt>OT Hours</dt> <dd></dd></div>
+            </dl></a>
+            <div class="project-approval-actions pending-action-grid">
+              <button type="button" class="action-btn-resubmit" data-project-approval-action="resubmit"><i class="fa-solid fa-rotate-left" aria-hidden="true"></i><span>Resubmit</span></button>
+              <button type="button" class="action-btn-reject" data-project-approval-action="reject"><i class="fa-solid fa-xmark" aria-hidden="true"></i><span>Reject</span></button>
+              <button type="button" class="action-btn-approve" data-project-approval-action="approve"><i class="fa-solid fa-check" aria-hidden="true"></i><span>Approve</span></button>
+            </div>
+          </div>
+        </article>
+      </template>
     </main>
     <phone-bottom-nav active="apps"></phone-bottom-nav>
     <left-profile-drawer></left-profile-drawer>
@@ -144,36 +102,11 @@
           <phone-status-bar time="9:41"></phone-status-bar>
           <div class="approval-page-heading">
             <button type="button" data-approval-back aria-label="Back to pending approvals"></button>
-            <h1 id="projectApprovalDetailsTitle" tabindex="-1">Timesheet Details</h1>
+            <h1 id="projectApprovalDetailsTitle" tabindex="-1">Timesheet Approval</h1>
           </div>
         </header>
         <div class="project-approval-details-body">
-          <section class="project-approval-detail-section" aria-labelledby="projectApprovalInformationTitle">
-            <h3 class="project-approval-detail-section-title" id="projectApprovalInformationTitle">General</h3>
-            <table class="project-approval-details-table" id="projectApprovalDetailsTable">
-              <tbody>
-                <tr><th scope="row">Document Reference</th><td id="projectApprovalDetailDocumentReference"></td></tr>
-                <tr><th scope="row">Document Status</th><td><span class="project-approval-detail-status" id="projectApprovalDetailDocumentStatus"></span></td></tr>
-                <tr><th scope="row">Employee</th><td><strong class="project-approval-detail-employee-name" id="projectApprovalDetailEmployeeName"></strong> <span class="project-approval-detail-employee-id" id="projectApprovalDetailEmployeeId"></span></td></tr>
-                <tr><th scope="row">Timesheet Date</th><td id="projectApprovalDetailTimesheetDate"></td></tr>
-                <tr><th scope="row">Clock Times</th><td id="projectApprovalDetailClockTimes"></td></tr>
-                <tr><th scope="row">Normal Work Hours</th><td id="projectApprovalDetailNormalWorkHours"></td></tr>
-                <tr><th scope="row">Overtime Hours</th><td id="projectApprovalDetailOvertimeHours"></td></tr>
-                <tr><th scope="row">Remark</th><td id="projectApprovalDetailRemark"></td></tr>
-              </tbody>
-            </table>
-          </section>
-          <section class="project-approval-detail-section" aria-labelledby="projectApprovalWorkActivityTitle">
-            <h3 class="project-approval-detail-section-title" id="projectApprovalWorkActivityTitle">Work Activity</h3>
-            <table class="project-approval-details-table" id="projectApprovalWorkActivityTable">
-              <tbody>
-                <tr><th scope="row">Time</th><td id="projectApprovalActivityTime"></td></tr>
-                <tr><th scope="row">Title</th><td id="projectApprovalActivityTitle"></td></tr>
-                <tr><th scope="row">Project</th><td id="projectApprovalActivityProject"></td></tr>
-                <tr><th scope="row">Task</th><td id="projectApprovalActivityTask"></td></tr>
-              </tbody>
-            </table>
-          </section>
+          <div id="projectApprovalRequest" class="project-form-page"></div>
           <section class="project-approval-comments-card" aria-labelledby="projectApprovalCommentsTitle">
             <label id="projectApprovalCommentsTitle" for="projectApprovalApproverComments">Approver Action Comments</label>
             <input type="text" id="projectApprovalApproverComments" placeholder="Add approver action comments (optional)...">

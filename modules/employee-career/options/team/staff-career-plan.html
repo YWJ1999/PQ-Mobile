@@ -22,7 +22,7 @@
     <section id="staffCareerPlanChartView" aria-label="Staff career plan analysis" hidden>
       <div class="staff-list-breakdown-card"><label for="staffCareerPlanChartMetric">Breakdown By</label><div class="staff-list-select"><select id="staffCareerPlanChartMetric"><option value="branch">Branch</option><option value="department">Department</option><option value="careerPath">Career Path</option></select><i class="fa-solid fa-chevron-down" aria-hidden="true"></i></div></div>
       <article class="staff-list-donut-card">
-        <div class="staff-list-chart-heading"><h2 id="staffCareerPlanChartTitle">Career plans by branch</h2><p id="staffCareerPlanChartPeriod"></p></div>
+        <div class="staff-list-chart-heading"><h2 id="staffCareerPlanChartTitle">Career plans by branch</h2><p id="staffCareerPlanChartFilterSummary"></p></div>
         <div class="staff-list-donut"><svg id="staffCareerPlanChartDonut" viewBox="0 0 180 180" role="img" aria-label="Career plans by branch"><circle cx="90" cy="90" r="70" fill="none" stroke="var(--border-subtle)" stroke-width="22"></circle><g id="staffCareerPlanChartSegments"></g></svg><div class="staff-list-donut-center"><strong id="staffCareerPlanChartTotal">0</strong><span>Career Plans</span></div></div>
         <p id="staffCareerPlanChartNote" class="staff-list-chart-note"></p>
       </article>
@@ -35,10 +35,11 @@
       <div class="standard-filter-handle" aria-hidden="true"></div>
       <header class="standard-filter-header"><h2 id="staffCareerPlanFilterTitle">Filter</h2><div class="standard-filter-header-actions"><button type="button" id="staffCareerPlanResetFilter" class="standard-filter-reset"><i class="fa-solid fa-rotate-left" aria-hidden="true"></i><span>Reset</span></button><button type="button" id="staffCareerPlanCloseFilter" class="standard-filter-close" aria-label="Close staff career plan filter"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button></div></header>
       <div class="staff-list-filter-fields">
-        <div><label for="staffCareerPlanFilterKeyword">Search keyword</label><input id="staffCareerPlanFilterKeyword" type="search" placeholder="Employee Number or Name" maxlength="150"></div>
-        <div><label for="staffCareerPlanFilterTargetYear">Target year</label><select id="staffCareerPlanFilterTargetYear"></select></div>
-        <div><label for="staffCareerPlanFilterBranch">Branch</label><select id="staffCareerPlanFilterBranch"></select></div>
-        <div><label for="staffCareerPlanFilterDepartment">Department</label><select id="staffCareerPlanFilterDepartment"></select></div>
+        <div><label for="staffCareerPlanFilterKeyword">Search Keyword</label><input id="staffCareerPlanFilterKeyword" name="keyword" type="search" placeholder="Employee Number or Name" maxlength="150"></div>
+        <div><label for="staffCareerPlanFilterCompany">Company</label><div class="staff-list-select"><select id="staffCareerPlanFilterCompany" name="company"><option value="">All Companies</option></select></div></div>
+        <div><label for="staffCareerPlanFilterBranch">Branch</label><div class="staff-list-select"><select id="staffCareerPlanFilterBranch" name="branch"><option value="">All Branches</option></select></div></div>
+        <div><label for="staffCareerPlanFilterDepartment">Department</label><div class="staff-list-select"><select id="staffCareerPlanFilterDepartment" name="department"><option value="">All Departments</option></select></div></div>
+        <div><label for="staffCareerPlanFilterCostCenter">Cost Centre</label><div class="staff-list-select"><select id="staffCareerPlanFilterCostCenter" name="costCenter"><option value="">All Cost Centres</option></select></div></div>
       </div>
       <footer class="standard-filter-footer"><button type="submit" id="staffCareerPlanApplyFilter" class="standard-filter-apply">Apply Filter</button></footer>
     </form>

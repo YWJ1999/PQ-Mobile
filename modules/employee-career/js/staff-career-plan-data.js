@@ -11,6 +11,8 @@ window.EMPLOYEE_CAREER_STAFF_PLAN_DATA = [
     nextPositionKey: 'hr-manager',
     targetDate: '2026-12-26',
     planDate: '2025-10-04',
+    company: 'PEOPLE QUEST SDN BHD',
+    costCenter: 'CC-HR',
     branch: 'Headquarters (HQ)',
     department: 'Human Resource'
   },
@@ -26,6 +28,8 @@ window.EMPLOYEE_CAREER_STAFF_PLAN_DATA = [
     nextPositionKey: 'senior-product-designer',
     targetDate: '2027-06-30',
     planDate: '2026-02-14',
+    company: 'PEOPLE QUEST SDN BHD',
+    costCenter: 'CC-DESIGN',
     branch: 'Headquarters (HQ)',
     department: 'Product & Design'
   },
@@ -41,6 +45,8 @@ window.EMPLOYEE_CAREER_STAFF_PLAN_DATA = [
     nextPositionKey: 'senior-finance-analyst',
     targetDate: '2027-03-31',
     planDate: '2026-03-21',
+    company: 'PEOPLE QUEST SDN BHD',
+    costCenter: 'CC-FINANCE',
     branch: 'Northern Region Branch',
     department: 'Finance & Accounting'
   },
@@ -56,6 +62,8 @@ window.EMPLOYEE_CAREER_STAFF_PLAN_DATA = [
     nextPositionKey: 'head-of-administration',
     targetDate: '2027-09-30',
     planDate: '2024-07-08',
+    company: 'PEOPLE QUEST SDN BHD',
+    costCenter: 'CC-ADMIN',
     branch: 'Headquarters (HQ)',
     department: 'Administration'
   },
@@ -71,6 +79,8 @@ window.EMPLOYEE_CAREER_STAFF_PLAN_DATA = [
     nextPositionKey: 'operations-manager',
     targetDate: '2027-01-15',
     planDate: '2025-05-19',
+    company: 'PEOPLE QUEST SDN BHD',
+    costCenter: 'CC-OPS',
     branch: 'Southern Region Branch',
     department: 'Operations'
   },
@@ -86,6 +96,8 @@ window.EMPLOYEE_CAREER_STAFF_PLAN_DATA = [
     nextPositionKey: 'senior-software-engineer',
     targetDate: '2027-08-31',
     planDate: '2025-12-01',
+    company: 'PEOPLE QUEST SDN BHD',
+    costCenter: 'CC-IT',
     branch: 'Sabah Branch',
     department: 'Information Technology'
   },
@@ -101,6 +113,8 @@ window.EMPLOYEE_CAREER_STAFF_PLAN_DATA = [
     nextPositionKey: 'sales-manager',
     targetDate: '2028-01-31',
     planDate: '2026-06-12',
+    company: 'PEOPLE QUEST SDN BHD',
+    costCenter: 'CC-SALES',
     branch: 'Northern Region Branch',
     department: 'Sales & Marketing'
   },
@@ -116,6 +130,8 @@ window.EMPLOYEE_CAREER_STAFF_PLAN_DATA = [
     nextPositionKey: 'systems-engineer',
     targetDate: '2027-11-30',
     planDate: '2026-08-03',
+    company: 'PEOPLE QUEST SDN BHD',
+    costCenter: 'CC-IT',
     branch: 'Central Region Branch',
     department: 'Information Technology'
   }

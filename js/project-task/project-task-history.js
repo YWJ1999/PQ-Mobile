@@ -342,15 +342,6 @@
       });
   }
 
-  function calculateActivityMinutes(activity) {
-    const from = String(activity.timeFrom || '').match(/^([0-9]{2}):([0-9]{2})$/);
-    const to = String(activity.timeTo || '').match(/^([0-9]{2}):([0-9]{2})$/);
-    if (!from || !to) return 0;
-    const start = Number(from[1]) * 60 + Number(from[2]);
-    const end = Number(to[1]) * 60 + Number(to[2]);
-    return (end - start + 1440) % 1440;
-  }
-
   function normalizeActivity(activity, index) {
     return {
       title: String(activity.title || 'Work Item ' + (index + 1)),
@@ -367,11 +358,9 @@
 
   function normalizeTimesheet(record, index) {
     const activities = Array.isArray(record.activities) ? record.activities.map(normalizeActivity) : [];
-    const calculated = activities.reduce((total, activity) => {
-      total[activity.overtime ? 'overtimeMinutes' : 'normalMinutes'] += calculateActivityMinutes(activity);
-      return total;
-    }, { normalMinutes: 0, overtimeMinutes: 0 });
+    const calculated = TimesheetRequests.totals(activities);
     return {
+      ...record,
       id: String(record.id || 'TS-LOCAL-' + (index + 1)),
       date: String(record.date || record.createdAt?.slice(0, 10) || ''),
       remark: String(record.remark || ''),
@@ -383,7 +372,8 @@
   }
 
   function getTimesheets() {
-    const stored = readStored('pq_project_timesheets').map(normalizeTimesheet).reverse();
+    const stored = readStored(TimesheetRequests.sheetsKey).map((record, index) =>
+      normalizeTimesheet({ ...record, id: TimesheetRequests.storedId(record, index) }, index)).reverse();
     const demoSamples = demoTimesheets
       .filter(record => ['TS-2026-0102', 'TS-2026-0094'].includes(record.id))
       .map(normalizeTimesheet);
@@ -392,7 +382,7 @@
       ? [normalizeTimesheet({ ...draft, id: 'TS-DRAFT-LOCAL', status: 'Draft' })]
       : [];
     const records = [...draftRecord, ...stored, ...demoSamples];
-    return selectStatusSamples(records);
+    return TimesheetRequests.reviewed(selectStatusSamples(records));
   }
 
   function formatDate(value) {
@@ -480,7 +470,7 @@
     return records.find(record => record.id === id) || null;
   }
 
-  function executeProjectHistoryAction(record, kind, action) {
+  async function executeProjectHistoryAction(record, kind, action) {
     const detailWasOpen = activeProjectHistoryDetail?.kind === kind && activeProjectHistoryDetail.id === record.id;
     const current = getProjectHistoryRecord(kind, record.id);
     const actionIsCurrent = current && getProjectHistoryActions(current).some(candidate => candidate.key === action.key);
@@ -493,14 +483,24 @@
     }
 
     if (action.key === 'discard' && detailWasOpen) closeOverlay('projectHistoryDetailOverlay', false);
-    historyActions.set(current.id, action.key);
-    if (current.id === 'TS-DRAFT-LOCAL' && (action.key === 'submit' || action.key === 'discard')) {
-      if (action.key === 'submit') {
-        const stored = readStored('pq_project_timesheets');
-        stored.push({ ...current, status: 'Submitted' });
-        localStorage.setItem('pq_project_timesheets', JSON.stringify(stored));
+    try {
+      if (kind === 'timesheet' && action.key === 'submit') {
+        const localDraft = current.id === 'TS-DRAFT-LOCAL';
+        const id = localDraft ? 'TS-' + crypto.randomUUID() : current.id;
+        const draft = localDraft ? localStorage.getItem('pq_project_timesheet_draft') : null;
+        await TimesheetRequests.submit({ ...current, id, status: 'Submitted', employeeName: current.employeeName || previewUserName,
+          employeeId: current.employeeId || current.empNo || 'EBB01' }, draft, localDraft);
+        if (detailWasOpen) activeProjectHistoryDetail.id = id;
+      } else if (kind === 'timesheet' && action.key === 'cancel' && TimesheetRequests.pending().some(sheet => sheet.id === current.id)) {
+        await TimesheetRequests.decide([current.id], 'cancel');
+      } else if (kind === 'timesheet' && current.id === 'TS-DRAFT-LOCAL' && action.key === 'discard') {
+        localStorage.removeItem('pq_project_timesheet_draft');
+      } else {
+        historyActions.set(current.id, action.key);
       }
-      localStorage.removeItem('pq_project_timesheet_draft');
+    } catch {
+      window.showToast?.('Unable to update the request. Check its status and try again.');
+      return false;
     }
 
     if (kind === 'work-plan') renderWorkPlans();
@@ -692,13 +692,13 @@
     section.dataset.detailSection = 'work-plan';
     section.append(
       createDetailRow('Reference #', record.id),
+      createDetailRow('Status', recordDetailStatus.create(record.status)),
       createDetailRow('Task Category', record.taskCategory),
       createDetailRow('Sub Task', record.subTask),
       createDetailRow('Project', record.project),
       createDetailRow('Milestone', record.milestone),
       createDetailRow('Schedule From', formatDate(record.scheduleFrom)),
       createDetailRow('Schedule To', formatDate(record.scheduleTo)),
-      createDetailRow('Status', recordDetailStatus.create(record.status)),
       createDetailRow('Assignee', record.assignee),
       createDetailRow('Est. Complete', formatDate(record.estimatedComplete)),
       createDetailRow('Act. Complete', formatDate(record.actualComplete)),
@@ -723,14 +723,15 @@
     summary.dataset.detailSection = 'timesheet-summary';
     summary.append(
       createDetailRow('Reference #', record.id),
+      createDetailRow('Status', recordDetailStatus.create(record.status)),
       createDetailRow('Date', formatDate(record.date)),
       createDetailRow('Remark', record.remark),
-      createDetailRow('Status', recordDetailStatus.create(record.status)),
       createDetailRow('Normal Hours', formatMinutes(record.normalMinutes)),
       createDetailRow('OT Hours', formatMinutes(record.overtimeMinutes))
     );
 
     const content = [summary, createNode('h3', 'project-history-detail-subtitle', 'Work Details')];
+    if (record.approverComments) summary.append(createDetailRow('Approver Action Comments', record.approverComments));
     if (!record.activities.length) {
       const empty = createNode('section', 'project-history-detail-activity');
       empty.append(createNode('div', 'project-history-detail-activity-header', 'No work details recorded'));
@@ -919,7 +920,7 @@
     });
     window.addEventListener('storage', event => {
       const workPlansChanged = !event.key || event.key === 'pq_project_work_plans';
-      const timesheetsChanged = !event.key || event.key === 'pq_project_timesheets' || event.key === 'pq_project_timesheet_draft';
+      const timesheetsChanged = !event.key || [TimesheetRequests.sheetsKey, TimesheetRequests.decisionsKey, 'pq_project_timesheet_draft'].includes(event.key);
       if (workPlansChanged) renderWorkPlans();
       if (timesheetsChanged) renderTimesheets();
       if (activeProjectHistoryDetail
@@ -927,6 +928,11 @@
           || (activeProjectHistoryDetail.kind === 'timesheet' && timesheetsChanged))) {
         refreshProjectHistoryDetails();
       }
+    });
+    window.addEventListener('pageshow', event => {
+      if (!event.persisted) return;
+      renderTimesheets();
+      if (activeProjectHistoryDetail?.kind === 'timesheet') refreshProjectHistoryDetails();
     });
     document.documentElement.dataset.projectHistoryReady = 'true';
   }

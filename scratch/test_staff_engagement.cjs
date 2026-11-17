@@ -30,7 +30,7 @@ async function formAppearance(page) {
       await page.goto(url('staff-engagement.html') + '?theme=' + theme, { waitUntil: 'load' });
       assert.ok(await page.$('#staffEngagementForm'), 'Staff Engagement must contain its working form');
       assert.deepEqual(await formAppearance(page), appearance, 'Staff Engagement reuses the Confirm Staff form design');
-      assert.deepEqual(await page.$$eval('#staffEngagementForm label', nodes => nodes.map(node => node.textContent.replace('*', '').trim())), ['Employee #', 'Name', 'Position', 'Interview Date', 'Positive Feedback', 'Negative Feedback', 'Flight Risk', 'Recommendation', 'Mitigation Action', 'Remarks']);
+      assert.deepEqual(await page.$$eval('#staffEngagementForm label', nodes => nodes.map(node => node.textContent.replace('*', '').trim())), ['Employee #', 'Name', 'Position', 'Interviewee #', 'Interviewee Position', 'Interview Date', 'Positive Feedback', 'Negative Feedback', 'Flight Risk', 'Recommendation', 'Mitigation Action', 'Remarks']);
       await page.click('#engagementSubmit');
       assert.equal(await page.evaluate(() => document.activeElement.id), 'engagementEmployee');
       assert.equal(await page.$eval('#employeeCareerToast', node => node.textContent), '');
@@ -45,6 +45,20 @@ async function formAppearance(page) {
       assert.equal(await page.$eval('#engagementPosition', node => node.value), '');
       assert.ok(await page.$eval('#engagementEmployeeId', node => node.hidden));
       await page.select('#engagementEmployee', 'EBB01');
+      const applicantIds = await page.$$eval('#engagementEmployee option', options => options.map(option => option.value));
+      const intervieweeIds = await page.$$eval('#engagementInterviewee option', options => options.map(option => option.value).filter(Boolean));
+      assert.deepEqual(intervieweeIds.filter(id => applicantIds.includes(id)), [], 'Interviewees are different people from the applicants');
+      await page.select('#engagementInterviewee', 'EBB47');
+      assert.equal(await page.$eval('#engagementIntervieweePosition', node => node.value), 'Training Coordinator');
+      assert.equal(await page.$eval('#engagementIntervieweePosition', node => node.readOnly), true);
+      await page.select('#engagementInterviewee', '');
+      assert.equal(await page.$eval('#engagementIntervieweePosition', node => node.value), '');
+      await page.select('#engagementInterviewee', 'EBB48');
+      const identities = await page.$eval('#staffEngagementForm', form => {
+        const fields = new FormData(form);
+        return ['employee', 'position', 'intervieweeNo', 'intervieweePosition'].map(key => fields.get(key));
+      });
+      assert.deepEqual(identities, ['EBB01', 'People Operations Executive', 'EBB48', 'Operations Analyst']);
       assert.equal(await page.$eval('#engagementInterviewDate', node => node.type), 'date');
       assert.match(await page.$eval('#engagementInterviewDate', node => node.value), /^\d{4}-\d{2}-\d{2}$/);
       await page.$eval('#engagementInterviewDate', node => { node.value = '2026-10-12'; });

@@ -22,6 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
   let visible = [];
   let filter;
   let currentId;
+  let guestRevision;
   let sheet;
   let opener;
   let background = [];
@@ -202,26 +203,24 @@ document.addEventListener('DOMContentLoaded', () => {
     section.replaceChildren(node('h4', 'claim-detail-section-title', title));
   }
   function renderDetails(item) {
+    guestRevision = item.guestRevision;
     const config = item.kind === 'inventory-request' ? tabConfig.inventory : tabConfig['guest-visit'];
     $('workplaceApprovalDetailsTitle').textContent = config.detailsTitle;
     const general = $('approvalPanel-general');
-    const guests = $('approvalPanel-guest');
-    const attendees = $('approvalPanel-attendee');
-    const other = $('approvalPanel-other');
-    general.hidden = false;
-    if (item.kind === 'inventory-request') {
-      [guests, attendees, other].forEach(section => {
-        section.hidden = true;
-        section.replaceChildren();
-      });
+    const visit = $('workplaceGuestVisit');
+    const inventory = item.kind === 'inventory-request';
+    general.hidden = !inventory;
+    visit.hidden = inventory;
+    visit.replaceChildren();
+    if (inventory) {
       sectionTitle(general, 'Request Details');
       table(general, [
         ['Document Reference #', node('span', 'workplace-approval-document-ref', item.reference)],
+        ['Document Status', recordDetailStatus.create(item.status)],
         ['Employee #', '#' + item.empNo.replace(/^#+/, '')],
         ['Name', item.employeeName],
         ['Position', item.position],
         ['Department', item.department],
-        ['Document Status', recordDetailStatus.create(item.status)],
         ['Submit Date', date(item.submitDate)],
         ['Item Group', item.itemGroup],
         ['Item', item.requestItem],
@@ -236,26 +235,11 @@ document.addEventListener('DOMContentLoaded', () => {
         ['Attachment', item.attachments.length ? item.attachments.join(', ') : 'None']
       ]);
     } else {
-      [guests, attendees, other].forEach(section => { section.hidden = false; });
-      sectionTitle(general, 'General');
-      table(general, [
-        ['Document Reference', node('span', 'workplace-approval-document-ref', item.reference)], ['Document Status', recordDetailStatus.create(item.status)],
-        ['Submit Date', date(item.submitDate)], ['Visit Date', date(item.visitDate)],
-        ['Visit Time', `${item.startTime} – ${item.endTime}`], ['Total Guest', item.totalGuest],
-        ['Location', item.location], ['Meal?', item.meal ? 'Yes' : 'No']
-      ]);
-      sectionTitle(guests, 'Guest');
-      item.guests.forEach(guest => table(guests, [['Company', guest.company], ['Relation', guest.relation], ['Name', guest.name], ['Position', guest.position]]));
-      sectionTitle(attendees, 'Attendee');
-      item.attendees.forEach(attendee => {
-        table(attendees, [['Employee', identity(attendee.name, attendee.empNo)], ['Department', attendee.department], ['Position', attendee.position]]);
-      });
-      sectionTitle(other, 'Other');
-      const requests = [['Floor Visit', 'floor-visit'], ['Sitting Arrangement', 'sitting-arrangement'], ['Multiple Rooms', 'multiple-rooms']].map(([text, value]) => [text, item.otherRequests.includes(value) ? 'Yes' : 'No']);
-      requests.push(['None', item.otherRequests.length === 0 ? 'Yes' : 'No']);
-      table(other, requests);
+      const fields = document.createElement('guest-visit-fields');
+      fields.setAttribute('readonly', '');
+      visit.append(fields);
+      fields.showSubmission(item, date, recordDetailStatus.create(item.status));
     }
-    if (item.kind !== 'inventory-request' && item.attachments.length) table(general, [['Attachment', item.attachments.join(', ')]]);
     const commentLabel = node('label', 'workplace-approval-comment-label', 'Approver Action Comments');
     commentLabel.htmlFor = 'approvalComments';
     const comments = node('input', 'payroll-approval-comments workplace-approval-comment-input');
@@ -296,6 +280,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const options = {};
     if (inDetails) {
       options.comments = $('approvalComments').value;
+      options.guestRevision = guestRevision;
     }
     try {
       const count = store.act(ids, action, options);
@@ -350,7 +335,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
   window.addEventListener('pageshow', render);
   window.addEventListener('storage', event => {
-    if (event.key === 'peoplehcm:workplace:pending-approval:v1' || event.key === null) { closeSheet(); render(); }
+    if (event.key === 'peoplehcm:workplace:pending-approval:v1' || event.key === 'peoplehcm:workplace:history:v1' || event.key === null) { closeSheet(); render(); }
   });
   render();
   PendingApprovalPage.register({

@@ -99,7 +99,7 @@ async function noOverflow(page) {
       assert.equal(await page.$eval('#evaluationListTitle', node => node.textContent), 'Competency');
       assert.equal(await page.$$eval('#evaluationSectionItems .evaluation-summary-item', nodes => nodes.length), 3);
       await page.click('#evaluationBack');
-      assert.deepEqual(await page.$$eval('#evaluationGeneral label', nodes => nodes.map(node => node.textContent)), ['Name', 'Position', 'Department', 'Supervisor', 'Report To', 'Evaluation Ref#', 'Period', 'Type', 'Status', 'Document Date', 'Remark']);
+      assert.deepEqual(await page.$$eval('#evaluationGeneral label', nodes => nodes.map(node => node.textContent)), ['Evaluation Ref#', 'Status', 'Document Date', 'Name', 'Position', 'Department', 'Supervisor', 'Report To', 'Period', 'Type', 'Remark']);
       assert.equal(await page.$eval('#evaluationName', node => node.value), 'Farhan Binti Rahmat');
       assert.equal(await page.$eval('#evaluationSupervisor', node => node.value), 'Angeline Loren Alan');
       assert.equal(await page.$eval('#evaluationReportTo', node => node.value), 'Muhammad Ali Bin Man');

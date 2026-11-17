@@ -82,9 +82,9 @@
       .format(new Date(`${value}-01T00:00:00Z`));
   }
 
-  function employeeId(value) {
-    const number = String(value ?? '').replace(/^#+/, '');
-    return number ? `#${number}` : '';
+  function employeeId(value, prefix = '#') {
+    const number = String(value ?? '').trim().replace(/^#+/, '');
+    return number ? prefix + number : '';
   }
 
   function confirmationFilterSummary() {
@@ -160,33 +160,9 @@
       </span>`).join('');
   }
 
-  function headingMarkup(record) {
-    if (kind === 'staff-engagement') {
-      return `<span class="history-card-heading team-history-employee-heading">
-        <span class="team-history-employee-name">${escape(record.interviewerName || '\u2014')}</span>
-        <span class="team-history-employee-position">${escape(record.interviewerPosition || '\u2014')}</span>
-        <span class="team-history-record-ref">Ref: ${escape(record.reference || record.id || '\u2014')}</span>
-      </span>`;
-    }
-    if (kind === 'staff-request') {
-      return `<span class="history-card-heading team-history-request-heading">
-        <span class="team-history-employee-name">${escape(record.employeeName || '\u2014')}</span>
-        <span class="team-history-request-ref">Ref: ${escape(record.reference || record.id || '\u2014')}</span>
-      </span>`;
-    }
-
-    const empNo = String(record.empNo || '').replace(/^#+/, '');
-    return `<span class="history-card-heading team-history-employee-heading">
-      <span class="team-history-employee-name">${escape(record.employeeName || '\u2014')}</span>
-      <span class="team-history-employee-id">#${escape(empNo)}</span>
-      ${kind === 'staff-exit' ? `<span class="team-history-employee-position">${escape(record.position || '\u2014')}</span>` : ''}
-      ${['staff-confirmation', 'staff-exit'].includes(kind) ? '' : `<span class="team-history-record-ref">Ref: ${escape(record.id || '\u2014')}</span>`}
-    </span>`;
-  }
-
   function cardMarkup(record) {
     const status = statusMarkup(record);
-    const name = kind === 'staff-engagement' ? record.interviewerName : record.employeeName;
+    const employee = [employeeId(record.empNo, ''), record.employeeName].filter(Boolean).join(' - ') || '—';
     const isConfirmation = kind === 'staff-confirmation';
     const isExit = kind === 'staff-exit';
     const isRequest = kind === 'staff-request';
@@ -198,14 +174,22 @@
       : isExit || isEngagement ? [['Notice Date', formatDate(record.noticeDate)], ['Last Paid Date', formatDate(record.lastPaidDate)], ['Reason', record.reason]]
       : isRequest ? [['Request Date', formatDate(record.requestDate)], ['Require Date', formatDate(record.requiredBy)], ['Reason', record.reason]]
       : record.fields;
+    if (isRequest || isEngagement) fields.push(['Reference #', record.reference || record.id]);
+    if (isEngagement && record.interviewerName) {
+      fields.push(['Interviewer', [record.interviewerName, record.interviewerPosition].filter(Boolean).join(' · ')]);
+    }
     const triggerAttributes = isConfirmation
       ? `type="button" data-confirmation-id="${escape(record.id || '')}" aria-haspopup="dialog" aria-controls="teamConfirmationDetailsOverlay"`
       : isExit ? `type="button" data-exit-id="${escape(record.id || '')}" aria-haspopup="dialog" aria-controls="teamExitDetailsOverlay"`
       : isRequest ? `type="button" data-request-id="${escape(record.id || '')}" aria-haspopup="dialog" aria-controls="teamRequestDetailsOverlay"`
       : isEngagement ? `type="button" data-engagement-id="${escape(record.id || '')}" aria-haspopup="dialog" aria-controls="teamEngagementDetailsOverlay"` : '';
-    return `<${tag} ${triggerAttributes} class="history-card-item team-history-card" data-status="${status.tone}" aria-label="${hasDetails ? 'View details for ' : ''}${escape(name || labels[kind])}, ${escape(recordReviewStatusLabel(record.status || 'Pending'))}">
+    const accessibleName = [employee, record.position, recordReviewStatusLabel(record.status || 'Pending')].filter(Boolean).join(', ');
+    return `<${tag} ${triggerAttributes} class="history-card-item team-history-card" data-status="${status.tone}" aria-label="${hasDetails ? 'View details for ' : ''}${escape(accessibleName)}">
       <span class="history-card-header">
-        ${headingMarkup(record)}
+        <span class="history-card-heading">
+          <span class="team-history-employee-identity">${escape(employee)}</span>
+          <span class="team-history-employee-position">${escape(record.position || '—')}</span>
+        </span>
         ${status.html}
       </span>
       <span class="history-card-details team-history-card-details">
@@ -289,8 +273,7 @@
     const display = value => value === '' || value == null ? '—' : String(value);
     const blacklist = record.isBlacklist ?? record.blacklist;
     const empNo = String(record.empNo ?? '').replace(/^#+/, '');
-    const fields = category === 'staff-engagement' ? [
-      ['Reference #', record.reference || record.id],
+    const categoryFields = category === 'staff-engagement' ? [
       ['Emp #', employeeId(record.empNo)],
       ['Name', record.employeeName],
       ['Position', record.position],
@@ -306,10 +289,8 @@
       ['Negative Feedback', record.negativeFeedback],
       ['Mitigation Action', record.mitigationAction],
       ['Approver Remark', record.approverRemark],
-      ['Applicant Remark', record.applicantRemark],
-      ['Status', record.status]
+      ['Applicant Remark', record.applicantRemark]
     ] : category === 'staff-request' ? [
-      ['Reference #', record.reference || record.id],
       ['Request', record.request ?? record.title],
       ['Period', formatPeriod(record.period)],
       ['Type', record.requestType ?? record.type],
@@ -328,8 +309,6 @@
       ['Reason', record.reason],
       ['Remarks', record.remarks]
     ] : category === 'staff-exit' ? [
-      ['Reference #', record.reference || record.id],
-      ['Status', record.status],
       ['Emp #', empNo ? `#${empNo}` : null],
       ['Name', record.employeeName],
       ['Position', record.position],
@@ -344,7 +323,6 @@
       ['Remarks', record.remarks],
       ['HR Remarks', record.hrRemarks ?? record.hrRemark]
     ] : [
-      ['Reference #', record.reference || record.id],
       ['Emp #', `#${String(record.empNo || '').replace(/^#+/, '')}`],
       ['Name', record.employeeName],
       ['Position', record.position],
@@ -357,6 +335,11 @@
       ['Adjustment', record.adjustment],
       ['Score', record.score == null ? null : `${record.score} / 100`],
       ['Remark', record.remark]
+    ];
+    const fields = [
+      ['Reference #', record.reference || record.id],
+      ['Status', record.status],
+      ...categoryFields
     ];
     const rows = fields.map(([label, value]) => {
       const row = document.createElement('tr');
@@ -405,7 +388,6 @@
     attachmentRow.append(attachmentLabel, attachmentValue);
     rows.push(attachmentRow);
     $(`${prefix}DetailsRows`).replaceChildren(...rows);
-    $(`${prefix}DetailsSubtitle`).textContent = category === 'staff-request' ? record.employeeName || '—' : `#${empNo} · ${record.employeeName || '—'}`;
     overlay.querySelector('.detail-popout-body').scrollTop = 0;
     openOverlay(overlay, $(`${prefix}CloseDetails`), trigger);
   }

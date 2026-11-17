@@ -4,7 +4,7 @@ const { pathToFileURL } = require('node:url');
 const puppeteer = require('puppeteer');
 
 const dashboard = pathToFileURL(path.resolve(__dirname, '../modules/employee-career/index.html')).href;
-const detailLabels = ['Job', 'Grade', 'Last Incumbent', 'Since', 'Company', 'Department', 'Status', 'Vacant Positions', 'Location', 'Access Code', 'Min Qualification', 'Opened On', 'Created On', 'Applicants'];
+const detailLabels = ['Job', 'Status', 'Grade', 'Last Incumbent', 'Since', 'Company', 'Department', 'Vacant Positions', 'Location', 'Access Code', 'Min Qualification', 'Opened On', 'Created On', 'Applicants'];
 
 async function assertFits(page, context) {
   const overflow = await page.evaluate(() => ['html', '.phone-container', 'main'].map(selector => {
@@ -76,7 +76,7 @@ async function assertFits(page, context) {
       await page.click('[data-vacancy-id="vac-account-01"]');
       assert.equal(await page.$eval('#vacantPositionDetailOverlay', node => node.hidden), false);
       assert.deepEqual(await page.$$eval('#vacantPositionDetailTable th', nodes => nodes.map(node => node.textContent.trim())), detailLabels);
-      assert.deepEqual(await page.$$eval('#vacantPositionDetailTable tbody tr', rows => rows.slice(1, 4).map(row => row.querySelector('td').textContent.trim())), ['G2-EXECUTIVE', 'Lim Mei Ling', '02 Apr 2025'], 'Details and card show the same vacancy metadata');
+      assert.deepEqual(await page.$$eval('#vacantPositionDetailTable tbody tr', rows => rows.slice(2, 5).map(row => row.querySelector('td').textContent.trim())), ['G2-EXECUTIVE', 'Lim Mei Ling', '02 Apr 2025'], 'Details and card show the same vacancy metadata');
       assert.equal(await page.$eval('main', node => node.inert), true);
       await assertFits(page, `${theme} ${width} details`);
       await page.screenshot({ path: path.resolve(__dirname, `vacant-position-detail-${theme}-${width}.png`) });

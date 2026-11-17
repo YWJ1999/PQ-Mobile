@@ -60,14 +60,19 @@
     return node;
   };
   const formatDate = value => value ? new Date(value + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : '—';
-  const employeeNumber = row => '#' + String(row.empNo).replace(/^#/, '');
+  const employeeNumber = row => {
+    const number = String(row.empNo ?? '').trim().replace(/^#+/, '');
+    return number ? '#' + number : '—';
+  };
   const statusLabel = status => status === 'Pending' ? 'Pending' : 'Responded';
   const recordKey = row => String(row.id || [row.empNo, row.date, row.title].join('|'));
   const savedReviews = stored(reviewStorageKey, []);
   const reviewEdits = Array.isArray(savedReviews) ? savedReviews : [];
   const records = sourceRecords.map(record => {
     const edit = reviewEdits.find(item => item?.key === recordKey(record));
-    return { ...record, ...(edit ? { reward: edit.reward, rating: edit.rating, reviewerComment: edit.reviewerComment, status: edit.status } : {}) };
+    if (!edit) return { ...record };
+    return { ...record, reward: edit.reward, rating: edit.rating, reviewerComment: edit.reviewerComment,
+      reviewedBy: edit.reviewedBy ?? record.reviewedBy, reviewedDate: edit.reviewedDate ?? record.reviewedDate, status: edit.status };
   });
   const historyStatus = status => statusLabel(status) === 'Pending' ? 'submitted' : 'draft';
   const statusIcon = status => statusLabel(status) === 'Pending' ? 'fa-clock' : 'fa-reply';
@@ -92,11 +97,10 @@
     const cards = visibleRows.map(row => {
       const card = element('article', 'history-card-item staff-feedback-card');
       card.dataset.status = historyStatus(row.status);
-      const detailsTrigger = element('div', 'staff-feedback-details-trigger');
-      detailsTrigger.tabIndex = 0;
-      detailsTrigger.setAttribute('role', 'button');
-      detailsTrigger.setAttribute('aria-haspopup', 'dialog');
-      detailsTrigger.setAttribute('aria-controls', 'staffFeedbackDetailsOverlay');
+      const key = recordKey(row);
+      card.dataset.recordKey = key;
+      const detailsTrigger = element('a', 'staff-feedback-details-trigger');
+      detailsTrigger.href = recordPageUrl('details', key);
       detailsTrigger.setAttribute('aria-label', `View feedback details for ${row.name}: ${row.title}`);
       const header = element('header', 'history-card-header staff-feedback-card-header');
       const identity = element('div', 'history-card-heading');
@@ -113,21 +117,18 @@
       const actions = element('footer', 'staff-feedback-card-actions');
       const reviewButton = element('button', 'staff-feedback-review-button');
       reviewButton.type = 'button';
-      reviewButton.dataset.reviewKey = recordKey(row);
       reviewButton.setAttribute('aria-label', `Review feedback from ${row.name}: ${row.title}`);
       reviewButton.append(element('span', '', 'Review'));
-      reviewButton.addEventListener('click', event => {
-        event.stopPropagation();
-        showReview(row);
+      reviewButton.addEventListener('click', () => {
+        rememberRecord(row, 'review');
+        window.location.href = recordPageUrl('review', key);
       });
-      reviewButton.addEventListener('keydown', event => event.stopPropagation());
       actions.append(reviewButton);
       detailsTrigger.append(header, body);
       card.append(detailsTrigger, actions);
-      const show = () => { detailsTrigger.focus({ preventScroll: true }); showDetails(row); };
-      detailsTrigger.addEventListener('click', show);
+      detailsTrigger.addEventListener('click', () => rememberRecord(row, 'details'));
       detailsTrigger.addEventListener('keydown', event => {
-        if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); show(); }
+        if (event.key === ' ') { event.preventDefault(); detailsTrigger.click(); }
       });
       return card;
     });
@@ -155,14 +156,14 @@
     return null;
   }
 
-  function showDetails(record) {
+  function renderDetails(record) {
     const fields = [
-      ['Emp #', employeeNumber(record)], ['Name', record.name], ['Type', record.type], ['Category', record.category],
+      ['Name', record.name], ['Status', statusLabel(record.status)], ['Emp #', employeeNumber(record)], ['Type', record.type], ['Category', record.category],
       ['Title', record.title], ['Feedback Date 1', formatDate(record.feedbackDate1 ?? record.date)],
       ['Feedback Date 2', formatDate(record.feedbackDate2)], ['Feedback Note', record.feedbackNote ?? record.feedback],
       ['Feedback Remarks', record.feedbackRemarks], ['Submit Date', formatDate(record.submitDate)],
       ['Reviewer Comment', record.reviewerComment], ['Reviewed By', record.reviewedBy],
-      ['Reviewed Date', formatDate(record.reviewedDate)], ['Rating', record.rating], ['Reward', record.reward], ['Status', statusLabel(record.status)]
+      ['Reviewed Date', formatDate(record.reviewedDate)], ['Rating', record.rating], ['Reward', record.reward]
     ];
     const rows = fields.map(([label, value]) => {
       const row = element('tr', '');
@@ -174,31 +175,32 @@
     });
     const attachmentRow = element('tr', '');
     const attachmentCell = element('td', 'detail-popout-value');
-    if (!record.attachments?.length) attachmentCell.textContent = 'No attachments';
-    else {
-      const list = element('div', 'staff-feedback-attachments');
-      record.attachments.forEach(attachment => {
-        const url = attachmentUrl(attachment.url);
-        const item = element(url ? 'a' : 'span', 'staff-feedback-attachment');
-        if (url) {
-          item.href = url;
-          item.target = '_blank';
-          item.rel = 'noopener noreferrer';
-          item.download = attachment.name || 'attachment';
-          item.setAttribute('aria-label', 'Download attachment ' + (attachment.name || 'Attachment'));
-        }
-        const icon = element('i', 'fa-solid fa-paperclip');
-        icon.setAttribute('aria-hidden', 'true');
-        item.append(icon, element('span', '', attachment.name || 'Attachment'));
-        list.append(item);
-      });
-      attachmentCell.append(list);
-    }
+    attachmentCell.append(attachmentList(record.attachments));
     attachmentRow.append(element('td', 'detail-popout-label', 'Attachment'), attachmentCell);
     rows.push(attachmentRow);
     $('staffFeedbackDetailsRows').replaceChildren(...rows);
-    $('staffFeedbackDetailsOverlay').querySelector('.detail-popout-body').scrollTop = 0;
-    openOverlay('staffFeedbackDetailsOverlay', 'staffFeedbackCloseDetails');
+  }
+
+  function attachmentList(attachments) {
+    if (!attachments?.length) return document.createTextNode('No attachments');
+    const list = element('div', 'staff-feedback-attachments');
+    attachments.forEach(attachment => {
+      const name = (typeof attachment === 'string' ? attachment : attachment?.name) || 'Attachment';
+      const url = attachmentUrl(attachment?.url);
+      const item = element(url ? 'a' : 'span', 'staff-feedback-attachment');
+      if (url) {
+        item.href = url;
+        item.target = '_blank';
+        item.rel = 'noopener noreferrer';
+        item.download = name;
+        item.setAttribute('aria-label', 'Download attachment ' + name);
+      }
+      const icon = element('i', 'fa-solid fa-paperclip');
+      icon.setAttribute('aria-hidden', 'true');
+      item.append(icon, element('span', '', name));
+      list.append(item);
+    });
+    return list;
   }
 
   function clearReviewError() {
@@ -207,28 +209,45 @@
     ['staffFeedbackReward', 'staffFeedbackRating', 'staffFeedbackComments'].forEach(id => $(id).removeAttribute('aria-invalid'));
   }
 
-  function showReview(record) {
-    sessionStorage.setItem(selectionStorageKey, JSON.stringify({ key: recordKey(record), record }));
-    sessionStorage.setItem(listStorageKey, JSON.stringify({ filters: applied, scroll: document.querySelector('main').scrollTop, key: recordKey(record) }));
-    const query = new URLSearchParams({ record: recordKey(record), theme: document.documentElement.dataset.theme || 'dark' });
-    window.location.href = `staff-feedback-review.html?${query}`;
+  function recordPageUrl(page, key) {
+    const query = new URLSearchParams({ record: key, theme: document.documentElement.dataset.theme || 'dark' });
+    return `staff-feedback-${page}.html?${query}`;
   }
 
-  function initReviewPage() {
+  function rememberRecord(record, action) {
+    const key = recordKey(record);
+    sessionStorage.setItem(selectionStorageKey, JSON.stringify({ key, record }));
+    sessionStorage.setItem(listStorageKey, JSON.stringify({ filters: applied, scroll: document.querySelector('main').scrollTop, key, action }));
+  }
+
+  function initRecordPage() {
     const requestedKey = new URLSearchParams(location.search).get('record');
     const selection = stored(selectionStorageKey, null);
     const record = selection?.key === requestedKey ? selection.record : records.find(row => recordKey(row) === requestedKey);
     const syncLinks = () => {
       const href = `staff-feedback.html?theme=${document.documentElement.dataset.theme === 'light' ? 'light' : 'dark'}`;
-      $('staffFeedbackReviewBack').href = href;
-      $('staffFeedbackCancelReview').href = href;
+      document.querySelectorAll('[data-feedback-list-link]').forEach(link => { link.href = href; });
     };
     syncLinks();
-    if (!record) { window.location.replace($('staffFeedbackReviewBack').href); return; }
+    if (!record) { window.location.replace(document.querySelector('[data-feedback-list-link]').href); return; }
+    new MutationObserver(syncLinks).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+    if ($('staffFeedbackDetailsRows')) {
+      renderDetails(record);
+      $('staffFeedbackDetailsTitle').focus({ preventScroll: true });
+      return;
+    }
+    initReviewPage(record);
+  }
+
+  function initReviewPage(record) {
     activeReviewRecord = record;
+    const name = String(record.name || '').trim();
+    const parts = name.split(/\s+/);
+    $('staffFeedbackReviewName').textContent = name || 'Employee';
+    $('staffFeedbackReviewEmployeeId').textContent = employeeNumber(record);
+    $('staffFeedbackReviewInitials').textContent = ((parts[0][0] || '') + (parts.length > 1 ? parts.at(-1)[0] : '')).toUpperCase() || '—';
+    $('staffFeedbackReviewAttachments').replaceChildren(attachmentList(record.attachments));
     const values = {
-      staffFeedbackReviewEmployeeId: employeeNumber(record),
-      staffFeedbackReviewName: record.name,
       staffFeedbackReviewType: record.type,
       staffFeedbackReviewCategory: record.category,
       staffFeedbackReviewFeedbackTitle: record.title,
@@ -241,18 +260,42 @@
       staffFeedbackReviewSubmitDate: formatDate(record.submitDate),
       staffFeedbackReviewReviewerComment: record.reviewerComment,
       staffFeedbackReviewReviewedBy: record.reviewedBy,
-      staffFeedbackReviewReviewedDate: formatDate(record.reviewedDate)
+      staffFeedbackReviewReviewedDate: formatDate(record.reviewedDate),
+      staffFeedbackSavedRating: record.rating,
+      staffFeedbackSavedReward: record.reward,
+      staffFeedbackReviewStatus: record.status ? statusLabel(record.status) : null
     };
     Object.entries(values).forEach(([id, value]) => { $(id).value = value == null || value === '' ? '—' : value; });
     $('staffFeedbackReward').value = record.reward || '';
     $('staffFeedbackRating').value = record.rating == null ? '' : String(record.rating);
     $('staffFeedbackComments').value = record.reviewerComment || '';
     clearReviewError();
+    const tabs = [...document.querySelectorAll('.staff-feedback-review-tabs [role="tab"]')];
+    function selectTab(selected) {
+      if (selected.getAttribute('aria-selected') === 'true') return;
+      tabs.forEach(tab => {
+        const active = tab === selected;
+        tab.setAttribute('aria-selected', String(active));
+        tab.tabIndex = active ? 0 : -1;
+        tab.classList.toggle('active', active);
+        $(tab.getAttribute('aria-controls')).hidden = !active;
+      });
+      document.querySelector('main').scrollTop = 0;
+    }
+    tabs.forEach((tab, index) => {
+      tab.addEventListener('click', () => selectTab(tab));
+      tab.addEventListener('keydown', event => {
+        const next = {ArrowLeft: tabs[1 - index], ArrowRight: tabs[1 - index], Home: tabs[0], End: tabs[1]}[event.key];
+        if (!next) return;
+        event.preventDefault();
+        selectTab(next);
+        next.focus();
+      });
+    });
     $('staffFeedbackReviewForm').addEventListener('submit', event => { event.preventDefault(); saveReview(); });
     ['staffFeedbackReward', 'staffFeedbackRating', 'staffFeedbackComments'].forEach(id => {
       $(id).addEventListener(id === 'staffFeedbackComments' ? 'input' : 'change', clearReviewError);
     });
-    new MutationObserver(syncLinks).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
     $('staffFeedbackReviewTitle').focus({ preventScroll: true });
   }
 
@@ -277,7 +320,10 @@
 
     const savedKey = recordKey(activeReviewRecord);
     const edits = reviewEdits.filter(item => item?.key !== savedKey);
-    edits.push({ key: savedKey, reward: reward.value, rating: Number(rating.value), reviewerComment: comments.value.trim(), status: 'Resolved' });
+    const now = new Date();
+    const reviewedDate = [now.getFullYear(), String(now.getMonth() + 1).padStart(2, '0'), String(now.getDate()).padStart(2, '0')].join('-');
+    edits.push({ key: savedKey, reward: reward.value, rating: Number(rating.value), reviewerComment: comments.value.trim(),
+      reviewedBy: previewUserName, reviewedDate, status: 'Resolved' });
     try { sessionStorage.setItem(reviewStorageKey, JSON.stringify(edits)); }
     catch { showReviewError(comments, 'Unable to submit review. Please try again.'); return; }
     sessionStorage.removeItem(selectionStorageKey);
@@ -392,7 +438,7 @@
   }
 
   function init() {
-    if ($('staffFeedbackReviewForm')) { initReviewPage(); return; }
+    if (document.querySelector('[data-feedback-list-link]')) { initRecordPage(); return; }
     $('staffFeedbackFilterTrigger').addEventListener('click', () => { fillFilter(applied); openOverlay('staffFeedbackFilterOverlay', 'staffFeedbackKeyword'); });
     $('staffFeedbackCloseFilter').addEventListener('click', closeOverlay);
     $('staffFeedbackResetFilter').addEventListener('click', () => { fillFilter(defaults); applyFilter(); });
@@ -404,11 +450,8 @@
       showView('list');
       $('staffFeedbackViewChart').focus({ preventScroll: true });
     });
-    $('staffFeedbackCloseDetails').addEventListener('click', closeOverlay);
     $('staffFeedbackChartMetric').addEventListener('change', renderChart);
-    ['staffFeedbackFilterOverlay', 'staffFeedbackDetailsOverlay'].forEach(id => {
-      $(id).addEventListener('click', event => { if (event.target === event.currentTarget) closeOverlay(); });
-    });
+    $('staffFeedbackFilterOverlay').addEventListener('click', event => { if (event.target === event.currentTarget) closeOverlay(); });
     document.addEventListener('keydown', event => {
       if (!activeOverlay && currentView === 'chart' && event.key === 'Escape') {
         event.preventDefault();
@@ -426,6 +469,16 @@
         else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
       }
     });
+    new MutationObserver(() => {
+      document.querySelectorAll('.staff-feedback-details-trigger').forEach(link => {
+        link.href = recordPageUrl('details', link.closest('article').dataset.recordKey);
+      });
+    }).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+    restoreList();
+    window.addEventListener('pageshow', event => { if (event.persisted) restoreList(); });
+  }
+
+  function restoreList() {
     const listState = stored(listStorageKey, null);
     if (listState?.filters) applied = Object.fromEntries(Object.keys(defaults).map(key => [key, typeof listState.filters[key] === 'string' ? listState.filters[key] : '']));
     render();
@@ -433,7 +486,8 @@
       sessionStorage.removeItem(listStorageKey);
       requestAnimationFrame(() => {
         document.querySelector('main').scrollTop = Number(listState.scroll) || 0;
-        const target = [...document.querySelectorAll('.staff-feedback-review-button')].find(button => button.dataset.reviewKey === listState.key) || $('staffFeedbackFilterTrigger');
+        const card = [...document.querySelectorAll('.staff-feedback-card')].find(node => node.dataset.recordKey === listState.key);
+        const target = card?.querySelector(listState.action === 'details' ? '.staff-feedback-details-trigger' : '.staff-feedback-review-button') || $('staffFeedbackFilterTrigger');
         target.focus({ preventScroll: true });
       });
     }

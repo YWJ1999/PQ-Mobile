@@ -14,16 +14,16 @@
   };
   const money = value => `RM ${Number(value || 0).toLocaleString('en-MY', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
   const defaults = category => category === 'deduction'
-    ? { from: '2016-10', to: '2026-10', item: 'all', status: 'all', description: '' }
-    : { from: '2026-01-01', to: '2026-10-03', item: 'all', status: 'all', description: '' };
+    ? { from: '2016-10', to: ['2026-10', PayrollRequests.today().slice(0, 7)].sort().at(-1), item: 'all', status: 'all', description: '' }
+    : { from: '2026-01-01', to: ['2026-10-03', PayrollRequests.today()].sort().at(-1), item: 'all', status: 'all', description: '' };
   const filters = { tax: defaults('tax'), deduction: defaults('deduction') };
   const records = { tax: [...window.PAYROLL_HISTORY_DATA.tax], deduction: [...window.PAYROLL_HISTORY_DATA.deduction] };
   const categories = {
     tax: { title: 'Tax Relief History', detail: 'Tax Relief Detail', label: 'Rebate Item', all: 'All Rebate Items', description: 'Description', file: 'tax-relief-request.html', name: 'Tax Relief' },
     deduction: { title: 'Deduction Request History', detail: 'Deduction Request Detail', label: 'Deduction Type', all: 'All Deduction Types', description: 'Remarks', file: 'deduction-request.html', name: 'Deduction Request' }
   };
-  const statuses = { submitted: 'Pending', draft: 'Draft', approved: 'Approved', rejected: 'Rejected', cancelled: 'Cancelled' };
-  const statusIcons = { submitted: 'fa-paper-plane', draft: 'fa-floppy-disk', approved: 'fa-circle-check', rejected: 'fa-circle-xmark', cancelled: 'fa-ban' };
+  const statuses = { submitted: 'Pending', draft: 'Draft', approved: 'Approved', rejected: 'Rejected', resubmit: 'Pending Resubmit', cancelled: 'Cancelled' };
+  const statusIcons = { submitted: 'fa-paper-plane', draft: 'fa-floppy-disk', approved: 'fa-circle-check', rejected: 'fa-circle-xmark', resubmit: 'fa-rotate-left', cancelled: 'fa-ban' };
   let kind = new URLSearchParams(location.search).get('category') === 'deduction' ? 'deduction' : 'tax';
   let currentModal = null, opener = null;
   let attachmentUrls = [];
@@ -70,7 +70,7 @@
     attachmentUrls = [];
   }
 
-  function executeHistoryAction(recordKind, recordId, action, source = 'card') {
+  async function executeHistoryAction(recordKind, recordId, action, source = 'card') {
     const list = records[recordKind] || [];
     const index = list.findIndex(record => record.id === recordId);
     if (index < 0) {
@@ -80,6 +80,26 @@
       return;
     }
     const openSameRecord = activeDetail?.kind === recordKind && activeDetail?.id === recordId;
+    const record = list[index];
+    if (!getHistoryActions(record).some(option => option.key === action)) return;
+    try {
+      if (record.localDraft || action === 'submit') {
+        if (record.localDraft) await PayrollRequests.updateDraft(record, window.PAYROLL_CONFIG.employee, action);
+        else await PayrollRequests.submitHistoryRecord(record, recordKind);
+        if (openSameRecord) closeModal();
+        await refreshSavedDrafts();
+        window.showToast?.(action === 'submit' ? 'Request submitted' : 'Draft discarded');
+        return;
+      }
+      if (action === 'cancel' && (record.category || window.PAYROLL_PENDING_DATA[recordKind].some(item => item.id === recordId))) {
+        await PayrollPendingStore.act([recordId], 'cancel');
+      }
+    } catch {
+      if (openSameRecord) closeModal();
+      await refreshSavedDrafts();
+      window.showToast?.('Unable to update this request. Check its status and try again.');
+      return;
+    }
     if (action === 'discard') {
       if (openSameRecord && currentModal?.id === 'historyDetailsModal') closeModal();
       list.splice(index, 1);
@@ -87,7 +107,7 @@
       window.showToast?.('Draft discarded');
       return;
     }
-    list[index].status = action === 'submit' ? 'submitted' : 'cancelled';
+    list[index].status = 'cancelled';
     render();
     if (source === 'detail' && openSameRecord) {
       renderDetail(list[index], recordKind);
@@ -97,7 +117,7 @@
       const card = [...document.querySelectorAll('.history-card-item')].find(node => node.dataset.reference === recordId);
       card?.querySelector('.history-card-main')?.focus({ preventScroll: true });
     }
-    window.showToast?.(action === 'submit' ? 'Request submitted' : 'Request cancelled');
+    window.showToast?.('Request cancelled');
   }
 
   function showModal(modal, button) {
@@ -136,7 +156,7 @@
       active.status === 'all' ? '' : statuses[active.status], active.description ? `“${active.description}”` : ''
     ].filter(Boolean).join(' · ');
     const matching = records[kind].filter(record => {
-      const when = kind === 'tax' ? recordDate(record).slice(0, 10) : deductionPeriod(record).replace('-', '');
+      const when = kind === 'tax' ? recordDate(record).slice(0, 10) : (deductionPeriod(record) || record.submitDate?.slice(0, 7) || '').replace('-', '');
       const from = kind === 'tax' ? active.from : active.from.replace('-', '');
       const to = kind === 'tax' ? active.to : active.to.replace('-', '');
       return when >= from && when <= to
@@ -226,9 +246,9 @@
     }).join('') || '—';
     const body = [
       row('Reference #', reference(record)),
+      row('Status', recordDetailStatus.html(statuses[record.status]), true),
       row('Emp #', employeeId, true),
       row('Name', employeeName, true),
-      row('Status', recordDetailStatus.html(statuses[record.status]), true),
       row('Submit Date', date(record.submitDate || record.savedDate))
     ];
     if (recordKind === 'tax') {
@@ -258,6 +278,8 @@
       );
     }
     $('historyDetailTitle').textContent = categories[recordKind].detail;
+    if (record.category && record.remarks) body.push(row('Remarks', record.remarks));
+    if (record.approverActionComments) body.push(row('Approver Action Comments', record.approverActionComments));
     $('historyDetailBody').innerHTML = `<table class="history-detail-table"><tbody>${body.join('')}</tbody></table>`;
     $('historyDetailBody').scrollTop = 0;
     renderDetailActions(record, recordKind);
@@ -299,42 +321,21 @@
   }
 
   async function loadSavedDrafts() {
-    // The current forms store one saved draft per employee and request kind.
-    const db = await new Promise((resolve, reject) => {
-      const request = indexedDB.open('peoplehcm-payroll-forms', 1);
-      request.onupgradeneeded = () => request.result.createObjectStore('requests', { keyPath: 'id' });
-      request.onsuccess = () => resolve(request.result);
-      request.onerror = () => reject(request.error);
-      request.onblocked = () => reject(new Error('Saved requests are busy'));
-    });
-    try {
-      const drafts = await new Promise((resolve, reject) => {
-        const transaction = db.transaction('requests', 'readonly');
-        const request = transaction.objectStore('requests').getAll();
-        transaction.oncomplete = () => resolve(request.result);
-        transaction.onerror = () => reject(transaction.error);
-        transaction.onabort = () => reject(transaction.error);
-      });
-      const employee = window.PAYROLL_CONFIG.employee;
-      Object.keys(records).forEach(category => {
-        records[category] = records[category].filter(record => !record.localDraft);
-      });
-      drafts.filter(draft => draft.employeeId === employee.empNo && Object.hasOwn(records, draft.kind)).forEach(draft => {
-        const values = draft.values || {};
-        const normalizedValues = draft.kind === 'deduction' ? {
-          ...values,
-          period: values.period || values.stopPeriod || '',
-          cycle: values.cycle || values.stopCycle || '',
-          deductionDate: values.deductionDate || values.stopDate || '',
-          amount: Number(values.amount || 0)
-        } : values;
-        records[draft.kind].push({
-          ...normalizedValues, id: draft.id, localDraft: true, status: 'draft',
-          employeeName: employee.name, empNo: employee.empNo, savedDate: draft.savedAt,
-          attachments: draft.attachments || []
-        });
-      });
-    } finally { db.close(); }
+    const saved = await PayrollPendingStore.refresh();
+    const employee = window.PAYROLL_CONFIG.employee;
+    for (const category of Object.keys(records)) {
+      const submitted = saved.filter(record => record.category === category);
+      const submittedIds = new Set(submitted.map(record => record.id));
+      const referenceRows = window.PAYROLL_HISTORY_DATA[category].filter(record => !submittedIds.has(record.id));
+      const drafts = saved.filter(record => record.kind === category && !record.submittedId && record.employeeId === employee.empNo);
+      records[category] = PayrollPendingStore.applyDecisions([
+        ...referenceRows, ...submitted.filter(record => record.empNo === employee.empNo || window.PAYROLL_HISTORY_DATA[category].some(row => row.id === record.id)),
+        ...drafts.map(record => ({
+          ...record.values, id: record.id, localDraft: true, status: 'draft',
+          employeeName: employee.name, empNo: employee.empNo, savedDate: record.savedAt, attachments: record.attachments || []
+        }))
+      ]);
+    }
   }
 
   document.querySelectorAll('[data-history-kind]').forEach(button => button.addEventListener('click', () => {
@@ -388,6 +389,11 @@
   window.addEventListener('pageshow', event => {
     if (!event.persisted) return;
     closeModal();
+    refreshSavedDrafts();
+  });
+  window.addEventListener('storage', event => {
+    if (event.key !== PayrollPendingStore.storageKey) return;
+    if (currentModal?.id === 'historyDetailsModal') closeModal();
     refreshSavedDrafts();
   });
   refreshSavedDrafts();

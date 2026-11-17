@@ -168,12 +168,12 @@ const moduleUrl = (file, query = '') => pathToFileURL(path.join(root, 'modules/t
     })), {
       hidden: 'false',
       title: 'Training Class Details',
-      labels: ['Class', 'Description', 'Course Title', 'Class Status', 'Start', 'End', 'Venue', 'Closing Date', 'Trainer / Facilitator', 'Class / Capacity', 'Remark', 'Class Attachment'],
+      labels: ['Class', 'Class Status', 'Description', 'Course Title', 'Start', 'End', 'Venue', 'Closing Date', 'Trainer / Facilitator', 'Class / Capacity', 'Remark', 'Class Attachment'],
       values: [
         'A01',
+        'Scheduled',
         'Hands-on productivity training covering collaboration, documents and workflow tools.',
         'Microsoft 365 Productivity',
-        'Scheduled',
         '20 Oct 2026, 9:00 AM',
         '20 Oct 2026, 5:00 PM',
         'Training Room 3A',
@@ -201,9 +201,9 @@ const moduleUrl = (file, query = '') => pathToFileURL(path.join(root, 'modules/t
       value: row.querySelector('dd').textContent.trim()
     }))), [
       { label: 'Class', value: 'A01' },
+      { label: 'Class Status', value: 'Scheduled' },
       { label: 'Description', value: 'Hands-on productivity training covering collaboration, documents and workflow tools.' },
       { label: 'Course Title', value: 'Microsoft 365 Productivity' },
-      { label: 'Class Status', value: 'Scheduled' },
       { label: 'Start', value: '20 Oct 2026, 9:00 AM' },
       { label: 'End', value: '20 Oct 2026, 5:00 PM' },
       { label: 'Venue', value: 'Training Room 3A' },

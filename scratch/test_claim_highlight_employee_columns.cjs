@@ -49,7 +49,7 @@ const pages = [
           employeeId: cells[0]?.textContent.trim(),
           employeeName: cells[1]?.textContent.trim(),
           columnsSeparated: Boolean(idRect && nameRect && nameRect.left >= idRect.right - 1),
-          modalId: document.getElementById(config.modalId)?.textContent.trim(),
+          hasHeaderId: Boolean(document.getElementById(config.modalId)),
           modalName: document.getElementById(config.modalName)?.textContent.trim()
         };
       }, config);
@@ -60,7 +60,7 @@ const pages = [
       assert.equal(result.employeeId, config.expectedId);
       assert.equal(result.employeeName, config.expectedName);
       assert.equal(result.columnsSeparated, true);
-      assert.equal(result.modalId, config.expectedId);
+      assert.equal(result.hasHeaderId, false);
       assert.equal(result.modalName, config.expectedName);
     }
 

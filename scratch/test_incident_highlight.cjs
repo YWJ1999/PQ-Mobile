@@ -32,7 +32,7 @@ const labels=['Employee #','Name','Incident Date','Created Date','Incident Type'
       assert.deepEqual(await page.$$eval('#incidentHighlightDetailsList > div:first-child table th',nodes=>nodes.map(node=>node.textContent.trim())),labels);
       assert.deepEqual(await page.$$eval('#incidentHighlightDetailsList > div:first-child table td',nodes=>nodes.slice(0,-1).map(node=>node.textContent.trim())),['#EBB01','Alex Tan','12 Oct 2026','12 Oct 2026 14:30','Commendation','Recognition','1 completed handover','Yes','Completed the project handover ahead of schedule and prepared clear notes for the team.']);
       assert.ok(await page.$eval('#incidentHighlightDetailsList > div:first-child table tr:last-child a',node=>node.textContent.includes('handover-notes.txt')&&node.download==='handover-notes.txt'));
-      assert.ok(await page.$eval('#incidentHighlightDetailEmpNo',node=>node.previousElementSibling.id==='incidentHighlightDetailName'&&node.textContent==='#EBB01'));
+      assert.equal(await page.$('#incidentHighlightDetailEmpNo'), null);
       await page.setViewport({width,height:568});
       await page.$eval('#incidentHighlightDetailsOverlay .detail-popout-body',node=>{node.scrollTop=node.scrollHeight;});
       assert.ok(await page.$eval('#incidentHighlightDetailsList > div:last-child table tr:last-child',node=>{const rect=node.getBoundingClientRect(),body=node.closest('.detail-popout-body').getBoundingClientRect(),panel=node.closest('.detail-popout-panel').getBoundingClientRect();return rect.top>=body.top-1&&rect.bottom<=body.bottom+1&&panel.top>=0&&panel.bottom<=innerHeight+1;}));

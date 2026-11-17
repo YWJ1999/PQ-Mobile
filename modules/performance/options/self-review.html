@@ -18,6 +18,8 @@
   <link rel="stylesheet" href="../css/self-review.css">
   <script src="../../../js/components.js"></script>
   <script src="../../../js/app.js" defer></script>
+  <script src="../js/performance-request-form.js" defer></script>
+  <script src="../js/performance-submissions.js" defer></script>
   <script src="../js/self-review.js" defer></script>
 </head>
 <body class="performance-page employee-career-form-page employee-career-team-form-page self-review-page">
@@ -29,52 +31,7 @@
     </header>
     <main class="main-content employee-career-content">
       <form id="selfReviewForm" aria-label="Self Review">
-        <div class="employee-career-form-card">
-          <section class="employee-career-form-section" aria-labelledby="selfReviewEmployeeHeading">
-            <h2 id="selfReviewEmployeeHeading" class="form-section-heading">Employee Details</h2>
-            <div class="employee-career-field"><label for="selfReviewName">Name</label><input id="selfReviewName" name="name" class="employee-career-control employee-career-readonly" type="text" value="Farhan Binti Rahmat" readonly></div>
-            <div class="employee-career-field"><label for="selfReviewEmployee">Employee#</label><input id="selfReviewEmployee" name="empNo" class="employee-career-control employee-career-readonly" type="text" value="#EBB12" readonly></div>
-            <div class="employee-career-field"><label for="selfReviewPosition">Position</label><input id="selfReviewPosition" name="position" class="employee-career-control employee-career-readonly" type="text" value="Group HR Manager" readonly></div>
-            <div class="employee-career-field"><label for="selfReviewPositionTitle">Position Title</label><input id="selfReviewPositionTitle" name="positionTitle" class="employee-career-control employee-career-readonly" type="text" value="Group Human Resource Manager" readonly></div>
-            <!-- Additional employee attributes are sample values for this form preview. -->
-            <div class="employee-career-field"><label for="selfReviewBand">Band</label><input id="selfReviewBand" name="band" class="employee-career-control employee-career-readonly" type="text" value="M1" readonly></div>
-            <div class="employee-career-field"><label for="selfReviewJoined">Date Joined</label><input id="selfReviewJoined" name="dateJoined" class="employee-career-control employee-career-readonly" type="text" value="12/08/2006" readonly></div>
-            <div class="employee-career-field"><label for="selfReviewConfirmation">Confirmation Due Date</label><input id="selfReviewConfirmation" name="confirmationDueDate" class="employee-career-control employee-career-readonly" type="text" value="12/11/2006" readonly></div>
-            <div class="employee-career-field"><label for="selfReviewService">Year of Service</label><input id="selfReviewService" name="yearOfService" class="employee-career-control employee-career-readonly" type="text" value="19 years" readonly></div>
-            <div class="employee-career-field"><label for="selfReviewCompany">Company</label><input id="selfReviewCompany" name="company" class="employee-career-control employee-career-readonly" type="text" value="PeopleHCM Malaysia" readonly></div>
-            <div class="employee-career-field"><label for="selfReviewBranch">Branch</label><input id="selfReviewBranch" name="branch" class="employee-career-control employee-career-readonly" type="text" value="Kuala Lumpur" readonly></div>
-            <div class="employee-career-field"><label for="selfReviewDepartment">Department</label><input id="selfReviewDepartment" name="department" class="employee-career-control employee-career-readonly" type="text" value="Human Resource" readonly></div>
-            <div class="employee-career-field"><label for="selfReviewCategory">Category</label><input id="selfReviewCategory" name="category" class="employee-career-control employee-career-readonly" type="text" value="Permanent" readonly></div>
-            <div class="employee-career-field"><label for="selfReviewSalary">Salary Scale</label><input id="selfReviewSalary" name="salaryScale" class="employee-career-control employee-career-readonly" type="text" value="M1 - Management" readonly></div>
-          </section>
-          <section class="employee-career-form-section" aria-labelledby="selfReviewAppraisalHeading">
-            <h2 id="selfReviewAppraisalHeading" class="form-section-heading">Appraisal Details</h2>
-            <div class="employee-career-field"><label for="selfReviewReference">Reference#</label><input id="selfReviewReference" name="reference" class="employee-career-control employee-career-readonly" type="text" value="APP000000000233" readonly></div>
-            <div class="employee-career-field"><label for="selfReviewCreated">Create Date</label><input id="selfReviewCreated" name="createdDate" class="employee-career-control employee-career-readonly" type="text" value="21/01/2009" readonly></div>
-            <div class="employee-career-field"><label for="selfReviewPeriod">Performance Period</label><input id="selfReviewPeriod" name="period" class="employee-career-control employee-career-readonly" type="text" value="FY 2026A - Review 01" readonly></div>
-            <div class="employee-career-field"><label for="selfReviewType">Appraisal Type</label><input id="selfReviewType" name="appraisalType" class="employee-career-control employee-career-readonly" type="text" value="ANNUAL APPRAISAL" readonly></div>
-            <div class="employee-career-field"><label for="selfReviewGroup">Performance Group</label><input id="selfReviewGroup" name="performanceGroup" class="employee-career-control employee-career-readonly" type="text" value="SENIOR MANAGEMENT" readonly></div>
-            <div class="employee-career-field"><label for="selfReviewRecordStatus">Status</label><input id="selfReviewRecordStatus" name="status" class="employee-career-control employee-career-readonly" type="text" value="Planning" readonly></div>
-            <div class="employee-career-field"><label for="selfReviewAssessmentFrom">Assessment From</label><input id="selfReviewAssessmentFrom" name="assessmentFrom" class="employee-career-control employee-career-readonly" type="text" value="01/01/2008" readonly></div>
-            <div class="employee-career-field"><label for="selfReviewAssessmentTo">Assessment To</label><input id="selfReviewAssessmentTo" name="assessmentTo" class="employee-career-control employee-career-readonly" type="text" value="31/12/2008" readonly></div>
-            <div class="employee-career-field"><label for="selfReviewValidFrom">Valid From</label><input id="selfReviewValidFrom" name="validFrom" class="employee-career-control employee-career-readonly" type="text" value="01/01/2026" readonly></div>
-            <div class="employee-career-field"><label for="selfReviewValidTo">Valid To</label><input id="selfReviewValidTo" name="validTo" class="employee-career-control employee-career-readonly" type="text" value="31/12/2026" readonly></div>
-          </section>
-          <section class="employee-career-form-section" aria-labelledby="selfReviewCommentsHeading">
-            <h2 id="selfReviewCommentsHeading" class="form-section-heading">Comments</h2>
-            <div class="employee-career-field"><label for="selfReviewComments">Approver / Supervisor Comments</label><textarea id="selfReviewComments" name="comments" class="employee-career-control" rows="4" maxlength="5000" placeholder="Enter comments"></textarea></div>
-          </section>
-          <fieldset class="employee-career-field employee-career-fieldset">
-            <legend class="form-section-heading">Attachment</legend>
-            <div class="employee-career-upload-actions">
-              <button class="employee-career-upload-button" type="button" data-file-picker="selfReviewFiles"><span class="employee-career-upload-icon"><i class="fa-solid fa-file-arrow-up" aria-hidden="true"></i></span><span>Select File(s)</span></button>
-              <button class="employee-career-upload-button" type="button" data-file-picker="selfReviewCamera"><span class="employee-career-upload-icon"><i class="fa-solid fa-camera" aria-hidden="true"></i></span><span>Take a Picture</span></button>
-            </div>
-            <input id="selfReviewFiles" type="file" multiple hidden>
-            <input id="selfReviewCamera" type="file" accept="image/*" capture="environment" hidden>
-            <div id="selfReviewAttachments" class="form-attachment-list" aria-live="polite"></div>
-          </fieldset>
-        </div>
+        <div id="selfReviewFields"></div>
         <div class="employee-career-form-actions form-action-row"><a id="selfReviewCancel" class="form-cancel-btn" href="../index.html?scope=individual"><i class="fa-solid fa-xmark" aria-hidden="true"></i><span>Cancel</span></a><button id="selfReviewSubmit" type="submit" class="employee-career-button primary"><span>Submit</span><i class="fa-solid fa-paper-plane" aria-hidden="true"></i></button></div>
         <p id="selfReviewStatus" class="self-review-status" role="status" aria-live="polite" hidden></p>
       </form>

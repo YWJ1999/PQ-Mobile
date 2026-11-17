@@ -116,3 +116,9 @@ window.EMPLOYEE_CAREER_PENDING_DATA = [{
 
 window.EMPLOYEE_CAREER_PENDING_CATEGORIES = ['CV Change Request', 'Staff Engagement'];
 window.EMPLOYEE_CAREER_BACKUP_APPROVERS = [];
+
+const submittedCVRequests = CVChangeRequests.all().filter(CVChangeRequests.isPending).map(row => ({
+  ...row, type: 'CV Change Request', status: 'pending', documentStatus: 'Submitted',
+  employeeName: row.name || row.employeeName || 'Employee', submitDate: row.submittedAt, savedCV: true
+}));
+window.EMPLOYEE_CAREER_PENDING_DATA.unshift(...submittedCVRequests);

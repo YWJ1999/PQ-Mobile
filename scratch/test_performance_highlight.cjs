@@ -30,8 +30,7 @@ const labels=['Evaluation Date','Period','Appraisal Type','Position','Reporting 
       assert.deepEqual(await page.$$eval('#performanceHighlightDetailsRows th',nodes=>nodes.map(node=>node.textContent.trim())),labels);
       assert.deepEqual(await page.$$eval('#performanceHighlightDetailsRows td',nodes=>nodes.map(node=>node.textContent.trim())),['30 Jan 2026','2026','Annual Appraisal','People Operations Executive','Farhan Rahmat','92.00','88.00','90.00','A','Career Development','5%','1.5','Consistently meets delivery targets.','Continue the development plan.']);
       assert.equal(await page.$eval('#performanceHighlightDetailName',node=>node.textContent.trim()),'Aina Rahman');
-      assert.equal(await page.$eval('#performanceHighlightDetailEmpNo',node=>node.textContent.trim()),'#EBB01');
-      assert.ok(await page.$eval('#performanceHighlightDetailEmpNo',node=>node.previousElementSibling.id==='performanceHighlightDetailName'));
+      assert.equal(await page.$('#performanceHighlightDetailEmpNo'), null);
       await page.setViewport({width,height:568});
       await page.$eval('#performanceHighlightDetailsOverlay .detail-popout-body',node=>{node.scrollTop=node.scrollHeight;});
       assert.ok(await page.$eval('#performanceHighlightDetailsRows tr:last-child',node=>{const rect=node.getBoundingClientRect(),body=node.closest('.detail-popout-body').getBoundingClientRect(),panel=node.closest('.detail-popout-panel').getBoundingClientRect();return rect.top>=body.top-1&&rect.bottom<=body.bottom+1&&panel.top>=0&&panel.bottom<=innerHeight+1;}));

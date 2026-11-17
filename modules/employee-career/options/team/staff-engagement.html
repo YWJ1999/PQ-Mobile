@@ -40,6 +40,16 @@
         </section>
         <section class="employee-career-form-section" aria-labelledby="engagementDetailsHeading">
           <h2 id="engagementDetailsHeading" class="form-section-heading">Engagement Details</h2>
+          <div class="employee-career-field">
+            <label for="engagementInterviewee">Interviewee #</label>
+            <select id="engagementInterviewee" name="intervieweeNo" class="employee-career-control">
+              <option value="">Select Interviewee</option>
+            </select>
+          </div>
+          <div class="employee-career-field">
+            <label for="engagementIntervieweePosition">Interviewee Position</label>
+            <input id="engagementIntervieweePosition" name="intervieweePosition" class="employee-career-control employee-career-readonly" type="text" placeholder="Selected interviewee position" readonly>
+          </div>
           <div class="employee-career-field"><label for="engagementInterviewDate">Interview Date <span class="engagement-required" aria-hidden="true">*</span></label><input id="engagementInterviewDate" name="interviewDate" class="employee-career-control" type="date" required></div>
           <div class="employee-career-field"><label for="engagementPositiveFeedback">Positive Feedback</label><textarea id="engagementPositiveFeedback" name="positiveFeedback" class="employee-career-control" placeholder="Add positive feedback from the interview" maxlength="5000"></textarea></div>
           <div class="employee-career-field"><label for="engagementNegativeFeedback">Negative Feedback</label><textarea id="engagementNegativeFeedback" name="negativeFeedback" class="employee-career-control" placeholder="Add concerns or negative feedback" maxlength="5000"></textarea></div>

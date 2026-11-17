@@ -106,7 +106,7 @@
     return list;
   }
   function openDetails(employee, trigger) {
-    $('incidentHighlightDetailName').textContent = display(employee.name); $('incidentHighlightDetailEmpNo').textContent = employeeId(employee.empNo);
+    $('incidentHighlightDetailName').textContent = display(employee.name);
     const list = $('incidentHighlightDetailsList'); list.replaceChildren();
     [...employee.incidents].sort((a, b) => String(b.incidentDate).localeCompare(String(a.incidentDate)) || String(b.createdDate).localeCompare(String(a.createdDate))).forEach(record => {
       const wrapper = node('div', 'incident-highlight-detail-record'), table = node('table', 'detail-popout-table'), tbody = node('tbody');

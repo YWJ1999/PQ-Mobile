@@ -35,6 +35,7 @@
 
   function openLegend() {
     if (!dialog) {
+      const pageKey = document.querySelector('template#recordColourKey');
       dialog = document.createElement('dialog');
       dialog.className = 'record-key-dialog';
       dialog.id = 'recordColourLegend';
@@ -42,11 +43,12 @@
       dialog.innerHTML = `<header><h2 id="recordKeyTitle">Info</h2>
         <form method="dialog"><button aria-label="Close Info" autofocus>×</button></form></header>
         <div class="record-key-body">
-        <h3>Status</h3>${legendList(cardKey, 'record-key-headers')}
+        ${pageKey ? '' : '<h3>Status</h3>' + legendList(cardKey, 'record-key-headers')}
         ${document.getElementById('leaveCalendarInfo') ? `<details open><summary>Leave calendar legend</summary>
           <h3>Day types</h3>${legendList(dayKey, 'record-key-days')}
           <h3>Leave status dots</h3>${legendList(leaveKey, 'record-key-dots')}</details>` : ''}
         </div>`;
+      if (pageKey) dialog.querySelector('.record-key-body').prepend(pageKey.content.cloneNode(true));
       dialog.addEventListener('click', event => {
         if (event.target !== dialog) return;
         const r = dialog.getBoundingClientRect();

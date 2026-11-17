@@ -684,10 +684,11 @@
   document.addEventListener('DOMContentLoaded', () => {
     initPayroll();
   });
-  window.addEventListener('pageshow', () => {
+  window.addEventListener('pageshow', async () => {
     const count = document.getElementById('teamPendingApprovalCount');
     const actionCount = document.getElementById('payrollTeamActionRequiredCount');
     if (window.PayrollPendingStore) {
+      try { await window.PayrollPendingStore.refresh(); } catch { /* Keep the reference queue available. */ }
       const pendingTotal = window.PayrollPendingStore.getPending().length;
       if (count) count.textContent = String(pendingTotal);
       if (actionCount) actionCount.textContent = pendingTotal + ' ' + (pendingTotal === 1 ? 'Task' : 'Tasks');

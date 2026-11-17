@@ -154,9 +154,9 @@
       lastClassDetailsTrigger = trigger;
       classDetailsFields.replaceChildren(
         classDetailRow('Class', details.class),
+        classDetailRow('Class Status', details.classStatus),
         classDetailRow('Description', details.description),
         classDetailRow('Course Title', details.courseTitle),
-        classDetailRow('Class Status', details.classStatus),
         classDetailRow('Start', formatDateTime(details.start)),
         classDetailRow('End', formatDateTime(details.end)),
         classDetailRow('Venue', details.venue),
@@ -369,8 +369,9 @@
     const classData = event.classDetails;
     const requestData = event.requestDetails;
     classFields.replaceChildren(
-      field('Class', classData.class), field('Description', classData.description), field('Course Title', classData.courseTitle),
+      field('Class', classData.class),
       field('Class Status', '', 'class-status', () => recordDetailStatus.create(classData.classStatus)),
+      field('Description', classData.description), field('Course Title', classData.courseTitle),
       field('Start', formatDateTime(classData.start)), field('End', formatDateTime(classData.end)), field('Venue', classData.venue),
       field('Trainer / Facilitator', classData.trainer), field('Class Capacity', classData.capacity), field('Remark', classData.remark)
     );

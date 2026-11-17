@@ -1,27 +1,16 @@
 const puppeteer = require('puppeteer');
 const path = require('path');
 
-const EXPECTED_BENEFIT_LABELS = [
-  'Document Reference', 'Document Status', 'Employee', 'Entitlement Year',
-  'Benefit Type', 'Claim Period', 'Start Date', 'End Date', 'Purpose',
-  'Receipt #', 'Other Ref.', 'Currency', 'Claim Amount', 'Claim Quantity',
-  'Remarks'
-];
+const assert = require('node:assert/strict');
+const { pathToFileURL } = require('node:url');
 
-const EXPECTED_MEDICAL_SECTIONS = {
-  General: [
-    'Document Reference', 'Status', 'Employee', 'Benefit Year',
-    'Benefit Type', 'Entitled Balance', 'Usable Balance', 'Claim Period',
-    'Receipt Date', 'Receipt No.', 'Claim Total', 'Remark'
-  ],
-  Medical: [
-    'Patient Type', 'Patient Name', 'Treatment Type', 'Clinic Location',
-    'Clinic / Hospital', 'Sickness Type'
-  ],
-  Details: ['Receipt No.', 'Expenses', 'Amount', 'Currency', 'Forex Rate', 'Local Amount']
-};
+const { checkType } = require('./claim_approval_checks.cjs');
 
 async function openDetails(page, tabName, itemId) {
+  if (await page.$('#claimDetailsModalOverlay:not([hidden])')) {
+    await page.click('#claimDetailsModalOverlay [data-approval-back]');
+    await page.waitForSelector('#claimDetailsModalOverlay', { hidden: true });
+  }
   await page.evaluate((name) => {
     const tab = [...document.querySelectorAll('.filter-pill')]
       .find(button => button.textContent.trim() === name);
@@ -29,130 +18,96 @@ async function openDetails(page, tabName, itemId) {
     tab.click();
   }, tabName);
 
-  await page.evaluate((id) => window.ClaimsEngine.triggerClaimViewDetails(id), itemId);
-  await page.waitForSelector('#claimDetailsModalOverlay[style*="display: flex"]');
-}
-
-async function readSections(page) {
-  return page.evaluate(() => {
-    const body = document.getElementById('claimDetailsDynamicBody');
-    return {
-      text: body.innerText,
-      sections: [...body.querySelectorAll(':scope > section[aria-label]')].map(section => ({
-        ariaLabel: section.getAttribute('aria-label'),
-        title: section.querySelector(':scope > h4')?.textContent.trim() || '',
-        rows: [...section.querySelectorAll('tr')].map(row => ({
-          label: row.cells[0]?.textContent.trim() || '',
-          value: row.cells[1]?.innerText.trim() || ''
-        }))
-      }))
-    };
-  });
-}
-
-function valuesByLabel(section) {
-  return Object.fromEntries(section.rows.map(row => [row.label, row.value]));
+  const link = '[data-approval-id="' + itemId + '"] .approval-record-link';
+  await page.$eval(link, el => el.scrollIntoView({ block: 'center' }));
+  await page.locator(link).click();
+  await page.waitForSelector('#claimDetailsModalOverlay:not([hidden])');
 }
 
 async function run() {
   const browser = await puppeteer.launch({
-    headless: 'new',
-    args: ['--no-sandbox', '--disable-setuid-sandbox']
+    headless: true,
+    executablePath: process.env.CHROME_BIN || 'C:/Program Files/Google/Chrome/Application/chrome.exe'
   });
 
   try {
     const page = await browser.newPage();
     const pageErrors = [];
     page.on('pageerror', error => pageErrors.push(error.message));
-    await page.setViewport({ width: 450, height: 950 });
-
-    const url = `file:///${path.resolve(__dirname, '../modules/claims/options/pending-approval.html').replace(/\\/g, '/')}`;
-    await page.goto(url, { waitUntil: 'networkidle0' });
-    await page.waitForSelector('#teamApprovalsQueue pending-approval-card');
-
+    page.setDefaultTimeout(6000);
+    await page.setViewport({ width: 360, height: 820 });
+    await page.setRequestInterception(true);
+    page.on('request', req => /^https?:/.test(req.url()) ? req.abort() : req.continue());
+    const url = pathToFileURL(path.resolve(__dirname, '../modules/claims/options/pending-approval.html')).href;
+    await page.goto(url);
     await openDetails(page, 'Benefit', '1');
-    const benefit = await readSections(page);
-    await page.evaluate(() => window.ClaimsEngine.closeClaimDetailsModal());
-    await page.waitForFunction(() => document.getElementById('claimDetailsModalOverlay').style.display === 'none');
-
-    await openDetails(page, 'Medical', '5');
-    const medical = await readSections(page);
-
-    const benefitSection = benefit.sections[0];
-    const benefitValues = benefitSection ? valuesByLabel(benefitSection) : {};
-    const benefitPassed = benefit.sections.length === 1
-      && benefitSection.title === ''
-      && JSON.stringify(benefitSection.rows.map(row => row.label)) === JSON.stringify(EXPECTED_BENEFIT_LABELS)
-      && /Farhan binti rahmat\s+#EBB12/.test(benefitValues.Employee || '')
-      && benefitValues['Document Status'] === 'Pending'
-      && benefitValues['Entitlement Year'] === '2019'
-      && benefitValues['Benefit Type'] === 'PERSONAL ALLOWANCE'
-      && benefitValues['Claim Period'] === '201902'
-      && benefitValues['Start Date'] === '4 Sep 2019'
-      && benefitValues['End Date'] === '4 Sep 2019'
-      && benefitValues['Claim Amount'] === 'RM -5.00'
-      && !/undefined/i.test(benefit.text);
-
-    const medicalTitles = medical.sections.map(section => section.title);
-    const medicalLabels = Object.fromEntries(
-      medical.sections.map(section => [section.title, section.rows.map(row => row.label)])
-    );
-    const medicalGeneralValues = valuesByLabel(
-      medical.sections.find(section => section.title === 'General') || { rows: [] }
-    );
-    const medicalPassed = JSON.stringify(medicalTitles) === JSON.stringify(['General', 'Medical', 'Details'])
-      && Object.entries(EXPECTED_MEDICAL_SECTIONS).every(([title, labels]) => (
-        JSON.stringify(medicalLabels[title]) === JSON.stringify(labels)
-      ))
-      && /Jessica Wong\s+#003891/.test(medicalGeneralValues.Employee || '')
-      && medicalGeneralValues['Benefit Type'] === 'General Consultation'
-      && medicalGeneralValues['Receipt Date'] === '07/09/2026'
-      && medicalGeneralValues['Receipt No.'] === 'QC-5510'
-      && medicalGeneralValues.Status === 'Pending'
-      && medicalGeneralValues['Claim Total'] === 'RM 135.00';
-
-    let screenshotExamplePassed = true;
-    for (const theme of ['dark', 'light']) {
-      await page.evaluate(theme => document.documentElement.setAttribute('data-theme', theme), theme);
-      await openDetails(page, 'Medical', '2');
-      const example = await readSections(page);
-      const general = example.sections.find(section => section.title === 'General');
-      const values = general ? valuesByLabel(general) : {};
-      screenshotExamplePassed = screenshotExamplePassed
-        && JSON.stringify(general?.rows.map(row => row.label)) === JSON.stringify(EXPECTED_MEDICAL_SECTIONS.General)
-        && values['Claim Period'] === '201601'
-        && values['Receipt Date'] === '09/03/2016'
-        && values['Receipt No.'] === '-'
-        && values['Claim Total'] === 'RM 100.00';
-      await page.evaluate(async () => {
-        const overlay = document.getElementById('claimDetailsModalOverlay');
-        await Promise.all(overlay.getAnimations({ subtree: true }).map(animation => animation.finished.catch(() => {})));
+    const review = '#claimDetailsDynamicBody > .benefit-claim-fields';
+    const fields = () => page.$$eval(review + ' [data-benefit-field]', els =>
+      Object.fromEntries(els.map(el => [el.dataset.benefitField, el.textContent])));
+    const benefit = await fields();
+    assert.deepEqual(benefit, { entitlementYear: '2019', benefitType: 'PERSONAL ALLOWANCE',
+      entitledBalance: '—', usableBalance: '—', periodYear: '2019', periodMonth: 'February',
+      fromDate: '4 Sep 2019', toDate: '4 Sep 2019', purpose: 'Purpose', receiptNo: 'Receipt',
+      otherRef: 'Reference', currency: 'INDONESIAN RUPIAH', amount: '-5.00', claimQuantity: '0', remarks: 'Remarks' });
+    assert.equal(await page.$(review + ' :is(input, select, textarea, button, [onclick])'), null);
+    assert.equal(await page.$eval('#claimDetailsDynamicBody', el => el.firstElementChild.querySelector('h2').textContent), 'Benefit Details');
+    assert.ok(!/Document Reference|Submission details|Farhan binti rahmat/.test(await page.$eval(review, el => el.innerText)));
+    for (const [theme, width, decision] of [['light', 360, 'approve'], ['dark', 420, 'resubmit'], ['dark', 360, 'reject']]) {
+      await page.setViewport({ width, height: 820 });
+      await page.goto(new URL('benefit-claim.html?theme=' + theme, url));
+      await page.click('[data-benefit-type="MOBILE PHONE"] button');
+      await page.select('#claimPeriodMonth', 'July');
+      await page.select('#currencySelect', 'SGD');
+      await page.type('#expenseAmountInput', '12.30');
+      await page.type('#purposeInput', 'Work calls <project>');
+      await page.type('#receiptNoInput', 'TX-18');
+      await page.type('#remarksInput', 'Receipt & call list');
+      await page.$eval('#hiddenClaimFileInput', el => {
+        for (const name of ['bill.pdf', 'calls.txt']) {
+          const transfer = new DataTransfer();
+          transfer.items.add(new File(['sample'], name));
+          el.files = transfer.files;
+          el.dispatchEvent(new Event('change'));
+        }
       });
-      await page.screenshot({ path: path.resolve(__dirname, `pending_medical_correct_fields_${theme}.png`) });
+      await page.click('#viewBenefitForm button[onclick="submitBenefitClaimForm()"]');
+      await page.waitForSelector('#viewBenefitList', { visible: true });
+      await page.goto(url + '?theme=' + theme);
+      const id = await page.$eval('pending-approval-card', el => el.getAttribute('item-id'));
+      await openDetails(page, 'Benefit', id);
+      await page.reload();
+      await page.waitForSelector(review);
+      const data = await fields();
+      for (const [key, value] of Object.entries({ benefitType: 'MOBILE PHONE', entitledBalance: '900.00', usableBalance: '780.00',
+        periodMonth: 'July', currency: 'SGD - SINGAPORE DOLLAR', amount: '12.30', purpose: 'Work calls <project>', receiptNo: 'TX-18', remarks: 'Receipt & call list' })) assert.equal(data[key], value, key);
+      assert.deepEqual(await page.$$eval(review + ' .attachment-upload-item', els => els.map(el => el.textContent)), ['bill.pdf', 'calls.txt']);
+      assert.ok(await page.$eval(review, el => el.scrollWidth <= el.clientWidth + 1));
+      await page.type('#claimDetailApproverComments', 'Checked receipts.');
+      await page.click('#claimDetailsModalOverlay .action-btn-' + decision);
+      await page.waitForSelector('#claimDetailsModalOverlay', { hidden: true });
+      await page.reload();
+      assert.equal(await page.$('[data-approval-id="' + id + '"]'), null);
+      await page.goto(new URL('history.html', url));
+      const historyCard = await page.waitForSelector('.history-card-item');
+      assert.equal(await historyCard.evaluate(el => el.dataset.status), {approve:'approved', resubmit:'resubmit', reject:'rejected'}[decision]);
+      await historyCard.click();
+      const history = await page.$eval('#claimDetailsModalContainer', el => el.textContent);
+      assert.match(history, /Checked receipts\./);
+      assert.match(history, /Work calls <project>/);
+      console.log('PASS Benefit Claim', theme, width, decision);
     }
-
-    let totalsPassed = true;
-    for (const [claimTotal, expected] of [[0, 'RM 0.00'], [250.5, 'RM 250.50'], [null, 'RM 100.00']]) {
-      await page.evaluate(total => { window.MOCK_TEAM_APPROVALS.find(item => item.id === 2).claimTotal = total; }, claimTotal);
+    await page.goto(url);
+    await openDetails(page, 'Medical', '5');
+    const medicalFields = '#claimDetailsDynamicBody [data-claim-field=';
+    assert.equal(await page.$eval(medicalFields + 'receiptNo]', el => el.textContent), 'QC-5510');
+    assert.equal(await page.$eval(medicalFields + 'entitledBalance]', el => el.textContent), 'RM 800.00');
+    for (const [amount, expected] of [[0, '0.00'], [250.5, '250.50'], [null, '100.00']]) {
+      await page.evaluate(value => { window.MOCK_TEAM_APPROVALS.find(item => item.id === 2).claimTotal = value; }, amount);
       await openDetails(page, 'Medical', '2');
-      const example = await readSections(page);
-      const general = example.sections.find(section => section.title === 'General');
-      totalsPassed = totalsPassed && valuesByLabel(general)['Claim Total'] === expected;
+      assert.equal(await page.$eval(medicalFields + 'claimTotal]', el => el.textContent), expected);
     }
-
-    const passed = benefitPassed && medicalPassed && screenshotExamplePassed && totalsPassed && pageErrors.length === 0;
-    console.log(JSON.stringify({
-      benefit: { sectionTitles: benefit.sections.map(section => section.title), rows: benefitSection?.rows || [] },
-      medical: { sectionTitles: medicalTitles, labels: medicalLabels },
-      pageErrors,
-      benefitPassed,
-      medicalPassed,
-      screenshotExamplePassed,
-      totalsPassed,
-      passed
-    }, null, 2));
-
-    if (!passed) process.exitCode = 1;
+    await checkType(browser, 'medical');
+    assert.deepEqual(pageErrors, []);
   } finally {
     await browser.close();
   }

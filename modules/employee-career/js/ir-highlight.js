@@ -217,7 +217,6 @@
 
   function openDetails(employee) {
     $('irHighlightDetailName').textContent = employee.name;
-    $('irHighlightDetailEmpNo').textContent = `#${employee.empNo}`;
     const tbody = $('irHighlightDetailsTable').tBodies[0];
     tbody.replaceChildren();
     [...employee.cases].sort((a, b) => a.date.localeCompare(b.date)).forEach(record => {

@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Claims - Expense Claim</title>
   <script src="../../../js/components.js"></script>
+  <script src="../../../js/claims/claim-request-store.js"></script>
+  <script src="../../../js/claims/claim-application-fields.js"></script>
   <script src="../../../js/app.js" defer></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -440,111 +442,7 @@
       <div id="view-1-main" class="view-container active">
         
         <!-- MAIN APPLICATION DETAILS CARD -->
-        <div class="form-card">
-          <div class="section-header-bar no-top-border">
-            <span class="section-title-accent"></span>
-            <span class="section-title-text">APPLICATION DETAILS</span>
-          </div>
-
-          <!-- Claim Period (Year & Month) -->
-          <div style="display: grid; grid-template-columns: 1fr 1.2fr; gap: 10px;" class="field-group">
-            <div>
-              <label class="field-label">Claim Period</label>
-              <input type="text" id="claimPeriodYear" class="form-ctrl" value="2026" readonly />
-            </div>
-            <div style="padding-top: 22px;">
-              <div class="select-wrapper">
-                <select id="claimPeriodMonth" class="form-ctrl" aria-label="Claim Period Month">
-                  <option value="September" selected>September</option>
-                  <option value="October">October</option>
-                  <option value="November">November</option>
-                </select>
-              </div>
-            </div>
-          </div>
-
-          <!-- Claim Date -->
-          <div class="field-group">
-            <label class="field-label">Claim Date</label>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-              <input type="date" id="claimDateFrom" class="form-ctrl" value="2026-09-25" aria-label="Claim date from" />
-              <input type="date" id="claimDateTo" class="form-ctrl" value="2026-09-25" aria-label="Claim date to" />
-            </div>
-          </div>
-
-          <!-- Benefit Year & Benefit Type -->
-          <div style="display: grid; grid-template-columns: 1fr 1.2fr; gap: 10px;" class="field-group">
-            <div>
-              <label class="field-label">Benefit Year</label>
-              <input type="text" id="benefitYear" class="form-ctrl" value="2026" readonly />
-            </div>
-            <div>
-              <label class="field-label">Benefit Type</label>
-              <div class="select-wrapper">
-                <select id="benefitTypeSelect" class="form-ctrl">
-                  <option value="" selected>Select Benefit</option>
-                  <option value="GENERAL EXPENSE">General Expense</option>
-                  <option value="OFFICE SUPPLIES">Office Supplies</option>
-                  <option value="SUBSCRIPTIONS">Subscriptions & Software</option>
-                </select>
-              </div>
-            </div>
-          </div>
-
-          <!-- Purpose -->
-          <div class="field-group">
-            <label class="field-label">Purpose<span class="req">*</span></label>
-            <input type="text" id="claimPurpose" class="form-ctrl" value="" placeholder="Enter claim purpose..." />
-          </div>
-
-          <!-- Claim Currency -->
-          <div class="field-group">
-            <label class="field-label">Claim Currency</label>
-            <div class="select-wrapper">
-              <select id="claimCurrencySelect" class="form-ctrl">
-                <option value="RINGGIT MALAYSIA" selected>RINGGIT MALAYSIA</option>
-                <option value="US DOLLAR">US DOLLAR</option>
-                <option value="SINGAPORE DOLLAR">SINGAPORE DOLLAR</option>
-              </select>
-            </div>
-          </div>
-          
-          <!-- Claim Total (Live auto-calculated) -->
-          <div class="field-group">
-            <label class="field-label">Claim Total</label>
-          <input type="text" id="claimTotalInput" class="form-ctrl" value="0.00" readonly style="color: var(--text-primary); font-weight: 800;" />
-          </div>
-
-          <!-- Project -->
-          <div class="field-group">
-            <label class="field-label">Project</label>
-            <div class="select-wrapper">
-              <select id="projectSelect" class="form-ctrl">
-                <option value="" selected>Select Project</option>
-                <option value="HQ Digitalization">HQ Digitalization</option>
-                <option value="Mobile HCM App">Mobile HCM App</option>
-              </select>
-            </div>
-          </div>
-
-          <!-- Cost Centre -->
-          <div class="field-group">
-            <label class="field-label">Cost Centre</label>
-            <div class="select-wrapper">
-              <select id="costCentreSelect" class="form-ctrl">
-                <option value="MANAGEMENT" selected>MANAGEMENT</option>
-                <option value="ADMINISTRATION">ADMINISTRATION</option>
-                <option value="FINANCE & ACCOUNTING">FINANCE & ACCOUNTING</option>
-              </select>
-            </div>
-          </div>
-
-          <!-- Remarks -->
-          <div class="field-group" style="margin-bottom: 0;">
-            <label class="field-label">Remarks</label>
-            <input type="text" id="claimRemarks" class="form-ctrl" placeholder="Enter remarks..." />
-          </div>
-        </div>
+        <template id="claimApplicationFields"></template>
 
         <!-- AGGREGATED SUMMARY ROW (Level 1 Total Claim & Drill-down Entry) -->
         <div class="category-summary-row" onclick="openCategoryItems('expense')" style="background: linear-gradient(135deg, rgba(124, 58, 237, 0.12) 0%, rgba(109, 40, 217, 0.18) 100%); border: 1.5px solid rgba(124, 58, 237, 0.4); border-radius: 22px; padding: 18px; margin-bottom: 16px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 6px 20px rgba(124, 58, 237, 0.18); transition: transform 0.2s ease;">
@@ -668,6 +566,7 @@
 
   <!-- SCRIPT -->
   <script>
+    ClaimApplicationFields.mount('Expense Claim');
     const formData = {
       claimDetails: {
         addedDetails: []
@@ -1204,6 +1103,7 @@
     }
 
     function submitClaim() {
+      if (!ClaimApplicationFields.submit('Expense Claim', { itemizedDetails: formData.claimDetails.addedDetails, attachments: formData.mainAttachments })) return;
       showToast('🚀 Expense Claim submitted successfully!');
       setTimeout(() => {
         window.location.href = '../index.html';

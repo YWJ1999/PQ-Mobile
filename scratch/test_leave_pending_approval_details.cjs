@@ -3,220 +3,124 @@ const path = require('node:path');
 const { pathToFileURL } = require('node:url');
 const puppeteer = require('puppeteer');
 
-const leaveUrl = pathToFileURL(path.resolve(__dirname, '..', 'leave.html')).href;
+const url = pathToFileURL(path.resolve(__dirname, '..', 'leave.html')).href;
+const active = '[data-approval-view="details"]:not([hidden])';
+const field = key => '[data-review-field="' + key + '"]';
+
+async function verify(browser, theme, width, decision) {
+  const context = await browser.createBrowserContext();
+  const page = await context.newPage();
+  const errors = [];
+  page.on('pageerror', error => errors.push(error.message));
+  page.setDefaultTimeout(5000);
+  await page.setRequestInterception(true);
+  page.on('request', req => /^https?:/.test(req.url()) ? req.abort() : req.continue());
+  await page.setViewport({ width, height: 820 });
+  const queue = url + '?view=approvals&mode=team&theme=' + theme;
+  const open = async ref => {
+    await page.click('[data-approval-id="' + ref + '"] .approval-record-link');
+    await page.waitForSelector(active);
+  };
+  const back = async () => {
+    await page.click(active + ' [data-approval-back]');
+    await page.waitForSelector(active, { hidden: true });
+  };
+  const value = selector => page.$eval(selector, el => el.textContent.trim());
+  try {
+    await page.goto(queue);
+    await open('VLV000000000790');
+    assert.equal(await value(active + ' h1'), 'Leave Approval');
+    assert.equal(await page.$eval('#standardLeaveDetailsView', el => el.firstElementChild.id), 'leaveApprovalForm');
+    assert.equal(await value(field('fromDate')), '23 Feb 2026');
+    assert.equal(await value(field('leaveDays')), '3.000');
+    assert.equal(await value(field('shortNotice')), 'Yes');
+    assert.equal(await value(field('blockLeave')), '—');
+    assert.match(await value(field('remark')), /home repair/);
+    assert.equal(await page.$(field('mcChitNo')), null);
+    assert.match(await value('#leaveApprovalForm [data-leave-heading]'), /^Leave Details/);
+    await back();
+    await page.click('#approvalCard1 button[title="Options"]');
+    await page.locator('button[onclick*="triggerViewDetailsFromMenu"]').click();
+    await page.waitForSelector(active, { visible: true });
+    assert.ok(await page.$eval(active, el => {
+      const frame = el.closest('.phone-container').getBoundingClientRect();
+      const header = el.querySelector('header').getBoundingClientRect();
+      const footer = el.querySelector('#approvalDetailsFooter').getBoundingClientRect();
+      return Math.abs(header.top - frame.top) < 2 && Math.abs(footer.bottom - frame.bottom) < 2;
+    }), 'The header and decision footer should fit the phone after opening the options menu');
+    await back();
+
+    for (const [tab, ref, title, table] of [
+      ['#tabApprovalCredit', 'LVR000000000589', 'Leave Credit Approval', '#leaveCreditDetailsView table'],
+      ['#tabApprovalOfftime', 'VOT000000000281', 'Time Off Approval', '#timeOffDetailsView table']
+    ]) {
+      await page.click(tab);
+      await open(ref);
+      assert.equal(await value(active + ' h1'), title);
+      await page.waitForSelector(table, { visible: true });
+      await back();
+    }
+
+    await page.goto(url + '?view=apply&theme=' + theme);
+    await page.evaluate(() => openLeaveApplyModal('Medical Leave'));
+    await page.select('#mainFormReasonSelect', 'medical');
+    await page.select('#mainFormRelieverSelect', 'sarah');
+    const form = '#viewApplyLeaveForm ';
+    await page.type(form + '[data-leave-field="mcChitNo"]', 'MC-123');
+    await page.type(form + '[data-leave-field="natureIllness"]', 'Fever');
+    await page.select(form + '[data-leave-field="clinic"]', 'sjmc');
+    await page.type(form + 'textarea', 'Rest <today> & tomorrow.');
+    await page.click(form + '.duration-tab-btn:nth-child(3)');
+    await page.click(form + '[data-leave-field="blockLeave"]');
+    await page.evaluate(() => {
+      const input = document.getElementById('hiddenLeaveFileInput');
+      for (const name of ['certificate.pdf', 'receipt.png']) {
+        const data = new DataTransfer();
+        data.items.add(new File(['test'], name));
+        input.files = data.files;
+        input.dispatchEvent(new Event('change'));
+      }
+    });
+    await page.click(form + 'button[onclick="submitLeaveApplicationForm()"]');
+    const historyCard = await page.waitForSelector('#myHistoryCardsList .history-item-card', { visible: true });
+    const ref = await historyCard.evaluate(el => el.dataset.ref);
+    await page.goto(queue);
+    await open(ref);
+    await page.reload();
+    await page.waitForSelector(active);
+    for (const [key, expected] of Object.entries({ type: 'Medical Leave', leaveDays: '0.5', duration: '2nd Half',
+      blockLeave: 'Yes', advanceLeave: 'No', reason: 'Medical / Illness', reliever: 'Sarah Wong (Team Lead)',
+      remark: 'Rest <today> & tomorrow.', mcChitNo: 'MC-123', natureIllness: 'Fever', clinic: 'Subang Jaya Medical Centre (Hospital)' })) {
+      assert.equal(await value(field(key)), expected, key);
+    }
+    assert.deepEqual(await page.$$eval('#leaveApprovalForm .form-attachment-file-name', els => els.map(el => el.textContent)), ['certificate.pdf', 'receipt.png']);
+    assert.equal(await page.$('#leaveApprovalForm :is(input,select,textarea,button,[onclick],[contenteditable])'), null);
+    assert.ok(await page.$eval('#leaveApprovalForm', el => el.scrollWidth <= el.clientWidth + 1));
+    await page.type('#approvalActionCommentsInput', 'Reviewed the certificate.');
+    await page.click('#approvalDetailsFooter .action-btn-' + decision);
+    await page.waitForSelector(active, { hidden: true });
+    await page.reload();
+    assert.equal(await page.$('[data-approval-id="' + ref + '"]'), null);
+    await page.goto(url + '?view=history&theme=' + theme);
+    const entry = '#myHistoryCardsList [data-ref="' + ref + '"]';
+    assert.equal(await page.$eval(entry, el => el.dataset.status), { approve: 'approved', reject: 'rejected', resubmit: 'resubmit' }[decision]);
+    await page.click(entry + ' h3');
+    const history = await value('#historyDetailsTableBody');
+    assert.match(history, /Reviewed the certificate\./);
+    assert.match(history, /Rest <today> & tomorrow\./);
+    assert.deepEqual(errors, []);
+    console.log('PASS ' + theme + ' ' + width + 'px: saved request, read-only review, ' + decision + ', history and adjacent approval types');
+  } finally { await context.close(); }
+}
 
 (async () => {
-  const browser = await puppeteer.launch({ headless: true });
+  const browser = await puppeteer.launch({
+    headless: true,
+    executablePath: process.env.CHROME_BIN || 'C:/Program Files/Google/Chrome/Application/chrome.exe'
+  });
   try {
-    const page = await browser.newPage();
-    const pageErrors = [];
-    page.on('pageerror', error => pageErrors.push(error.message));
-    await page.setViewport({ width: 390, height: 950 });
-    await page.goto(leaveUrl, { waitUntil: 'domcontentloaded' });
-    await page.waitForFunction(() => typeof window.openApprovalThreeDotsMenu === 'function' && typeof window.triggerViewDetailsFromMenu === 'function');
-
-    await page.evaluate(() => showLeaveSection('viewTeamApprovals'));
-    const firstApprovalCardText = await page.$eval('#approvalCard1', card => card.textContent.replace(/\s+/g, ' ').trim());
-    assert.doesNotMatch(firstApprovalCardText, /Requested On Behalf By|Benjamin Lee|Business Development Executive/);
-
-    await page.evaluate(() => {
-      window.openApprovalThreeDotsMenu(
-        'Kathleen lee chee dee',
-        'MEDICAL LEAVE',
-        '15 May 2020',
-        'Full Day',
-        '',
-        {
-          docRef: 'VLV000000000792',
-          docStatus: 'Final Approval',
-          employee: 'EBB21 - Kathleen lee chee dee',
-          branch: 'TIMES SQUARE BRANCH',
-          department: 'HUMAN RESOURCE',
-          leaveYear: '2020',
-          cutoffPeriod: '01/01/2020 – 31/12/2020',
-          submitter: 'EBB21 - Kathleen lee chee dee',
-          submitDate: '12 May 2020',
-          fromDate: '15 May 2020',
-          toDate: '15 May 2020',
-          leaveDays: '1.000',
-          mcChitNo: '1231313',
-          reliever: '',
-          remark: '',
-          attachment: 'lighthouse-clip-art-png.png',
-          advanceLeave: 'No',
-          shortNotice: 'No'
-        }
-      );
-      window.triggerViewDetailsFromMenu();
-    });
-
-    await page.waitForFunction(() => document.getElementById('approvalDetailsModalOverlay')?.classList.contains('active'));
-
-    const expectedLabels = [
-      'Document Reference', 'Document Status', 'Employee', 'Branch', 'Department',
-      'Leave Year', 'Leave Type', 'Cutoff Period', 'Submitter', 'Submit Date',
-      'Start Date', 'End Date', 'Duration', 'Leave Days/Hours', 'MC Chit No',
-      'Reliever', 'Reason', 'Advance Leave', 'Short Notice Leave', 'Attachment'
-    ];
-    const labels = await page.$$eval(
-      '#standardLeaveDetailsView [data-leave-approval-general] tr > td:first-child',
-      cells => cells.map(cell => cell.textContent.replace(/\s+/g, ' ').trim())
-    );
-    assert.deepEqual(labels, expectedLabels);
-
-    const detail = await page.evaluate(() => ({
-      title: document.getElementById('approvalDetailsModalHeaderTitle')?.textContent.trim(),
-      docRef: document.getElementById('detailsDocRef')?.textContent.trim(),
-      status: document.getElementById('detailsDocStatus')?.textContent.trim(),
-      employeeName: document.getElementById('detailsEmployeeName')?.textContent.trim(),
-      employeeId: document.getElementById('detailsEmployeeId')?.textContent.trim(),
-      branch: document.getElementById('detailsBranch')?.textContent.trim(),
-      department: document.getElementById('detailsDepartment')?.textContent.trim(),
-      leaveYear: document.getElementById('detailsLeaveYear')?.textContent.trim(),
-      leaveType: document.getElementById('detailsLeaveType')?.textContent.trim(),
-      cutoff: document.getElementById('detailsCutoffPeriod')?.textContent.trim(),
-      submitDate: document.getElementById('detailsSubmitDate')?.textContent.trim(),
-      fromDate: document.getElementById('detailsFromDate')?.textContent.trim(),
-      toDate: document.getElementById('detailsToDate')?.textContent.trim(),
-      duration: document.getElementById('detailsDuration')?.textContent.trim(),
-      leaveDays: document.getElementById('detailsLeaveDays')?.textContent.trim(),
-      mcChit: document.getElementById('detailsMcChitNo')?.textContent.trim(),
-      reliever: document.getElementById('detailsReliever')?.textContent.trim(),
-      reason: document.getElementById('detailsReasonText')?.textContent.trim(),
-      advanceLeave: document.getElementById('detailsAdvanceLeaveContainer')?.textContent.trim(),
-      shortNotice: document.getElementById('detailsShortNoticeContainer')?.textContent.trim(),
-      attachment: document.getElementById('detailsAttachmentName')?.textContent.trim(),
-      commentsTitle: document.querySelector('.leave-approval-comments label')?.textContent.trim(),
-      commentsPlaceholder: document.getElementById('approvalActionCommentsInput')?.placeholder,
-      actions: [...document.querySelectorAll('#approvalDetailsFooter button')]
-        .filter(button => getComputedStyle(button).display !== 'none')
-        .map(button => button.textContent.replace(/\s+/g, ' ').trim()),
-      attachmentSeparate: !document.getElementById('detailsAttachmentName')?.closest('[data-leave-approval-general]'),
-      attachmentButtonCount: document.getElementById('detailsAttachmentName')?.closest('td')?.querySelectorAll('button').length
-    }));
-
-    assert.deepEqual(detail, {
-      title: 'Leave Approval',
-      docRef: 'VLV000000000792',
-      status: 'Final Approval',
-      employeeName: 'Kathleen lee chee dee',
-      employeeId: '#EBB21',
-      branch: 'TIMES SQUARE BRANCH',
-      department: 'HUMAN RESOURCE',
-      leaveYear: '2020',
-      leaveType: 'MEDICAL LEAVE',
-      cutoff: '01/01/2020 – 31/12/2020',
-      submitDate: '12 May 2020',
-      fromDate: '15 May 2020',
-      toDate: '15 May 2020',
-      duration: 'Full Day',
-      leaveDays: '1.000',
-      mcChit: '1231313',
-      reliever: '—',
-      reason: '—',
-      advanceLeave: 'No',
-      shortNotice: 'No',
-      attachment: 'lighthouse-clip-art-png.png',
-      commentsTitle: 'Approver Action Comments',
-      commentsPlaceholder: 'Add approver action comments (optional)...',
-      actions: ['Approve', 'Resubmit', 'Cancel', 'Reject'],
-      attachmentSeparate: false,
-      attachmentButtonCount: 0
-    });
-
-    await page.evaluate(() => {
-      window.openApprovalThreeDotsMenu(
-        'Siti Nurhaliza',
-        'Personal Time Off',
-        '23 Sep 2026',
-        '2.5 Hours (14:30 - 17:00)',
-        'Urgent Family Care',
-        {
-          docRef: 'VOT000000000281',
-          fromDate: '23 Sep 2026',
-          duration: '2.5 Hours',
-          remark: 'Emergency visit to school clinic for child health concern.',
-          approverRemarks: 'Pending supervisor review'
-        }
-      );
-      window.triggerViewDetailsFromMenu();
-    });
-    await page.waitForFunction(() => document.getElementById('approvalDetailsModalHeaderTitle')?.textContent.trim() === 'Time Off Approval');
-
-    assert.deepEqual(
-      await page.$$eval(
-        '#timeOffDetailsView [data-time-off-approval-general] tr > td:first-child',
-        cells => cells.map(cell => cell.textContent.replace(/\s+/g, ' ').trim())
-      ),
-      ['Document Status', 'Date', 'Start Time', 'End Time', 'Hours', 'Reason', 'Remarks', 'Approver Remarks']
-    );
-    assert.deepEqual(
-      await page.$$eval(
-        '#timeOffDetailsView [data-time-off-approval-general] tr > td:last-child',
-        cells => cells.map(cell => cell.textContent.replace(/\s+/g, ' ').trim())
-      ),
-      [
-        'Pending Approval',
-        '23 Sep 2026',
-        '14:30',
-        '17:00',
-        '2.5 Hours',
-        'Urgent Family Care',
-        'Emergency visit to school clinic for child health concern.',
-        'Pending supervisor review'
-      ]
-    );
-    assert.equal(await page.$eval('#standardLeaveDetailsView', node => getComputedStyle(node).display), 'none');
-    assert.equal(await page.$eval('#timeOffDetailsView', node => getComputedStyle(node).display), 'flex');
-
-    await page.evaluate(() => {
-      window.openApprovalThreeDotsMenu(
-        'Farhan binti rahmat',
-        'REPLACEMENT LEAVE',
-        '3 Jul 2024',
-        '1.000 Day',
-        'OTHERS',
-        {
-          isCredit: true,
-          docRef: 'LVR000000000589',
-          docStatus: 'Final Approval',
-          employee: 'EBB12 - Farhan binti rahmat',
-          creditLeave: 'REPLACEMENT LEAVE',
-          creditType: 'Working on Public Holiday',
-          submitter: 'EBB12 - Farhan binti rahmat',
-          submitDate: '12 Jul 2024',
-          fromDate: '3 Jul 2024',
-          toDate: '3 Jul 2024',
-          creditDays: '1.000',
-          effectiveDate: '4 Jul 2024',
-          attachment: 'replacement-leave.jpg'
-        }
-      );
-      window.triggerViewDetailsFromMenu();
-    });
-    await page.waitForFunction(() => document.getElementById('approvalDetailsModalHeaderTitle')?.textContent.trim() === 'Leave Credit Approval');
-    const creditState = await page.evaluate(() => ({
-      standardDisplay: getComputedStyle(document.getElementById('standardLeaveDetailsView')).display,
-      creditDisplay: getComputedStyle(document.getElementById('leaveCreditDetailsView')).display,
-      footerDisplay: getComputedStyle(document.getElementById('approvalDetailsFooter')).display,
-      statusHasInlineStyle: document.getElementById('lcDetailsDocStatus').hasAttribute('style'),
-      attachmentButtonCount: document.getElementById('lcDetailsAttachment').closest('td').querySelectorAll('button').length,
-      actions: [...document.querySelectorAll('#approvalDetailsFooter button')]
-        .filter(button => getComputedStyle(button).display !== 'none')
-        .map(button => button.textContent.replace(/\s+/g, ' ').trim())
-    }));
-    assert.equal(creditState.standardDisplay, 'none');
-    assert.equal(creditState.creditDisplay, 'flex');
-    assert.notEqual(creditState.footerDisplay, 'none');
-    assert.equal(creditState.statusHasInlineStyle, false);
-    assert.equal(creditState.attachmentButtonCount, 0);
-    assert.deepEqual(creditState.actions, ['Approve', 'Resubmit', 'Cancel', 'Reject']);
-    assert.deepEqual(pageErrors, []);
-    console.log('PASS: Leave Pending Approval exposes the required leave application details.');
-  } finally {
-    await browser.close();
-  }
-})().catch(error => {
-  console.error(error);
-  process.exitCode = 1;
-});
+    await verify(browser, 'light', 360, 'approve');
+    await verify(browser, 'dark', 420, 'reject');
+    await verify(browser, 'dark', 360, 'resubmit');
+  } finally { await browser.close(); }
+})().catch(error => { console.error(error); process.exitCode = 1; });

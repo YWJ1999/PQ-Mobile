@@ -33,7 +33,7 @@
       const detail = taxDetails.get(id);
       return {
         id, category: 'tax', empNo, employeeName, position: 'HUMAN RESOURCE', rebateCode, rebateItem, description, transactionDate, amount, submitDate,
-        process: false, status: 'Submitted', receiptNo: detail?.receiptNo || '', period: detail?.period || '', cycle: detail?.cycle || '',
+        process: false, status: 'Submitted', receiptNo: detail?.receiptNo || '', remarks: detail?.remarks || '', period: detail?.period || '', cycle: detail?.cycle || '',
         approvalDate: detail?.approvalDate || '', approvalDateLabel: detail?.approvalDateLabel || '', approverRemarks: detail?.approverRemarks || '',
         attachments: (detail?.attachments || []).map(attachment => ({ ...attachment }))
       };
@@ -53,26 +53,48 @@
 
   // Approval actions are retained locally for the preview; no payroll API is called.
   const storageKey = 'pq_payroll_pending_decisions';
+  const actionStatus = { approve: 'approved', reject: 'rejected', resubmit: 'resubmit', cancel: 'cancelled' };
+  let submissions = [];
+  async function refresh() {
+    const all = await PayrollRequests.all();
+    submissions = all.filter(record => record.category);
+    return all;
+  }
   function decisions() {
     try {
       const saved = JSON.parse(localStorage.getItem(storageKey));
-      return Array.isArray(saved) ? saved.filter(item => item && typeof item.id === 'string' && ['approve', 'resubmit', 'reject'].includes(item.action)) : [];
+      return Array.isArray(saved) ? saved.filter(item => item && typeof item.id === 'string' && Object.hasOwn(actionStatus, item.action)) : [];
     } catch { return []; }
   }
   function getPending() {
     const handled = new Set(decisions().map(item => item.id));
-    return [...window.PAYROLL_PENDING_DATA.tax, ...window.PAYROLL_PENDING_DATA.deduction].filter(item => !handled.has(item.id));
+    return [...submissions, ...window.PAYROLL_PENDING_DATA.tax, ...window.PAYROLL_PENDING_DATA.deduction].filter(item => !handled.has(item.id));
   }
-  function act(ids, action, approverActionComments = '') {
-    if (!['approve', 'resubmit', 'reject'].includes(action)) throw new Error('Unknown approval action');
+  function saveDecision(ids, action, approverActionComments) {
+    if (!Object.hasOwn(actionStatus, action)) throw new Error('Unknown approval action');
     const selected = new Set(ids);
     const comments = String(approverActionComments).trim().slice(0, 2000);
-    const changes = getPending().filter(item => selected.has(item.id)).map(item => ({
+    const pending = getPending().filter(item => selected.has(item.id));
+    if (!pending.length || pending.length !== selected.size || (action === 'resubmit' && pending.some(item => item.category === 'deduction'))) {
+      throw new Error('Action unavailable for this request');
+    }
+    const changes = pending.map(item => ({
       id: item.id, action, decidedAt: new Date().toISOString(),
-      ...(item.category === 'deduction' && comments ? { approverActionComments: comments } : {})
+      ...(comments ? { approverActionComments: comments } : {})
     }));
     localStorage.setItem(storageKey, JSON.stringify([...decisions(), ...changes]));
     return changes.length;
   }
-  window.PayrollPendingStore = { getPending, act };
+  function act(ids, action, comment = '') {
+    const save = () => saveDecision(ids, action, comment);
+    return navigator.locks ? navigator.locks.request(storageKey, save) : save();
+  }
+  function applyDecisions(records) {
+    const byId = new Map(decisions().map(item => [item.id, item]));
+    return records.map(item => {
+      const decision = byId.get(item.id);
+      return decision ? { ...item, status: actionStatus[decision.action], approverActionComments: decision.approverActionComments } : item;
+    });
+  }
+  window.PayrollPendingStore = { getPending, act, refresh, applyDecisions, storageKey };
 })();

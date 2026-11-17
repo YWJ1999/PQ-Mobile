@@ -10,7 +10,12 @@
   let activeOptionId = 'benefit';
   let activeSubCategoryObj = null;
   let isAttachmentUploaded = false;
-  let teamQueue = window.MOCK_TEAM_APPROVALS ? [...window.MOCK_TEAM_APPROVALS] : [];
+  let teamQueue = [...(window.MOCK_TEAM_APPROVALS || [])];
+  function syncSavedClaimQueue() {
+    const pending = ClaimRequestStore.list().filter(item => item.status === 'submitted');
+    teamQueue = [...pending, ...teamQueue.filter(item => !item.savedClaim)];
+  }
+  syncSavedClaimQueue();
   let selectedIndividualCalendarDay = Number(window.INDIVIDUAL_TRAVEL_DATA?.selectedDay) || 28;
   let selectedTeamCalendarDay = Number(window.TEAM_TRAVEL_DATA?.selectedDay) || 28;
 
@@ -66,9 +71,10 @@
    * ==========================================
    */
   function renderIndividualDashboard() {
+    const submissions = [...ClaimRequestStore.list(), ...(window.CLAIM_STATUS_RECORDS || window.MOCK_MY_SUBMISSIONS || [])];
     document.querySelectorAll('.work-status-card[data-status]').forEach(card => {
       const status = card.dataset.status;
-      const count = (window.CLAIM_STATUS_RECORDS || window.MOCK_MY_SUBMISSIONS || []).filter(item => item.status === status || (status === 'submitted' && item.status === 'pending')).length;
+      const count = submissions.filter(item => item.status === status || (status === 'submitted' && item.status === 'pending')).length;
       const value = card.querySelector('strong');
       if (value) value.textContent = count;
     });
@@ -468,7 +474,7 @@
     const badge = document.getElementById('mySubmissionsCountBadge');
     if (!container) return;
 
-    let items = window.MOCK_MY_SUBMISSIONS || [];
+    let items = [...ClaimRequestStore.list(), ...(window.MOCK_MY_SUBMISSIONS || [])];
     if (filterType !== 'all') {
       const status = recordReviewStatusLabel(filterType).toLowerCase();
       items = items.filter(item => recordReviewStatusLabel(item.status).toLowerCase() === status);
@@ -507,7 +513,7 @@
               ${item.merchant || item.optionName} • ${item.date}
             </div>
             <div style="font-size: 14.5px; font-weight: 900; color: var(--purple-primary); white-space: nowrap; margin-left: 8px;">
-              RM ${item.amount.toFixed(2)}
+              RM ${item.amount == null ? '—' : item.amount.toFixed(2)}
             </div>
           </div>
         </div>
@@ -885,8 +891,22 @@
     });
   }
 
+  function finishClaims(items, action, comment) {
+    try {
+      ClaimRequestStore.decide(items.filter(item => item.savedClaim).map(item => item.id), action, comment);
+    } catch {
+      refreshSavedClaims();
+      showToast('Could not update the claim. Check its status and try again.');
+      return false;
+    }
+    const handled = new Set(items.map(item => item.id));
+    teamQueue = teamQueue.filter(item => !handled.has(item.id));
+    return true;
+  }
+
   function actionTeamClaim(id, action, userName, amount) {
-    teamQueue = teamQueue.filter(item => item.id !== id);
+    const item = teamQueue.find(record => String(record.id) === String(id));
+    if (!item || !finishClaims([item], action)) return;
     renderTeamQueue();
 
     if (action === 'approve') {
@@ -904,7 +924,7 @@
   }
 
   function approveAllTeamClaims() {
-    teamQueue = [];
+    if (!finishClaims(teamQueue, 'approve')) return;
     renderTeamQueue();
     showToast('🎉 Approved all pending team claims!');
   }
@@ -999,38 +1019,6 @@
     }
   }
 
-  let activeMedSubTab = 'general';
-
-  function makeTableRow(label, valueHtml, isLast = false) {
-    return `
-      <tr>
-        <td style="padding: 10px 14px; ${isLast ? 'border-bottom: none;' : 'border-bottom: 1px solid var(--border-subtle);'} border-right: 1px solid var(--border-subtle); font-weight: 700; color: var(--text-muted); background: var(--bg-input); width: 38%; vertical-align: top;">${label}</td>
-        <td style="padding: 10px 14px; ${isLast ? 'border-bottom: none;' : 'border-bottom: 1px solid var(--border-subtle);'} color: var(--text-primary); width: 62%; font-weight: 600; line-height: 1.45;">${valueHtml}</td>
-      </tr>
-    `;
-  }
-
-  function makeClaimDetailSection(ariaLabel, title, rowGroups) {
-    const groups = Array.isArray(rowGroups) ? rowGroups : [rowGroups];
-    return `
-      <section class="claim-detail-section" aria-label="${ariaLabel}" style="flex-shrink: 0;">
-        ${title ? `
-        <h4 class="claim-detail-section-title" style="display: flex; align-items: center; gap: 8px; margin: 2px 2px 9px; color: var(--text-primary); font-size: 13px; font-weight: 850; letter-spacing: -0.1px;">
-          <span style="width: 3px; height: 15px; border-radius: 999px; background: var(--purple-primary); box-shadow: 0 0 8px rgba(124, 58, 237, 0.35);"></span>
-          ${title}
-        </h4>` : ''}
-        <div style="display: flex; flex-direction: column; gap: 10px;">
-          ${groups.map(rowsHtml => `
-          <div class="claim-detail-table-grid" style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 16px; overflow: hidden; box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);">
-            <table style="width: 100%; border-collapse: collapse; font-size: 12px; text-align: left;">
-              <tbody>${rowsHtml}</tbody>
-            </table>
-          </div>`).join('')}
-        </div>
-      </section>
-    `;
-  }
-
   function renderClaimApproverComments() {
     return `
       <div class="claim-detail-approver-comments" style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 16px; padding: 12px 14px; flex-shrink: 0;">
@@ -1039,557 +1027,6 @@
       </div>
     `;
   }
-
-  function renderUnifiedClaimDetail(d) {
-    if (!d) return '';
-
-    const claimType = d.optionName || 'Benefit Claim';
-    const optLower = claimType.toLowerCase();
-
-    // Format amount (support numbers and strings)
-    let amountFormatted = 'RM 0.00';
-    if (typeof d.amount === 'number') {
-      amountFormatted = `RM ${d.amount.toFixed(2)}`;
-    } else if (d.amount) {
-      const cleanAmt = String(d.amount).trim();
-      amountFormatted = cleanAmt.startsWith('RM') ? cleanAmt : `RM ${cleanAmt}`;
-    }
-
-    // Format employee ID and details (conforming to AGENTS.md Employee ID presentation standard)
-    const rawEmp = (d.empNo || '004177').replace(/^#+/, '');
-    const empNo = rawEmp;
-    const deptClean = d.dept || 'Operations • Quality Assurance';
-    const docRef = d.docRef || (optLower.includes('medical') ? 'CMD000000000133' : optLower.includes('ot') ? 'BXT000000000283' : 'CBF000000000025');
-    const docStatus = recordDetailStatus.html(d.docStatus || 'Submitted');
-    const receiptFile = d.receipt || (d.receiptNo ? `Receipt #${d.receiptNo}` : 'supporting_receipt_docs.pdf');
-
-    const employeeHtml = `
-      <div style="font-weight: 800; font-size: 13px; color: var(--text-primary);">${d.userName || 'Employee'}</div>
-      <div style="font-size: 11.5px; font-weight: 700; color: var(--text-muted); opacity: 0.8; font-family: monospace, sans-serif; margin-top: 2px;">#${empNo}</div>
-    `;
-    const cleanRemarks = String(d.remarks || d.purpose || '-')
-      .replace(/\|?undefined/gi, ' ')
-      .replace(/\s*\|\s*/g, ' ')
-      .replace(/\s{2,}/g, ' ')
-      .trim() || '-';
-
-    if (optLower.includes('medical')) {
-      const claimTotal = d.claimTotal;
-      const totalText = typeof claimTotal === 'number' ? claimTotal.toFixed(2) : String(claimTotal ?? '').trim();
-      const claimTotalFormatted = totalText ? (/^RM\s/i.test(totalText) ? totalText : `RM ${totalText}`) : amountFormatted;
-      const periodStart = d.claimPeriodStart || d.period || '-';
-      const periodEnd = d.claimPeriodEnd || periodStart;
-      const claimPeriod = periodStart === periodEnd ? periodStart : `${periodStart} – ${periodEnd}`;
-      const generalRows = `
-        ${makeTableRow('Document Reference', `<span style="font-family: monospace; font-weight: 800;">${docRef}</span>`)}
-        ${makeTableRow('Status', docStatus)}
-        ${makeTableRow('Employee', employeeHtml)}
-        ${makeTableRow('Benefit Year', d.benefitYear || '2026')}
-        ${makeTableRow('Benefit Type', d.benefitType || d.medicalType || d.subCatName || '-')}
-        ${makeTableRow('Entitled Balance', `<span style="font-family: monospace; font-weight: 800;">RM ${d.entitledBalance || '0.00'}</span>`)}
-        ${makeTableRow('Usable Balance', `<span style="font-family: monospace; font-weight: 800;">RM ${d.usableBalance || '0.00'}</span>`)}
-        ${makeTableRow('Claim Period', `<span style="font-family: monospace; font-weight: 800;">${claimPeriod}</span>`)}
-        ${makeTableRow('Receipt Date', d.receiptDate || d.claimDate || '-')}
-        ${makeTableRow('Receipt No.', d.receiptNo || '-')}
-        ${makeTableRow('Claim Total', `<span style="font-family: monospace; font-weight: 850;">${claimTotalFormatted}</span>`)}
-        ${makeTableRow('Remark', cleanRemarks, true)}
-      `;
-      const medicalRows = `
-        ${makeTableRow('Patient Type', d.patientType || '-')}
-        ${makeTableRow('Patient Name', d.patientName || d.userName || '-')}
-        ${makeTableRow('Treatment Type', d.treatmentType || '-')}
-        ${makeTableRow('Clinic Location', d.clinicLocation || '-')}
-        ${makeTableRow('Clinic / Hospital', d.clinicName || '-')}
-        ${makeTableRow('Sickness Type', d.sicknessType || '-', true)}
-      `;
-      const detailItems = Array.isArray(d.detailItems) && d.detailItems.length ? d.detailItems : [d];
-      const detailRowGroups = detailItems.map(item => `
-        ${makeTableRow('Receipt No.', item.receiptNo || d.receiptNo || '-')}
-        ${makeTableRow('Expenses', item.expenses || item.detailExpenses || d.detailExpenses || '-')}
-        ${makeTableRow('Amount', item.amount !== undefined && item !== d ? item.amount : (item.detailAmount || d.detailAmount || '0.00'))}
-        ${makeTableRow('Currency', item.currency || item.detailCurrency || d.detailCurrency || 'RINGGIT MALAYSIA')}
-        ${makeTableRow('Forex Rate', item.forexRate || item.detailForexRate || d.detailForexRate || '1.0000')}
-        ${makeTableRow('Local Amount', item.localAmount || item.detailLocalAmount || d.detailLocalAmount || '0.00', true)}
-      `);
-
-      return `
-        ${makeClaimDetailSection('General', 'General', generalRows)}
-        ${makeClaimDetailSection('Medical', 'Medical', medicalRows)}
-        ${makeClaimDetailSection('Details', 'Details', detailRowGroups)}
-        ${renderClaimApproverComments()}
-      `;
-    }
-
-    if (optLower.includes('benefit')) {
-      const benefitRows = `
-        ${makeTableRow('Document Reference', `<span style="font-family: monospace; font-weight: 800;">${docRef}</span>`)}
-        ${makeTableRow('Document Status', docStatus)}
-        ${makeTableRow('Employee', employeeHtml)}
-        ${makeTableRow('Entitlement Year', d.entitlementYear || '2026')}
-        ${makeTableRow('Benefit Type', d.benefitType || d.subCatName || '-')}
-        ${makeTableRow('Claim Period', `<span style="font-family: monospace; font-weight: 800;">${d.period || '-'}</span>`)}
-        ${makeTableRow('Start Date', d.fromDate || d.claimDate || '-')}
-        ${makeTableRow('End Date', d.toDate || d.claimDate || '-')}
-        ${makeTableRow('Purpose', d.purpose || '-')}
-        ${makeTableRow('Receipt #', d.receiptNo || '-')}
-        ${makeTableRow('Other Ref.', d.otherRef || '-')}
-        ${makeTableRow('Currency', d.currency || 'RINGGIT MALAYSIA')}
-        ${makeTableRow('Claim Amount', `<span style="font-family: monospace; font-weight: 850;">${amountFormatted}</span>`)}
-        ${makeTableRow('Claim Quantity', d.claimQuantity !== undefined ? d.claimQuantity : '-')}
-        ${makeTableRow('Remarks', cleanRemarks, true)}
-      `;
-
-      return `
-        ${makeClaimDetailSection('Benefit claim details', '', benefitRows)}
-        ${renderClaimApproverComments()}
-      `;
-    }
-
-    if (optLower.includes('ot') || optLower.includes('overtime')) {
-      const otRows = `
-        ${makeTableRow('Document #', `<span style="font-family: monospace; font-weight: 800;">${docRef}</span>`)}
-        ${makeTableRow('Status', docStatus)}
-        ${makeTableRow('Employee', employeeHtml)}
-        ${makeTableRow('Claim Period', d.period || '-')}
-        ${makeTableRow('Date', d.otDate || d.claimDate || '-')}
-        ${makeTableRow('OT Type', d.otType || d.subCatName || '-')}
-        ${makeTableRow('Start Time', d.startTime || '-')}
-        ${makeTableRow('End Time', d.endTime || '-')}
-        ${makeTableRow('OT Hours', d.otHours !== undefined ? d.otHours : (d.hours || '0'))}
-        ${makeTableRow('Cross Day', d.crossDay || 'False')}
-        ${makeTableRow('Break Hours', d.breakHours || '-')}
-        ${makeTableRow('Break Minutes', d.breakMinutes || '-')}
-        ${makeTableRow('Project', d.project || '-')}
-        ${makeTableRow('Reason', d.reason || d.purpose || '-')}
-        ${makeTableRow('Meal Allowance Amount', d.mealAllowanceAmount || '0')}
-        ${makeTableRow('Meal Allowance', d.mealAllowance || '-')}
-        ${makeTableRow('Transport', d.transport || '-')}
-        ${makeTableRow('Distance', d.distance || '0')}
-        ${makeTableRow('Way', d.way || '-')}
-        ${makeTableRow('Mileage Amount', d.mileageAmount || '0')}
-        ${makeTableRow('Remarks', cleanRemarks, true)}
-      `;
-
-      return `
-        ${makeClaimDetailSection('OT claim details', '', otRows)}
-        ${renderClaimApproverComments()}
-      `;
-    }
-
-    if (optLower.includes('travel request')) {
-      const generalRows = `
-        ${makeTableRow('Document Reference', `<span style="font-family: monospace; font-weight: 800;">${docRef}</span>`)}
-        ${makeTableRow('Status', docStatus)}
-        ${makeTableRow('Employee', employeeHtml)}
-        ${makeTableRow('Traveling Period', d.period || '-')}
-        ${makeTableRow('Travel Date', `${d.travelDateFrom || '-'} - ${d.travelDateTo || '-'}`)}
-        ${makeTableRow('Training Reference', d.trainingReference || '-')}
-        ${makeTableRow('Benefit Type', d.benefitType || '-')}
-        ${makeTableRow('Travel Type', d.travelType || '-')}
-        ${makeTableRow('Purpose', d.purpose || '-')}
-        ${makeTableRow('Destination', d.destination || '-')}
-        ${makeTableRow('Reason', d.reason || '-')}
-        ${makeTableRow('Car Type', d.carType || '-')}
-        ${makeTableRow('Selected Passenger(s)', d.passengers || '-')}
-        ${makeTableRow('Charge To', d.chargeTo || '-')}
-        ${makeTableRow('Accommodation', d.accommodation || 'No')}
-        ${makeTableRow('Flight', d.flight || 'No')}
-        ${makeTableRow('Remarks', cleanRemarks)}
-        ${makeTableRow('Attachment', d.attachment || 'No Data of Attachments', true)}
-      `;
-      const taskItems = Array.isArray(d.taskItems) && d.taskItems.length ? d.taskItems : [{}];
-      const taskGroups = taskItems.map(item => `
-        ${makeTableRow('Task', item.task || '-')}
-        ${makeTableRow('Purpose', item.purpose || '-')}
-        ${makeTableRow('Location', item.location || '-')}
-        ${makeTableRow('Dates', item.dates || '-', true)}
-      `);
-      const requestTravelItems = Array.isArray(d.requestTravelItems) && d.requestTravelItems.length ? d.requestTravelItems : [{}];
-      const travelingGroups = requestTravelItems.map(item => `
-        ${makeTableRow('Origin', item.origin || '-')}
-        ${makeTableRow('Destination', item.destination || '-')}
-        ${makeTableRow('Dates', item.dates || '-')}
-        ${makeTableRow('Est. Cost', item.estimatedCost || '0.00', true)}
-      `);
-      const accommodationItems = Array.isArray(d.accommodationItems) && d.accommodationItems.length ? d.accommodationItems : [{}];
-      const accommodationGroups = accommodationItems.map(item => `
-        ${makeTableRow('Hotel', item.hotel || '-')}
-        ${makeTableRow('Check In', item.checkIn || '-')}
-        ${makeTableRow('Check Out', item.checkOut || '-', true)}
-      `);
-
-      return `
-        ${makeClaimDetailSection('General', 'General', generalRows)}
-        ${makeClaimDetailSection('Task', 'Task', taskGroups)}
-        ${makeClaimDetailSection('Traveling', 'Traveling', travelingGroups)}
-        ${makeClaimDetailSection('Accommodation', 'Accommodation', accommodationGroups)}
-        ${renderClaimApproverComments()}
-      `;
-    }
-
-    if (optLower.includes('travel')) {
-      const claimDateFrom = d.claimDateFrom || d.claimDate || '-';
-      const claimDateTo = d.claimDateTo || d.claimDate || '-';
-      const generalRows = `
-        ${makeTableRow('Document Reference', `<span style="font-family: monospace; font-weight: 800;">${docRef}</span>`)}
-        ${makeTableRow('Status', docStatus)}
-        ${makeTableRow('Employee', employeeHtml)}
-        ${makeTableRow('Claim Period', d.period || '-')}
-        ${makeTableRow('Travelling Request #', d.travelRequestNo || '-')}
-        ${makeTableRow('Benefit Type', d.benefitType || d.travelType || '-')}
-        ${makeTableRow('Claim Date', `${claimDateFrom} - ${claimDateTo}`)}
-        ${makeTableRow('Cost Centre', d.costCentre || '-')}
-        ${makeTableRow('Charge To', d.chargeTo || '-')}
-        ${makeTableRow('Purpose', d.purpose || '-')}
-        ${makeTableRow('Project', d.project || '-')}
-        ${makeTableRow('Claim Currency', d.currency || 'RINGGIT MALAYSIA')}
-        ${makeTableRow('Claim Total', d.claimTotal || amountFormatted)}
-        ${makeTableRow('Remarks', cleanRemarks, true)}
-      `;
-      const mileageItems = Array.isArray(d.mileageItems) && d.mileageItems.length ? d.mileageItems : [d];
-      const mileageGroups = mileageItems.map(item => `
-        ${makeTableRow('Description', item.description || '-')}
-        ${makeTableRow('Origin', item.origin || '-')}
-        ${makeTableRow('Destination', item.destination || '-')}
-        ${makeTableRow('Dates', item.dates || '-')}
-        ${makeTableRow('Distance (KM)', item.distance || '0.00')}
-        ${makeTableRow('Amount', item.amount || '0.00', true)}
-      `);
-      const travelItems = Array.isArray(d.travelItems) && d.travelItems.length ? d.travelItems : [d];
-      const travelGroups = travelItems.map(item => `
-        ${makeTableRow('Origin', item.origin || '-')}
-        ${makeTableRow('Destination', item.destination || '-')}
-        ${makeTableRow('Dates', item.dates || '-')}
-        ${makeTableRow('Amount', item.amount || '0.00', true)}
-      `);
-      const expenseItems = Array.isArray(d.expenseItems) && d.expenseItems.length ? d.expenseItems : [d];
-      const expenseGroups = expenseItems.map(item => `
-        ${makeTableRow('Expense', item.expense || '-')}
-        ${makeTableRow('Dates', item.dates || '-')}
-        ${makeTableRow('Amount', item.amount || '0.00', true)}
-      `);
-
-      return `
-        ${makeClaimDetailSection('General', 'General', generalRows)}
-        ${makeClaimDetailSection('Mileage', 'Mileage', mileageGroups)}
-        ${makeClaimDetailSection('Travel', 'Travel', travelGroups)}
-        ${makeClaimDetailSection('Expense', 'Expense', expenseGroups)}
-        ${renderClaimApproverComments()}
-      `;
-    }
-
-    if (optLower.includes('entertainment')) {
-      const yesNo = value => (
-        value === true || /^(?:yes|true)$/i.test(String(value || '').trim()) ? 'Yes' : 'No'
-      );
-      const generalRows = `
-        ${makeTableRow('Document Reference', `<span style="font-family: monospace; font-weight: 800;">${docRef}</span>`)}
-        ${makeTableRow('Status', docStatus)}
-        ${makeTableRow('Employee', employeeHtml)}
-        ${makeTableRow('Claim Period', d.period || '-')}
-        ${makeTableRow('Travelling & Mileage Claim #', d.travellingMileageClaimNo || '-')}
-        ${makeTableRow('Benefit Type', d.benefitType || '-')}
-        ${makeTableRow('Claim Date', `${d.claimDateFrom || '-'} - ${d.claimDateTo || '-'}`)}
-        ${makeTableRow('Cost Centre', d.costCentre || '-')}
-        ${makeTableRow('Project', d.project || '-')}
-        ${makeTableRow('Entertained Person / Org', d.entertainedPersonOrg || '-')}
-        ${makeTableRow('Place Entertained', d.placeEntertained || '-')}
-        ${makeTableRow('Purpose', d.purpose || '-')}
-        ${makeTableRow('Currency', d.currency || 'RINGGIT MALAYSIA')}
-        ${makeTableRow('Total Amount', d.totalAmount || '0.00')}
-        ${makeTableRow('No. of Internal Attendees', d.internalAttendeeCount ?? '0')}
-        ${makeTableRow('No. of External Attendees', d.externalAttendeeCount ?? '0')}
-        ${makeTableRow('Avg Per Pax', d.avgPerPax || '0.00')}
-        ${makeTableRow('Board Approve', yesNo(d.boardApprove))}
-        ${makeTableRow('Gift / Ent', yesNo(d.giftEnt))}
-        ${makeTableRow('Trv / Hosp', yesNo(d.trvHosp))}
-        ${makeTableRow('Remarks', cleanRemarks, true)}
-      `;
-      const detailItems = Array.isArray(d.entertainmentDetails) && d.entertainmentDetails.length ? d.entertainmentDetails : [{}];
-      const detailGroups = detailItems.map(item => `
-        ${makeTableRow('Expense', item.expense || '-')}
-        ${makeTableRow('Date', item.date || '-')}
-        ${makeTableRow('Amount', item.amount || '0.00', true)}
-      `);
-      const internalAttendees = Array.isArray(d.internalAttendees) && d.internalAttendees.length ? d.internalAttendees : [{}];
-      const employeeGroups = internalAttendees.map(item => `
-        ${makeTableRow('Employee', item.employee || '-')}
-        ${makeTableRow('Position', item.position || '-')}
-        ${makeTableRow('Company', item.company || '-')}
-        ${makeTableRow('Department', item.department || '-', true)}
-      `);
-      const externalAttendees = Array.isArray(d.externalAttendees) && d.externalAttendees.length ? d.externalAttendees : [{}];
-      const guestGroups = externalAttendees.map(item => `
-        ${makeTableRow('Attendee', item.attendee || '-')}
-        ${makeTableRow('Company', item.company || '-')}
-        ${makeTableRow('Designation', item.designation || '-')}
-        ${makeTableRow('Relationship', item.relationship || '-', true)}
-      `);
-
-      return `
-        ${makeClaimDetailSection('General', 'General', generalRows)}
-        ${makeClaimDetailSection('Detail', 'Detail', detailGroups)}
-        ${makeClaimDetailSection('Employees', 'Employees', employeeGroups)}
-        ${makeClaimDetailSection('Guest', 'Guest', guestGroups)}
-        ${renderClaimApproverComments()}
-      `;
-    }
-
-    if (optLower.includes('advance')) {
-      const claimTotal = d.claimTotal || (typeof d.amount === 'number' ? d.amount.toFixed(2) : (d.amount || '0.00'));
-      const generalRows = `
-        ${makeTableRow('Document Reference', `<span style="font-family: monospace; font-weight: 800;">${docRef}</span>`)}
-        ${makeTableRow('Status', docStatus)}
-        ${makeTableRow('Employee', employeeHtml)}
-        ${makeTableRow('Claim Period', d.period || '-')}
-        ${makeTableRow('Claim Date', `${d.claimDateFrom || d.claimDate || '-'} - ${d.claimDateTo || d.claimDate || '-'}`)}
-        ${makeTableRow('Cost Centre', d.costCentre || '-')}
-        ${makeTableRow('Project', d.project || '-')}
-        ${makeTableRow('Claim Type', d.claimType || d.advanceType || '-')}
-        ${makeTableRow('Benefit Type', d.benefitType || '-')}
-        ${makeTableRow('Purpose', d.purpose || '-')}
-        ${makeTableRow('Claim Currency', d.currency || 'RINGGIT MALAYSIA')}
-        ${makeTableRow('Claim Total', claimTotal)}
-        ${makeTableRow('Remarks', cleanRemarks, true)}
-      `;
-      const expenseItems = Array.isArray(d.advanceExpenseItems) && d.advanceExpenseItems.length
-        ? d.advanceExpenseItems
-        : [{ expense: d.benefitType, description: d.subCatName || d.purpose, amount: claimTotal }];
-      const expenseGroups = expenseItems.map(item => `
-        ${makeTableRow('Expense', item.expense || '-')}
-        ${makeTableRow('Description', item.description || '-')}
-        ${makeTableRow('Amount', item.amount || '0.00', true)}
-      `);
-
-      return `
-        ${makeClaimDetailSection('General', 'General', generalRows)}
-        ${makeClaimDetailSection('Expense', 'Expense', expenseGroups)}
-        ${renderClaimApproverComments()}
-      `;
-    }
-
-    if (optLower.includes('expense')) {
-      const displayValue = value => {
-        const cleaned = String(value ?? '').trim();
-        return !cleaned || /^-?\s*select\b/i.test(cleaned) ? '-' : cleaned;
-      };
-      const claimTotal = d.claimTotal || (typeof d.amount === 'number' ? d.amount.toFixed(2) : (d.amount || '0.00'));
-      const generalRows = `
-        ${makeTableRow('Document Reference', `<span style="font-family: monospace; font-weight: 800;">${docRef}</span>`)}
-        ${makeTableRow('Status', docStatus)}
-        ${makeTableRow('Employee', employeeHtml)}
-        ${makeTableRow('Claim Period', d.period || '-')}
-        ${makeTableRow('Start Date', d.claimDateFrom || d.claimDate || '-')}
-        ${makeTableRow('End Date', d.claimDateTo || d.claimDate || '-')}
-        ${makeTableRow('Benefit Year', d.benefitYear || '-')}
-        ${makeTableRow('Benefit Type', displayValue(d.benefitType))}
-        ${makeTableRow('Purpose', d.purpose || '-')}
-        ${makeTableRow('Claim Currency', d.currency || 'RINGGIT MALAYSIA')}
-        ${makeTableRow('Claim Total', claimTotal)}
-        ${makeTableRow('Project', displayValue(d.project))}
-        ${makeTableRow('Cost Centre', d.costCentre || '-')}
-        ${makeTableRow('Remarks', cleanRemarks, true)}
-      `;
-      const itemizedDetails = Array.isArray(d.itemizedDetails) && d.itemizedDetails.length
-        ? d.itemizedDetails
-        : [{ description: d.purpose || d.expenseType, amount: claimTotal }];
-      const itemizedGroups = itemizedDetails.map(item => `
-        ${makeTableRow('Description', item.description || '-')}
-        ${makeTableRow('Amount', item.amount || '0.00', true)}
-      `);
-
-      return `
-        ${makeClaimDetailSection('Expense claim details', '', generalRows)}
-        ${makeClaimDetailSection('Itemized Details', 'Itemized Details', itemizedGroups)}
-        ${renderClaimApproverComments()}
-      `;
-    }
-
-    // Section 1: Specific Claim Rows based on Claim Type
-    let specificRowsHtml = '';
-
-    if (optLower.includes('medical')) {
-      specificRowsHtml = `
-        ${makeTableRow('Medical Type', `<span style="font-weight: 800; color: var(--purple-primary);">${d.subCatName || d.medicalType || 'General Consultation'}</span>`)}
-        ${makeTableRow('Benefit Year', d.benefitYear || '2026')}
-        ${makeTableRow('Patient Type', d.patientType || 'Employee')}
-        ${makeTableRow('Patient Name', `<strong style="color: var(--text-primary);">${d.patientName || d.userName || 'Employee'}</strong>`)}
-        ${makeTableRow('Treatment Type', d.treatmentType || 'Out Patient')}
-        ${makeTableRow('Clinic / Hospital', `<strong style="color: var(--text-primary);">${d.clinicName || 'Qualitas Health Clinic KLCC'}</strong> ${d.clinicLocation ? `<div style="font-size: 11px; color: var(--text-muted);">${d.clinicLocation}</div>` : ''}`)}
-        ${makeTableRow('Sickness Type', d.sicknessType || 'Acute Upper Respiratory Infection')}
-        ${makeTableRow('Entitled Balance', `<span style="font-weight: 800; font-family: monospace;">RM ${d.entitledBalance || '800.00'}</span>`)}
-        ${makeTableRow('Usable Balance', `<span style="font-weight: 800; color: #10b981; font-family: monospace;">RM ${d.usableBalance || '665.00'}</span>`)}
-        ${makeTableRow('Receipt Date', d.receiptDate || d.claimDate || '07/09/2026')}
-        ${makeTableRow('Receipt No.', `<span style="font-family: monospace; font-weight: 800;">${d.receiptNo || 'QC-5510'}</span>`)}
-        ${makeTableRow('Expense Detail', d.detailExpenses || 'CONSULTATION & MEDICATION')}
-        ${makeTableRow('Claim Amount', `<span style="font-size: 14.5px; font-weight: 900; color: var(--purple-primary); font-family: monospace;">${amountFormatted}</span>`)}
-        ${makeTableRow('Currency', d.currency || d.detailCurrency || 'RINGGIT MALAYSIA')}
-        ${makeTableRow('Remarks', d.remarks || d.purpose || 'Doctor consultation and prescribed medicine', true)}
-      `;
-    } else if (optLower.includes('ot') || optLower.includes('overtime')) {
-      const otHours = d.hours || (d.otHours ? `${d.otHours} hrs` : '5.0 hrs');
-      specificRowsHtml = `
-        ${makeTableRow('OT Type', `<span style="font-weight: 800; color: #f59e0b;">${d.otType || d.subCatName || '1.5 OT'}</span>`)}
-        ${makeTableRow('OT Date', d.otDate || d.claimDate || '15/04/2024')}
-        ${makeTableRow('Shift', d.shift || '8.00AM - 5.30PM')}
-        ${makeTableRow('OT Time Window', `<span style="font-family: monospace; font-weight: 800;">${d.startTime || '18:57:00'}</span> to <span style="font-family: monospace; font-weight: 800;">${d.endTime || '23:57:00'}</span>`)}
-        ${makeTableRow('OT Hours', `<span style="font-size: 13.5px; font-weight: 800; color: var(--purple-primary);">${otHours}</span>`)}
-        ${makeTableRow('Break Hours', d.breakHours || '1.0 hr')}
-        ${makeTableRow('Cross Day', d.crossDay || 'False')}
-        ${makeTableRow('Reason', d.reason || d.purpose || 'OTHERS')}
-        ${makeTableRow('Meal Allowance', (d.mealAllowance && d.mealAllowance !== '- Select Meal Allowance -') ? `${d.mealAllowance} ${d.mealAllowanceAmount && d.mealAllowanceAmount !== '0' ? '(RM ' + d.mealAllowanceAmount + ')' : ''}` : 'None')}
-        ${makeTableRow('Transport', (d.transport && d.transport !== '- Select Transport -') ? `${d.transport} ${d.distance && d.distance !== '0' ? '• ' + d.distance + ' km' : ''}` : 'Personal Transport')}
-        ${makeTableRow('Total Amount', `<span style="font-size: 14.5px; font-weight: 900; color: var(--purple-primary); font-family: monospace;">${amountFormatted}</span>`)}
-        ${makeTableRow('Remarks', d.remarks || 'Production maintenance & ad-hoc shift coverage', true)}
-      `;
-    } else if (optLower.includes('travel')) {
-      specificRowsHtml = `
-        ${makeTableRow('Travel Type', `<span style="font-weight: 800; color: var(--purple-primary);">${d.travelType || d.subCatName || 'Mileage Claim'}</span>`)}
-        ${makeTableRow('Travel Date', d.claimDate || '13 Sep 2026')}
-        ${makeTableRow('Destination', `<strong style="color: var(--text-primary);">${d.destination || 'Penang Logistics Hub & Northern Depot'}</strong>`)}
-        ${makeTableRow('Transport Mode', d.transportMode || 'Personal Vehicle (Sedan)')}
-        ${makeTableRow('Distance', `<span style="font-family: monospace; font-weight: 800;">${d.distance || '120 km'}</span>`)}
-        ${makeTableRow('Mileage Rate', d.mileageRate || 'RM 0.80 / km')}
-        ${makeTableRow('Mileage Amount', `RM ${d.mileageAmount || '96.00'}`)}
-        ${makeTableRow('Toll / Parking', `RM ${d.tollsParking || '24.00'}`)}
-        ${makeTableRow('Total Amount', `<span style="font-size: 14.5px; font-weight: 900; color: var(--purple-primary); font-family: monospace;">${amountFormatted}</span>`)}
-        ${makeTableRow('Receipt / Log', d.receipt || 'GPS Log & Toll Receipt')}
-        ${makeTableRow('Remarks', d.purpose || d.remarks || 'Site inspection and equipment servicing travel', true)}
-      `;
-    } else if (optLower.includes('entertainment')) {
-      specificRowsHtml = `
-        ${makeTableRow('Entertainment Type', `<span style="font-weight: 800; color: var(--purple-primary);">${d.subCatName || 'Client Lunch'}</span>`)}
-        ${makeTableRow('Event Date', d.claimDate || '09 Sep 2026')}
-        ${makeTableRow('Venue / Location', `<strong style="color: var(--text-primary);">${d.venue || 'Nobu Kuala Lumpur'}</strong>`)}
-        ${makeTableRow('Attendees / Client', d.clientAttendees || 'Mr. Robert Tan (CEO, Alpha Corp) + 2 pax')}
-        ${makeTableRow('Receipt No.', `<span style="font-family: monospace; font-weight: 800;">${d.receipt || 'Nobu Invoice #1029'}</span>`)}
-        ${makeTableRow('Currency', d.currency || 'RINGGIT MALAYSIA')}
-        ${makeTableRow('Total Amount', `<span style="font-size: 14.5px; font-weight: 900; color: var(--purple-primary); font-family: monospace;">${amountFormatted}</span>`)}
-        ${makeTableRow('Purpose', d.purpose || 'Quarterly review lunch with key enterprise stakeholders')}
-        ${makeTableRow('Remarks', d.remarks || 'Annual enterprise SLA renewal discussion', true)}
-      `;
-    } else if (optLower.includes('advance')) {
-      specificRowsHtml = `
-        ${makeTableRow('Advance Type', `<span style="font-weight: 800; color: var(--purple-primary);">${d.advanceType || 'Overseas Travel Advance'}</span>`)}
-        ${makeTableRow('Required Date', `<strong style="color: #f59e0b;">${d.requiredDate || '24 Sep 2026'}</strong>`)}
-        ${makeTableRow('Settlement Date', `<strong style="color: var(--text-primary);">${d.settlementDate || '15 Oct 2026'}</strong>`)}
-        ${makeTableRow('Other Reference', `<span style="font-family: monospace; font-weight: 800;">${d.otherRef || 'ADV-2026-0902'}</span>`)}
-        ${makeTableRow('Currency', d.currency || 'RINGGIT MALAYSIA')}
-        ${makeTableRow('Requested Amount', `<span style="font-size: 14.5px; font-weight: 900; color: var(--purple-primary); font-family: monospace;">${amountFormatted}</span>`)}
-        ${makeTableRow('Purpose / Reason', d.purpose || 'Tokyo Design Summit 2026 travel advance')}
-        ${makeTableRow('Remarks', d.remarks || 'Advance requisition for flight and lodging booking', true)}
-      `;
-    } else if (optLower.includes('expense')) {
-      specificRowsHtml = `
-        ${makeTableRow('Expense Category', `<span style="font-weight: 800; color: var(--purple-primary);">${d.expenseType || 'Subscriptions & Software'}</span>`)}
-        ${makeTableRow('Expense Date', d.claimDate || '20 Sep 2026')}
-        ${makeTableRow('Merchant / Supplier', `<strong style="color: var(--text-primary);">${d.merchant || 'Digital Tools SaaS Inc.'}</strong>`)}
-        ${makeTableRow('Receipt No.', `<span style="font-family: monospace; font-weight: 800;">${d.receiptNo || 'INV-29014'}</span>`)}
-        ${makeTableRow('Tax Invoice', d.taxInvoice || 'Yes (SST 6%)')}
-        ${makeTableRow('Currency', d.currency || 'RINGGIT MALAYSIA')}
-        ${makeTableRow('Total Amount', `<span style="font-size: 14.5px; font-weight: 900; color: var(--purple-primary); font-family: monospace;">${amountFormatted}</span>`)}
-        ${makeTableRow('Purpose', d.purpose || 'Cloud development tools and sandbox subscriptions')}
-        ${makeTableRow('Remarks', d.remarks || 'Standard department subscription reimbursement', true)}
-      `;
-    } else {
-      // Default: Benefit Claim
-      specificRowsHtml = `
-        ${makeTableRow('Benefit Type', `<span style="font-weight: 800; color: var(--purple-primary);">${d.subCatName || d.benefitType || 'PERSONAL ALLOWANCE'}</span>`)}
-        ${makeTableRow('Entitlement Year', d.entitlementYear || '2026')}
-        ${makeTableRow('Claim Period', `<span style="font-family: monospace; font-weight: 800;">${d.period || '202609'}</span>`)}
-        ${makeTableRow('Date Period', d.fromDate ? `${d.fromDate} <span style="color: var(--text-muted); margin: 0 4px;">to</span> ${d.toDate}` : (d.claimDate || '12 Sep 2026'))}
-        ${makeTableRow('Claim Quantity', `${d.claimQuantity !== undefined ? d.claimQuantity : '1'} Unit`)}
-        ${makeTableRow('Receipt No.', `<span style="font-family: monospace; font-weight: 800;">${d.receiptNo || d.receipt || 'FP-8891'}</span>`)}
-        ${makeTableRow('Other Reference', d.otherRef || '-')}
-        ${makeTableRow('Currency', d.currency || 'RINGGIT MALAYSIA')}
-        ${makeTableRow('Claim Amount', `<span style="font-size: 14.5px; font-weight: 900; color: var(--purple-primary); font-family: monospace;">${amountFormatted}</span>`)}
-        ${makeTableRow('Remarks', d.remarks || d.purpose || 'General benefit claim reimbursement', true)}
-      `;
-    }
-
-    return `
-      <!-- SECTION 1: CLAIM APPLICATION DETAILS -->
-      <div style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 18px; overflow: hidden; box-shadow: 0 4px 16px rgba(0,0,0,0.06); flex-shrink: 0;">
-        <table style="width: 100%; border-collapse: collapse; font-size: 12px; text-align: left;">
-          <tbody>
-            ${makeTableRow('Document Reference', `<span style="font-family: monospace; letter-spacing: 0.3px; font-weight: 800; color: var(--text-primary);">${docRef}</span>`)}
-            ${makeTableRow('Document Status', docStatus)}
-            ${makeTableRow('Claim Type', `<span style="color: var(--purple-primary); font-weight: 800; font-size: 12.5px;">${claimType.toUpperCase()}</span>`)}
-            ${specificRowsHtml}
-          </tbody>
-        </table>
-      </div>
-
-      <!-- SECTION 2: EMPLOYEE & AUDIT RECORD -->
-      <div style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 18px; overflow: hidden; box-shadow: 0 4px 16px rgba(0,0,0,0.06); flex-shrink: 0;">
-        <table style="width: 100%; border-collapse: collapse; font-size: 12px; text-align: left;">
-          <tbody>
-            <tr>
-              <td style="padding: 10px 14px; border-bottom: 1px solid var(--border-subtle); border-right: 1px solid var(--border-subtle); font-weight: 700; color: var(--text-muted); background: var(--bg-input); width: 38%; vertical-align: top;">Employee</td>
-              <td style="padding: 10px 14px; border-bottom: 1px solid var(--border-subtle); color: var(--text-primary); width: 62%;">
-                <div style="font-weight: 800; font-size: 13.5px; color: var(--text-primary);">${d.userName || 'Employee'}</div>
-                <!-- AGENTS.md Employee ID Presentation Standard: directly BELOW name, leading #, subtle muted typography -->
-                <div style="font-size: 11.5px; font-weight: 700; color: var(--text-muted); opacity: 0.8; font-family: monospace, sans-serif; margin-top: 2px; margin-bottom: 2px;">#${empNo}</div>
-                <div style="font-size: 11px; font-weight: 600; color: var(--text-muted);">${deptClean}</div>
-              </td>
-            </tr>
-            ${makeTableRow('Department', deptClean)}
-            ${makeTableRow('Submitter', d.userName || 'Employee')}
-            ${makeTableRow('Submit Date', `<span style="font-family: monospace; font-weight: 700;">${d.submitDate || d.claimDate || '13 Sep 2026'}</span>`)}
-            <tr>
-              <td style="padding: 10px 14px; border-bottom: none; border-right: 1px solid var(--border-subtle); font-weight: 700; color: var(--text-muted); background: var(--bg-input); width: 38%; vertical-align: top;">Approval Stage</td>
-              <td style="padding: 10px 14px; border-bottom: none; color: var(--text-primary); width: 62%;">
-                <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
-                  <span style="font-size: 11px; font-weight: 800; color: #7c3aed; background: rgba(124, 58, 237, 0.12); padding: 2px 7px; border-radius: 6px; border: 1px solid rgba(124, 58, 237, 0.25);">Level 1 of 2</span>
-                  <span style="font-size: 10.5px; font-weight: 700; color: #059669; background: rgba(16, 185, 129, 0.12); padding: 2px 7px; border-radius: 6px;">● Pending Your Action</span>
-                </div>
-                <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px; line-height: 1.4;">
-                  Role: <strong style="color: var(--text-primary);">Line Manager Approval</strong>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <!-- SECTION 3: VERIFICATION & APPROVER ACTION -->
-      <div style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 18px; overflow: hidden; box-shadow: 0 4px 16px rgba(0,0,0,0.06); flex-shrink: 0;">
-        <table style="width: 100%; border-collapse: collapse; font-size: 12px; text-align: left;">
-          <tbody>
-            <tr>
-              <td style="padding: 10px 14px; border-bottom: 1px solid var(--border-subtle); border-right: 1px solid var(--border-subtle); font-weight: 700; color: var(--text-muted); background: var(--bg-input); width: 38%; vertical-align: middle;">Supporting Doc</td>
-              <td style="padding: 10px 14px; border-bottom: 1px solid var(--border-subtle); color: var(--text-primary); width: 62%;">
-                <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
-                  <div style="display: flex; align-items: center; gap: 6px; min-width: 0;">
-                    <i class="fa-solid fa-paperclip" style="color: var(--purple-primary); font-size: 13px;"></i>
-                    <span style="font-size: 11.5px; font-weight: 700; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 130px;">${receiptFile}</span>
-                  </div>
-                  <button type="button" onclick="if (typeof window.ClaimsEngine.showToast === 'function') window.ClaimsEngine.showToast('Opening receipt preview: ${receiptFile.replace(/'/g, "\\'")}', 'info')" style="background: var(--bg-input); border: 1px solid var(--border-subtle); color: var(--purple-primary); padding: 4px 9px; border-radius: 7px; font-size: 10.5px; font-weight: 800; cursor: pointer; flex-shrink: 0;">
-                    View ↗
-                  </button>
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <td style="padding: 10px 14px; border-bottom: none; border-right: 1px solid var(--border-subtle); font-weight: 700; color: var(--text-muted); background: var(--bg-input); width: 38%; vertical-align: middle;">Comments</td>
-              <td style="padding: 8px 12px; border-bottom: none; width: 62%;">
-                <input type="text" id="claimDetailApproverComments" placeholder="Add approver action comments (optional)..." style="width: 100%; padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border-subtle); background: var(--bg-input); color: var(--text-primary); font-size: 12px; font-weight: 500; outline: none; box-sizing: border-box;">
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    `;
-  }
-
-  // Backward-compatibility aliases
-  function renderBenefitClaimDetail(d) { return renderUnifiedClaimDetail(d); }
-  function renderMedicalClaimDetail(d) { return renderUnifiedClaimDetail(d); }
-  function renderOTClaimDetail(d) { return renderUnifiedClaimDetail(d); }
-  function renderTravelClaimDetail(d) { return renderUnifiedClaimDetail(d); }
-  function renderEntertainmentClaimDetail(d) { return renderUnifiedClaimDetail(d); }
-  function renderAdvanceClaimDetail(d) { return renderUnifiedClaimDetail(d); }
-  function renderExpenseClaimDetail(d) { return renderUnifiedClaimDetail(d); }
 
   function triggerClaimViewDetails(id = currentSelectedClaimData?.id) {
     if (id == null) return;
@@ -1630,7 +1067,9 @@
 
     const bodyEl = document.getElementById('claimDetailsDynamicBody');
     if (bodyEl) {
-      bodyEl.innerHTML = renderUnifiedClaimDetail(data);
+      bodyEl.innerHTML = renderClaimApproverComments();
+      bodyEl.prepend(optLower.includes('benefit') ? BenefitClaimForm.create(data) : ClaimReview.create(data));
+      bodyEl.closest('.phone-container').scrollTop = 0;
     }
 
     const commentInput = document.getElementById('claimDetailApproverComments');
@@ -1662,7 +1101,7 @@
     const commentInput = document.getElementById('claimDetailApproverComments');
     const commentText = commentInput ? commentInput.value.trim() : '';
 
-    teamQueue = teamQueue.filter(q => String(q.id) !== String(targetId));
+    if (!item || !finishClaims([item], action, commentText)) return;
     renderTeamQueue();
     closeClaimDetailsModal();
 
@@ -1768,6 +1207,19 @@
     handleGlobalBack
   };
 
+  function refreshSavedClaims() {
+    syncSavedClaimQueue();
+    renderTeamQueue();
+    if (currentSelectedClaimData?.savedClaim && typeof PendingApprovalPage !== 'undefined' && PendingApprovalPage.active &&
+        !teamQueue.some(item => item.id === currentSelectedClaimData.id)) PendingApprovalPage.back();
+  }
+  window.addEventListener('storage', event => {
+    if (event.key === ClaimRequestStore.key || event.key === null) {
+      refreshSavedClaims();
+      if (document.querySelector('.work-status-card')) renderIndividualDashboard();
+    }
+  });
+
   const selectAllPending = document.getElementById('claimsSelectAllPending');
   if (selectAllPending) {
     renderTeamQueue();
@@ -1785,7 +1237,7 @@
       const ids = new Set(boxes.map(box => box.closest('.approval-request-card').dataset.itemId));
       const message = formatBulkApprovalResult(action, ids.size, 'claim');
       if (!message) return;
-      teamQueue = teamQueue.filter(item => !ids.has(String(item.id)));
+      if (!finishClaims(teamQueue.filter(item => ids.has(String(item.id))), action)) return;
       renderTeamQueue();
       showToast(message);
     });

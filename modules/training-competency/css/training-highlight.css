@@ -1,7 +1,4 @@
 /* Reuse the Leave/Highlight report and three-card chart, trend and analysis surfaces. */
-.training-highlight-person { margin: 0 2px 14px; }
-.training-highlight-person strong { display: block; color: var(--text-primary); font-size: 15px; font-weight: 800; line-height: 1.4; overflow-wrap: anywhere; }
-.training-highlight-person span { display: block; margin: 3px 0 4px; color: var(--text-muted); font: 700 11.5px/1.3 monospace, sans-serif; opacity: .8; }
 .training-highlight-page .training-highlight-detail-table { min-height: 0; }
 .training-highlight-detail-table .attendance-report-table { min-width: 0; table-layout: fixed; }
 .training-highlight-detail-table th:first-child { width: 96px; }
@@ -12,13 +9,7 @@
 .training-highlight-page .attendance-report-view-all button { cursor: pointer; }
 .training-highlight-details-overlay { display: flex; }
 .training-highlight-details-overlay .detail-popout-body { display: grid !important; gap: 14px !important; }
-.training-highlight-details-overlay .training-highlight-person { margin: 0; }
-.training-highlight-details-overlay .training-highlight-person strong { color: var(--detail-text); }
-.training-highlight-details-overlay .training-highlight-person span { color: var(--detail-muted); }
-.training-highlight-details-overlay .detail-popout-header { flex-basis: 60px !important; height: 60px !important; min-height: 60px !important; }
 .training-highlight-details-overlay .detail-popout-header .detail-popout-title { text-transform: none !important; letter-spacing: 0 !important; font-size: 14px !important; }
-.training-highlight-details-overlay .detail-popout-title #trainingHighlightDetailName { margin: 0; color: inherit; font: inherit; opacity: 1; }
-.training-highlight-details-overlay .detail-popout-header .detail-popout-subtitle { color: rgba(255,255,255,.86) !important; font: 700 11.5px/14px monospace,sans-serif !important; opacity: .8; margin-bottom: 4px !important; }
 .training-highlight-details-overlay .attendance-report-summary { margin: 0; padding: 12px; }
 .training-highlight-details-overlay .training-highlight-detail-table { margin: 0; border-radius: 12px; }
 @media print {

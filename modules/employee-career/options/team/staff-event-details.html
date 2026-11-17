@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PeopleHCM - Staff Events</title>
+  <script>document.documentElement.dataset.theme = new URLSearchParams(location.search).get('theme') === 'light' ? 'light' : 'dark';</script>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="../../../../css/theme.css">
+  <link rel="stylesheet" href="../../../../css/app.css">
+  <link rel="stylesheet" href="../../css/employee-career.css">
+  <link rel="stylesheet" href="../../css/employee-career-team.css">
+  <script src="../../../../js/components.js"></script>
+  <script src="../../../../js/app.js" defer></script>
+  <script src="../../js/staff-events-data.js" defer></script>
+  <script src="../../js/employee-career-team.js" defer></script>
+</head>
+<body class="employee-career-option-page">
+  <preview-top-bar active-page="v2"></preview-top-bar>
+  <div class="phone-container">
+    <header class="employee-career-header">
+      <phone-status-bar time="9:41"></phone-status-bar>
+      <div class="employee-career-header-row">
+        <a id="staffEventBack" class="employee-career-back" href="../../index.html?scope=team#employeeCareerStaffEvents" aria-label="Back to Employee and Career"><i class="fa-solid fa-chevron-left" aria-hidden="true"></i></a>
+        <div class="employee-career-heading"><h1 id="staffEventTitle">Staff Events</h1></div>
+        <span class="employee-career-header-spacer" aria-hidden="true"></span>
+      </div>
+    </header>
+    <main class="main-content employee-career-content">
+      <div class="employee-career-event-card">
+        <ul id="staffEventList" class="employee-career-event-list" aria-labelledby="staffEventTitle"></ul>
+        <p id="staffEventEmpty" class="career-event-empty" hidden></p>
+      </div>
+      <p id="staffEventAvailable" class="career-event-available" hidden></p>
+    </main>
+    <phone-bottom-nav active="apps"></phone-bottom-nav>
+    <left-profile-drawer></left-profile-drawer>
+    <notification-sheet></notification-sheet>
+    <favourite-sheet></favourite-sheet>
+  </div>
+</body>
+</html>

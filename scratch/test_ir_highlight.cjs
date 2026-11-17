@@ -41,7 +41,7 @@ const pageUrl = theme => pathToFileURL(path.join(root, 'modules/employee-career/
       await page.click('#irHighlightTable tbody tr .ir-highlight-cases-button');
       assert.equal(await page.$eval('#irHighlightDetailsOverlay', node => node.hidden), false);
       assert.equal(await page.$eval('#irHighlightDetailName', node => node.textContent.trim()), 'Farhan Binti Rahmat');
-      assert.equal(await page.$eval('#irHighlightDetailEmpNo', node => node.textContent.trim()), '#EBB12');
+      assert.equal(await page.$('#irHighlightDetailEmpNo'), null);
       assert.deepEqual(await page.$$eval('#irHighlightDetailsTable thead th', nodes => nodes.map(node => node.textContent.trim())), ['Date', 'Offence', 'Action']);
       assert.equal(await page.$$eval('#irHighlightDetailsTable tbody tr', nodes => nodes.length), 3);
       assert.deepEqual(await page.$eval('#irHighlightDetailsTable tbody tr', row => [...row.cells].map(cell => cell.textContent.trim())), ['14 Feb 2026', 'Late Attendance', 'Verbal Warning']);

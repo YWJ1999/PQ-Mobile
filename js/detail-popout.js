@@ -58,7 +58,7 @@
       if (node === close) continue;
       if (!node.textContent.trim() && !node.querySelector('button') && !node.contains(title)) addClass(node, 'detail-popout-decoration');
     }
-    for (const node of header.querySelectorAll('p,small,[id$="Sub"],[id$="Subtitle"],#detailEmpNo')) addClass(node, 'detail-popout-subtitle');
+    for (const node of header.querySelectorAll('p,small,[id$="Sub"],[id$="Subtitle"]')) addClass(node, 'detail-popout-subtitle');
     // Some header metadata is a div next to the title, not a semantic subtitle.
     for (const node of title.parentElement.children) {
       if (node !== title && !node.contains(close) && clean(node.textContent) && !node.matches('button')) addClass(node, 'detail-popout-subtitle');

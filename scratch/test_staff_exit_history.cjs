@@ -15,14 +15,13 @@ const url = pathToFileURL(path.resolve(__dirname, '../modules/employee-career/op
       await page.setViewport({ width, height: 900 });
       await page.goto(url + '?category=staff-exit&theme=' + theme, { waitUntil: 'load' });
       assert.deepEqual(await page.$$eval('#teamHistoryList .history-card-item', cards => cards.map(card => ({
-        name: card.querySelector('.team-history-employee-name').textContent.trim(),
-        id: card.querySelector('.team-history-employee-name + .team-history-employee-id').textContent.trim(),
+        name: card.querySelector('.team-history-employee-identity').textContent.trim(),
         position: card.querySelector('.team-history-employee-position')?.textContent.trim(),
         status: card.querySelector('.status-pill').textContent.trim(),
         fields: [...card.querySelectorAll('.history-card-row')].map(row => [...row.children].map(node => node.textContent.trim()))
       }))), [
-        { name: 'Daniel Wong', id: '#EBB02', position: 'Product Designer', status: 'Pending', fields: [['Notice Date', '2 Oct 2026'], ['Last Paid Date', '31 Oct 2026'], ['Reason', 'Career Opportunity']] },
-        { name: 'Nur Izzati', id: '#EBB03', position: 'Finance Analyst', status: 'Approved', fields: [['Notice Date', '15 Sept 2026'], ['Last Paid Date', '30 Sept 2026'], ['Reason', 'Contract Completed']] }
+        { name: 'EBB02 - Daniel Wong', position: 'Product Designer', status: 'Pending', fields: [['Notice Date', '2 Oct 2026'], ['Last Paid Date', '31 Oct 2026'], ['Reason', 'Career Opportunity']] },
+        { name: 'EBB03 - Nur Izzati', position: 'Finance Analyst', status: 'Approved', fields: [['Notice Date', '15 Sept 2026'], ['Last Paid Date', '30 Sept 2026'], ['Reason', 'Contract Completed']] }
       ]);
       assert.equal(await page.$eval('#teamExitFilterBar', node => node.hidden), false);
       assert.equal(await page.$eval('#teamConfirmationFilterBar', node => node.hidden), true);
@@ -71,31 +70,31 @@ const url = pathToFileURL(path.resolve(__dirname, '../modules/employee-career/op
         }, values);
         await page.click('#teamExitApplyFilter');
       };
-      const names = () => page.$$eval('#teamHistoryList .team-history-employee-name', nodes => nodes.map(node => node.textContent.trim()));
+      const names = () => page.$$eval('#teamHistoryList .team-history-employee-identity', nodes => nodes.map(node => node.textContent.trim()));
       await apply({ keyword: '#ebb02' });
-      assert.deepEqual(await names(), ['Daniel Wong'], 'Keyword supports employee IDs including #');
+      assert.deepEqual(await names(), ['EBB02 - Daniel Wong'], 'Keyword supports employee IDs including #');
       await apply({ keyword: 'FINANCE ANALYST' });
-      assert.deepEqual(await names(), ['Nur Izzati'], 'Keyword supports position and ignores case');
+      assert.deepEqual(await names(), ['EBB03 - Nur Izzati'], 'Keyword supports position and ignores case');
       await apply({ status: 'Approved' });
-      assert.deepEqual(await names(), ['Nur Izzati']);
+      assert.deepEqual(await names(), ['EBB03 - Nur Izzati']);
       await apply({ status: 'Submitted' });
-      assert.deepEqual(await names(), ['Daniel Wong']);
+      assert.deepEqual(await names(), ['EBB02 - Daniel Wong']);
       await apply({ startDate: '2026-09-15', endDate: '2026-09-15' });
-      assert.deepEqual(await names(), ['Nur Izzati'], 'Notice Date filtering includes both date boundaries');
+      assert.deepEqual(await names(), ['EBB03 - Nur Izzati'], 'Notice Date filtering includes both date boundaries');
       await apply({ keyword: 'career opportunity', startDate: '2026-10-02', endDate: '2026-10-02', status: 'Submitted' });
-      assert.deepEqual(await names(), ['Daniel Wong'], 'Keyword, dates and status combine');
+      assert.deepEqual(await names(), ['EBB02 - Daniel Wong'], 'Keyword, dates and status combine');
       await page.click('[data-team-history-kind="staff-confirmation"]');
       assert.equal(await page.$eval('#teamHistoryRecordCount', node => node.textContent.trim()), '2', 'Exit filters do not affect Staff Confirmation');
       await page.click('[data-team-history-kind="staff-exit"]');
-      assert.deepEqual(await names(), ['Daniel Wong'], 'Exit filters survive switching tabs');
+      assert.deepEqual(await names(), ['EBB02 - Daniel Wong'], 'Exit filters survive switching tabs');
       await page.click('#teamExitFilterTrigger');
       await page.$eval('#teamExitKeyword', node => { node.value = 'unapplied'; });
       await page.keyboard.press('Escape');
-      assert.deepEqual(await names(), ['Daniel Wong'], 'Closing does not apply draft filter edits');
+      assert.deepEqual(await names(), ['EBB02 - Daniel Wong'], 'Closing does not apply draft filter edits');
       await apply({ startDate: '2026-10-31', endDate: '2026-10-01' });
       assert.equal(await page.$eval('#teamExitFilterOverlay', node => node.hidden), false);
       assert.equal(await page.$eval('#teamExitFilterError', node => node.hidden), false);
-      assert.deepEqual(await names(), ['Daniel Wong'], 'Invalid date ranges leave applied filters unchanged');
+      assert.deepEqual(await names(), ['EBB02 - Daniel Wong'], 'Invalid date ranges leave applied filters unchanged');
       await page.click('#teamExitResetFilter');
       assert.equal(await page.$eval('#teamExitFilterOverlay', node => node.hidden), true);
       assert.equal(await page.$eval('#teamHistoryRecordCount', node => node.textContent.trim()), '2');

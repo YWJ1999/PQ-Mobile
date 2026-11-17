@@ -63,7 +63,7 @@ const puppeteer = require('puppeteer');
         });
         assert.deepEqual(cards[0].values, ['08:09 · 19:40', '8.00', '2.00', 'Unapproved OT']);
         assert.deepEqual(cards[1].values, ['07:38', '0.00', '0.00', 'Missing Clock Out']);
-        assert.deepEqual(cards.map(card => card.status), ['Unapproved OT', 'Missing Clock Out']);
+        assert.deepEqual(cards.map(card => card.status), ['Unapproved OT', 'Unpaired Clock Entry']);
         assert.ok(await page.$eval('.main-content', node => node.scrollWidth <= node.clientWidth + 1));
         if (width === 390) await page.screenshot({ path: path.join(__dirname, `pending_attendance_feedback_${theme}.png`) });
       }

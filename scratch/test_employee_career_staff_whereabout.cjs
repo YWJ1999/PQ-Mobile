@@ -47,9 +47,9 @@ const url = pathToFileURL(path.resolve(__dirname, '../modules/employee-career/op
         assert.ok(await page.$('#staffWhereaboutDetails'), 'Staff Whereabout needs a card details popup');
         assert.equal(await page.$eval('#staffWhereaboutDetails', n => n.hidden), false, 'Clicking a staff card must open its details');
         assert.deepEqual(await page.$$eval('#staffWhereaboutDetails .detail-popout-label', nodes => nodes.map(n => n.textContent)),
-          ['Name', 'Branch', 'Department', 'Project', 'Task', 'State', 'Date', 'Description', 'Status', 'Remark']);
+          ['Name', 'Status', 'Branch', 'Department', 'Project', 'Task', 'State', 'Date', 'Description', 'Remark']);
         assert.deepEqual(await page.$$eval('#staffWhereaboutDetails .detail-popout-value', nodes => nodes.map(n => n.textContent)),
-          ['Andrew', '-', '-', '-', '-', '-', '5 Oct 2026', '-', '-', '-']);
+          ['Andrew', '—', '-', '-', '-', '-', '-', '5 Oct 2026', '-', '-']);
         assert.equal(await page.$('#staffWhereaboutDetails .staff-whereabout-detail-id'), null);
         assert.ok(await page.$eval('#staffWhereaboutDetails .detail-popout-body', n => n.scrollWidth <= n.clientWidth + 1));
         assert.ok(await page.$eval('#staffWhereaboutDetails', n => {

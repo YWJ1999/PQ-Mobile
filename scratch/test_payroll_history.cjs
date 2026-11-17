@@ -23,6 +23,8 @@ async function run() {
   const browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox'] });
   try {
     const page = await browser.newPage();
+    await page.setRequestInterception(true);
+    page.on('request', req => /^https?:/.test(req.url()) ? req.abort() : req.continue());
     const faults = [];
     page.on('pageerror', error => faults.push(error.message));
     await page.setViewport({ width: 390, height: 844 });
@@ -125,7 +127,7 @@ async function run() {
             .filter(node => node.getClientRects().length && node.scrollWidth > node.clientWidth + 1)
             .map(node => node.className));
           assert.deepEqual(overflow, [], `${theme} ${width}px ${state} must fit horizontally`);
-          if (width === 390) await page.screenshot({ path: path.join(__dirname, `payroll_history_${state}_${theme}.png`) });
+          if (width === 390) await page.screenshot({ path: path.join(process.env.PAYROLL_SCREENSHOTS || __dirname, `payroll_history_${state}_${theme}.png`) });
           if (state !== 'list') await page.keyboard.press('Escape');
         }
       }
@@ -146,7 +148,7 @@ async function run() {
     await page.click('[data-reference="PDR000000000004"] .history-card-main');
     assert.deepEqual(await page.$$eval('#historyDetailActions [data-history-action]', nodes => nodes.map(node => node.textContent.trim())), ['Submit', 'Delete Record']);
     const deductionRows = await page.$$eval('#historyDetailBody tr', rows => Object.fromEntries(rows.map(row => [row.querySelector('th').textContent.trim(), row.querySelector('td').textContent.replace(/\s+/g, ' ').trim()])));
-    assert.deepEqual(Object.keys(deductionRows), ['Reference #', 'Emp #', 'Name', 'Status', 'Submit Date', 'Request Type', 'Deduction Type', 'Period', 'Cycle', 'Deduction Date', 'Account No', 'Amount', 'Attachments']);
+    assert.deepEqual(Object.keys(deductionRows), ['Reference #', 'Status', 'Emp #', 'Name', 'Submit Date', 'Request Type', 'Deduction Type', 'Period', 'Cycle', 'Deduction Date', 'Account No', 'Amount', 'Attachments']);
     assert.equal(deductionRows['Reference #'], 'PDR000000000004');
     assert.equal(deductionRows['Emp #'], '#EBB12');
     assert.equal(deductionRows.Name, 'Farhan binti rahmat');
@@ -186,61 +188,24 @@ async function run() {
     await page.goto(`${url('options/history.html')}?category=deduction`, { waitUntil: 'networkidle0' });
     await page.setViewport({ width: 390, height: 844 });
     await page.waitForSelector('.history-card-item');
-    assert.deepEqual(await refs(page), ['PDR000000000004', 'deduction-202008-asb', 'deduction-202112-absent', 'deduction-202205-advance', 'deduction-202507-uniform', 'EBB01:deduction']);
-    const deduction = await page.$eval('[data-reference="EBB01:deduction"]', node => node.textContent);
-    for (const expected of ['HOUSING LOAN', 'Draft', '202610', 'MONTH END', 'RM 0.00']) assert.ok(deduction.includes(expected));
-    const draftActions = await page.$eval('[data-reference="EBB01:deduction"]', card => [...card.querySelectorAll('.history-card-action')].map(button => button.textContent.trim()));
-    assert.deepEqual(draftActions, ['Submit', 'Cancel'], 'Draft history cards expose Submit and Cancel');
-    await page.click('[data-reference="EBB01:deduction"] .history-card-main');
+    await page.waitForSelector('[data-reference^="PDR-"]');
+    const submitted = await page.$eval('[data-reference^="PDR-"]', el => el.dataset.reference);
+    const selector = '[data-reference="' + submitted + '"]';
+    assert.ok(!(await refs(page)).includes('EBB01:deduction'));
+    const card = await page.$(selector);
+    assert.equal(await card.evaluate(el => el.dataset.status), 'submitted');
+    assert.deepEqual(await card.$$eval('[data-history-action]', els => els.map(el => el.dataset.historyAction)), ['cancel']);
+    await card.$eval('.history-card-main', el => el.click());
     const savedDetail = await page.$eval('#historyDetailBody', node => node.textContent);
-    assert.deepEqual(await page.$$eval('#historyDetailActions [data-history-action]', nodes => nodes.map(node => node.textContent.trim())), ['Submit', 'Delete Record']);
-    assert.equal(await page.$eval('#historyDetailActions [data-history-detail-aux]', node => node.textContent.trim()), 'Edit Deduction Request');
-    assert.ok(await page.$('#historyDetailActions [data-history-detail-aux] > .fa-pen[aria-hidden="true"]'));
-    assert.ok(await page.$eval('#historyDetailActions', footer => {
-      const [submit, remove, edit] = [...footer.children].map(action => action.getBoundingClientRect());
-      const css = getComputedStyle(footer);
-      const width = footer.clientWidth - parseFloat(css.paddingLeft) - parseFloat(css.paddingRight);
-      return remove.top >= submit.bottom && edit.top >= remove.bottom
-        && Math.abs(remove.width - width) <= 1 && Math.abs(edit.width - width) <= 1;
-    }), 'Delete Record and Edit occupy their own full-width rows');
-    for (const expected of ['Sarah Jenkins', '#EBB01', 'Stop Deduction', '202610', '1 Oct 2026', 'MONTH END', '001235', 'deduction.txt']) assert.ok(savedDetail.includes(expected));
-    assert.equal(savedDetail.includes('Please stop the housing loan deduction.'), false, 'Deduction details must only show fields supplied by the history schema');
-    assert.equal(await page.$eval('.history-attachment', async link => (await fetch(link.href)).text()), 'Payroll deduction attachment', 'Saved attachments must retain their actual file contents');
-    await page.screenshot({ path: path.join(__dirname, 'payroll_history_deduction_details_light.png') });
+    for (const expected of ['Sarah Jenkins', '#EBB01', 'Stop Deduction', '202610', '1 Oct 2026', 'MONTH END', '001235', 'deduction.txt', 'Please stop the housing loan deduction.']) assert.ok(savedDetail.includes(expected));
+    assert.equal(await page.$eval('.history-attachment', async link => (await fetch(link.href)).text()), 'Payroll deduction attachment');
+    assert.equal(await page.$('#historyDetailActions [data-history-detail-aux]'), null);
     await page.keyboard.press('Escape');
     await filter(page, { historyDateFrom: '2026-10', historyDateTo: '2026-10', historyRebateItem: 'HOUSING LOAN' });
-    assert.equal((await refs(page)).length, 1);
-    await page.screenshot({ path: path.join(__dirname, 'payroll_history_deduction_list_light.png') });
-    await page.click('[data-reference="EBB01:deduction"] .history-card-main');
-    await page.evaluate(async () => {
-      const db = await new Promise((resolve, reject) => {
-        const request = indexedDB.open('peoplehcm-payroll-forms', 1);
-        request.onsuccess = () => resolve(request.result);
-        request.onerror = () => reject(request.error);
-      });
-      await new Promise((resolve, reject) => {
-        const transaction = db.transaction('requests', 'readwrite');
-        const store = transaction.objectStore('requests');
-        const request = store.get('EBB01:deduction');
-        request.onsuccess = () => {
-          const record = request.result;
-          record.values.accountNo = '007777';
-          record.attachments = [{ name: 'updated.txt', file: new File(['Updated attachment'], 'updated.txt', { type: 'text/plain' }) }];
-          store.put(record);
-        };
-        transaction.oncomplete = resolve;
-        transaction.onerror = () => reject(transaction.error);
-      });
-      db.close();
-      window.dispatchEvent(new PageTransitionEvent('pageshow', { persisted: true }));
-    });
-    assert.equal(await shown(page, '#historyDetailsModal'), false, 'A restored page must close stale details after a request was edited');
+    assert.deepEqual(await refs(page), [submitted]);
+    await page.evaluate(() => window.dispatchEvent(new PageTransitionEvent('pageshow', { persisted: true })));
     await page.waitForFunction(() => document.getElementById('payrollHistoryList').getAttribute('aria-busy') === 'false');
-    assert.equal((await refs(page)).length, 1, 'Restoring History must replace saved drafts without duplicating records');
-    await page.click('[data-reference="EBB01:deduction"] .history-card-main');
-    assert.ok(await page.$eval('#historyDetailBody', node => node.textContent.includes('007777')));
-    assert.equal(await page.$eval('.history-attachment', async link => (await fetch(link.href)).text()), 'Updated attachment');
-    await page.keyboard.press('Escape');
+    assert.deepEqual(await refs(page), [submitted]);
     await page.click('[data-history-kind="tax"]');
     assert.equal((await refs(page)).length, 3, 'Each category must retain its own filters');
 

@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Claims - Travel Request</title>
   <script src="../../../js/components.js"></script>
+  <script src="../../../js/claims/claim-request-store.js"></script>
+  <script src="../../../js/claims/claim-application-fields.js"></script>
   <script src="../../../js/app.js" defer></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -535,181 +537,7 @@
       <div class="view-container active" id="view-1-main">
 
         <!-- MAIN APPLICATION DETAILS CARD -->
-        <div class="form-card">
-          <div class="section-header-bar no-top-border">
-            <span class="section-title-accent"></span>
-            <span class="section-title-text">APPLICATION DETAILS</span>
-          </div>
-
-          <!-- Traveling Period : -->
-          <div class="field-group">
-            <label class="field-label">Traveling Period</label>
-            <div style="display: grid; grid-template-columns: 1fr 1.2fr; gap: 10px;">
-              <div class="select-wrapper">
-                <select id="v1PeriodYear" class="form-ctrl">
-                  <option value="2026" selected>2026</option>
-                  <option value="2025">2025</option>
-                </select>
-              </div>
-              <div class="select-wrapper">
-                <select id="v1PeriodMonth" class="form-ctrl">
-                  <option value="September" selected>September</option>
-                  <option value="August">August</option>
-                  <option value="July">July</option>
-                </select>
-              </div>
-            </div>
-          </div>
-
-          <!-- Travel Date -->
-          <div class="field-group">
-            <label class="field-label">Travel Date</label>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-              <input type="date" id="v1StartDate" class="form-ctrl" value="2026-09-24" aria-label="Travel date from" />
-              <input type="date" id="v1EndDate" class="form-ctrl" value="2026-09-24" aria-label="Travel date to" />
-            </div>
-          </div>
-
-          <!-- Training Reference : -->
-          <div class="field-group">
-            <label class="field-label">Training Reference</label>
-            <div class="select-wrapper">
-              <select id="v1TrainingRef" class="form-ctrl">
-                <option value="" selected>- Select Training Ref -</option>
-                <option value="TR-2026-001">TR-2026-001 (User Training)</option>
-                <option value="TR-2026-002">TR-2026-002 (System Integration)</option>
-              </select>
-            </div>
-          </div>
-
-          <!-- Benefit Type : -->
-          <div class="field-group">
-            <label class="field-label">Benefit Type</label>
-            <div class="select-wrapper">
-              <select id="v1BenefitType" class="form-ctrl">
-                <option value="" selected>Select Benefit</option>
-                <option value="TRAVEL ALLOWANCE">TRAVEL ALLOWANCE</option>
-                <option value="OUTSTATION BENEFIT">OUTSTATION BENEFIT</option>
-              </select>
-            </div>
-          </div>
-
-          <!-- Travel Type : -->
-          <div class="field-group">
-            <label class="field-label">Travel Type</label>
-            <div class="select-wrapper">
-              <select id="v1TravelType" class="form-ctrl">
-                <option value="" selected>- Select Travel Type -</option>
-                <option value="DOMESTIC">DOMESTIC</option>
-                <option value="OVERSEAS">OVERSEAS</option>
-              </select>
-            </div>
-          </div>
-
-          <!-- Purpose : -->
-          <div class="field-group">
-            <label class="field-label">Purpose</label>
-            <input type="text" id="v1Purpose" class="form-ctrl" placeholder="" />
-          </div>
-
-          <!-- Destination : -->
-          <div class="field-group">
-            <label class="field-label">Destination</label>
-            <input type="text" id="v1Destination" class="form-ctrl" placeholder="" />
-          </div>
-
-          <!-- Reason : -->
-          <div class="field-group">
-            <label class="field-label">Reason</label>
-            <div class="select-wrapper">
-              <select id="v1Reason" class="form-ctrl">
-                <option value="" selected>- Select Reason -</option>
-                <option value="CLIENT MEETING">CLIENT MEETING</option>
-                <option value="USER TRAINING">USER TRAINING</option>
-                <option value="SITE INSPECTION">SITE INSPECTION</option>
-              </select>
-            </div>
-          </div>
-
-          <!-- Car Type : -->
-          <div class="field-group">
-            <label class="field-label">Car Type</label>
-            <input type="text" id="v1CarType" class="form-ctrl" value="Personal" />
-          </div>
-
-          <!-- Passenger(s) : -->
-          <div class="field-group">
-            <label class="field-label">Passenger(s)</label>
-            <div class="select-wrapper">
-              <select id="v1Passengers" class="form-ctrl" onchange="handlePassengerAdd(this)">
-                <option value="" selected>- Select Passenger -</option>
-                <option value="Sarah Jenkins">Sarah Jenkins (#EBB01)</option>
-                <option value="Marcus Tan">Marcus Tan (#004177)</option>
-                <option value="Daniel Lee">Daniel Lee (#000582)</option>
-              </select>
-            </div>
-          </div>
-
-          <!-- Selected Passenger(s) : -->
-          <div class="field-group">
-            <label class="field-label">Selected Passenger(s)</label>
-            <div id="v1SelectedPassengersContainer" style="display: flex; flex-wrap: wrap; gap: 6px; min-height: 28px;">
-              <span style="font-size: 12px; color: var(--text-muted); font-style: italic;">None selected</span>
-            </div>
-          </div>
-
-          <!-- Charge To : -->
-          <div class="field-group">
-            <label class="field-label">Charge To</label>
-            <div class="select-wrapper">
-              <select id="v1ChargeTo" class="form-ctrl">
-                <option value="" selected>- Select Charge -</option>
-                <option value="Company HQ">Company HQ</option>
-                <option value="Project Budget">Project Budget</option>
-                <option value="Client Account">Client Account</option>
-              </select>
-            </div>
-          </div>
-
-          <!-- Accomodation? : -->
-          <div class="field-group toggle-option-card">
-            <label class="toggle-option-label">Accommodation</label>
-            <div class="radio-circle-opt leave-toggle" id="v1Accomodation" onclick="toggleRadioCircle('v1Accomodation')" role="switch" aria-checked="false"></div>
-          </div>
-
-          <!-- Flight? : -->
-          <div class="field-group toggle-option-card">
-            <label class="toggle-option-label">Flight</label>
-            <div class="radio-circle-opt leave-toggle" id="v1Flight" onclick="toggleRadioCircle('v1Flight')" role="switch" aria-checked="false"></div>
-          </div>
-
-          <!-- Remarks : -->
-          <div class="field-group">
-            <label class="field-label">Remarks</label>
-            <input type="text" id="v1Remarks" class="form-ctrl" placeholder="" />
-          </div>
-
-        <!-- ATTACHMENT CONTENT -->
-          <label class="field-label form-section-heading" style="font-size: 13.5px; font-weight: 800; color: var(--text-primary); margin-bottom: 12px; display: block;">Upload Attachment</label>
-          
-          <div style="display: flex; align-items: center; justify-content: center; gap: 36px; padding: 8px 0;">
-            <div style="display: flex; flex-direction: column; align-items: center; gap: 8px; cursor: pointer;" onclick="triggerFileUpload('main')">
-              <div style="width: 54px; height: 54px; border-radius: 50%; background: rgba(124, 58, 237, 0.12); border: 1px solid rgba(124, 58, 237, 0.3); display: flex; align-items: center; justify-content: center; color: var(--purple-primary); font-size: 18px;">
-                <i class="fa-solid fa-file-arrow-up"></i>
-              </div>
-              <span style="font-size: 12.5px; font-weight: 700; color: var(--purple-primary);">Select File(s)</span>
-            </div>
-
-            <div style="display: flex; flex-direction: column; align-items: center; gap: 8px; cursor: pointer;" onclick="triggerFileUpload('main')">
-              <div style="width: 54px; height: 54px; border-radius: 50%; background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%); display: flex; align-items: center; justify-content: center; color: #ffffff; font-size: 18px; box-shadow: 0 6px 18px rgba(124, 58, 237, 0.45);">
-                <i class="fa-solid fa-camera"></i>
-              </div>
-              <span style="font-size: 12.5px; font-weight: 800; color: var(--text-primary);">Take Picture</span>
-            </div>
-          </div>
-
-          <div id="mainChipsList" class="attachment-upload-list"></div>
-        </div>
+        <template id="claimApplicationFields"></template>
 
         <!-- AGGREGATED SUMMARY ROW (Categories Drill-down Entry) -->
         <div class="category-summary-row" onclick="switchView('view-2-categories', 'Request Categories')" style="background: linear-gradient(135deg, rgba(124, 58, 237, 0.12) 0%, rgba(109, 40, 217, 0.18) 100%); border: 1.5px solid rgba(124, 58, 237, 0.4); border-radius: 22px; padding: 18px; margin-bottom: 16px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 6px 20px rgba(124, 58, 237, 0.18); transition: transform 0.2s ease;">
@@ -895,6 +723,7 @@
 
   <!-- DRILL-DOWN NAVIGATION & FORM STATE MANAGEMENT SCRIPT -->
   <script>
+    ClaimApplicationFields.mount('Travel Request');
     const formData = {
       applicationInfo: {
         periodYear: '2026',
@@ -2089,6 +1918,9 @@
     }
 
     function submitTravelRequest() {
+      if (!ClaimApplicationFields.submit('Travel Request', { taskItems: formData.requestDetails.taskItems, requestTravelItems: formData.requestDetails.travelingItems,
+        accommodationItems: formData.requestDetails.accomodationItems, passengers: formData.applicationInfo.selectedPassengers,
+        attachments: formData.mainAttachments })) return;
       showToast('🚀 Travel Request submitted successfully!');
       setTimeout(() => {
         window.location.href = '../index.html';

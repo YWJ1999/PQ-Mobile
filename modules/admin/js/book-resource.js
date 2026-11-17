@@ -70,6 +70,7 @@ document.addEventListener('DOMContentLoaded', () => {
       detailsContent.replaceChildren();
       [
         ['References', record.meetingRef],
+        ['Status', record.status === 'plan' ? 'Plan' : 'Confirmed'],
         ['Emp #', '#' + record.employee.empNo.replace(/^#+/, '')],
         ['Name', record.employee.name],
         ['Booking Date', formatDate(record.date)],
@@ -78,7 +79,6 @@ document.addEventListener('DOMContentLoaded', () => {
         ['Meeting Room #', resource?.roomNo],
         ['Resource', resource?.name],
         ['Task', task?.name],
-        ['Status', record.status === 'plan' ? 'Plan' : 'Confirmed'],
         ['Purpose', record.purpose],
         ['Remark', record.remarks]
       ].forEach(([label, value]) => detailRow(label, value));

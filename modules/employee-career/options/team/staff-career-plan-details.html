@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PeopleHCM - Career Plan</title>
+  <script>(()=>{const q=new URLSearchParams(location.search).get('theme');document.documentElement.dataset.theme=q==='light'?'light':'dark';})();</script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="../../../../css/theme.css"><link rel="stylesheet" href="../../../../css/app.css">
+  <link rel="stylesheet" href="../../css/employee-career.css"><link rel="stylesheet" href="../../css/confirm-new-user-details.css"><link rel="stylesheet" href="../../css/staff-career-plan.css">
+  <script src="../../../../js/components.js"></script><script src="../../../../js/app.js" defer></script>
+  <script src="../../js/staff-career-plan-data.js" defer></script><script src="../../js/staff-career-plan.js" defer></script>
+</head>
+<body class="employee-career-option-page staff-career-plan-page">
+  <preview-top-bar active-page="v2"></preview-top-bar>
+  <div class="phone-container">
+    <header class="employee-career-header">
+      <phone-status-bar time="9:41"></phone-status-bar>
+      <div class="employee-career-header-row">
+        <a id="staffCareerPlanDetailsBack" class="employee-career-back" href="staff-career-plan.html" aria-label="Back to Staff Career Plan"><i class="fa-solid fa-chevron-left" aria-hidden="true"></i></a>
+        <div class="employee-career-heading"><h1>Career Plan</h1></div>
+        <span class="employee-career-header-spacer" aria-hidden="true"></span>
+      </div>
+    </header>
+    <main class="main-content employee-career-content">
+      <section class="new-user-profile-card staff-career-plan-profile" aria-labelledby="staffCareerPlanDetailName">
+        <span id="staffCareerPlanInitials" class="new-user-profile-avatar" aria-hidden="true"></span>
+        <div class="new-user-profile-copy">
+          <h2 id="staffCareerPlanDetailName" class="new-user-profile-name"></h2>
+          <p id="staffCareerPlanDetailEmployeeId" class="new-user-profile-id"></p>
+        </div>
+        <dl class="new-user-facts">
+          <div><dt>Position</dt><dd id="staffCareerPlanDetailPosition"></dd></div>
+          <div><dt>Department</dt><dd id="staffCareerPlanDetailDepartment"></dd></div>
+        </dl>
+      </section>
+      <dl class="employee-career-form-card new-user-facts staff-career-plan-outlook" aria-label="Career plan details">
+        <div><dt>Next Job</dt><dd id="staffCareerPlanDetailJob"></dd></div>
+        <div><dt>Target Year</dt><dd id="staffCareerPlanDetailYear"></dd></div>
+        <div class="wide"><dt>Career Goal</dt><dd id="staffCareerPlanDetailGoal"></dd></div>
+        <div class="wide"><dt>Development Needs / Notes</dt><dd id="staffCareerPlanDetailNotes"></dd></div>
+      </dl>
+    </main>
+    <phone-bottom-nav active="apps"></phone-bottom-nav><left-profile-drawer></left-profile-drawer><notification-sheet></notification-sheet><favourite-sheet></favourite-sheet>
+  </div>
+</body>
+</html>

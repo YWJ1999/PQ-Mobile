@@ -184,7 +184,6 @@ function openDetailModal(recordId) {
   const record = violationRecords.find(item => item.id === recordId);
   if (!record) return;
   document.getElementById('detailName').textContent = record.name;
-  document.getElementById('detailEmpNo').textContent = `#${record.empNo}`;
   document.getElementById('detailRecordCount').textContent = record.history.length;
   const body = document.getElementById('detailTableBody');
   body.replaceChildren();

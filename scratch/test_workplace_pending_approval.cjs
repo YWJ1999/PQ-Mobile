@@ -27,7 +27,7 @@ async function shot(page, name) {
         { text: 'Inventory', selected: 'false' }
       ]);
       assert.equal(await page.$$eval('#workplacePendingQueue .approval-request-card', n => n.length), 1);
-      assert.match(await page.$eval('#workplacePendingQueue', n => n.textContent), /Farhan binti rahmat.*#EBB12.*Pending.*16 Aug 2024.*FGV0000000000013/s);
+      assert.match(await page.$eval('#workplacePendingQueue', n => n.textContent), /Farhan binti rahmat.*#EBB12.*FGV0000000000013.*Pending.*16 Aug 2024/s);
       assert.equal(await page.$eval('.employee-id', n => n.previousElementSibling.textContent), 'Farhan binti rahmat');
       await shot(page, `workplace-pending-list-${theme}-${width}.png`);
       await page.focus('[data-workplace-tab="guest-visit"]');
@@ -44,11 +44,11 @@ async function shot(page, name) {
         row.querySelector('td').textContent.trim()
       ])), [
         ['Document Reference #', 'IRQ0000000000064'],
+        ['Document Status', 'Pending'],
         ['Employee #', '#EBB12'],
         ['Name', 'Farhan binti rahmat'],
         ['Position', 'GROUP HR MANAGER'],
         ['Department', 'HUMAN RESOURCE'],
-        ['Document Status', 'Pending'],
         ['Submit Date', '8 Sep 2026'],
         ['Item Group', 'OFFICE EQUIPMENT'],
         ['Item', 'LOCKER 1000'],
@@ -80,11 +80,13 @@ async function shot(page, name) {
         height: '34px',
         cardRadius: '16px'
       });
-      await page.keyboard.press('Escape');
+      await page.click('#workplaceApprovalDetails [data-approval-back]');
+      await page.waitForSelector('#workplaceApprovalDetails', { hidden: true });
       await page.click('#workplacePendingQueue .three-dots-btn');
       await page.click('#workplacePendingViewWorkflow');
       assert.match(await page.$eval('#workplaceApprovalWorkflow', n => n.textContent), /Farhan binti rahmat.*#EBB12.*RequestInventory Request/s);
-      await page.keyboard.press('Escape');
+      await page.click('#workplaceApprovalWorkflow [data-approval-back]');
+      await page.waitForSelector('#workplaceApprovalWorkflow', { hidden: true });
       await page.click('[data-workplace-tab="guest-visit"]');
       await page.click('#workplacePendingFilterTrigger');
       await page.type('#workplacePendingFilter-keyword', 'no matching employee');
@@ -100,22 +102,30 @@ async function shot(page, name) {
       await page.click('#workplacePendingViewWorkflow');
       assert.match(await page.$eval('#workplaceApprovalWorkflow', n => n.textContent), /FGV0000000000013.*Farhan binti rahmat.*#EBB12.*Submitted.*Awaiting Approval/s);
       assert.equal(await page.$eval('#workplaceApprovalWorkflow .employee-id', n => getComputedStyle(n).fontSize), '11.5px', 'Workflow uses the same subtle employee ID typography');
-      await page.keyboard.press('Escape');
+      await page.click('#workplaceApprovalWorkflow [data-approval-back]');
+      await page.waitForSelector('#workplaceApprovalWorkflow', { hidden: true });
       await page.click('.three-dots-btn');
       await page.click('#workplacePendingViewDetails');
       assert.match(await page.$eval('#workplaceApprovalDetailsTitle', n => n.textContent), /Guest Visit Request Approval/);
-      assert.equal(await page.$$eval('#workplaceApprovalDetails .claim-detail-section input, #workplaceApprovalDetails .claim-detail-section select, #workplaceApprovalDetails .claim-detail-section textarea', n => n.length), 0, 'Submitted request data is displayed as read-only text');
-      assert.match(await page.$eval('#approvalPanel-general', n => n.textContent), /Visit Date.*8 Oct 2026.*Visit Time.*00:00.*00:00.*Total Guest.*0.*Meal\?.*No/s);
-      assert.equal(await page.$$eval('#workplaceApprovalDetails [role="tab"]', n => n.length), 0, 'Mileage-style approval details show continuous sections');
-      assert.deepEqual(await page.$$eval('#workplaceApprovalDetails .claim-detail-section > h4', n => n.map(h => h.textContent)), ['General', 'Guest', 'Attendee', 'Other']);
-      assert.ok(await page.$$eval('#workplaceApprovalDetails .claim-detail-section', n => n.every(section => !section.hidden)), 'All request sections are available in one scrollable detail view');
+      const fields = '#workplaceGuestVisit guest-visit-fields[readonly]';
+      assert.deepEqual(await page.$$eval(fields + ' [role="tab"]', tabs => tabs.map(tab => tab.textContent.trim().slice(1))), ['General', 'Guest', 'Attendee', 'Other']);
+      assert.ok(await page.$$eval(fields + ' input, ' + fields + ' select', controls => controls.every(control => control.readOnly || control.disabled)));
+      assert.deepEqual(await page.$$eval('#visitDate, #visitStartTime, #visitEndTime, #visitTotalGuest, #visitLocation', inputs => inputs.map(input => input.value)), ['8 Oct 2026', '00:00', '00:00', '0', '—']);
+      assert.equal(await page.$eval('#visitMeal', field => field.checked), false);
+      assert.match(await page.$eval('.visit-submission-meta', n => n.textContent), /FGV0000000000013.*Pending.*16 Aug 2024/);
+      assert.equal(await page.$eval('#visitAttachments', n => n.textContent), 'No attachments');
+      assert.equal(await page.$(fields + ' .visit-add-record, ' + fields + ' input[type="file"]'), null);
       await shot(page, `workplace-pending-general-${theme}-${width}.png`);
-      assert.equal(await page.$eval('#approvalPanel-guest', n => /No guest/.test(n.textContent)), false);
-      assert.match(await page.$eval('#approvalPanel-attendee', n => n.textContent), /Ram chhabila.*#000001.*ACCOUNTS.*ACCOUNT EXECUTIVE/s);
-      await page.$eval('#approvalPanel-attendee', n => { const body = n.parentElement; body.scrollTop += n.getBoundingClientRect().top - body.getBoundingClientRect().top - 14; });
+      await page.click('#visitSummaryDetails');
+      await page.click('[data-visit-category="guest"]');
+      assert.equal(await page.$eval('#visitGuestEmpty', n => n.hidden), false);
+      await page.focus('#visitTab-guest');
+      await page.keyboard.press('ArrowRight');
+      await page.click('#visitAttendeeList [data-toggle-record]');
+      assert.match(await page.$eval('#visitAttendeeList', n => n.innerText.replace(/\s+/g, ' ')), /Ram chhabila.*#000001.*ACCOUNTS.*ACCOUNT EXECUTIVE/);
       await shot(page, `workplace-pending-attendee-${theme}-${width}.png`);
-      assert.match(await page.$eval('#approvalPanel-other', n => n.textContent), /Floor VisitNo.*Sitting ArrangementNo.*Multiple RoomsNo.*NoneYes/s);
-      await page.$eval('#approvalPanel-other', n => { const body = n.parentElement; body.scrollTop += n.getBoundingClientRect().top - body.getBoundingClientRect().top - 14; });
+      await page.click('#visitTab-other');
+      assert.deepEqual(await page.$$eval('#visitPanel-other input', n => n.map(input => input.checked)), [false, false, false, true]);
       await shot(page, `workplace-pending-other-${theme}-${width}.png`);
       const submitted = await page.evaluate(() => window.WorkplacePendingStore.list()[0]);
       await page.type('#approvalComments', '<script>review</script> Approved visit');
@@ -159,7 +169,7 @@ async function shot(page, name) {
       await page.reload({ waitUntil: 'load' });
       await page.click('.three-dots-btn');
       await page.click('#workplacePendingViewDetails');
-      assert.ok(await page.$eval('#workplaceApprovalDetails .payroll-approval-panel', n => n.scrollWidth <= n.clientWidth));
+      assert.ok(await page.$eval('#workplaceGuestVisit', n => n.scrollWidth <= n.clientWidth));
       assert.ok(await page.$eval('main', n => n.scrollWidth <= n.clientWidth));
       assert.deepEqual(errors, []);
       console.log(`PASS ${theme} ${width}: consistent approval cards, reference fields, filters, details, attendee, other requests, decisions, bulk actions, persistence and storage errors`);

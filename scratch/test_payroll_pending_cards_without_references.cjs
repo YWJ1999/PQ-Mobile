@@ -23,9 +23,7 @@ async function cardState(page) {
 async function openFirstDetails(page) {
   await page.click('.approval-request-card .three-dots-btn');
   await page.click('#payrollPendingViewDetails');
-  return page.$eval('#payrollPendingDetailsTable', table =>
-    Object.fromEntries([...table.rows].map(row => [row.cells[0].textContent, row.cells[1].textContent]))
-  );
+  return new URL(page.url()).hash;
 }
 
 async function run() {
@@ -51,7 +49,7 @@ async function run() {
       assert.equal(tax.firstEmployeeMeta, 'HUMAN RESOURCE');
       assert.equal(tax.firstEmployeeMetaFollowsId, true);
       const taxDetails = await openFirstDetails(page);
-      assert.equal(taxDetails['Reference #'], tax.firstId);
+      assert.equal(taxDetails, '#approval/details/' + tax.firstId);
       await page.click('#payrollPendingDetails .action-btn-cancel');
 
       await page.click('[data-payroll-tab="deduction"]');
@@ -61,7 +59,7 @@ async function run() {
       assert.equal(deduction.hasReferenceLabel, false);
       assert.equal(deduction.exposesInternalId, false);
       const deductionDetails = await openFirstDetails(page);
-      assert.equal(deductionDetails['Document Reference'], deduction.firstId);
+      assert.equal(deductionDetails, '#approval/details/' + deduction.firstId);
 
       assert.deepEqual(pageErrors, []);
       await page.close();

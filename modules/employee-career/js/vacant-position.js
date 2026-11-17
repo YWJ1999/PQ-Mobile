@@ -91,7 +91,7 @@
   }
   function openDetails(record, trigger) {
     state.recordTrigger = trigger;
-    const fields = [['Job', record.job], ['Grade', record.grade], ['Last Incumbent', record.lastIncumbent], ['Since', date(record.since)], ['Company', record.company], ['Department', record.department], ['Status', record.status], ['Vacant Positions', record.vacancies], ['Location', record.location], ['Access Code', record.accessCode], ['Min Qualification', record.qualification], ['Opened On', date(record.openedOn)], ['Created On', date(record.createdOn)], ['Applicants', record.applicants?.length || 0]];
+    const fields = [['Job', record.job], ['Status', record.status], ['Grade', record.grade], ['Last Incumbent', record.lastIncumbent], ['Since', date(record.since)], ['Company', record.company], ['Department', record.department], ['Vacant Positions', record.vacancies], ['Location', record.location], ['Access Code', record.accessCode], ['Min Qualification', record.qualification], ['Opened On', date(record.openedOn)], ['Created On', date(record.createdOn)], ['Applicants', record.applicants?.length || 0]];
     const body = $('vacantPositionDetailTable').tBodies[0];
     body.replaceChildren();
     fields.forEach(([label, value]) => {

@@ -1,4 +1,5 @@
 (() => {
+  document.getElementById('performanceRequestFields').replaceWith(PerformanceRequestForm.appraisalFields(true));
   const store = window.SelfEvaluationStore;
   const source = store?.get() || window.PERFORMANCE_SELF_EVALUATION || {};
   const $ = id => document.getElementById(id);
@@ -9,7 +10,6 @@
   const theme = () => document.documentElement.dataset.theme === 'light' ? 'light' : 'dark';
   const title = () => section === 'competencies' ? 'Competency' : 'Goal';
   const items = () => section ? source[section] || [] : [];
-  const compact = value => Number(value).toLocaleString('en-US', { maximumFractionDigits: 2 });
   const icon = name => { const node = document.createElement('i'); node.className = 'fa-solid ' + name; node.setAttribute('aria-hidden', 'true'); return node; };
   const element = (tag, className, text) => { const node = document.createElement(tag); if (className) node.className = className; if (text !== undefined) node.textContent = text; return node; };
 
@@ -32,37 +32,16 @@
     toastTimer = setTimeout(() => $('selfEvaluationToast').classList.remove('show'), 2400);
   }
 
-  function fieldRow(label, value) {
-    const row = element('div', 'goal-plan-item-field');
-    row.append(element('dt', '', label), element('dd', '', value || '—'));
-    return row;
-  }
-
   function renderCard(item) {
-    const card = element('article', 'goal-plan-card');
-    card.dataset.itemId = item.id;
-    const header = element('header', 'goal-plan-card-header');
-    const toggle = element('button', 'goal-plan-item-toggle');
-    toggle.type = 'button';
-    toggle.setAttribute('aria-expanded', 'false');
-    const itemIcon = element('span', 'goal-plan-item-icon');
-    itemIcon.append(icon(section === 'competencies' ? 'fa-award' : 'fa-bullseye'));
-    toggle.append(itemIcon, element('strong', 'goal-plan-card-title', item.title), element('strong', 'goal-plan-item-weight', compact(item.rating) + ' / 5'), icon('fa-chevron-down'));
-    toggle.lastChild.classList.add('goal-plan-item-chevron');
+    const card = PerformanceRequestForm.itemCard(item, section, true);
     const update = element('a', 'goal-plan-card-update self-evaluation-update');
     update.href = 'self-evaluation-item.html?kind=' + encodeURIComponent(section) + '&item=' + encodeURIComponent(item.id) + '&theme=' + theme();
     update.dataset.selfEvaluationLink = '';
     update.setAttribute('aria-label', 'Edit ' + item.title);
     update.append(icon('fa-pen-to-square'));
-    header.append(toggle, element('div', 'goal-plan-card-actions'));
-    header.lastChild.append(update);
-    const details = element('div', 'goal-plan-card-body goal-plan-item-details');
-    details.hidden = true;
-    const fields = element('dl', 'goal-plan-item-fields');
-    fields.append(fieldRow('Title', item.title), fieldRow('Weightage', compact(item.weightage) + '%'), fieldRow('Rating', compact(item.rating) + ' / 5'), fieldRow('Remark', item.remark));
-    details.append(fields);
-    toggle.addEventListener('click', () => { details.hidden = !details.hidden; toggle.setAttribute('aria-expanded', String(!details.hidden)); });
-    card.append(header, details);
+    const actions = element('div', 'goal-plan-card-actions');
+    actions.append(update);
+    card.querySelector('header').append(actions);
     return card;
   }
 
@@ -108,7 +87,15 @@
     });
     $('selfEvaluationBack').addEventListener('click', event => { if (!section) return; event.preventDefault(); section = null; history.pushState(null, '', 'self-evaluation.html?theme=' + theme()); render(); });
     $('selfEvaluationDraft').addEventListener('click', () => { sessionStorage.setItem('pq_self_evaluation_status_v1', 'Draft'); showToast('Self Evaluation draft saved.'); });
-    $('selfEvaluationSubmit').addEventListener('click', () => { sessionStorage.setItem('pq_self_evaluation_status_v1', 'Submitted'); showToast('Self Evaluation submitted successfully.'); });
+    $('selfEvaluationSubmit').addEventListener('click', () => {
+      try {
+        PerformanceSubmissions.appraisal('self-evaluation', source, source.goals, source.competencies);
+        sessionStorage.setItem('pq_self_evaluation_status_v1', 'Submitted');
+        showToast('Self Evaluation submitted successfully.');
+      } catch {
+        showToast('Unable to save the submission. Your evaluation is still here.');
+      }
+    });
     window.addEventListener('popstate', () => { const value = new URLSearchParams(location.search).get('kind'); section = ['goals', 'competencies'].includes(value) ? value : null; render(); });
     render();
   });

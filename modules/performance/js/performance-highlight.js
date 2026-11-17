@@ -107,7 +107,6 @@
       ['Bonus Factor', record.bonusFactor], ['Notes', record.notes], ['Superior Remarks', record.superiorRemarks]
     ];
     $('performanceHighlightDetailName').textContent = display(record.name);
-    $('performanceHighlightDetailEmpNo').textContent = employeeId(record.empNo);
     $('performanceHighlightDetailsRows').replaceChildren(...fields.map(([label, value]) => {
       const row = node('tr'), heading = node('th', 'detail-popout-label', label);
       heading.scope = 'row'; row.append(heading, node('td', 'detail-popout-value', display(value))); return row;

@@ -32,6 +32,10 @@
   })));
   let memory = {};
   let backupMemory = {};
+  try { PerformanceSubmissions.importPreviousAppraisals(); } catch { /* Existing approval records remain available when storage is full. */ }
+  function allRecords() {
+    return [...PerformanceSubmissions.records(), ...records];
+  }
   function actions() {
     try {
       const saved = JSON.parse(sessionStorage.getItem(key) || JSON.stringify(memory));
@@ -47,14 +51,14 @@
   window.PerformancePendingStore = {
     getPending: () => {
       const completed = actions(), assigned = backups();
-      return records.filter(record => !completed[record.id]).map(record => ({ ...record, backupApprover: assigned[record.id] || null }));
+      return allRecords().filter(record => !completed[record.id]).map(record => ({ ...record, backupApprover: assigned[record.id] || null }));
     },
     getBackupApprovers: () => backupApprovers.map(person => ({ ...person })),
     assignBackup(ids, empNo) {
       const approver = backupApprovers.find(person => person.empNo === empNo);
       if (!approver || !Array.isArray(ids)) return 0;
       const completed = actions(), assigned = backups();
-      const pending = records.filter(record => ids.includes(record.id) && !completed[record.id] && record.empNo !== empNo);
+      const pending = allRecords().filter(record => ids.includes(record.id) && !completed[record.id] && record.empNo !== empNo);
       pending.forEach(record => { assigned[record.id] = { ...approver, assignedAt: new Date().toISOString() }; });
       // A backup assignment is separate from an approval decision and keeps the request pending.
       sessionStorage.setItem(backupKey, JSON.stringify(assigned));
@@ -64,7 +68,7 @@
     act(ids, action, comments) {
       if (!Array.isArray(ids) || !['approve', 'resubmit', 'reject'].includes(action)) return 0;
       const completed = actions();
-      const pending = records.filter(record => ids.includes(record.id) && !completed[record.id]);
+      const pending = allRecords().filter(record => ids.includes(record.id) && !completed[record.id]);
       pending.forEach(record => {
         completed[record.id] = { action, comments, date: new Date().toISOString() };
       });

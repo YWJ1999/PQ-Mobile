@@ -89,8 +89,8 @@ const detailLabels = () => [...document.querySelectorAll('#historyDetailBody .hi
     await page.click('.history-card-item');
     assert.equal(await page.$eval('#historyDetailTitle', node => node.textContent.trim()), 'Guest Visit Details');
     assert.deepEqual(await page.evaluate(detailLabels), [
-      'Reference #', 'Emp #', 'Name', 'Visit Date', 'Visit Time', 'Visitor', 'Submit Date',
-      'Location', 'Request Meal?', 'Floor Visit?', 'Sit Arrange?', 'Multi Room?', 'Remarks', 'Status'
+      'Reference #', 'Status', 'Emp #', 'Name', 'Visit Date', 'Visit Time', 'Visitor', 'Submit Date',
+      'Location', 'Request Meal?', 'Floor Visit?', 'Sit Arrange?', 'Multi Room?', 'Remarks'
     ]);
     assert.equal(await page.$eval('#historyDetailBody [data-detail-field="Emp #"]', node => node.textContent.trim()), '#EBB12');
     assert.deepEqual(await page.$$eval('.history-detail-section-title', nodes => nodes.map(node => node.textContent.trim())), [
@@ -115,7 +115,7 @@ const detailLabels = () => [...document.querySelectorAll('#historyDetailBody .hi
     await page.click('.history-card-item');
     assert.equal(await page.$eval('#historyDetailTitle', node => node.textContent.trim()), 'Letter Request Details');
     assert.deepEqual(await page.evaluate(detailLabels), [
-      'Request Date', 'Reference #', 'Type', 'Status', 'Description', '1st Merge Text',
+      'Reference #', 'Status', 'Request Date', 'Type', 'Description', '1st Merge Text',
       '2nd Merge Text', '3rd Merge Text', 'Reason', 'Remark', 'FileName', 'Acknowledged On'
     ]);
     assert.equal(await page.$eval('#historyDetailBody [data-detail-field="FileName"]', node => node.textContent.trim()), 'guarantee-letter.pdf');

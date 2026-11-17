@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Claims - Advance Request</title>
   <script src="../../../js/components.js"></script>
+  <script src="../../../js/claims/claim-request-store.js"></script>
+  <script src="../../../js/claims/claim-application-fields.js"></script>
   <script src="../../../js/app.js" defer></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -473,116 +475,7 @@
       <div class="view-container active" id="view-1-main">
         
         <!-- MAIN APPLICATION INFO CARD -->
-        <div class="form-card">
-          <div class="section-header-bar no-top-border">
-            <span class="section-title-accent"></span>
-            <span class="section-title-text">APPLICATION DETAILS</span>
-          </div>
-
-          <!-- Claim Period : -->
-          <div class="field-group">
-            <label class="field-label">Claim Period</label>
-            <div style="display: grid; grid-template-columns: 1fr 1.2fr; gap: 10px;">
-              <div class="select-wrapper">
-                <select id="claimPeriodYear" class="form-ctrl">
-                  <option value="2026" selected>2026</option>
-                  <option value="2025">2025</option>
-                </select>
-              </div>
-              <div class="select-wrapper">
-                <select id="claimPeriodMonth" class="form-ctrl">
-                  <option value="September" selected>September</option>
-                  <option value="August">August</option>
-                  <option value="July">July</option>
-                </select>
-              </div>
-            </div>
-          </div>
-
-          <!-- Claim Date -->
-          <div class="field-group">
-            <label class="field-label">Claim Date <span class="req">*</span></label>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-              <input type="date" id="claimStartDate" class="form-ctrl" value="2026-09-23" aria-label="Claim date from" />
-              <input type="date" id="claimEndDate" class="form-ctrl" value="2026-09-23" aria-label="Claim date to" />
-            </div>
-          </div>
-
-          <!-- Cost Centre : -->
-          <div class="field-group">
-            <label class="field-label">Cost Centre <span class="req">*</span></label>
-            <div class="select-wrapper">
-              <select id="costCentreSelect" class="form-ctrl">
-                <option value="MANAGEMENT" selected>MANAGEMENT</option>
-                <option value="OPERATIONS">OPERATIONS</option>
-              </select>
-            </div>
-          </div>
-
-          <!-- Project : -->
-          <div class="field-group">
-            <label class="field-label">Project</label>
-            <div class="select-wrapper">
-              <select id="projectSelect" class="form-ctrl">
-                <option value="">- Select Project -</option>
-                <option value="PROJ-01">Project Alpha</option>
-                <option value="PROJ-02">Enterprise Migration</option>
-              </select>
-            </div>
-          </div>
-
-          <!-- Claim Type : -->
-          <div class="field-group">
-            <label class="field-label">Claim Type <span class="req">*</span></label>
-            <div class="select-wrapper">
-              <select id="claimTypeSelect" class="form-ctrl">
-                <option value="OVERSEAS TRAVEL ADVANCE" selected>OVERSEAS TRAVEL ADVANCE</option>
-                <option value="PROJECT OOP ADVANCE">PROJECT OOP ADVANCE</option>
-              </select>
-            </div>
-          </div>
-
-          <!-- Benefit Type : -->
-          <div class="field-group">
-            <label class="field-label">Benefit Type <span class="req">*</span></label>
-            <div class="select-wrapper">
-              <select id="benefitTypeSelect" class="form-ctrl">
-                <option value="ADVANCE" selected>ADVANCE</option>
-              </select>
-            </div>
-          </div>
-
-          <!-- Purpose : -->
-          <div class="field-group">
-            <label class="field-label">Purpose</label>
-            <input type="text" id="purposeInput" class="form-ctrl" value="" placeholder="Enter purpose..." />
-          </div>
-
-          <!-- Claim Currency : -->
-          <div class="field-group">
-            <label class="field-label">Claim Currency</label>
-            <div class="select-wrapper">
-              <select id="claimCurrencySelect" class="form-ctrl">
-                <option value="MYR" selected>RINGGIT MALAYSIA</option>
-                <option value="USD">US DOLLAR</option>
-              </select>
-            </div>
-          </div>
-
-          <div class="field-group">
-            <div style="display: flex; align-items: center; justify-content: space-between; padding: 4px 0;">
-              <span class="field-label" style="margin-bottom: 0;">Claim Total</span>
-              <span id="advanceClaimTotalDisplay" style="font-size: 15px; font-weight: 800; color: var(--text-primary);">0.00</span>
-            </div>
-          </div>
-
-          <!-- Remarks -->
-          <div class="field-group">
-            <label class="field-label">Remarks</label>
-            <input type="text" id="remarksInput" class="form-ctrl" placeholder="Enter remarks..." />
-          </div>
-
-        </div>
+        <template id="claimApplicationFields"></template>
 
         <!-- AGGREGATED SUMMARY ROW (Level 1 Total Claim & Drill-down Entry) -->
         <div class="category-summary-row" onclick="openCategoryItems('advance')" style="background: linear-gradient(135deg, rgba(124, 58, 237, 0.12) 0%, rgba(109, 40, 217, 0.18) 100%); border: 1.5px solid rgba(124, 58, 237, 0.4); border-radius: 22px; padding: 18px; margin-bottom: 16px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 6px 20px rgba(124, 58, 237, 0.18); transition: transform 0.2s ease;">
@@ -701,6 +594,7 @@
 
   <!-- STATE MANAGEMENT & DRILL-DOWN NAVIGATION SCRIPT -->
   <script>
+    ClaimApplicationFields.mount('Advance Claim');
     const formData = {
       applicationInfo: {
         claimYear: '2026',
@@ -1216,6 +1110,7 @@
     }
 
     function submitAdvanceClaim() {
+      if (!ClaimApplicationFields.submit('Advance Claim', { advanceExpenseItems: formData.claimDetails.addedDetails })) return;
       if (typeof showToast === 'function') showToast('🚀 Advance Request submitted successfully!');
       else alert('Advance Request submitted successfully!');
       window.location.href = '../index.html';

@@ -12,12 +12,17 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="../../../css/theme.css">
   <link rel="stylesheet" href="../../../css/app.css">
+  <link rel="stylesheet" href="../../../css/claim-forms.css">
+  <link rel="stylesheet" href="../../../css/form-section-headings.css">
+  <link rel="stylesheet" href="../../../css/payroll-request-fields.css">
   <link rel="stylesheet" href="../../../css/payroll-pending-approval.css">
   <link rel="stylesheet" href="../../../css/approval-actions.css">
   <link rel="stylesheet" href="../../../css/pending-approval-filter.css">
   <script src="../../../js/components.js"></script>
   <script src="../../../js/app.js" defer></script>
   <script src="../../../js/pending-approval-filter.js" defer></script>
+  <script src="../../../js/payroll/payroll-request-fields.js" defer></script>
+  <script src="../../../js/payroll/payroll-request-store.js" defer></script>
   <script src="../../../js/payroll/payroll-history-data.js" defer></script>
   <script src="../../../js/payroll/payroll-pending-data.js" defer></script>
   <script src="../../../js/pending-approval-backup.js" defer></script>
@@ -72,10 +77,16 @@
           <phone-status-bar time="9:41"></phone-status-bar>
           <div class="approval-page-heading">
             <button type="button" data-approval-back aria-label="Back to pending approvals"></button>
-            <h1 id="payrollPendingDetailsTitle" tabindex="-1">Tax Relief Detail</h1>
+            <h1 id="payrollPendingDetailsTitle" tabindex="-1">Tax Relief Approval</h1>
           </div>
         </header>
-        <div class="payroll-approval-details-body"><table class="payroll-approval-table" id="payrollPendingDetailsTable"><tbody></tbody></table></div>
+        <div class="payroll-approval-details-body">
+          <div id="payrollPendingForm" class="payroll-request-fields"></div>
+          <div class="claim-form-card payroll-review-comments">
+            <label class="claim-field-label" for="payrollPendingApproverComments">Approver Action Comments</label>
+            <textarea id="payrollPendingApproverComments" class="claim-control" rows="2" maxlength="2000" placeholder="Add comments (optional)"></textarea>
+          </div>
+        </div>
         <footer class="payroll-approval-details-footer pending-action-grid"></footer>
       </section>
     </main>

@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Claims - OT Claim</title>
   <script src="../../../js/components.js"></script>
+  <script src="../../../js/claims/claim-request-store.js"></script>
+  <script src="../../../js/claims/claim-application-fields.js"></script>
   <script src="../../../js/app.js" defer></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -550,33 +552,7 @@
       <div class="view-container active" id="view-1-main">
         
         <!-- MAIN APPLICATION INFO CARD -->
-        <div class="form-card">
-          <div class="section-header-bar no-top-border">
-            <span class="section-title-accent"></span>
-            <span class="section-title-text">APPLICATION DETAILS</span>
-          </div>
-
-          <!-- Claim Period : -->
-          <div class="field-group">
-            <label class="field-label">Claim Period <span class="req">*</span></label>
-            <div style="display: grid; grid-template-columns: 1fr 1.2fr; gap: 10px;">
-              <div class="select-wrapper">
-                <select id="v1ClaimYear" class="form-ctrl">
-                  <option value="2026" selected>2026</option>
-                  <option value="2025">2025</option>
-                </select>
-              </div>
-              <div class="select-wrapper">
-                <select id="v1ClaimMonth" class="form-ctrl">
-                  <option value="September" selected>September</option>
-                  <option value="August">August</option>
-                  <option value="July">July</option>
-                  <option value="June">June</option>
-                </select>
-              </div>
-            </div>
-          </div>
-        </div>
+        <template id="claimApplicationFields"></template>
 
         <!-- OT DETAILS LIST -->
         <section id="ot-details-section">
@@ -833,6 +809,7 @@
   </div>
   
   <script>
+    ClaimApplicationFields.mount('OT Claim');
     let isCrossDay = false;
     let editingItemIndex = -1;
     const formData = {
@@ -1245,6 +1222,7 @@
     }
 
     function submitOTClaim() {
+      if (!ClaimApplicationFields.submit('OT Claim', { otEntries: formData.otEntries })) return;
       if (typeof showToast === 'function') {
         showToast('✅ OT Claim submitted successfully!');
       } else {

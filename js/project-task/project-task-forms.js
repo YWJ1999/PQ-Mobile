@@ -56,14 +56,6 @@
     return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
   }
 
-  function duration(from, to) {
-    if (!/^\d{2}:\d{2}$/.test(from) || !/^\d{2}:\d{2}$/.test(to)) return 0;
-    const [fromHour, fromMinute] = from.split(':').map(Number);
-    const [toHour, toMinute] = to.split(':').map(Number);
-    if (fromHour > 23 || toHour > 23 || fromMinute > 59 || toMinute > 59) return 0;
-    return (toHour * 60 + toMinute - fromHour * 60 - fromMinute + 1440) % 1440;
-  }
-
   function fillOptions(selector, placeholder, values) {
     for (const select of document.querySelectorAll(selector)) {
       select.replaceChildren(new Option(placeholder, ''), ...values.map(value => new Option(value, value)));
@@ -206,19 +198,13 @@
     if (!form) return;
     const activityForm = byId('workActivityForm');
     const draft = readStored('pq_project_timesheet_draft', null);
+    let savedDraft = draft ? JSON.stringify(draft) : null;
     let activities = [];
     let editing = null;
     if (draft && typeof draft === 'object') {
       if (typeof draft.date === 'string') byId('timesheetDate').value = draft.date;
       if (typeof draft.remark === 'string') byId('timesheetRemark').value = draft.remark;
-      if (Array.isArray(draft.activities)) activities = draft.activities.filter(item => item && typeof item.title === 'string' && duration(item.timeFrom, item.timeTo) > 0);
-    }
-
-    function totals() {
-      return activities.reduce((result, activity) => {
-        result[activity.overtime ? 'overtimeMinutes' : 'normalMinutes'] += duration(activity.timeFrom, activity.timeTo);
-        return result;
-      }, { normalMinutes: 0, overtimeMinutes: 0 });
+      if (Array.isArray(draft.activities)) activities = draft.activities.filter(item => item && typeof item.title === 'string' && TimesheetRequests.duration(item.timeFrom, item.timeTo) > 0);
     }
 
     function showMain() {
@@ -259,77 +245,10 @@
     }
 
     function renderActivities() {
-      const total = totals();
-      byId('normalWorkHours').textContent = (total.normalMinutes / 60).toFixed(2) + ' Hours';
-      byId('overtimeHours').textContent = (total.overtimeMinutes / 60).toFixed(2) + ' Hours';
-      byId('workActivityTotal').textContent = 'Total Hours: ' + ((total.normalMinutes + total.overtimeMinutes) / 60).toFixed(1) + ' hrs';
-      const list = byId('workActivityList');
-      if (!activities.length) {
-        list.replaceChildren(node('p', 'project-activities-empty', 'No work activities added yet'));
-        return;
-      }
-      list.replaceChildren(...activities.map((activity, index) => {
-        const item = node('article', 'project-activity-item');
-        const top = node('div', 'project-activity-top');
-        const heading = node('div', 'project-activity-heading');
-        const symbol = node('span', 'project-activity-symbol');
-        symbol.append(icon('fa-clock'));
-        const copy = node('div', 'project-activity-copy');
-        const title = node('h3', 'project-activity-title', activity.title);
-        title.title = activity.title;
-        const time = node('div', 'project-activity-time', `${activity.timeFrom} - ${activity.timeTo}${activity.timeTo < activity.timeFrom ? ' (+1 day)' : ''}`);
-        copy.append(title, time);
-        heading.append(symbol, copy);
-        const toggle = node('button', 'project-activity-details-toggle');
-        toggle.type = 'button';
-        toggle.setAttribute('aria-expanded', 'false');
-        toggle.setAttribute('aria-controls', 'activity-details-' + index);
-        toggle.setAttribute('aria-label', 'Expand details for ' + activity.title);
-        toggle.title = 'Expand Details';
-        toggle.append(icon('fa-chevron-down'));
-        const details = node('div', 'project-activity-details');
-        details.id = 'activity-details-' + index;
-        details.hidden = true;
-        for (const [label, value] of [
-          ['Title', activity.title], ['Description', activity.description], ['Is Adhoc Task?', activity.adhoc ? 'Yes' : 'No'],
-          ['Project', activity.project], ['Task', activity.task], ['Is Overtime?', activity.overtime ? 'Yes' : 'No'],
-          ['Time From', activity.timeFrom], ['Time To', activity.timeTo], ['Completion %', activity.completion + '%']
-        ]) {
-          const row = node('div', 'project-activity-data-row');
-          row.append(node('span', '', label), node('span', '', value || '-'));
-          details.append(row);
-        }
-        function toggleDetails() {
-          details.hidden = !details.hidden;
-          toggle.setAttribute('aria-expanded', String(!details.hidden));
-          toggle.setAttribute('aria-label', (details.hidden ? 'Expand details for ' : 'Collapse details for ') + activity.title);
-          toggle.title = details.hidden ? 'Expand Details' : 'Collapse Details';
-          toggle.querySelector('i').className = 'fa-solid ' + (details.hidden ? 'fa-chevron-down' : 'fa-chevron-up');
-        }
-        toggle.addEventListener('click', toggleDetails);
-        top.addEventListener('click', event => {
-          if (!event.target.closest('button')) toggleDetails();
-        });
-        const tools = node('div', 'project-activity-tools');
-        const edit = node('button', 'project-activity-icon-button');
-        edit.type = 'button';
-        edit.dataset.editActivity = index;
-        edit.setAttribute('aria-label', 'Edit ' + activity.title);
-        edit.title = 'Edit Activity';
-        edit.append(icon('fa-pen-to-square'));
-        edit.addEventListener('click', () => openActivity(index));
-        const remove = node('button', 'project-activity-icon-button project-activity-delete');
-        remove.type = 'button';
-        remove.dataset.deleteActivity = index;
-        remove.setAttribute('aria-label', 'Delete ' + activity.title);
-        remove.title = 'Delete Activity';
-        remove.append(icon('fa-trash-can'));
-        remove.addEventListener('click', () => { activities.splice(index, 1); renderActivities(); });
-        tools.append(node('span', 'project-activity-hours', (duration(activity.timeFrom, activity.timeTo) / 60).toFixed(1) + ' hrs'), toggle, edit, remove);
-        top.append(heading, tools);
-        item.append(top, details);
-        return item;
-      }));
+      TimesheetView.render(form, activities, {
+        edit: openActivity,
+        remove(index) { activities.splice(index, 1); renderActivities(); }
+      });
     }
 
     byId('addWorkActivity').addEventListener('click', () => openActivity());
@@ -345,7 +264,7 @@
       requireText('activityTitle', 'Title');
       const from = byId('activityTimeFrom').value;
       const to = byId('activityTimeTo').value;
-      byId('activityTimeTo').setCustomValidity(from && to && duration(from, to) === 0 ? 'Time To must differ from Time From.' : '');
+      byId('activityTimeTo').setCustomValidity(from && to && TimesheetRequests.duration(from, to) === 0 ? 'Time To must differ from Time From.' : '');
       if (!activityForm.reportValidity()) return;
       const activity = Object.fromEntries(new FormData(activityForm));
       activity.title = activity.title.trim();
@@ -360,24 +279,38 @@
     });
     byId('saveTimesheetDraft').addEventListener('click', () => {
       const data = { date: byId('timesheetDate').value, remark: byId('timesheetRemark').value, activities };
-      if (writeStored('pq_project_timesheet_draft', data, 'timesheetFeedback')) showFeedback('timesheetFeedback', 'Timesheet draft saved.');
+      if (writeStored('pq_project_timesheet_draft', data, 'timesheetFeedback')) {
+        savedDraft = JSON.stringify(data);
+        showFeedback('timesheetFeedback', 'Timesheet draft saved.');
+      }
     });
-    form.addEventListener('submit', event => {
+    form.addEventListener('submit', async event => {
       event.preventDefault();
-      if (!form.reportValidity()) return;
+      const submit = byId('submitTimesheet');
+      if (submit.disabled || !form.reportValidity()) return;
       if (!activities.length) {
         showFeedback('timesheetFeedback', 'Add at least one work activity before submitting.', true);
         return;
       }
-      const data = { date: byId('timesheetDate').value, remark: byId('timesheetRemark').value, ...totals(), activities };
-      if (!saveRecord('pq_project_timesheets', record('TS', data), 'timesheetFeedback')) return;
-      localStorage.removeItem('pq_project_timesheet_draft');
-      showFeedback('timesheetFeedback', 'Timesheet saved.');
+      submit.disabled = true;
+      try {
+        const data = { date: byId('timesheetDate').value, remark: byId('timesheetRemark').value,
+          employeeName: previewUserName, employeeId: 'EBB01', ...TimesheetRequests.totals(activities), activities: [...activities] };
+        await TimesheetRequests.submit(record('TS', data), savedDraft);
+        savedDraft = null;
+        showFeedback('timesheetFeedback', 'Timesheet saved.');
+      } catch {
+        showFeedback('timesheetFeedback', 'Unable to submit the timesheet. Please try again.', true);
+      } finally {
+        submit.disabled = false;
+      }
     });
     renderActivities();
   }
 
   document.addEventListener('DOMContentLoaded', () => {
+    const fields = byId('timesheetFields');
+    if (fields) fields.replaceWith(TimesheetView.fields());
     fillOptions('[data-project-select]', '- Select Project -', projects);
     fillOptions('[data-task-category-select]', '- Select Task Category -', taskCategories);
     fillOptions('[data-task-select]', '- Select Task -', tasks);

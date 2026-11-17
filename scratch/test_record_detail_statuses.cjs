@@ -16,6 +16,13 @@ const fills = {
 async function checkBadge(page, container, status, label) {
   const selector = container + ' .record-detail-status';
   await page.waitForSelector(selector, { visible: true, timeout: 5000 });
+  const rowIndex = await page.$eval(selector, el => {
+    const row = el.closest('tr, .project-history-detail-row, .tax-relief-detail-row, dl > div');
+    return row && /status/i.test(row.firstElementChild.textContent)
+      ? [...row.parentElement.children].indexOf(row)
+      : null;
+  });
+  if (rowIndex !== null) assert.equal(rowIndex, 1, page.url() + ' status belongs in row two');
   const badge = await page.$eval(selector, el => {
     const style = getComputedStyle(el);
     const icon = el.querySelector('i[aria-hidden="true"]');
@@ -51,6 +58,17 @@ async function run() {
         await page.waitForSelector(selector, { timeout: 5000 });
         return page.$eval(selector, el => el.textContent.trim());
       };
+
+      for (const [category, prefix, key, text] of [
+        ['staff-confirmation', 'teamConfirmation', 'resubmit', 'To Resubmit'],
+        ['staff-exit', 'teamExit', 'pending', 'Pending'],
+        ['staff-request', 'teamRequest', 'approved', 'Approved'],
+        ['staff-engagement', 'teamEngagement', 'pending', 'Pending']
+      ]) {
+        await open('modules/employee-career/options/team/history.html', { category });
+        await click('#teamHistoryList .history-card-item');
+        await checkBadge(page, '#' + prefix + 'DetailsRows', key, text);
+      }
 
       await open('modules/employee-career/options/history.html', { category: 'feedback' });
       await click('.career-history-card-open');
@@ -153,10 +171,10 @@ async function run() {
 
       for (const [module, actions, body, key, label] of [
         ['admin', ['.three-dots-btn', '#workplacePendingViewDetails'], '#workplaceApprovalDetails', 'pending', 'Pending'],
-        ['payroll', ['.three-dots-btn', '#payrollPendingViewDetails'], '#payrollPendingDetailsTable', 'pending', 'Pending'],
+        ['payroll', ['.three-dots-btn', '#payrollPendingViewWorkflow'], '#payrollPendingWorkflowRequest', 'pending', 'Pending'],
         ['employee-career', ['.career-pending-review'], '#careerPendingDetails', 'pending', 'Pending'],
-        ['project-task', ['[data-project-approval-menu]', '#projectApprovalViewDetails'], '#projectApprovalDetailDocumentStatus', 'pending', 'Pending'],
-        ['performance', ['.three-dots-btn', '#performanceApprovalViewDetails'], '#approvalDetailsBody', 'pending', 'Pending Approval']
+        ['project-task', ['[data-project-approval-menu]', '#projectApprovalViewWorkflow'], '#projectApprovalWorkflowSteps .is-active', 'pending', 'Pending'],
+        ['performance', ['.three-dots-btn', '#performanceApprovalViewWorkflow'], '#performanceApprovalWorkflowRequest', 'pending', 'Pending Approval']
       ]) {
         await open('modules/' + module + '/options/pending-approval.html');
         for (const action of actions) await click(action);

@@ -4,6 +4,84 @@ const { pathToFileURL } = require('node:url');
 const puppeteer = require('puppeteer');
 const url = file => pathToFileURL(path.resolve(__dirname, '..', file)).href;
 
+async function checkSubmittedCV(browser) {
+  const page = await browser.newPage();
+  const queue = url('modules/employee-career/options/pending-approval.html') + '?theme=light';
+  await page.goto(url('change-request.html') + '?theme=light');
+  const fill = async (selector, value) => page.$eval(selector, (input, text) => {
+    input.value = text;
+    input.dispatchEvent(new Event('input', { bubbles: true }));
+  }, value);
+  await fill('[data-field-id=name]', 'Submitted applicant');
+  await page.click('#cv-step-qualification');
+  await page.click('[data-qualification-index="1"] [data-edit-qualification]');
+  await fill('#input_qual_notes', 'New submission notes');
+  await page.click('#saveQualificationButton');
+  await page.click('#cv-step-payroll');
+  await fill('[data-field-id=account]', '00007777');
+  await page.click('#cv-step-contacts');
+  await fill('[data-field-id=em_city]', 'New emergency city');
+  await page.click('#cv-step-family');
+  await page.click('#btnReviewSubmit');
+  await page.click('#btnConfirmSubmit');
+  const saved = await page.evaluate(() => JSON.parse(localStorage.getItem('pq_change_request_history'))[0]);
+  await page.goto(url('modules/employee-career/index.html') + '?scope=team&theme=light');
+  assert.equal(await page.$eval('#employeeCareerPendingCount', n => n.textContent), '3');
+  await Promise.all([page.waitForNavigation(), page.click('#employeeCareerPendingApproval')]);
+  await page.click(`[data-approval-id="${saved.id}"] .career-pending-review`);
+  const value = (section, label) => page.$eval(`#cv-panel-${section} [data-cv-field="${label}"] textarea`, n => n.value);
+  assert.equal(await value('personal', 'Name'), 'Submitted applicant');
+  await page.type('#cv-panel-personal [data-cv-field=Name] textarea', 'Edit attempt');
+  assert.equal(await value('personal', 'Name'), 'Submitted applicant');
+  assert.equal(await value('personal', 'Age'), '0');
+  await page.click('[data-cv-tab=qualification]');
+  await page.click('[data-qualification-card-toggle="1"]');
+  assert.equal(await page.$eval('[data-qualification-card-panel="1"] [data-cv-field=Notes] textarea', n => n.value), 'New submission notes');
+  assert.equal(await page.$eval('[data-qualification-card-panel="1"] [data-cv-field="Start Date"] textarea', n => n.value), '2001-06-11');
+  await page.click('[data-cv-tab=payroll]');
+  assert.equal(await value('payroll', 'Account #'), '00007777');
+  await page.click('[data-cv-tab=contacts]');
+  assert.equal(await value('contacts', 'City'), 'Damansara');
+  assert.equal(await value('contacts', 'Contact City'), 'New emergency city');
+  assert.equal(await value('contacts', 'Contact State'), '');
+  assert.ok((await value('contacts', 'Address')).includes('\n'));
+  await page.click('[data-cv-tab=family]');
+  await page.click('[data-cv-family-member=existing] button');
+  assert.ok((await page.$eval('.cv-family-member-dialog', n => n.textContent)).includes('880412-14-5589'));
+  await page.click('.cv-family-member-dialog .detail-popout-close');
+  assert.deepEqual(await page.$$eval('#careerPendingDetails :is(input, textarea, select):not([readonly]):not([disabled])', fields => fields.map(n => n.id)), ['careerPendingComments']);
+  await page.type('#careerPendingComments', 'Checked submitted details');
+  await page.click('#careerPendingDetails [data-career-approval-action=approve]');
+  await page.waitForSelector('#careerPendingDetails', { hidden: true });
+  await page.reload();
+  assert.equal(await page.$(`[data-approval-id="${saved.id}"]`), null);
+  const decided = await page.evaluate(() => JSON.parse(localStorage.getItem('pq_change_request_history'))[0]);
+  assert.equal(decided.status, 'Approved');
+  assert.equal(decided.approverRemarks, 'Checked submitted details');
+  assert.deepEqual(decided.profile, saved.profile);
+  assert.deepEqual(decided.changes, saved.changes);
+
+  for (const [action, status] of [['resubmit', 'Resubmit'], ['reject', 'Rejected']]) {
+    const legacy = {
+      id: 'legacy-' + action, status: 'Pending HR Approval', submittedAt: '2026-11-10',
+      changes: [{section: 'personal', label: 'Name', oldVal: 'Earlier name', newVal: 'Submitted name'}]
+    };
+    await page.evaluate(row => {
+      const rows = JSON.parse(localStorage.getItem('pq_change_request_history'));
+      localStorage.setItem('pq_change_request_history', JSON.stringify([row, ...rows]));
+    }, legacy);
+    await page.goto('about:blank');
+    await page.goto(queue + '#approval/details/' + legacy.id);
+    assert.equal(await value('personal', 'Name'), 'Submitted name');
+    assert.equal(await value('personal', 'Personal Email'), '');
+    await page.click(`#careerPendingDetails [data-career-approval-action=${action}]`);
+    await page.waitForSelector('#careerPendingDetails', { hidden: true });
+    assert.equal(await page.evaluate(() => JSON.parse(localStorage.getItem('pq_change_request_history'))[0].status), status);
+  }
+  console.log('PASS: Submitted CV values, read-only approval, legacy requests and persisted decisions.');
+  await page.close();
+}
+
 (async () => {
   const browser = await puppeteer.launch({
     headless: true,
@@ -73,7 +151,7 @@ const url = file => pathToFileURL(path.resolve(__dirname, '..', file)).href;
       assert.equal(await page.$eval('#careerPendingDetailsTitle', n => n.textContent.trim()), 'CV Change Request Approval');
       assert.deepEqual(
         await page.$$eval('[data-cv-tab]', n => n.map(x => x.textContent.trim())),
-        ['Personal', 'Qualification', 'Payroll', 'Contacts', 'Family']
+        ['1Personal', '2Qualification', '3Payroll', '4Contact', '5Family']
       );
       assert.ok(await page.$eval('#cv-panel-personal .cv-history-detail-employee', n => (
         n.textContent.includes('Farhan binti rahmat') &&
@@ -92,7 +170,7 @@ const url = file => pathToFileURL(path.resolve(__dirname, '..', file)).href;
         family: [...document.querySelectorAll('#cv-panel-family tr.cv-history-field-changed')]
           .map(row => [...row.cells].map(cell => cell.textContent.trim()).join(' '))
       })), {
-        personal: ['Name', 'Birth Date', 'Marital Status', 'Passport #'],
+        personal: ['Name', 'Birth Date', 'Passport #', 'Marital Status'],
         qualification: ['Qualification', 'Major', 'Institute'],
         payroll: ['Account #', 'Spouse Handicap?'],
         contacts: ['Company Email', 'Mobile #', 'Emergency Contact #'],
@@ -175,7 +253,7 @@ const url = file => pathToFileURL(path.resolve(__dirname, '..', file)).href;
         const active = panel.querySelector('[data-qualification-card-panel]:not([hidden])');
         const panelBox = panel.getBoundingClientRect();
         const activeBox = active?.getBoundingClientRect();
-        const sheet = panel.closest('.payroll-approval-panel');
+        const sheet = panel.closest('.approval-record-page');
         const cardTops = cards.map(card => Math.round(card.getBoundingClientRect().top));
         return {
           oneVisibleRecord: panel.querySelectorAll('[data-qualification-card-panel]:not([hidden])').length === 1,
@@ -216,7 +294,7 @@ const url = file => pathToFileURL(path.resolve(__dirname, '..', file)).href;
         { title: 'Emergency Contact', fields: ['Emergency Contact #', 'Contact Name', 'Contact Address', 'Contact Postal Code', 'Contact City', 'Contact State', 'Contact Country', 'Remarks'] }
       ], 'Pending Approval keeps correspondence and emergency contact details separate');
       const contacts = await page.$eval('#cv-panel-contacts', n => n.textContent);
-      for (const value of ['yewweijiang123@gmail.com', 'Phone #', 'Mobile #', '0123456789', '10, JALAN UPTOWN 2', '#05-33 JALAN 2228', 'DAMANSARA KOTA', '40862', 'Damansara', 'SELANGOR', 'MALAYSIA', '04-6677778', 'RAZALI', 'AS CORRESPONDENCE ADDRESS', '01920', 'Puchong', 'State', '—', 'FATHER']) {
+      for (const value of ['yewweijiang123@gmail.com', 'Phone #', 'Mobile #', '0123456789', '10, JALAN UPTOWN 2', '#05-33 JALAN 2228', 'DAMANSARA KOTA', '40862', 'Damansara', 'SELANGOR', 'MALAYSIA', '04-6677778', 'RAZALI', 'AS CORRESPONDENCE ADDRESS', '01920', 'Puchong', 'State', 'FATHER']) {
         assert.ok(contacts.includes(value), 'Contacts includes ' + value);
       }
       await page.click('[data-cv-tab="family"]');
@@ -235,12 +313,12 @@ const url = file => pathToFileURL(path.resolve(__dirname, '..', file)).href;
       await page.click('[data-cv-tab="personal"]');
       const modernDetailLayout = await page.$eval('#careerPendingDetails', modal => {
         const overlayBox = modal.getBoundingClientRect();
-        const panel = modal.querySelector('.payroll-approval-panel');
+        const panel = modal.querySelector('.approval-record-layout');
         const panelBox = panel.getBoundingClientRect();
-        const navigation = modal.querySelector('.cv-history-navigation');
+        const navigation = modal.querySelector('.cv-step-track');
         const tabs = [...modal.querySelectorAll('[data-cv-tab]')];
         const tabBoxes = tabs.map(tab => tab.getBoundingClientRect());
-        const personalRows = [...modal.querySelectorAll('#cv-panel-personal > .cv-history-fields > .cv-history-detail-row')]
+        const personalRows = [...modal.querySelectorAll('#cv-panel-personal .cv-approval-field')]
           .slice(0, 3)
           .map(row => row.getBoundingClientRect());
         const footer = modal.querySelector('#careerPendingDetailsActions');
@@ -249,26 +327,25 @@ const url = file => pathToFileURL(path.resolve(__dirname, '..', file)).href;
           panelAnchoredToBottom: Math.abs(panelBox.bottom - overlayBox.bottom) <= 1,
           navigationHeight: navigation.getBoundingClientRect().height,
           tabsShareOneRow: new Set(tabBoxes.map(box => Math.round(box.top))).size === 1,
-          tabsFlowHorizontally: tabs.every(tab => getComputedStyle(tab).flexDirection === 'row'),
-          tabsAreCompact: tabBoxes.every(box => box.height <= 44),
-          tabRailScrollsHorizontally: navigation.querySelector('.cv-history-detail-tabs').scrollWidth > navigation.querySelector('.cv-history-detail-tabs').clientWidth,
+          allFiveStepsFit: navigation.scrollWidth <= navigation.clientWidth + 1,
+          readOnlyFields: [...modal.querySelectorAll('.cv-approval-field textarea')].every(control => control.readOnly),
           personalRowsAreGrouped: personalRows.length === 3 && personalRows.every((box, index) => index === 0 || box.top > personalRows[index - 1].top),
           actionHeights: [...footer.querySelectorAll('button')].map(button => button.getBoundingClientRect().height),
-          closeUsesSimpleGlyph: modal.querySelector('.payroll-approval-details-header .payroll-approval-close i')?.classList.contains('fa-xmark') === true
+          hasBack: Boolean(modal.querySelector('header [data-approval-back]'))
         };
       });
       assert.equal(modernDetailLayout.panelInsideViewport, true);
-      assert.equal(modernDetailLayout.panelAnchoredToBottom, true, 'Approval details use a bottom-anchored mobile sheet');
+      assert.equal(modernDetailLayout.panelAnchoredToBottom, true);
       assert.ok(modernDetailLayout.navigationHeight <= 78, 'Compact navigation leaves more room for request data');
       assert.equal(modernDetailLayout.tabsShareOneRow, true, 'Profile sections stay on a single horizontal rail');
-      assert.equal(modernDetailLayout.tabsFlowHorizontally, true);
-      assert.equal(modernDetailLayout.tabsAreCompact, true);
-      assert.equal(modernDetailLayout.tabRailScrollsHorizontally, true);
-      assert.equal(modernDetailLayout.personalRowsAreGrouped, true, 'Profile values use one grouped key-value list');
-      assert.ok(modernDetailLayout.actionHeights.every(height => height >= 44), 'Approval actions keep touch-friendly targets');
-      assert.equal(modernDetailLayout.closeUsesSimpleGlyph, true);
+      assert.equal(modernDetailLayout.allFiveStepsFit, true);
+      assert.equal(modernDetailLayout.readOnlyFields, true);
+      assert.equal(modernDetailLayout.personalRowsAreGrouped, true);
+      assert.ok(modernDetailLayout.actionHeights.every(height => height >= 40), 'Approval actions keep the shared action-button height');
+      assert.equal(modernDetailLayout.hasBack, true);
       await page.screenshot({ path: path.resolve(__dirname, 'employee-career-pending-detail-' + theme + '-' + width + '.png') });
-      await page.click('#careerPendingDetails [data-close-career-sheet]');
+      await page.click('#careerPendingDetails [data-approval-back]');
+      await page.waitForSelector('#careerPendingDetails', { hidden: true });
       assert.equal(await page.$eval('#careerPendingDetails', n => n.hidden), true);
       assert.equal(await page.evaluate(() => document.activeElement.classList.contains('career-pending-review')), true);
       await page.click('.three-dots-btn');
@@ -276,19 +353,22 @@ const url = file => pathToFileURL(path.resolve(__dirname, '..', file)).href;
       await page.waitForSelector('#careerPendingWorkflow', { visible: true });
       assert.ok(await page.$eval('#careerPendingWorkflowSteps', n => n.textContent.includes('No approval steps available.')));
       assert.ok(await page.$eval('#careerPendingWorkflowAudit', n => n.textContent.includes('No audit history available.')));
-      await page.keyboard.press('Escape');
+      await page.click('#careerPendingWorkflow [data-approval-back]');
+      await page.waitForSelector('#careerPendingWorkflow', { hidden: true });
       await page.screenshot({ path: path.resolve(__dirname, 'employee-career-pending-' + theme + '-' + width + '.png') });
       assert.ok(await page.$eval('.phone-container', n => n.scrollWidth <= n.clientWidth + 1));
       await page.click('.career-pending-review');
       await page.click('[data-cv-tab="family"]');
       await page.type('#careerPendingComments', 'Discard this draft remark');
-      await page.click('#careerPendingDetails [data-close-career-sheet]');
+      await page.click('#careerPendingDetails [data-approval-back]');
+      await page.waitForSelector('#careerPendingDetails', { hidden: true });
       assert.equal(await page.$eval('#careerPendingDetails', n => n.hidden), true, 'Close dismisses the review');
       assert.equal(await page.$eval('#careerPendingCount', n => n.textContent), '1', 'Close keeps the request pending');
       assert.equal(await page.evaluate(() => document.activeElement.classList.contains('career-pending-review')), true);
       await page.click('.career-pending-review');
       assert.equal(await page.$eval('#careerPendingComments', n => n.value), '', 'Close does not save an unsubmitted remark');
-      await page.click('#careerPendingDetails [data-close-career-sheet]');
+      await page.click('#careerPendingDetails [data-approval-back]');
+      await page.waitForSelector('#careerPendingDetails', { hidden: true });
       await page.click('.approval-request-card [data-career-approval-action="resubmit"]');
       assert.equal(await page.$eval('#careerPendingCount', n => n.textContent), '0');
       assert.equal(await page.$eval('#careerPendingEmpty', n => n.hidden), false);
@@ -301,6 +381,7 @@ const url = file => pathToFileURL(path.resolve(__dirname, '..', file)).href;
       console.log('PASS ' + theme + ' ' + width);
       await page.close();
     }
+    await checkSubmittedCV(browser);
   } finally {
     await browser.close();
   }

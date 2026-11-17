@@ -13,6 +13,7 @@
   <link rel="stylesheet" href="css/app.css">
   <script src="js/components.js"></script>
   <script src="js/app.js" defer></script>
+  <script src="modules/employee-career/js/cv-change-requests.js"></script>
   <link rel="stylesheet" href="css/form-section-headings.css">
   <link rel="stylesheet" href="css/cv-change-request-steps.css">
 </head>
@@ -22,7 +23,7 @@
   <!-- Desktop Switcher Bar (Light/Dark Mode outside phone frame) -->
   <preview-top-bar active-page="me"></preview-top-bar>
 
-  <div class="phone-container change-request-page">
+  <div class="phone-container change-request-page" data-emp-no="EBB12">
     <!-- Top Executive Header Block (Purple Gradient) -->
     <div class="bonus-top-header" style="padding-bottom: 12px;">
       <!-- Status Bar -->
@@ -1584,6 +1585,7 @@ DAMANSARA KOTA</textarea>
         modifiedFields.delete(addKey);
       } else {
         modifiedFields.set('family_delete_' + removed.id, {
+          member: removed,
           element: null,
           label: 'Delete family member',
           oldVal: removed.name,
@@ -1695,17 +1697,46 @@ DAMANSARA KOTA</textarea>
       }
     }
 
-    // Confirm Submission
+    function submittedProfile() {
+      const profile = {};
+      for (const section of ['personal', 'payroll', 'contacts']) {
+        const fields = {};
+        for (const control of document.querySelectorAll('#cat-' + section + ' [data-field-id]')) {
+          const card = control.closest('.change-field-card, .change-toggle-card');
+          let label = card.querySelector('.change-field-label, .change-toggle-label').textContent.replace('*', '').trim();
+          if (control.dataset.fieldId === 'license') label = 'Driving License';
+          if (['em_postcode', 'em_city', 'em_state', 'em_country'].includes(control.dataset.fieldId)) label = 'Contact ' + label;
+          fields[label] = control.type === 'checkbox' ? (control.checked ? 'Yes' : 'No') : control.value;
+        }
+        profile[section] = fields;
+      }
+      profile.qualifications = qualificationRecords.map(record => ({
+        id: record.id, Qualification: record.qualification, Status: record.status, Description: record.description,
+        Major: record.major, Institute: record.institute, CGPA: record.cgpa, 'Certificate #': record.certificate,
+        'Start Date': record.startDate, 'End Date': record.endDate, Highest: record.highest ? 'Yes' : 'No',
+        Notes: record.notes, Attachments: record.attachments || []
+      }));
+      profile.family = {
+        existing: familyRecords,
+        deleted: [...modifiedFields.values()].filter(item => item.member).map(item => item.member)
+      };
+      return profile;
+    }
+
     function confirmSubmitRequest() {
       if (modifiedFields.size === 0) return;
       const changes = Array.from(modifiedFields, ([fieldId, item]) => {
         const section = fieldId.startsWith('qual_') ? 'qualification' : /^(fam_|family_)/.test(fieldId) ? 'family' : item.element?.closest('.change-form-container')?.id.replace(/^cat-/, '') || 'personal';
         return { fieldId, section, label: item.label, oldVal: item.oldVal, newVal: item.newVal };
       });
-      const request = { id: 'REQ-' + new Date().getFullYear() + '-' + String(Date.now()).slice(-6), submittedAt: new Date().toISOString(), status: 'Pending HR Approval', changes };
-      const history = JSON.parse(localStorage.getItem('pq_change_request_history') || '[]');
-      history.unshift(request);
-      localStorage.setItem('pq_change_request_history', JSON.stringify(history));
+      const profile = submittedProfile();
+      const request = {
+        id: 'REQ-' + new Date().getFullYear() + '-' + Date.now(), submittedAt: new Date().toISOString(),
+        status: 'Pending HR Approval', name: profile.personal.Name,
+        empNo: document.querySelector('.change-request-page').dataset.empNo, profile, changes
+      };
+      try { CVChangeRequests.submit(request); }
+      catch { showToast('Unable to submit', 'Could not save this request. Your edits are still here.'); return; }
       const list = document.getElementById('changeRequestHistoryList');
       if (list) {
         const row = document.createElement('div');

@@ -688,7 +688,6 @@
         <div style="background: linear-gradient(135deg, #4c1d95 0%, #6d28d9 50%, #7c3aed 100%); padding: 18px 20px; display: flex; justify-content: space-between; align-items: flex-start; box-shadow: 0 4px 20px rgba(124, 58, 237, 0.35);">
           <div>
             <div id="modalEmpNameText" style="font-size: 16px; font-weight: 800; color: #ffffff; line-height: 1.25;">Sarah Jenkins</div>
-            <div id="modalEmpIdBadge" style="font-family: monospace, sans-serif; color: rgba(255, 255, 255, 0.76); font-size: 11.5px; font-weight: 700; margin-top: 3px;">#EBB01</div>
             <div style="font-size: 10.5px; color: rgba(255, 255, 255, 0.75); font-weight: 700; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.8px;">Benefit Highlight Details</div>
           </div>
           <button type="button" onclick="closeBenefitDetailsModal()" style="width: 32px; height: 32px; border-radius: 50%; background: rgba(255, 255, 255, 0.18); border: 1px solid rgba(255, 255, 255, 0.25); color: #ffffff; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0;">
@@ -1115,7 +1114,6 @@
         ]
       };
 
-      document.getElementById('modalEmpIdBadge').textContent = empNo;
       document.getElementById('modalEmpNameText').textContent = data.name || empName;
 
       const listContainer = document.getElementById('benefitDetailsList');

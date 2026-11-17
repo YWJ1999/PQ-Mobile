@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Claims - Travel Mileage</title>
   <script src="../../../js/components.js"></script>
+  <script src="../../../js/claims/claim-request-store.js"></script>
+  <script src="../../../js/claims/claim-application-fields.js"></script>
   <script src="../../../js/app.js" defer></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -492,152 +494,7 @@
       <div class="view-container active" id="view-1-main">
 
         <!-- MAIN APPLICATION DETAILS CARD -->
-        <div class="form-card">
-          <div class="section-header-bar no-top-border">
-            <span class="section-title-accent"></span>
-            <span class="section-title-text">APPLICATION DETAILS</span>
-          </div>
-
-          <!-- Claim Period : -->
-          <div class="field-group">
-            <label class="field-label">Claim Period</label>
-            <div style="display: grid; grid-template-columns: 1fr 1.2fr; gap: 10px;">
-              <div class="select-wrapper">
-                <select id="v1ClaimPeriodYear" class="form-ctrl">
-                  <option value="2026" selected>2026</option>
-                  <option value="2025">2025</option>
-                </select>
-              </div>
-              <div class="select-wrapper">
-                <select id="v1ClaimPeriodMonth" class="form-ctrl">
-                  <option value="September" selected>September</option>
-                  <option value="August">August</option>
-                  <option value="July">July</option>
-                </select>
-              </div>
-            </div>
-          </div>
-
-          <!-- Travelling Request # : -->
-          <div class="field-group">
-            <label class="field-label">Travelling Request #</label>
-            <div class="select-wrapper">
-              <select id="v1TravellingReqNo" class="form-ctrl">
-                <option value="" selected>- Select Travelling Request # -</option>
-                <option value="TR-2026-001">TR-2026-001 (KL Site Visit)</option>
-                <option value="TR-2026-002">TR-2026-002 (Penang Client Meeting)</option>
-              </select>
-            </div>
-          </div>
-
-          <!-- Benefit Type : -->
-          <div class="field-group">
-            <label class="field-label">Benefit Type</label>
-            <div class="select-wrapper">
-              <select id="v1TravelClaimType" class="form-ctrl">
-                <option value="" selected>Select Benefit</option>
-                <option value="MILEAGE">MILEAGE (RM0.80/KM)</option>
-                <option value="TRAVEL RECORD">TRAVEL RECORD</option>
-                <option value="PARKING & TOLLS">PARKING &amp; TOLL RECEIPTS</option>
-              </select>
-            </div>
-          </div>
-
-          <!-- Claim Date : -->
-          <div class="field-group">
-            <label class="field-label">Claim Date</label>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-              <input type="date" id="v1ClaimStartDate" class="form-ctrl" value="2026-09-23" aria-label="Claim Date From" />
-              <input type="date" id="v1ClaimEndDate" class="form-ctrl" value="2026-09-23" aria-label="Claim Date To" />
-            </div>
-          </div>
-
-          <!-- Cost Centre : -->
-          <div class="field-group">
-            <label class="field-label">Cost Centre</label>
-            <div class="select-wrapper">
-              <select id="v1CostCentre" class="form-ctrl">
-                <option value="MANAGEMENT" selected>MANAGEMENT</option>
-                <option value="ADMINISTRATION">ADMINISTRATION</option>
-                <option value="OPERATIONS">OPERATIONS</option>
-              </select>
-            </div>
-          </div>
-
-          <!-- Charge To : -->
-          <div class="field-group">
-            <label class="field-label">Charge To</label>
-            <div class="select-wrapper">
-              <select id="v1ChargeTo" class="form-ctrl">
-                <option value="" selected>- Select Charge -</option>
-                <option value="Company HQ">Company HQ</option>
-                <option value="Project Budget">Project Budget</option>
-                <option value="Client Account">Client Account</option>
-              </select>
-            </div>
-          </div>
-
-          <!-- Purpose : -->
-          <div class="field-group">
-            <label class="field-label">Purpose</label>
-            <input type="text" id="v1Purpose" class="form-ctrl" placeholder="" />
-          </div>
-
-          <!-- Project : -->
-          <div class="field-group">
-            <label class="field-label">Project</label>
-            <div class="select-wrapper">
-              <select id="v1Project" class="form-ctrl">
-                <option value="" selected>- Select Project -</option>
-                <option value="PROJ-01">HQ Digitalization</option>
-                <option value="PROJ-02">Enterprise Migration</option>
-              </select>
-            </div>
-          </div>
-
-          <!-- Claim Currency : -->
-          <div class="field-group">
-            <label class="field-label">Claim Currency</label>
-            <div class="select-wrapper">
-              <select id="v1ClaimCurrency" class="form-ctrl">
-                <option value="MYR" selected>RINGGIT MALAYSIA</option>
-                <option value="USD">US DOLLAR</option>
-                <option value="SGD">SINGAPORE DOLLAR</option>
-              </select>
-            </div>
-          </div>
-
-          <!-- Claim Total : -->
-          <div class="field-group">
-            <div style="display: flex; align-items: center; justify-content: space-between; padding: 4px 0;">
-              <span class="field-label" style="margin-bottom: 0;">Claim Total</span>
-              <span id="travelClaimTotalDisplay" style="font-size: 15px; font-weight: 800; color: var(--text-primary);">0.00</span>
-            </div>
-          </div>
-
-          <!-- Remarks : (Exact label matching Image 4) -->
-          <div class="field-group">
-            <label class="field-label">Remarks</label>
-            <input type="text" id="v1Remarks" class="form-ctrl" placeholder="" />
-          </div>
-
-          <!-- Upload Attachment -->
-          <div class="field-group">
-            <label class="field-label form-section-heading">Upload Attachment</label>
-            <div style="display: flex; align-items: center; justify-content: center; gap: 36px; padding: 8px 0;">
-              <div style="display: flex; flex-direction: column; align-items: center; gap: 8px; cursor: pointer;" onclick="triggerFileUpload('main')">
-                <div style="width: 54px; height: 54px; border-radius: 50%; background: rgba(124, 58, 237, 0.12); border: 1px solid rgba(124, 58, 237, 0.3); display: flex; align-items: center; justify-content: center; color: var(--purple-primary); font-size: 18px;"><i class="fa-solid fa-file-arrow-up"></i></div>
-                <span style="font-size: 12.5px; font-weight: 700; color: var(--purple-primary);">Select File(s)</span>
-              </div>
-              <div style="display: flex; flex-direction: column; align-items: center; gap: 8px; cursor: pointer;" onclick="triggerFileUpload('main')">
-                <div style="width: 54px; height: 54px; border-radius: 50%; background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%); display: flex; align-items: center; justify-content: center; color: #ffffff; font-size: 18px; box-shadow: 0 6px 18px rgba(124, 58, 237, 0.45);"><i class="fa-solid fa-camera"></i></div>
-                <span style="font-size: 12.5px; font-weight: 800; color: var(--text-primary);">Take Picture</span>
-              </div>
-            </div>
-            <div id="mainChipsList" class="attachment-upload-list"></div>
-          </div>
-
-        </div>
+        <template id="claimApplicationFields"></template>
 
         <!-- AGGREGATED SUMMARY ROW (Level 1 Total Claim & Drill-down Entry) -->
         <div class="category-summary-row" onclick="switchView('view-2-categories', 'Claim Categories')" style="background: linear-gradient(135deg, rgba(124, 58, 237, 0.12) 0%, rgba(109, 40, 217, 0.18) 100%); border: 1.5px solid rgba(124, 58, 237, 0.4); border-radius: 22px; padding: 18px; margin-bottom: 16px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 6px 20px rgba(124, 58, 237, 0.18); transition: transform 0.2s ease;">
@@ -831,6 +688,7 @@
 
   <!-- DRILL-DOWN NAVIGATION & FORM STATE MANAGEMENT SCRIPT -->
   <script>
+    ClaimApplicationFields.mount('Travel Claim');
     const formData = {
       applicationInfo: {
         claimPeriodYear: '2026',
@@ -2060,6 +1918,8 @@
     }
 
     function submitTravelClaim() {
+      if (!ClaimApplicationFields.submit('Travel Claim', { mileageItems: formData.claimDetails.mileageItems, travelItems: formData.claimDetails.travelItems,
+        expenseItems: formData.claimDetails.generalExpenseItems, attachments: formData.mainAttachments })) return;
       if (typeof showToast === 'function') showToast('🚀 Travel Mileage submitted successfully!');
       else alert('Travel Mileage submitted successfully!');
       window.location.href = '../index.html';

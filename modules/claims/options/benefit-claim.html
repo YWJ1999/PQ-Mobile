@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Claims - Benefit Claim</title>
   <script src="../../../js/components.js"></script>
+  <script src="../../../js/claims/claim-request-store.js"></script>
+  <script src="../../../js/claims/benefit-claim-form.js"></script>
   <script src="../../../js/app.js" defer></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -13,6 +15,7 @@
   <link rel="stylesheet" href="../../../css/theme.css">
   <link rel="stylesheet" href="../../../css/app.css">
   <link rel="stylesheet" href="../../../css/claim-forms.css">
+  <link rel="stylesheet" href="../../../css/benefit-claim-form.css">
   <style>
     * {
       margin: 0;
@@ -92,49 +95,6 @@
       transform: scale(0.96);
     }
 
-    .field-label {
-      display: block;
-      font-size: 12.5px;
-      font-weight: 700;
-      color: var(--text-muted);
-      margin-bottom: 6px;
-    }
-    .field-label span.req {
-      color: #ef4444;
-    }
-
-    .form-input-ctrl {
-      width: 100%;
-      background: var(--bg-input);
-      border: 1px solid var(--border-subtle);
-      border-radius: 12px;
-      padding: 12px 14px;
-      font-size: 13.5px;
-      font-weight: 600;
-      color: var(--text-primary);
-      outline: none;
-      transition: all 0.2s ease;
-      font-family: inherit;
-    }
-    .form-input-ctrl:focus {
-      border-color: var(--purple-primary);
-      box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.15);
-    }
-    .form-input-ctrl[readonly] {
-      opacity: 1;
-      background: var(--bg-input);
-    }
-
-    .balance-pill {
-      background: #4b5563;
-      color: #ffffff;
-      font-size: 13px;
-      font-weight: 800;
-      padding: 4px 16px;
-      border-radius: 20px;
-      display: inline-block;
-    }
-
     .attach-btn-pill {
       flex: 1;
       display: flex;
@@ -153,68 +113,6 @@
     }
     .attach-btn-pill:active {
       transform: scale(0.97);
-    }
-
-    .attachment-upload-list {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      width: 100%;
-      margin-top: 12px;
-    }
-    .attachment-upload-item {
-      width: 100%;
-      min-width: 0;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      box-sizing: border-box;
-      padding: 8px 10px;
-      background: var(--bg-input);
-      border: 1px solid var(--border-subtle);
-      border-radius: 12px;
-    }
-    .attachment-upload-icon {
-      width: 28px;
-      height: 28px;
-      flex: 0 0 28px;
-      border-radius: 9px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      background: rgba(124, 58, 237, 0.14);
-      color: var(--purple-primary);
-      font-size: 12px;
-    }
-    .attachment-upload-name {
-      min-width: 0;
-      flex: 1;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      color: var(--text-primary);
-      font-size: 11.5px;
-      font-weight: 700;
-    }
-    .attachment-upload-remove {
-      width: 26px;
-      height: 26px;
-      flex: 0 0 26px;
-      border: 0;
-      border-radius: 8px;
-      background: transparent;
-      color: var(--text-muted);
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      transition: background 0.2s ease, color 0.2s ease;
-    }
-    .attachment-upload-remove:hover,
-    .attachment-upload-remove:focus-visible {
-      background: rgba(239, 68, 68, 0.12);
-      color: #ef4444;
-      outline: none;
     }
 
   </style>
@@ -383,151 +281,7 @@
 
       <!-- VIEW 2: BENEFIT CLAIM APPLICATION FORM (MATCHING SCREENSHOT FIELDS & LEAVE FORM DESIGN) -->
       <div id="viewBenefitForm" style="display: none; margin-top: 4px; padding-bottom: 30px;">
-        <div style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 24px; padding: 20px; box-shadow: var(--shadow-card); margin-bottom: 20px;">
-          
-          <!-- FORM HEADER INFO -->
-          <div style="margin-bottom: 20px;">
-            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
-              <h2 class="form-section-heading" style="font-size: 19px; font-weight: 800; color: var(--text-primary); letter-spacing: -0.3px; margin: 0;">Benefit Details</h2>
-              <div style="font-size: 12.5px; font-weight: 700; color: var(--text-muted);">
-                Entitlement Year <strong style="color: var(--text-primary);">2026</strong>
-              </div>
-            </div>
-
-            <div style="display: flex; flex-direction: column; gap: 16px;">
-              
-              <!-- 1. Benefit Type -->
-              <div>
-                <label class="field-label">Benefit Type <span class="req">*</span></label>
-                <select id="mainApplyBenefitTypeSelect" class="form-input-ctrl" onchange="handleBenefitTypeChange(this.value)">
-                  <option value="CAR MAINTENANCE">CAR MAINTENANCE</option>
-                  <option value="PERSONAL ALLOWANCE">PERSONAL ALLOWANCE</option>
-                  <option value="MOBILE PHONE">MOBILE PHONE</option>
-                  <option value="OPTICAL &amp; DENTAL">OPTICAL &amp; DENTAL</option>
-                </select>
-              </div>
-
-              <!-- 2. Entitled Balance & Usable Balance -->
-              <div style="display: flex; flex-direction: column; gap: 10px;">
-                <div style="display: flex; align-items: center; gap: 10px;">
-                  <span class="field-label" style="margin-bottom: 0; min-width: 120px;">Entitled Balance</span>
-                  <span id="entitledBalanceDisplay" class="balance-pill">1000.00</span>
-                </div>
-                <div style="display: flex; align-items: center; gap: 10px;">
-                  <span class="field-label" style="margin-bottom: 0; min-width: 120px;">Usable Balance</span>
-                  <span id="usableBalanceDisplay" class="balance-pill">803.00</span>
-                </div>
-              </div>
-
-              <!-- 3. Claim Period (Year & Month) -->
-              <div>
-                <label class="field-label">Claim Period <span class="req">*</span></label>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                  <select id="claimPeriodYear" class="form-input-ctrl">
-                    <option value="2026" selected>2026</option>
-                    <option value="2025">2025</option>
-                  </select>
-                  <select id="claimPeriodMonth" class="form-input-ctrl">
-                    <option value="September" selected>September</option>
-                    <option value="August">August</option>
-                    <option value="July">July</option>
-                    <option value="June">June</option>
-                  </select>
-                </div>
-              </div>
-
-              <!-- 4. Start Date & End Date -->
-              <div>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                  <div>
-                    <label class="field-label">Start Date</label>
-                    <input type="date" id="startDateInput" class="form-input-ctrl" value="2026-09-22" aria-label="Start Date" />
-                  </div>
-                  <div>
-                    <label class="field-label">End Date</label>
-                    <input type="date" id="endDateInput" class="form-input-ctrl" value="2026-09-22" aria-label="End Date" />
-                  </div>
-                </div>
-              </div>
-
-              <!-- 5. Purpose -->
-              <div>
-                <label class="field-label">Purpose <span class="req">*</span></label>
-                <input type="text" id="purposeInput" class="form-input-ctrl" placeholder="Enter claim purpose..." />
-              </div>
-
-              <!-- 6. Receipt # & Other Reference # -->
-              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                <div>
-                  <label class="field-label">Receipt # <span class="req">*</span></label>
-                  <input type="text" id="receiptNoInput" class="form-input-ctrl" placeholder="Receipt #" />
-                </div>
-                <div>
-                  <label class="field-label">Other Reference #</label>
-                  <input type="text" id="otherRefNoInput" class="form-input-ctrl" placeholder="Ref #" />
-                </div>
-              </div>
-
-              <!-- 7. Currency -->
-              <div>
-                <label class="field-label">Currency <span class="req">*</span></label>
-                <select id="currencySelect" class="form-input-ctrl">
-                  <option value="US DOLLAR" selected>US DOLLAR</option>
-                  <option value="MYR">MYR - MALAYSIAN RINGGIT</option>
-                  <option value="SGD">SGD - SINGAPORE DOLLAR</option>
-                </select>
-              </div>
-
-              <!-- 8. Claim Amount & Claim Quantity -->
-              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                <div>
-                  <label class="field-label">Claim Amount <span class="req">*</span></label>
-                  <input type="number" id="expenseAmountInput" class="form-input-ctrl" placeholder="0.00" step="0.01" />
-                </div>
-                <div>
-                  <label class="field-label">Claim Quantity <span class="req">*</span></label>
-                  <input type="number" id="claimQuantityInput" class="form-input-ctrl" value="5" min="1" />
-                </div>
-              </div>
-
-              <!-- 9. Remarks -->
-              <div>
-                <label class="field-label">Remarks</label>
-                <textarea id="remarksInput" rows="3" class="form-input-ctrl" placeholder="Add optional remarks..." style="font-family: inherit; resize: vertical;"></textarea>
-              </div>
-
-              <!-- 10. Upload Attachment -->
-              <div style="margin-top: 6px;">
-                <label class="field-label form-section-heading" style="font-size: 13px; font-weight: 700; color: var(--text-primary); margin-bottom: 10px; display: block;">Upload Attachment</label>
-                
-                <div style="display: flex; align-items: center; justify-content: center; gap: 36px; padding: 12px 0 6px;">
-                  <!-- Select File(s) Circle Button -->
-                  <div style="display: flex; flex-direction: column; align-items: center; gap: 8px; cursor: pointer;" onclick="triggerClaimFileUpload('file')">
-                    <div style="width: 58px; height: 58px; border-radius: 50%; background: rgba(124, 58, 237, 0.12); border: 1px solid rgba(124, 58, 237, 0.3); display: flex; align-items: center; justify-content: center; color: var(--purple-primary); font-size: 20px; transition: transform 0.15s;" onmousedown="this.style.transform='scale(0.92)'" onmouseup="this.style.transform='scale(1)'">
-                      <i class="fa-solid fa-file-arrow-up"></i>
-                    </div>
-                    <span style="font-size: 13px; font-weight: 700; color: var(--purple-primary);">Select File(s)</span>
-                  </div>
-
-                  <!-- Take a Picture Circle Button -->
-                  <div style="display: flex; flex-direction: column; align-items: center; gap: 8px; cursor: pointer;" onclick="triggerClaimFileUpload('camera')">
-                    <div style="width: 58px; height: 58px; border-radius: 50%; background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%); display: flex; align-items: center; justify-content: center; color: #ffffff; font-size: 20px; box-shadow: 0 6px 18px rgba(124, 58, 237, 0.45); transition: transform 0.15s;" onmousedown="this.style.transform='scale(0.92)'" onmouseup="this.style.transform='scale(1)'">
-                      <i class="fa-solid fa-camera"></i>
-                    </div>
-                    <span style="font-size: 13px; font-weight: 800; color: var(--text-primary);">Take a Picture</span>
-                  </div>
-                </div>
-
-                <!-- Attached Files List -->
-                <div id="uploadedClaimFilesChipsList" class="attachment-upload-list"></div>
-
-                <input type="file" id="hiddenClaimFileInput" style="display: none;" onchange="handleClaimFileSelected(this)" />
-              </div>
-
-            </div>
-          </div>
-
-        </div>
+        <div id="benefitClaimFields"></div>
 
         <div class="form-action-row" style="margin-top: 20px; padding-bottom: 24px;">
           <button type="button" class="form-cancel-btn" data-page-form-cancel onclick="handleBenefitBack()">
@@ -591,6 +345,7 @@
   </div>
 
   <script>
+    document.getElementById('benefitClaimFields').append(BenefitClaimForm.create());
     let currentView = 'list';
 
     // Exact balances matching user screenshots
@@ -636,6 +391,7 @@
       if (disp) {
         disp.innerText = `${yr} · ${typeLabel}`;
       }
+      document.querySelector('[data-benefit-field="entitlementYear"]').textContent = yr;
       const count = document.getElementById('benefitTypeCountDisplay');
       if (count) count.innerText = `${visibleCount} ${visibleCount === 1 ? 'type' : 'types'}`;
       closeEntitlementYearFilterModal();
@@ -708,8 +464,14 @@
     }
 
     function submitBenefitClaimForm() {
-      const select = document.getElementById('mainApplyBenefitTypeSelect');
-      const name = select ? select.value : 'Benefit';
+      const fields = BenefitClaimForm.read(document.getElementById('benefitClaimFields'));
+      try {
+        ClaimRequestStore.submit(fields);
+      } catch {
+        showToast('Could not save the benefit claim. Please try again.');
+        return;
+      }
+      const name = fields.benefitType;
       if (typeof showToast === 'function') {
         showToast(`✅ [${name}] Benefit claim submitted successfully!`);
       } else {

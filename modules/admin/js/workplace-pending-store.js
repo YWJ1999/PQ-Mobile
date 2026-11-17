@@ -24,7 +24,7 @@
       audit: [{ action: 'submitted', at: '2026-09-08', comments: '' }]
     }
   ];
-  function list() {
+  function storedRows() {
     const raw = localStorage.getItem(key);
     if (raw === null) {
       const rows = initial();
@@ -62,13 +62,36 @@
     }
     return rows;
   }
+  function guestDecisions() {
+    if (!localStorage.getItem(key)) return new Map();
+    return new Map(storedRows().filter(row => row.guestRevision).map(row => [row.id, row]));
+  }
+  function list(stored = storedRows()) {
+    const history = window.WorkplaceHistoryStore;
+    if (!history) return stored;
+    const decisions = new Map(stored.filter(row => row.guestRevision).map(row => [row.id, row]));
+    const visits = history.list(decisions).filter(row => row.kind === 'guest-visit' && row.guestVisit).map(row => {
+      const { revision, submittedAt, ...fields } = row.guestVisit;
+      const decision = decisions.get(row.id);
+      const current = decision?.guestRevision === revision ? decision : null;
+      return {
+        ...fields, id: row.id, kind: row.kind, reference: history.referenceNumber(row),
+        guestRevision: revision, status: row.status,
+        approverComments: current?.approverComments || '',
+        audit: current?.audit || [...(decision?.audit || []), { action: 'submitted', at: submittedAt, comments: '' }]
+      };
+    });
+    return [...visits, ...stored.filter(row => !row.guestRevision)];
+  }
   function act(ids, action, options = {}) {
     const status = { approve: 'approved', resubmit: 'resubmit', reject: 'rejected', cancel: 'cancelled' }[action];
     if (!status) throw new Error('Unsupported approval action.');
     if (!Array.isArray(ids) || !ids.length || new Set(ids).size !== ids.length) throw new Error('Please select a request.');
-    const rows = list();
+    const stored = storedRows();
+    const rows = list(stored);
     const targets = ids.map(id => rows.find(row => row.id === id && row.status === 'submitted'));
     if (targets.some(row => !row)) throw new Error('This request is no longer pending.');
+    if (options.guestRevision && targets.some(row => row.guestRevision !== options.guestRevision)) throw new Error('This request has changed. Reopen it before reviewing.');
     const comments = String(options.comments || '').trim();
     const at = new Date().toISOString();
     targets.forEach(row => {
@@ -76,8 +99,11 @@
       row.approverComments = comments;
       row.audit.push({ action, at, comments });
     });
-    localStorage.setItem(key, JSON.stringify(rows));
+    // Commit the decisions together. Unreviewed submissions are still owned by History.
+    const saved = new Map(stored.map(row => [row.id, row]));
+    targets.forEach(row => saved.set(row.id, row));
+    localStorage.setItem(key, JSON.stringify([...saved.values()]));
     return targets.length;
   }
-  window.WorkplacePendingStore = { list, getPending: () => list().filter(row => row.status === 'submitted'), act };
+  window.WorkplacePendingStore = { list, getPending: () => list().filter(row => row.status === 'submitted'), act, guestDecisions };
 })();

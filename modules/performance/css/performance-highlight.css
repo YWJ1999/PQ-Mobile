@@ -55,7 +55,6 @@
 .performance-highlight-page [aria-invalid='true'] { border-color: #ef4444 !important; }
 .performance-highlight-details-overlay { display: flex; }
 .performance-highlight-details-overlay .detail-popout-value { white-space: pre-line; }
-:is(#performanceHighlightDetailEmpNo, #incidentHighlightDetailEmpNo) { font-family: monospace, sans-serif; font-size: 11.5px !important; font-weight: 700 !important; opacity: .8; }
 @media (max-width: 480px) {
   .performance-highlight-page { height: 100dvh; padding: 0; overflow: hidden; }
   .performance-highlight-page > preview-top-bar { flex-shrink: 0; }

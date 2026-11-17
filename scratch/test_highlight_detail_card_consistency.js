@@ -36,8 +36,7 @@ async function inspectClaimHighlight(page, config) {
     return {
       modalOpen: modal?.style.display === 'flex',
       name: clean(name?.textContent),
-      id: clean(id?.textContent),
-      idBelowName: Boolean(name && id && id.getBoundingClientRect().top >= name.getBoundingClientRect().bottom),
+      hasHeaderId: Boolean(id),
       period: clean(firstRecord?.querySelector(config.periodValueSelector)?.textContent),
       type: clean(firstRecord?.querySelector(config.typeSelector)?.textContent),
       amount: clean(firstRecord?.querySelector(config.amountSelector)?.textContent),
@@ -106,7 +105,7 @@ async function inspectClaimHighlight(page, config) {
     await page.evaluate(() => {
       document.documentElement.setAttribute('data-theme', 'light');
       showLeaveSection('viewLeaveHighlight');
-      document.querySelector('#viewLeaveHighlight tbody tr td:last-child').click();
+      document.querySelector('#viewLeaveHighlight .leave-highlight-total-pill').click();
     });
     await new Promise(resolve => setTimeout(resolve, 60));
 
@@ -119,14 +118,12 @@ async function inspectClaimHighlight(page, config) {
       const dateHeader = firstRecord?.querySelector('.leave-highlight-detail-date');
       const recordStyle = firstRecord ? getComputedStyle(firstRecord) : null;
       const detailsList = document.querySelector('.leave-highlight-details-list');
-      const totalLeavePill = document.querySelector('#viewLeaveHighlight tbody tr td:last-child span');
+      const totalLeavePill = document.querySelector('#viewLeaveHighlight .leave-highlight-total-pill');
 
       return {
         modalOpen: modal?.style.display === 'flex',
         name: (name?.textContent || '').replace(/\s+/g, ' ').trim(),
-        id: (id?.textContent || '').replace(/\s+/g, ' ').trim(),
-        idBelowName: Boolean(name && id &&
-          id.getBoundingClientRect().top >= name.getBoundingClientRect().bottom),
+        hasHeaderId: Boolean(id),
         recordCount: records.length,
         firstRecordText: (firstRecord?.textContent || '').replace(/\s+/g, ' ').trim(),
         usesOneBorder: Boolean(recordStyle &&
@@ -155,8 +152,7 @@ async function inspectClaimHighlight(page, config) {
       benefit.modalOpen &&
       benefit.recordCount === 6 &&
       benefit.name === 'Sarah Jenkins' &&
-      benefit.id === '#EBB01' &&
-      benefit.idBelowName &&
+      !benefit.hasHeaderId &&
       benefit.period === '202105' &&
       benefit.type === 'ENTERTAINMENT' &&
       benefit.amount === '3,588.00' &&
@@ -168,8 +164,7 @@ async function inspectClaimHighlight(page, config) {
       expense.modalOpen &&
       expense.recordCount === 3 &&
       expense.name === 'Marcus Tan' &&
-      expense.id === '#004177' &&
-      expense.idBelowName &&
+      !expense.hasHeaderId &&
       expense.period === '202609' &&
       expense.type === 'CLIENT DINING & ENTERTAINMENT' &&
       expense.amount === '2,450.00' &&
@@ -180,8 +175,7 @@ async function inspectClaimHighlight(page, config) {
       expense.recordBackgrounds.every(color => color === LIGHT_CARD) &&
       leave.modalOpen &&
       leave.name === 'AHMAD RAFY BIN ZULKIPLE' &&
-      leave.id === '#004177' &&
-      leave.idBelowName &&
+      !leave.hasHeaderId &&
       leave.recordCount > 0 &&
       leave.firstRecordText === '02 Sep 2026 Description Annual Leave Days 1.00' &&
       leave.firstRecordText.includes('Description') &&

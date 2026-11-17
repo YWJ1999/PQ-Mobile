@@ -208,9 +208,9 @@
       : '—';
     byId('taxReliefDetailTable').innerHTML = [
       detailRow('Reference #', record.reference),
+      detailRow('Status', recordDetailStatus.html(formatStatus(record.status)), true),
       detailRow('Emp #', `#${record.empNo.replace(/^#+/, '')}`),
       detailRow('Name', record.name),
-      detailRow('Status', recordDetailStatus.html(formatStatus(record.status)), true),
       detailRow('Submit Date', formatDate(record.submitDate)),
       detailRow('Rebate Item', record.rebateItem),
       detailRow('Transaction Date', formatDate(record.transactionDate)),

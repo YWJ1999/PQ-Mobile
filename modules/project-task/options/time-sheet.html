@@ -14,6 +14,8 @@
   <link rel="stylesheet" href="../../../css/project-task-forms.css">
   <script src="../../../js/components.js"></script>
   <script src="../../../js/app.js" defer></script>
+  <script src="../../../js/project-task/timesheet-requests.js" defer></script>
+  <script src="../../../js/project-task/timesheet-view.js" defer></script>
   <script src="../../../js/project-task/project-task-app.js" defer></script>
   <script src="../../../js/project-task/project-task-forms.js" defer></script>
   <link rel="stylesheet" href="../../../css/form-section-headings.css">
@@ -32,23 +34,7 @@
     <main class="main-content project-task-content">
       <div id="timesheet-main-view">
         <form id="timesheetForm" novalidate>
-          <section class="form-card" aria-labelledby="timesheetDetailsHeading">
-            <div class="section-header-bar"><span class="section-title-accent" aria-hidden="true"></span><h2 class="section-title-text" id="timesheetDetailsHeading">Timesheet Details</h2></div>
-            <div class="field-group"><label class="field-label" for="timesheetDate">Timesheet Date <span class="req">*</span></label><input type="date" id="timesheetDate" name="date" class="form-ctrl" data-today required></div>
-            <div class="field-group"><span class="field-label">Clock Times</span><div class="project-clock-times" id="timesheetClockTimes">No clock times recorded</div></div>
-            <div class="project-hours-summary" aria-live="polite">
-              <div class="project-hours-stat"><span>Normal Work Hours</span><strong id="normalWorkHours">0.00 Hours</strong></div>
-              <div class="project-hours-stat"><span>Overtime Hours</span><strong id="overtimeHours">0.00 Hours</strong></div>
-            </div>
-            <div class="field-group"><label class="field-label" for="timesheetRemark">Remark</label><textarea id="timesheetRemark" name="remark" class="form-ctrl" rows="3"></textarea></div>
-          </section>
-          <section class="form-card project-activities-card" aria-labelledby="workActivityHeading">
-            <div class="project-activities-header">
-              <div class="project-activities-heading"><span class="project-option-icon"><i class="fa-solid fa-list-check" aria-hidden="true"></i></span><div><h2 class="form-section-heading" id="workActivityHeading">Work Activity</h2><span class="project-activities-total" id="workActivityTotal">Total Hours: 0.0 hrs</span></div></div>
-              <button type="button" class="btn-submit-primary project-add-activity" id="addWorkActivity" aria-label="Add Work Activity" title="Add Work Activity"><i class="fa-solid fa-plus" aria-hidden="true"></i></button>
-            </div>
-            <div class="project-activities-list" id="workActivityList"></div>
-          </section>
+          <template id="timesheetFields"></template>
           <div class="project-form-actions form-action-row">
             <button type="button" class="form-cancel-btn" data-page-form-cancel onclick="window.location.href='../index.html?scope=individual'"><i class="fa-solid fa-xmark" aria-hidden="true"></i><span>Cancel</span></button>
             <button type="button" class="btn-submit-primary" id="saveTimesheetDraft"><i class="fa-solid fa-floppy-disk" aria-hidden="true"></i><span>Save Draft</span></button>

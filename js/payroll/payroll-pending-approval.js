@@ -51,8 +51,8 @@
   function filteredItems() {
     return window.PayrollPendingStore.getPending().filter(item => item.category === activeTab && filter.matches({
       keyword: [tabNames[item.category], ...Object.values(item).filter(value => typeof value !== 'object'), ...(item.attachments || []).map(file => file.name), '#' + item.empNo].join(' '),
-      startDate: item.transactionDate || item.dateFrom,
-      endDate: item.transactionDate || item.dateTo,
+      startDate: item.transactionDate || item.dateFrom || item.stopDate,
+      endDate: item.transactionDate || item.dateTo || item.stopDate,
       submittedAt: item.submitDate || item.requestDate
     }));
   }
@@ -116,15 +116,19 @@
     header.insertBefore(status, menu);
     const fields = item.category === 'tax'
       ? [
-          ['Submit Date', date(item.submitDate || item.requestDate)], ['Tax Relief Item', item.rebateCode + ' - ' + item.rebateItem],
+          ['Submit Date', date(item.submitDate || item.requestDate)], ['Tax Relief Item', [item.rebateCode, item.rebateItem].filter(Boolean).join(' - ')],
           ['Description', item.description], ['Txn. Date', date(item.transactionDate)], ['Process', item.process ? 'Yes' : 'No']
         ]
       : [
           ['Request Date', date(item.submitDate || item.requestDate)], ['Deduction Type', item.deductionType], ['Request Type', item.requestType],
-          ['Date From', date(item.dateFrom)], ['Date To', date(item.dateTo)], ['Days', item.days.toFixed(2)],
-          ['Period', item.period], ['Cycle', item.cycle]
+          ...(item.stopPeriod || item.stopDate || item.stopCycle ? [
+            ['Stop Period', item.stopPeriod], ['Stop Date', date(item.stopDate)], ['Stop Cycle', item.stopCycle]
+          ] : [
+            ['Date From', date(item.dateFrom)], ['Date To', date(item.dateTo)], ['Days', item.days?.toFixed(2) ?? '—'],
+            ['Period', item.period], ['Cycle', item.cycle]
+          ])
         ];
-    fields.push(['Amount', money(item.amount)]);
+    if (item.amount != null && item.amount !== '') fields.push(['Amount', money(item.amount)]);
     body.append(PendingApprovalPage.link(item.id, createApprovalCardDetails(fields)), createApprovalCardActions('payrollAction', { resubmit: item.category !== 'deduction' }));
     PendingApprovalBackup.showAssignment(body.lastElementChild, { scope: 'payroll', id: item.id });
     card.append(header, body);
@@ -189,57 +193,15 @@
     toggleOverlay(currentSheet, true);
     currentSheet.querySelector('button').focus({ preventScroll: true });
   }
-  function attachmentContent(item) {
-    const attachments = node('div', 'payroll-approval-files');
-    for (const file of item.attachments || []) {
-      const entry = node('span', 'payroll-approval-file');
-      entry.append(icon(/\.docx?$/i.test(file.name) ? 'fa-file-word' : /\.pdf$/i.test(file.name) ? 'fa-file-pdf' : 'fa-file-lines'), node('span', '', file.name));
-      attachments.append(entry);
-    }
-    return attachments.childElementCount ? attachments : '-';
+  const fileUrls = [];
+  function releaseFiles() {
+    fileUrls.splice(0).forEach(url => URL.revokeObjectURL(url));
   }
   function renderDetails(item) {
-    byId('payrollPendingDetailsTitle').textContent = tabNames[item.category] + ' Detail';
-    const employeeName = node('span', 'employee-name', item.employeeName);
-    const employeeId = node('span', 'employee-id', '#' + item.empNo);
-    const rows = [];
-    const comments = node('textarea', 'payroll-approval-comments');
-    comments.id = 'payrollPendingApproverComments';
-    comments.rows = 2;
-    comments.maxLength = 2000;
-    comments.placeholder = 'Add comments...';
-    comments.setAttribute('aria-label', 'Approver Action Comments');
-    comments.value = item.approverActionComments || '';
-    if (item.category === 'tax') {
-      rows.push(
-        ['Reference #', item.id], ['Name', employeeName], ['Emp #', employeeId], ['Status', recordDetailStatus.create(item.status)],
-        ['Submit Date', date(item.submitDate)], ['Rebate Item', item.rebateItem], ['Transaction Date', date(item.transactionDate)],
-        ['Description', item.description || '-'], ['Receipt #', item.receiptNo || '-'], ['Amount', money(item.amount)],
-        ['Process', item.process ? 'Yes' : 'No'], ['Period', item.period || '-'], ['Cycle', item.cycle || '-'],
-        ['Approval Date', item.approvalDateLabel || date(item.approvalDate)], ['Approver Remarks', item.approverRemarks || '-'],
-        ['Attachments', attachmentContent(item)]
-      );
-    } else {
-      const employee = node('div');
-      employee.append(employeeName, employeeId);
-      rows.push(
-        ['Document Reference', item.id], ['Document Status', recordDetailStatus.create(item.status)], ['Employee', employee],
-        ['Deduction Type', item.deductionType], ['Request Type', item.requestType],
-        ['Stop Period', item.stopPeriod || '-'], ['Stop Date', date(item.stopDate)], ['Stop Cycle', item.stopCycle || '-'],
-        ['Account #', item.accountNo || '-'], ['Remarks', item.remarks || '-'], ['Attachment', attachmentContent(item)]
-      );
-    }
-    rows.push(['Approver Action Comments', comments]);
-    byId('payrollPendingDetailsTable').querySelector('tbody').replaceChildren(...rows.map(([label, value]) => {
-      const row = node('tr');
-      const key = node('th', '', label);
-      key.scope = 'row';
-      const content = node('td');
-      if (value instanceof Node) content.append(value);
-      else content.textContent = value;
-      row.append(key, content);
-      return row;
-    }));
+    byId('payrollPendingDetailsTitle').textContent = tabNames[item.category] + ' Approval';
+    releaseFiles();
+    byId('payrollPendingForm').replaceChildren(PayrollRequestFields.create(item.category, item, fileUrls));
+    byId('payrollPendingApproverComments').value = item.approverActionComments || '';
     const footer = document.querySelector('.payroll-approval-details-footer');
     const detailActions = detailActionButtons(item.category);
     footer.dataset.actionCount = detailActions.dataset.actionCount;
@@ -278,12 +240,12 @@
     byId('payrollPendingWorkflowAudit').replaceChildren(audit);
     document.querySelector('.payroll-approval-workflow-body').scrollTop = 0;
   }
-  function handleAction(button) {
+  async function handleAction(button) {
     const action = button.dataset.payrollAction;
     const ids = button.closest('#payrollPendingBulk') ? [...selected] : [button.closest('.approval-request-card')?.dataset.itemId || currentItemId];
     try {
       const comments = button.closest('#payrollPendingDetails') ? byId('payrollPendingApproverComments')?.value || '' : '';
-      const count = window.PayrollPendingStore.act(ids, action, comments);
+      const count = await window.PayrollPendingStore.act(ids, action, comments);
       PendingApprovalPage.back();
       closeSheet(false);
       renderQueue();
@@ -292,7 +254,7 @@
     } catch { showToast('Unable to save the approval action. Please try again.'); }
   }
 
-  document.addEventListener('DOMContentLoaded', () => {
+  document.addEventListener('DOMContentLoaded', async () => {
     setTheme(getCurrentTheme());
     filter = window.PendingApprovalFilter.create('payrollPendingFilter', { summaryId: 'payrollPendingFilterSummary', onApply: renderQueue });
     byId('payrollPendingFilterTrigger').addEventListener('click', () => filter.open());
@@ -329,8 +291,11 @@
         else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
       });
     }
+    try { await PayrollPendingStore.refresh(); }
+    catch { showToast('Unable to load locally submitted requests.'); }
     switchTab(activeTab);
     PendingApprovalPage.register({
+      onLeave: releaseFiles,
       render(view, id) {
         const item = window.PayrollPendingStore.getPending().find(record => record.id === id);
         if (!item) return false;
@@ -341,6 +306,18 @@
         else renderWorkflow(item);
         return true;
       }
+    });
+    function updateQueue() {
+      if (PendingApprovalPage.active && !PayrollPendingStore.getPending().some(item => item.id === currentItemId)) PendingApprovalPage.back();
+      renderQueue();
+    }
+    window.addEventListener('storage', event => {
+      if (event.key === PayrollPendingStore.storageKey) updateQueue();
+    });
+    window.addEventListener('pageshow', async event => {
+      if (!event.persisted) return;
+      try { await PayrollPendingStore.refresh(); updateQueue(); }
+      catch { showToast('Unable to refresh locally submitted requests.'); }
     });
   });
 })();

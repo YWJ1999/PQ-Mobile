@@ -51,7 +51,8 @@ async function totals(page) {
       assert.deepEqual(await page.$$eval('#trainingHighlightDetailTable tbody tr', nodes => nodes.map(node => [...node.cells].map(cell => cell.textContent))), [
         ['02 Oct 2026', 'Effective Crisis Management', '2.00'], ['18 Sep 2026', 'Bolt Fitment', '1.00'], ['12 Aug 2026', 'Channel Assembly', '1.00']
       ]);
-      assert.deepEqual(await page.$eval('.training-highlight-person', node => [...node.children].map(child => child.textContent)), ['Farhan Binti Rahmat', '#EBB12']);
+      assert.equal(await page.$eval('#trainingHighlightDetailsTitle', node => node.textContent), 'Farhan Binti Rahmat');
+      assert.equal(await page.$('#trainingHighlightDetailEmpNo'), null);
       await page.screenshot({ path: path.join(__dirname, `training-highlight-details-${theme}-${width}.png`) });
       await page.click('#trainingHighlightDetailsClose');
       assert.equal(await page.$eval('#trainingHighlightDetailsOverlay', node => node.hidden), true);

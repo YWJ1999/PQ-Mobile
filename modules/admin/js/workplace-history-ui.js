@@ -9,8 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
     draft: ['Draft', 'fa-floppy-disk'],
     cancelled: ['Cancelled', 'fa-ban']
   };
-  const referencePrefixes = { 'guest-visit': 'FGV', 'letter-request': 'DRQ', 'inventory-request': 'IRQ' };
-  const currentEmployee = { empNo: '#EBB12', name: 'Farhan binti rahmat' };
+  const { currentEmployee, referenceNumber } = window.WorkplaceHistoryStore;
   const requested = new URLSearchParams(location.search).get('category');
   let kind = labels[requested] ? requested : 'guest-visit';
   const emptyFilter = () => ({ from: '', to: '', status: '', type: '' });
@@ -49,20 +48,6 @@ document.addEventListener('DOMContentLoaded', () => {
     return pill;
   }
 
-  function referenceNumber(row, fields = fieldMap(row)) {
-    const explicit = fieldValue(fields, 'Reference #', 'Reference No.', 'Reference');
-    if (explicit) return explicit;
-    if (row.id.startsWith('sample-')) return emptyValue;
-    const seed = String(row.id || row.createdAt || row.date || row.title);
-    let hash = 2166136261;
-    for (let index = 0; index < seed.length; index++) {
-      hash ^= seed.charCodeAt(index);
-      hash = Math.imul(hash, 16777619);
-    }
-    const timestamp = Number.isFinite(Date.parse(row.createdAt)) ? String(Date.parse(row.createdAt)) : '';
-    const digits = (timestamp + String(hash >>> 0).padStart(10, '0')).slice(-13).padStart(13, '0');
-    return (referencePrefixes[row.kind] || 'REQ') + digits;
-  }
 
   function cardContent(row) {
     const fields = fieldMap(row);
@@ -138,6 +123,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const otherRequest = fieldValue(fields, 'Other Request');
     appendTable(body, [
       ['Reference #', referenceNumber(row, fields)],
+      ['Status', recordDetailStatus.create(statuses[row.status]?.[0] || row.status)],
       ['Emp #', employeeNumber(fieldValue(fields, 'Emp #', 'Employee #') || currentEmployee.empNo)],
       ['Name', fieldValue(fields, 'Name', 'Employee Name') || currentEmployee.name],
       ['Visit Date', date(fieldValue(fields, 'Visit Date') || row.date)],
@@ -149,8 +135,7 @@ document.addEventListener('DOMContentLoaded', () => {
       ['Floor Visit?', fieldValue(fields, 'Floor Visit?') || requestFlag(otherRequest, ['floor visit'])],
       ['Sit Arrange?', fieldValue(fields, 'Sit Arrange?') || requestFlag(otherRequest, ['sit arrange', 'sitting arrangement', 'seating arrangement'])],
       ['Multi Room?', fieldValue(fields, 'Multi Room?') || requestFlag(otherRequest, ['multi room'])],
-      ['Remarks', fieldValue(fields, 'Remarks', 'Remark') || emptyValue],
-      ['Status', recordDetailStatus.create(statuses[row.status]?.[0] || row.status)]
+      ['Remarks', fieldValue(fields, 'Remarks', 'Remark') || emptyValue]
     ], 'history-detail-main-table');
 
     const guestSection = appendSection(body, 'Guest Information');
@@ -198,10 +183,10 @@ document.addEventListener('DOMContentLoaded', () => {
   function letterDetail(row, body) {
     const fields = fieldMap(row);
     appendTable(body, [
-      ['Request Date', date(fieldValue(fields, 'Request Date') || row.date)],
       ['Reference #', referenceNumber(row, fields)],
-      ['Type', fieldValue(fields, 'Type', 'Letter Type') || row.title],
       ['Status', recordDetailStatus.create(statuses[row.status]?.[0] || row.status)],
+      ['Request Date', date(fieldValue(fields, 'Request Date') || row.date)],
+      ['Type', fieldValue(fields, 'Type', 'Letter Type') || row.title],
       ['Description', fieldValue(fields, 'Description') || row.title || emptyValue],
       ['1st Merge Text', fieldValue(fields, '1st Merge Text') || emptyValue],
       ['2nd Merge Text', fieldValue(fields, '2nd Merge Text') || emptyValue],

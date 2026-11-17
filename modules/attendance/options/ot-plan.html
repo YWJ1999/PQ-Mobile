@@ -1592,7 +1592,6 @@
       <div class="sheet-header">
         <div>
           <div class="sheet-title" id="staffHistoryEmployeeName">Employee Name</div>
-          <div class="emp-id-label" id="staffHistoryEmployeeId">#000000</div>
         </div>
         <button type="button" class="sheet-close-btn" onclick="closeModal('staffOtHistoryModal')" aria-label="Close OT details"><i class="fa-solid fa-xmark"></i></button>
       </div>
@@ -2138,7 +2137,6 @@
       const totalHours = getStaffMtdOtHours(id);
 
       document.getElementById('staffHistoryEmployeeName').textContent = employee.name;
-      document.getElementById('staffHistoryEmployeeId').textContent = `#${employee.id}`;
       document.getElementById('staffHistoryTotalRecords').textContent = String(records.length);
       document.getElementById('staffHistoryTotalHours').textContent = `${totalHours.toFixed(2)} h`;
       document.getElementById('staffHistoryTableRows').innerHTML = records.length

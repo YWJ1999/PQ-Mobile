@@ -197,9 +197,9 @@
       if (!record || card.hidden || !overlay.hidden) return;
       summary.replaceChildren(...[
         ['Reference #', record.reference],
+        ['Status', record.status],
         ['Date', record.dateLabel],
         ['Remark', record.remark],
-        ['Status', record.status],
         ['Normal Hours', `${record.normalHours} hrs`],
         ['OT Hours', `${record.otHours} hrs`]
       ].map(([label, value]) => createRow(label, value)));
@@ -293,44 +293,62 @@
   function initPendingApprovalActions() {
     const queue = document.getElementById('projectTimesheetApprovalList');
     if (!queue) return;
-    const storageKey = 'pq_project_pending_decisions';
-    const read = () => {
-      try { const value = JSON.parse(localStorage.getItem(storageKey)); return Array.isArray(value) ? value : []; }
-      catch { return []; }
-    };
-    const updateCount = () => {
-      const count = document.querySelectorAll('#projectTimesheetApprovalList .project-approval-card').length;
-      const label = document.getElementById('projectTimesheetApprovalCount');
-      if (label) label.textContent = window.PeopleHcmRecordSummary.formatCount(count);
-    };
-    const handled = new Set(read().map(item => item.reference));
-    document.querySelectorAll('#projectTimesheetApprovalList .project-approval-card').forEach(card => {
-      const reference = card.dataset.reference;
-      if (handled.has(reference)) { card.remove(); return; }
-      PendingApprovalBackup.showAssignment(card.querySelector('.project-approval-actions'), { scope: 'timesheet', id: reference });
-    });
-    updateCount();
-    function decide(cards, action, comments = '') {
-      const references = new Set(cards.map(card => card.dataset.reference));
-      const decisions = read().filter(item => !references.has(item.reference));
-      const decidedAt = new Date().toISOString();
-      for (const reference of references) decisions.push({ reference, action, comments, decidedAt });
+    const template = document.getElementById('projectApprovalCardTemplate');
+    function renderQueue() {
+      const checked = new Set([...queue.querySelectorAll('.approval-card-checkbox:checked')].map(box => box.closest('article').dataset.reference));
+      const records = TimesheetRequests.pending();
+      queue.replaceChildren(...records.map(record => {
+        const card = template.content.firstElementChild.cloneNode(true);
+        card.dataset.reference = card.dataset.approvalId = record.id;
+        const employeeId = '#' + String(record.employeeId).replace(/^#+/, '');
+        card.querySelector('.project-approval-employee-name').textContent = record.employeeName;
+        card.querySelector('.project-approval-employee-id').textContent = employeeId;
+        const box = card.querySelector('.approval-card-checkbox');
+        box.checked = checked.has(record.id);
+        box.setAttribute('aria-label', 'Select ' + record.id + ' for ' + record.employeeName);
+        card.querySelector('[data-project-approval-menu]').setAttribute('aria-label', 'Options for ' + record.id);
+        card.querySelector('.approval-record-link').href = PendingApprovalPage.href('details', record.id);
+        card.querySelector('[data-field="date"] dd').textContent = record.dateLabel;
+        card.querySelector('[data-field="normal-hours"] dd').textContent = (record.normalMinutes / 60).toFixed(2) + ' hrs';
+        card.querySelector('[data-field="ot-hours"] dd').textContent = (record.overtimeMinutes / 60).toFixed(2) + ' hrs';
+        PendingApprovalBackup.showAssignment(card.querySelector('.project-approval-actions'), { scope: 'timesheet', id: record.id });
+        return card;
+      }));
+      document.getElementById('projectTimesheetApprovalCount').textContent = window.PeopleHcmRecordSummary.formatCount(records.length);
+      if (!records.length) {
+        const empty = document.createElement('p');
+        empty.className = 'project-activities-empty';
+        empty.textContent = 'No timesheets awaiting approval.';
+        queue.append(empty);
+      }
+    }
+    renderQueue();
+    async function decide(cards, action, comments = '') {
       try {
-        localStorage.setItem(storageKey, JSON.stringify(decisions));
+        await TimesheetRequests.decide(cards.map(card => card.dataset.reference), action, comments);
       } catch {
-        window.showToast?.('Unable to save the decision. Please try again.');
+        window.showToast?.('Unable to save the decision. Check the request and try again.');
+        renderQueue();
         return false;
       }
-      cards.forEach(card => card.remove());
-      updateCount();
+      renderQueue();
       const verb = { approve: 'Approved', reject: 'Rejected', resubmit: 'Sent for resubmission' }[action];
       window.showToast?.(`${verb}: ${cards.length} request${cards.length === 1 ? '' : 's'}`);
       return true;
     }
+    function refresh() {
+      renderQueue();
+      if (PendingApprovalPage.active && ![...queue.querySelectorAll('.approval-record-link')].some(link =>
+        link.hash === location.hash.replace('#approval/workflow/', '#approval/details/'))) PendingApprovalPage.back();
+    }
+    window.addEventListener('pageshow', event => { if (event.persisted) refresh(); });
+    window.addEventListener('storage', event => {
+      if (!event.key || [TimesheetRequests.sheetsKey, TimesheetRequests.decisionsKey].includes(event.key)) refresh();
+    });
     mountPendingApprovalSelection(queue, document.getElementById('projectApprovalSelectAll'), (action, boxes) => {
       decide(boxes.map(box => box.closest('.project-approval-card')), action);
     });
-    document.addEventListener('click', event => {
+    document.addEventListener('click', async event => {
       const button = event.target.closest('[data-project-approval-action]');
       if (!button) return;
       event.preventDefault();
@@ -341,7 +359,7 @@
       if (!card) return;
       const action = button.dataset.projectApprovalAction;
       const comments = inDetails ? document.getElementById('projectApprovalApproverComments').value.trim() : '';
-      if (decide([card], action, comments) && inDetails) PendingApprovalPage.back();
+      if (await decide([card], action, comments) && inDetails && details.dataset.reference === card.dataset.reference) PendingApprovalPage.back();
     });
   }
 
@@ -375,50 +393,29 @@
       inertElements = [];
       if (restoreFocus) returnFocus?.focus({ preventScroll: true });
     };
-    const value = key => currentCard?.dataset[key] || '—';
-    const fillDetails = () => {
-      const fields = {
-        projectApprovalDetailDocumentReference: 'documentReference',
-        projectApprovalDetailEmployeeName: 'employeeName',
-        projectApprovalDetailEmployeeId: 'employeeId',
-        projectApprovalDetailTimesheetDate: 'timesheetDate',
-        projectApprovalDetailClockTimes: 'clockTimes',
-        projectApprovalDetailNormalWorkHours: 'normalWorkHours',
-        projectApprovalDetailOvertimeHours: 'otHours',
-        projectApprovalDetailRemark: 'remark',
-        projectApprovalActivityTime: 'activityTime',
-        projectApprovalActivityTitle: 'activityTitle',
-        projectApprovalActivityProject: 'activityProject',
-        projectApprovalActivityTask: 'activityTask'
-      };
-      Object.entries(fields).forEach(([id, key]) => {
-        document.getElementById(id).textContent = value(key);
-      });
-      document.getElementById('projectApprovalDetailDocumentStatus').replaceChildren(recordDetailStatus.create(value('documentStatus')));
-      document.getElementById('projectApprovalApproverComments').value = '';
-      details.dataset.reference = value('reference');
-    };
-    document.querySelectorAll('[data-project-approval-menu]').forEach(button => {
-      button.addEventListener('click', () => {
-        currentCard = button.closest('.project-approval-card');
-        currentMenuTrigger = button;
-        openOverlay(menu, button);
-      });
+    document.getElementById('projectTimesheetApprovalList').addEventListener('click', event => {
+      const button = event.target.closest('[data-project-approval-menu]');
+      if (!button) return;
+      currentCard = button.closest('.project-approval-card');
+      currentMenuTrigger = button;
+      openOverlay(menu, button);
     });
     for (const [id, view] of [['projectApprovalViewDetails', 'details'], ['projectApprovalViewWorkflow', 'workflow']]) {
-      document.getElementById(id).addEventListener('click', () => PendingApprovalPage.open(view, value('reference'), currentMenuTrigger));
+      document.getElementById(id).addEventListener('click', () => PendingApprovalPage.open(view, currentCard.dataset.reference, currentMenuTrigger));
     }
     PendingApprovalPage.register({
       render(view, id) {
-        currentCard = document.querySelector('.project-approval-card[data-reference="' + CSS.escape(id) + '"]');
-        if (!currentCard) return false;
+        const record = TimesheetRequests.pending().find(sheet => sheet.id === id);
+        if (!record) return false;
         closeOverlay(false);
         if (view === 'details') {
-          fillDetails();
+          TimesheetView.review(document.getElementById('projectApprovalRequest'), record);
+          document.getElementById('projectApprovalApproverComments').value = '';
+          details.dataset.reference = id;
         } else {
-          document.getElementById('projectApprovalWorkflowReference').textContent = value('reference');
-          document.getElementById('projectApprovalWorkflowName').textContent = value('employeeName');
-          document.getElementById('projectApprovalWorkflowEmployeeId').textContent = value('employeeId');
+          document.getElementById('projectApprovalWorkflowReference').textContent = id;
+          document.getElementById('projectApprovalWorkflowName').textContent = record.employeeName;
+          document.getElementById('projectApprovalWorkflowEmployeeId').textContent = '#' + String(record.employeeId).replace(/^#+/, '');
           const backup = PendingApprovalBackup.assigned('timesheet', id);
           const assignment = document.getElementById('projectApprovalWorkflowBackup');
           assignment.hidden = !backup;
@@ -535,6 +532,16 @@
     if (!document.getElementById('projectTab-individual')) return;
     document.getElementById('projectCalendarPrevious')?.addEventListener('click', () => changeCalendarMonth(-1));
     document.getElementById('projectCalendarNext')?.addEventListener('click', () => changeCalendarMonth(1));
+    function refreshPendingCount() {
+      const count = TimesheetRequests.pending().length;
+      document.querySelector('#projectTeamPendingApproval .team-pending-approval-count').textContent = count;
+      document.querySelector('#projectPanel-team .team-action-required-badge').textContent = count + (count === 1 ? ' Task' : ' Tasks');
+    }
+    refreshPendingCount();
+    window.addEventListener('pageshow', event => { if (event.persisted) refreshPendingCount(); });
+    window.addEventListener('storage', event => {
+      if (!event.key || [TimesheetRequests.sheetsKey, TimesheetRequests.decisionsKey].includes(event.key)) refreshPendingCount();
+    });
     renderIndividualCalendar();
     switchScope(new URLSearchParams(window.location.search).get('scope'));
     for (const scope of ['individual', 'team']) {

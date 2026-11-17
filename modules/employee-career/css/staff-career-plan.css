@@ -1,3 +1,6 @@
+@media screen {
+  .staff-career-plan-page > .phone-container { min-height: 0; overflow: clip; }
+}
 .staff-career-plan-page .employee-career-content { padding-bottom: 104px; }
 .staff-career-plan-page .employee-career-heading h1 { font-size: 17px; letter-spacing: -.35px; }
 .staff-career-plan-page .staff-list-action-summary { margin-bottom: 14px; }
@@ -16,34 +19,38 @@
 }
 .staff-career-plan-page .staff-career-plan-card:hover { border-color: var(--purple-border); box-shadow: var(--shadow-card); transform: translateY(-1px); }
 .staff-career-plan-page .staff-career-plan-card:active { transform: scale(.985); }
-.staff-career-plan-page .staff-career-plan-card:focus-visible { outline: 3px solid rgba(124,58,237,.28); outline-offset: 3px; }
+.staff-career-plan-page .staff-career-plan-card:focus-visible { outline: 3px solid var(--purple-text); outline-offset: 2px; }
 .staff-career-plan-card-header {
-  display: flex;
-  align-items: flex-start;
+  display: grid;
+  gap: 3px;
   box-sizing: border-box;
-  padding: 11px 14px 7px;
+  width: 100%;
+  border: 0;
+  padding: 11px 14px;
   background: linear-gradient(100deg, #6d28d9, #7c3aed);
   color: #fff;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
 }
-.staff-career-plan-identity { display: flex; flex: 1; min-width: 0; flex-direction: column; }
 .staff-career-plan-name { color: #fff; font-size: 14px; font-weight: 800; line-height: 1.35; overflow-wrap: anywhere; }
+.staff-career-plan-subtitle { color: rgba(255, 255, 255, .85); font-size: 12px; font-weight: 700; line-height: 1.4; overflow-wrap: anywhere; }
 .staff-career-plan-employee-id {
-  margin-top: 3px;
-  margin-bottom: 4px;
-  color: #fff;
   font-family: monospace, sans-serif;
   font-size: 11.5px;
-  font-weight: 700;
-  line-height: 1.3;
-  opacity: .8;
+  white-space: nowrap;
 }
 .staff-career-plan-details { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 12px; margin: 12px 14px 14px; padding: 10px 12px; border: 1px solid var(--border-subtle); border-radius: 12px; background: var(--bg-input); }
+.staff-career-plan-details::before { content: ''; grid-column: 1 / -1; grid-row: 2; border-top: 1px solid var(--border-subtle); }
 .staff-career-plan-detail { min-width: 0; box-sizing: border-box; }
-.staff-career-plan-detail:last-child { grid-column: 1 / -1; }
 .staff-career-plan-detail dt { margin-bottom: 2px; color: var(--text-muted); font-size: 10.5px; font-weight: 700; line-height: 1.4; }
 .staff-career-plan-detail dd { margin: 0; color: var(--text-primary); font-size: 12px; font-weight: 750; line-height: 1.45; overflow-wrap: anywhere; }
-.staff-career-plan-detail:nth-child(-n+2) dd { color: var(--purple-text); }
 .staff-career-plan-detail:last-child dd { font-variant-numeric: tabular-nums; }
+.staff-career-plan-profile { display: grid; grid-template-columns: 50px minmax(0, 1fr); padding: 16px; }
+.staff-career-plan-profile .new-user-facts { grid-column: 1 / -1; padding: 12px 0 0; border-top: 1px solid var(--border-subtle); }
+.staff-career-plan-outlook { grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); }
+.staff-career-plan-outlook > .wide { padding-top: 12px; border-top: 1px solid var(--border-subtle); }
+.staff-career-plan-outlook .wide dd { white-space: pre-wrap; }
 .staff-career-plan-empty { padding: 42px 22px; border: 1px dashed var(--border-subtle); border-radius: 20px; background: var(--bg-card); text-align: center; }
 .staff-career-plan-empty i { display: grid; place-items: center; width: 52px; height: 52px; margin: 0 auto 14px; border-radius: 17px; background: var(--purple-subtle); color: var(--purple-text); font-size: 20px; }
 .staff-career-plan-empty h2 { margin: 0 0 6px; color: var(--text-primary); font-size: 15px; font-weight: 800; }
@@ -52,6 +59,23 @@
 .staff-career-plan-page .staff-list-chart-heading p { font-variant-numeric: tabular-nums; }
 .staff-career-plan-page .staff-career-plan-chart-empty { margin: 16px 0 0; color: var(--text-muted); font-size: 12px; text-align: center; }
 .staff-career-plan-page .staff-list-filter-fields { padding-bottom: 8px; }
+.staff-career-plan-page .staff-list-filter-fields select {
+  appearance: none;
+  padding-inline-end: 40px !important;
+}
+.staff-career-plan-page .staff-list-filter-fields .staff-list-select::after {
+  content: '';
+  position: absolute;
+  inset-inline-end: 16px;
+  top: 50%;
+  width: 7px;
+  height: 7px;
+  box-sizing: border-box;
+  border: solid var(--text-primary);
+  border-width: 0 2px 2px 0;
+  transform: translateY(-70%) rotate(45deg);
+  pointer-events: none;
+}
 .staff-career-plan-page .staff-career-plan-filter-error { margin: 0 20px 12px; padding: 10px 12px; border-radius: 12px; background: rgba(239,68,68,.1); color: #ef4444; font-size: 11.5px; font-weight: 700; line-height: 1.45; }
 .staff-career-plan-page .staff-career-plan-filter-error[hidden] { display: none; }
 .staff-career-plan-page [aria-invalid='true'] { border-color: #ef4444 !important; box-shadow: 0 0 0 3px rgba(239,68,68,.12); }

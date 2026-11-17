@@ -7,6 +7,8 @@
   <script src="../../../js/components.js"></script>
   <script src="../../../js/app.js" defer></script>
   <script src="../../../js/payroll/payroll-config.js" defer></script>
+  <script src="../../../js/payroll/payroll-request-store.js" defer></script>
+  <script src="../../../js/payroll/payroll-request-fields.js" defer></script>
   <script src="../../../js/payroll/payroll-request-forms.js" defer></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -15,6 +17,7 @@
   <link rel="stylesheet" href="../../../css/theme.css">
   <link rel="stylesheet" href="../../../css/app.css">
   <link rel="stylesheet" href="../../../css/claim-forms.css">
+  <link rel="stylesheet" href="../../../css/payroll-request-fields.css">
   <link rel="stylesheet" href="../../../css/payroll-request-forms.css">
   <link rel="stylesheet" href="../../../css/form-section-headings.css">
 </head>
@@ -29,33 +32,8 @@
       </div>
     </header>
     <main class="main-content">
-      <form id="payrollForm" data-request-kind="deduction">
-        <section class="claim-form-card" aria-labelledby="deductionDetailsTitle">
-          <div class="claim-section-header">
-            <div class="claim-section-title-wrap"><span class="claim-section-accent" aria-hidden="true"></span><h2 class="claim-section-title" id="deductionDetailsTitle">Deduction Details</h2></div>
-          </div>
-          <div class="claim-form-stack">
-            <div class="claim-field"><label class="claim-field-label" for="deductionType">Deduction Type <span class="claim-required">*</span></label><div class="payroll-select"><select class="claim-control" id="deductionType" name="deductionType" required><option value="">Select Deduction Type</option></select><i class="fa-solid fa-chevron-down" aria-hidden="true"></i></div></div>
-            <div class="claim-field"><label class="claim-field-label" for="requestType">Request Type</label><div class="payroll-select"><select class="claim-control" id="requestType" name="requestType"><option value="Stop Deduction">Stop Deduction</option></select><i class="fa-solid fa-chevron-down" aria-hidden="true"></i></div></div>
-            <div class="claim-field-grid">
-              <div class="claim-field"><label class="claim-field-label" for="stopPeriod">Stop Period</label><input class="claim-control" id="stopPeriod" name="stopPeriod" type="text" inputmode="numeric" pattern="[0-9]{4}(0[1-9]|1[0-2])" maxlength="6" placeholder="YYYYMM" title="Enter a valid period in YYYYMM format, for example 202610" value="202610"></div>
-              <div class="claim-field"><label class="claim-field-label" for="stopDate">Stop Date</label><input class="claim-control" id="stopDate" name="stopDate" type="date" value="2026-10-01"></div>
-            </div>
-            <div class="claim-field"><label class="claim-field-label" for="stopCycle">Stop Cycle</label><div class="payroll-select"><select class="claim-control" id="stopCycle" name="stopCycle"><option value="MONTH END">MONTH END</option></select><i class="fa-solid fa-chevron-down" aria-hidden="true"></i></div></div>
-            <div class="claim-field"><label class="claim-field-label" for="accountNo">Account #</label><input class="claim-control" id="accountNo" name="accountNo" type="text" placeholder="Account number" maxlength="100"></div>
-            <div class="claim-field"><label class="claim-field-label" for="remarks">Remarks</label><textarea class="claim-control" id="remarks" name="remarks" rows="2" placeholder="Add optional remarks" maxlength="2000"></textarea></div>
-            <div class="payroll-upload" role="group" aria-labelledby="attachmentTitle">
-              <h3 class="form-section-heading" id="attachmentTitle">Upload Attachments</h3>
-              <div class="payroll-upload-actions">
-                <button type="button" class="payroll-upload-button" id="payrollChooseFiles"><span class="payroll-upload-icon"><i class="fa-solid fa-file-arrow-up" aria-hidden="true"></i></span><span>Select File(s)</span></button>
-                <button type="button" class="payroll-upload-button is-camera" id="payrollTakePicture"><span class="payroll-upload-icon"><i class="fa-solid fa-camera" aria-hidden="true"></i></span><span>Take a Picture</span></button>
-              </div>
-              <div class="payroll-file-list" id="payrollFileList" aria-live="polite"></div>
-              <input id="payrollFiles" type="file" multiple hidden>
-              <input id="payrollCamera" type="file" accept="image/*" capture="environment" hidden>
-            </div>
-          </div>
-        </section>
+      <form id="payrollForm" class="payroll-request-fields" data-request-kind="deduction">
+        <template id="payrollRequestFields"></template>
         <div class="payroll-form-actions form-action-row">
           <button class="claim-button claim-button-primary" id="payrollCancel" data-page-form-cancel type="button"><i class="fa-solid fa-xmark" aria-hidden="true"></i>Cancel</button>
           <button class="claim-button claim-button-primary" id="payrollSubmit" type="submit" disabled><span>Submit</span><i class="fa-solid fa-paper-plane" aria-hidden="true"></i></button>

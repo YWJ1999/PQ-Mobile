@@ -61,7 +61,7 @@ const pageUrl = pathToFileURL(path.resolve(__dirname, '../modules/attendance/opt
     await page.click('.ot-staff-card .ot-staff-summary-panel');
     assert.equal(await page.$eval('#staffOtHistoryModal', node => getComputedStyle(node).display), 'flex');
     assert.equal(await page.$eval('#staffHistoryEmployeeName', node => node.textContent.trim()), 'Aqilah Antasha');
-    assert.equal(await page.$eval('#staffHistoryEmployeeId', node => node.textContent.trim()), '#000008');
+    assert.equal(await page.$('#staffHistoryEmployeeId'), null);
     assert.equal(await page.$eval('#staffHistoryTotalRecords', node => node.textContent.trim()), '3');
     assert.equal(await page.$eval('#staffHistoryTotalHours', node => node.textContent.trim()), '7.50 h');
     assert.deepEqual(

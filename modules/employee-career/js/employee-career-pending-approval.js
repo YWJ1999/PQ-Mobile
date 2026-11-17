@@ -167,18 +167,16 @@
     $('careerPendingDetailsTitle').textContent = item.approvalTitle || `${item.type || 'Request'} Approval`;
     const body = $('careerPendingDetails').querySelector('.payroll-approval-details-body');
     body.replaceChildren();
-    const isProfile = Boolean(item.profile && window.EmployeeCareerCVHistoryDetails);
+    const isProfile = item.type === 'CV Change Request';
+    overlay.classList.toggle('change-request-page', isProfile);
     body.classList.toggle('career-pending-record-details', !isProfile);
     if (isProfile) {
       body.innerHTML = window.EmployeeCareerCVHistoryDetails.render(
         item,
         recordDetailStatus.html(item.documentStatus || 'Submitted'),
         date(item.submitDate),
-        {qualificationLayout: 'cards'}
+        {qualificationLayout: 'cards', approval: true}
       );
-      const remarksRow = [...body.querySelectorAll('.cv-history-request-summary .cv-history-detail-row')]
-        .find(row => row.querySelector('dt')?.textContent.trim() === 'Approver Remarks');
-      remarksRow?.remove();
       const remarks = node('section', 'career-pending-remarks approval-comments-card');
       const label = node('label', '', 'Approver Remarks');
       label.htmlFor = 'careerPendingComments';
@@ -192,7 +190,7 @@
       const tbody = node('tbody');
       table.classList.toggle('career-pending-engagement-table', isEngagement);
       table.classList.toggle('detail-popout-table', isEngagement);
-      const rows = isEngagement ? [
+      const detailFields = isEngagement ? [
         ['Employee #', item.empNo ? '#' + String(item.empNo).replace(/^#+/, '') : '—'],
         ['Name', item.employeeName],
         ['Position', item.position],
@@ -205,13 +203,16 @@
         ['Remarks', item.remarks],
         ['Attachment', engagementAttachments(item.attachments)]
       ] : [
-        ['Document Reference', item.reference || item.id],
-        ['Document Status', recordDetailStatus.create(item.documentStatus || 'Submitted')],
         ['Employee', identity(item.employeeName, item.empNo, item.position)],
         ['Type', item.type],
         ['Submit Date', date(item.submitDate)],
         ...(item.details || []),
         ['Approver Remarks', remarksControl(item)]
+      ];
+      const rows = [
+        ['Document Reference', item.reference || item.id],
+        ['Document Status', recordDetailStatus.create(item.documentStatus || 'Submitted')],
+        ...detailFields
       ];
       rows.forEach(([label, value]) => {
         const row = node('tr');
@@ -262,12 +263,24 @@
     if (!items.length) { showToast('Please select at least one request.'); return; }
     const status = { approve: 'approved', resubmit: 'resubmit', reject: 'rejected' }[action];
     if (!status) return;
-    items.forEach(item => { item.status = status; selected.delete(item.id); });
+    const submitted = items.filter(item => item.savedCV);
+    let decided = items;
+    if (submitted.length) {
+      try {
+        const saved = CVChangeRequests.decide(submitted, {approve: 'Approved', resubmit: 'Resubmit', reject: 'Rejected'}[action]);
+        decided = items.filter(item => !item.savedCV || saved.has(item.id));
+      } catch {
+        showToast('Could not save the decision. Please try again.');
+        return;
+      }
+    }
+    items.forEach(item => { item.status = decided.includes(item) ? status : 'closed'; selected.delete(item.id); });
     PendingApprovalPage.back();
     closeSheet();
     render();
-    showToast(`${items.length} ${items.length === 1 ? 'request' : 'requests'} ${action === 'resubmit' ? 'returned for resubmission' : status}.`);
-    window.dispatchEvent(new CustomEvent('employee-career-approval-change', { detail: { action, records: items.map(item => ({ ...item })) } }));
+    if (!decided.length) { showToast('This request has already been processed.'); return; }
+    showToast(`${decided.length} ${decided.length === 1 ? 'request' : 'requests'} ${action === 'resubmit' ? 'returned for resubmission' : status}.`);
+    window.dispatchEvent(new CustomEvent('employee-career-approval-change', { detail: { action, records: decided.map(item => ({ ...item })) } }));
   }
   function init() {
     const types = [...new Set([...(window.EMPLOYEE_CAREER_PENDING_CATEGORIES || []), ...records.map(item => item.type).filter(Boolean)])];

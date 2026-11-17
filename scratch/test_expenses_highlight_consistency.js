@@ -105,8 +105,7 @@ function inspectCards(page, viewId, chartSelector, detailsSelector) {
       const firstRecord = document.querySelector('.expense-detail-record');
       return {
         name: name?.textContent.trim() || '',
-        id: id?.textContent.trim() || '',
-        idBelowName: Boolean(name && id && id.getBoundingClientRect().top >= name.getBoundingClientRect().bottom),
+        hasHeaderId: Boolean(id),
         headerBackground: header ? getComputedStyle(header).backgroundImage : '',
         firstRecord: firstRecord?.textContent.replace(/\s+/g, ' ').trim() || '',
         period: firstRecord?.querySelector('.expense-detail-period-value')?.textContent.trim() || '',
@@ -150,8 +149,7 @@ function inspectCards(page, viewId, chartSelector, detailsSelector) {
       branchSelection?.firstDetail.includes('CLIENT DINING & ENTERTAINMENT') &&
       branchSelection?.firstDetail.includes('RM 2,450.00') &&
       modal.name === 'Marcus Tan' &&
-      modal.id === '#004177' &&
-      modal.idBelowName &&
+      !modal.hasHeaderId &&
       modal.headerBackground.includes('rgb(76, 29, 149)') &&
       modal.headerBackground.includes('rgb(109, 40, 217)') &&
       modal.headerBackground.includes('rgb(124, 58, 237)') &&

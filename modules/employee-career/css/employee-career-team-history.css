@@ -148,8 +148,7 @@
   min-width: 0;
 }
 
-.team-history-employee-name,
-.team-history-request-title {
+.team-history-employee-identity {
   display: block;
   color: var(--text-primary);
   font-size: 13px;
@@ -158,30 +157,9 @@
   overflow-wrap: anywhere;
 }
 
-.team-history-employee-id {
-  display: block;
-  margin: 2px 0 4px;
-  color: var(--text-muted);
-  font-family: monospace, sans-serif;
-  font-size: 11.5px;
-  font-weight: 700;
-  line-height: 1.4;
-  opacity: .8;
-}
-
-.team-history-record-ref,
-.team-history-request-ref {
-  display: block;
-  margin-top: 3px;
-  color: var(--purple-text);
-  font-size: 10.5px;
-  font-weight: 700;
-  line-height: 1.4;
-  overflow-wrap: anywhere;
-}
-
 .team-history-employee-position {
   display: block;
+  margin-top: 3px;
   color: var(--text-secondary);
   font-size: 12px;
   font-weight: 600;

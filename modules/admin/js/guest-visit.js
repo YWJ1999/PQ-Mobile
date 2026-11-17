@@ -2,6 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const form = document.getElementById('guestVisitForm');
   if (!form) return;
   const $ = id => document.getElementById(id);
+  const fields = form.querySelector('guest-visit-fields');
   const draftKey = 'peoplehcm:guest-visit:draft:v1';
   const tabs = ['general', 'guest', 'attendee', 'other'];
   const generalIds = ['visitDate', 'visitStartTime', 'visitEndTime', 'visitTotalGuest', 'visitLocation'];
@@ -42,16 +43,7 @@ document.addEventListener('DOMContentLoaded', () => {
     $('visitAttendeeListView').hidden = false;
     document.querySelector('.admin-heading h1').textContent = 'Guest Visit';
     const step = tabs.indexOf(name);
-    tabs.forEach((tab, index) => {
-      const active = tab === name;
-      const button = $('visitTab-' + tab);
-      button.setAttribute('aria-selected', String(active));
-      button.tabIndex = active ? 0 : -1;
-      button.classList.toggle('active', active);
-      button.classList.toggle('passed', index < step);
-      $('visitPanel-' + tab).hidden = !active;
-    });
-    $('visitStepFill').style.width = step * 25 + '%';
+    fields.selectStep(name);
     const listPage = name === 'guest' || name === 'attendee';
     $('visitPageActions').classList.toggle('is-list-page', listPage);
     $('visitSaveDraft').hidden = listPage;
@@ -64,16 +56,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelector('main').scrollTop = 0;
     if (focus) $('visitTab-' + name).focus();
   }
-  form.querySelectorAll('[data-visit-tab]').forEach(button => {
-    button.addEventListener('click', () => showTab(button.dataset.visitTab));
-    button.addEventListener('keydown', event => {
-      const index = tabs.indexOf(currentTab);
-      const next = { ArrowRight: (index + 1) % 4, ArrowLeft: (index + 3) % 4, Home: 0, End: 3 }[event.key];
-      if (next === undefined) return;
-      event.preventDefault();
-      showTab(tabs[next], true);
-    });
-  });
+  fields.bindSteps(showTab);
   function showCategories() {
     showTab('general');
     currentView = 'categories';
@@ -164,77 +147,11 @@ document.addEventListener('DOMContentLoaded', () => {
     if (text !== undefined) element.textContent = text;
     return element;
   }
-  function detailRows(values) {
-    const dl = node('dl');
-    values.forEach(([label, value]) => {
-      const row = node('div');
-      row.append(node('dt', '', label), node('dd', '', value));
-      dl.append(row);
-    });
-    return dl;
-  }
-  function recordButton(text, attribute, index, name) {
-    const button = node('button', '', text);
-    button.type = 'button';
-    button.setAttribute(attribute, index);
-    button.setAttribute('aria-label', text + ' ' + name);
-    if (text === 'Edit' || text === 'Remove') {
-      button.replaceChildren();
-      button.className = 'visit-record-action';
-      const icon = node('i', text === 'Edit' ? 'fa-solid fa-pen-to-square' : 'fa-solid fa-trash-can');
-      icon.setAttribute('aria-hidden', 'true');
-      button.append(icon);
-      button.title = text;
-    }
-    return button;
-  }
   function updateSummaries() {
-    $('visitGuestSummaryCount').textContent = String(guests.length);
-    $('visitSummarySubtitle').textContent = guests.length + (guests.length === 1 ? ' guest, ' : ' guests, ') + attendeeIds.length + (attendeeIds.length === 1 ? ' attendee added' : ' attendees added');
-    $('visitGuestListCount').textContent = window.PeopleHcmRecordSummary.formatCount(guests.length);
-    $('visitAttendeeListCount').textContent = window.PeopleHcmRecordSummary.formatCount(attendeeIds.length);
-    $('visitGuestCategoryCount').textContent = String(guests.length);
-    $('visitAttendeeCategoryCount').textContent = String(attendeeIds.length);
-    $('visitOtherCategoryCount').textContent = String(form.querySelectorAll('[data-other-request]:checked').length);
-  }
-  function addRecordDetails(record, title, subtitle, values, index, category, employeeId) {
-    const header = node('div', 'visit-record-header');
-    const copy = node('div', 'visit-record-copy');
-    copy.append(node('h3', 'visit-record-name', title));
-    if (employeeId) copy.append(node('span', 'visit-employee-id', '#' + employeeId));
-    if (subtitle) copy.append(node('p', 'visit-record-subtitle', subtitle));
-    const details = node('div', 'visit-record-details');
-    details.id = 'visitRecord-' + category + '-' + index;
-    details.hidden = true;
-    details.append(detailRows(values));
-    const toggle = node('button', 'form-record-toggle');
-    toggle.type = 'button';
-    toggle.dataset.toggleRecord = '';
-    toggle.setAttribute('aria-label', 'Details for ' + title);
-    toggle.setAttribute('aria-expanded', 'false');
-    toggle.setAttribute('aria-controls', details.id);
-    const icon = node('i', 'fa-solid fa-chevron-down');
-    icon.setAttribute('aria-hidden', 'true');
-    toggle.append(icon);
-    const actions = node('div', 'visit-record-actions');
-    actions.append(toggle, recordButton('Edit', 'data-edit-' + category, index, title), recordButton('Remove', 'data-remove-' + category, index, title));
-    header.append(copy, actions);
-    record.append(header, details);
-  }
-  function toggleRecord(event) {
-    const toggle = event.target.closest('[data-toggle-record]') ||
-      (!event.target.closest('button') && event.target.closest('.visit-record-header')?.querySelector('[data-toggle-record]'));
-    toggleFormRecordDetails(toggle);
+    fields.updateCounts(guests.length, attendeeIds.length);
   }
   function renderGuests() {
-    const list = $('visitGuestList');
-    list.replaceChildren();
-    $('visitGuestEmpty').hidden = guests.length > 0;
-    guests.forEach((guest, index) => {
-      const record = node('article', 'visit-record');
-      addRecordDetails(record, guest.name, guest.company, [['Company', guest.company], ['Relation', guest.relation], ['Position', guest.position]], index, 'guest');
-      list.append(record);
-    });
+    fields.renderPeople('guest', guests);
     updateSummaries();
   }
   function resetGuest() {
@@ -268,7 +185,6 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   $('visitGuestCancelEdit').addEventListener('click', cancelGuestEntry);
   $('visitGuestList').addEventListener('click', event => {
-    toggleRecord(event);
     const edit = event.target.closest('[data-edit-guest]');
     const remove = event.target.closest('[data-remove-guest]');
     if (edit) {
@@ -301,15 +217,7 @@ document.addEventListener('DOMContentLoaded', () => {
     $('visitSelectedStaffId').hidden = !employee;
   }
   function renderAttendees() {
-    const list = $('visitAttendeeList');
-    list.replaceChildren();
-    $('visitAttendeeEmpty').hidden = attendeeIds.length > 0;
-    attendeeIds.forEach((id, index) => {
-      const employee = employees[id];
-      const record = node('article', 'visit-record visit-attendee-record');
-      addRecordDetails(record, employee.name, '', [['Department', employee.department], ['Position', employee.position]], index, 'attendee', id);
-      list.append(record);
-    });
+    fields.renderPeople('attendee', attendeeIds.map(empNo => ({ ...employees[empNo], empNo })));
     updateSummaries();
   }
   $('visitStaff').addEventListener('change', updateStaff);
@@ -340,7 +248,6 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   $('visitAttendeeCancelEdit').addEventListener('click', cancelAttendeeEntry);
   $('visitAttendeeList').addEventListener('click', event => {
-    toggleRecord(event);
     const edit = event.target.closest('[data-edit-attendee]');
     if (edit) {
       editingAttendee = Number(edit.dataset.editAttendee);
@@ -380,7 +287,9 @@ document.addEventListener('DOMContentLoaded', () => {
       icon.setAttribute('aria-hidden', 'true');
       const text = node('span', 'visit-attachment-text', attachment.name);
       if (!attachment.file) text.append(node('span', 'visit-attachment-note', 'Please reattach this file or remove it.'));
-      const remove = recordButton('', 'data-remove-attachment', index, attachment.name);
+      const remove = node('button');
+      remove.type = 'button';
+      remove.dataset.removeAttachment = index;
       remove.className = 'visit-record-action';
       const removeIcon = node('i', 'fa-solid fa-xmark');
       removeIcon.setAttribute('aria-hidden', 'true');
@@ -491,6 +400,13 @@ document.addEventListener('DOMContentLoaded', () => {
       const requests = [...form.querySelectorAll('[data-other-request]:checked')].map(field => field.closest('label').querySelector('span').textContent);
       const record = window.WorkplaceHistoryStore.save({
         id: historyRecordId, kind: 'guest-visit', title: location, date: $('visitDate').value,
+        guestVisit: {
+          visitDate: $('visitDate').value, startTime: $('visitStartTime').value, endTime: $('visitEndTime').value,
+          totalGuest: Number($('visitTotalGuest').value), location, meal: $('visitMeal').checked,
+          guests, attendees: attendeeIds.map(empNo => ({ empNo, ...employees[empNo] })),
+          otherRequests: requestInputs.filter(input => input.checked).map(input => input.value),
+          attachments: attachments.map(file => file.name)
+        },
         fields: [['Visit Date', $('visitDate').value], ['Time', $('visitStartTime').value + ' – ' + $('visitEndTime').value],
           ['Total Guest', $('visitTotalGuest').value], ['Location', location], ['Meal', $('visitMeal').checked ? 'Yes' : 'No'],
           ...guests.map((guest, index) => ['Guest ' + (index + 1), `${guest.name} • ${guest.company} • ${guest.relation} • ${guest.position}`]),

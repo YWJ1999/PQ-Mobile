@@ -106,12 +106,12 @@
     });
   }
 
-  function bindEmployee(selectId, fields) {
+  function bindEmployee(selectId, fields, directory = employees) {
     const select = document.getElementById(selectId);
     if (!select) return;
 
     function update() {
-      const employee = employees[select.value];
+      const employee = directory[select.value];
       Object.entries(fields).forEach(([fieldId, property]) => {
         const field = document.getElementById(fieldId);
         if (field) field.value = employee?.[property] || '';
@@ -245,6 +245,16 @@
     if (!form) return;
     bindEmployee('engagementEmployee', { engagementName: 'name', engagementPosition: 'position' });
     const select = document.getElementById('engagementEmployee');
+    const interviewee = document.getElementById('engagementInterviewee');
+    const interviewees = {
+      EBB47: { name: 'Mira Zainal', position: 'Training Coordinator' },
+      EBB48: { name: 'Evan Teoh', position: 'Operations Analyst' },
+      EBB49: { name: 'Anitha Siva', position: 'Accounts Executive' }
+    };
+    for (const [empNo, person] of Object.entries(interviewees)) {
+      interviewee.add(new Option(`${person.name} (#${empNo})`, empNo));
+    }
+    bindEmployee('engagementInterviewee', { engagementIntervieweePosition: 'position' }, interviewees);
     const id = document.getElementById('engagementEmployeeId');
     select.addEventListener('change', () => {
       id.textContent = employees[select.value] ? '#' + select.value : '';

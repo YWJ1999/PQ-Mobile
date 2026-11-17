@@ -5,10 +5,11 @@
   if (!form) return;
   const $ = id => document.getElementById(id);
   const kind = form.dataset.requestKind;
+  $('payrollRequestFields').replaceWith(PayrollRequestFields.create(kind));
   const employee = window.PAYROLL_CONFIG.employee;
   const recordKey = `${employee.empNo}:${kind}`;
   const fields = Array.from(form.querySelectorAll('[name]'));
-  let db, attachments = [], urls = [], dirty = false, busy = false, loaded = false;
+  let attachments = [], urls = [], dirty = false, busy = false, loaded = false, submitted = false;
   let revision = 0;
   let savedValues = {}, savedAttachments = [], hasSavedRecord = false;
 
@@ -21,36 +22,6 @@
     dirty = true;
     revision++;
     status('Unsaved changes');
-  }
-
-  function database() {
-    return new Promise((resolve, reject) => {
-      const request = indexedDB.open('peoplehcm-payroll-forms', 1);
-      request.onupgradeneeded = () => request.result.createObjectStore('requests', { keyPath: 'id' });
-      request.onsuccess = () => resolve(request.result);
-      request.onerror = () => reject(request.error);
-      request.onblocked = () => reject(new Error('Storage is busy'));
-    });
-  }
-
-  function load() {
-    return new Promise((resolve, reject) => {
-      const transaction = db.transaction('requests', 'readonly');
-      const request = transaction.objectStore('requests').get(recordKey);
-      transaction.oncomplete = () => resolve(request.result);
-      transaction.onerror = () => reject(transaction.error);
-      transaction.onabort = () => reject(transaction.error);
-    });
-  }
-
-  function persist(record) {
-    return new Promise((resolve, reject) => {
-      const transaction = db.transaction('requests', 'readwrite');
-      transaction.objectStore('requests').put(record);
-      transaction.oncomplete = resolve;
-      transaction.onerror = () => reject(transaction.error);
-      transaction.onabort = () => reject(transaction.error);
-    });
   }
 
   function renderFiles() {
@@ -151,7 +122,7 @@
 
   form.addEventListener('submit', async event => {
     event.preventDefault();
-    if (busy || !loaded) return;
+    if (busy || !loaded || (kind === 'deduction' && submitted && !dirty)) return;
     fields.forEach(validateField);
     if (!form.reportValidity()) return;
     busy = true;
@@ -167,7 +138,8 @@
     };
     status('Saving…');
     try {
-      await persist(record);
+      await PayrollRequests.save(record, kind === 'deduction', employee);
+      submitted = kind === 'deduction';
       savedValues = { ...record.values };
       savedAttachments = [...record.attachments];
       hasSavedRecord = true;
@@ -201,9 +173,8 @@
     $('payrollChooseFiles').disabled = true;
     $('payrollTakePicture').disabled = true;
     try {
-      db = await database();
-      db.onversionchange = () => db.close();
-      const record = await load();
+      const record = await PayrollRequests.get(recordKey);
+      submitted = Boolean(record?.submittedId);
       if (record) {
         fields.forEach(field => {
           if (!field.readOnly && Object.hasOwn(record.values, field.name)) {

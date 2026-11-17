@@ -98,8 +98,7 @@
 
   function renderDetails() {
     const sessions = state.sessions.filter(record => record.empNo === selectedEmployee.empNo).sort((a, b) => b.date.localeCompare(a.date));
-    $('trainingHighlightDetailName').textContent = display(selectedEmployee.name);
-    $('trainingHighlightDetailEmpNo').textContent = employeeId(selectedEmployee.empNo);
+    $('trainingHighlightDetailsTitle').textContent = display(selectedEmployee.name);
     $('trainingHighlightDetailRecords').textContent = String(sessions.length);
     $('trainingHighlightDetailDays').textContent = numberText(total(sessions));
     $('trainingHighlightDetailTable').tBodies[0].replaceChildren(...sessions.map(record => {

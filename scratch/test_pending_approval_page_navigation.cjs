@@ -19,7 +19,7 @@ const categories = {
   attendance: [['#staffTabOTPlan', 'OT Plan Approval'], ['#staffTabFinalOT', 'Final OT Approval'], ['#staffTabFeedback', 'Attendance Advice Approval']],
   leave: [['#tabApprovalCredit', 'Leave Credit Approval'], ['#tabApprovalOfftime', 'Time Off Approval']],
   admin: [['#workplacePendingTab-inventory', 'Inventory Request Approval']],
-  payroll: [['#payrollPendingTab-deduction', 'Deduction Request Detail']],
+  payroll: [['#payrollPendingTab-deduction', 'Deduction Request Approval']],
   performance: [['[data-approval-tab="self-evaluation"]', 'Self Evaluation Approval'], ['[data-approval-tab="self-review"]', 'Self Review Approval']]
 };
 
@@ -71,8 +71,8 @@ const categories = {
           assert.equal(await page.$eval('#cv-panel-qualification', el => el.hidden), false);
         }
         if (module === 'leave') {
-          assert.equal(await page.$eval('#detailsDocRef', el => el.textContent), id);
-          assert.match(await page.$eval('#standardLeaveDetailsView', el => el.textContent), /Afifah Nasir/);
+          const request = await page.$eval(card, el => JSON.parse(el.dataset.request));
+          assert.equal(await page.$eval('#leaveApprovalForm [data-review-field="reason"]', el => el.textContent), request.reason);
         }
         await page.goBack();
         await page.waitForSelector(check, { visible: true });

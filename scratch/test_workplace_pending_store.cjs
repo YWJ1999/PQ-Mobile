@@ -3,19 +3,41 @@ const test = require('node:test');
 const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
+const { randomUUID } = require('node:crypto');
 const key = 'peoplehcm:workplace:pending-approval:v1';
 const file = path.resolve(__dirname, '../modules/admin/js/workplace-pending-store.js');
 function openStore() {
   assert.ok(fs.existsSync(file), 'Workplace pending approval store is required');
   const data = new Map();
   const localStorage = { getItem: key => data.get(key) ?? null, setItem: (key, value) => data.set(key, value) };
-  const browser = { window: {}, localStorage, Date };
+  const browser = { window: {}, localStorage, Date, crypto: { randomUUID } };
   vm.createContext(browser);
   vm.runInContext(fs.readFileSync(file, 'utf8'), browser);
-  return { store: browser.window.WorkplacePendingStore, data, localStorage };
+  return { store: browser.window.WorkplacePendingStore, data, localStorage, browser };
 }
 const plain = value => JSON.parse(JSON.stringify(value));
 const validChanges = { visitDate: '2026-10-08', startTime: '09:00', endTime: '10:00', totalGuest: 0, location: 'Head Office', meal: true, otherRequests: ['floor-visit'] };
+test('Review follows the submitted Guest Visit revision through resubmission and cancellation', () => {
+  const { store, browser } = openStore();
+  vm.runInContext(fs.readFileSync(path.resolve(__dirname, '../modules/admin/js/workplace-history-store.js'), 'utf8'), browser);
+  const history = browser.window.WorkplaceHistoryStore;
+  const row = history.save({ kind: 'guest-visit', date: validChanges.visitDate, fields: [],
+    guestVisit: { ...validChanges, guests: [], attendees: [], attachments: ['Visit notes.txt'] } });
+  const original = store.getPending().find(item => item.id === row.id);
+  store.act([row.id], 'resubmit', { guestRevision: original.guestRevision, comments: 'Please confirm attendees' });
+  assert.equal(history.list()[0].status, 'resubmit');
+  history.setStatus(row.id, 'submitted');
+  const updated = store.getPending().find(item => item.id === row.id);
+  assert.notEqual(updated.guestRevision, original.guestRevision);
+  assert.deepEqual(plain(updated.attachments), ['Visit notes.txt']);
+  assert.throws(() => store.act([row.id], 'approve', { guestRevision: original.guestRevision }), /changed/);
+  store.act([row.id], 'approve', { guestRevision: updated.guestRevision });
+  assert.deepEqual(plain(store.list().find(item => item.id === row.id).audit.map(event => event.action)), ['submitted', 'resubmit', 'submitted', 'approve']);
+  assert.equal(history.list()[0].status, 'approved');
+  history.setStatus(row.id, 'cancelled');
+  assert.equal(store.list().find(item => item.id === row.id).status, 'cancelled');
+  assert.equal(store.getPending().some(item => item.id === row.id), false);
+});
 test('Reference request seeds once with exact supplied employee and attendee details', () => {
   const { store } = openStore();
   const row = store.getPending().find(item => item.kind === 'guest-visit');

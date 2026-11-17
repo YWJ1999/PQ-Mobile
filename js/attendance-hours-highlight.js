@@ -99,7 +99,6 @@
 
   function openDetails(employee) {
     document.getElementById('highlightDetailName').textContent = employee.name;
-    document.getElementById('highlightDetailEmpNo').textContent = '#' + employee.empNo;
     const list = document.getElementById('highlightDetailsList');
     list.replaceChildren();
     if (kind === 'overtime' && employee.details.length) {

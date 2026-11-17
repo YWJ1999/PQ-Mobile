@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PeopleHCM - Staff Feedback Details</title>
+  <script>(()=>{const q=new URLSearchParams(location.search).get('theme');document.documentElement.dataset.theme=q==='light'?'light':'dark';})();</script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="../../../../css/theme.css">
+  <link rel="stylesheet" href="../../../../css/app.css">
+  <link rel="stylesheet" href="../../css/employee-career.css">
+  <link rel="stylesheet" href="../../css/staff-feedback.css">
+  <script src="../../../../js/components.js"></script>
+  <script src="../../../../js/app.js" defer></script>
+  <script src="../../js/staff-feedback.js" defer></script>
+</head>
+<body class="employee-career-option-page staff-feedback-page">
+  <preview-top-bar active-page="v2"></preview-top-bar>
+  <div class="phone-container">
+    <header class="employee-career-header">
+      <phone-status-bar time="9:41"></phone-status-bar>
+      <div class="employee-career-header-row">
+        <a id="staffFeedbackDetailsBack" class="employee-career-back" data-feedback-list-link href="staff-feedback.html" aria-label="Back to Staff Feedback"><i class="fa-solid fa-chevron-left" aria-hidden="true"></i></a>
+        <div class="employee-career-heading"><h1 id="staffFeedbackDetailsTitle" tabindex="-1">Staff Feedback Details</h1></div>
+        <span class="employee-career-header-spacer" aria-hidden="true"></span>
+      </div>
+    </header>
+    <main class="main-content employee-career-content">
+      <table id="staffFeedbackDetailsTable" class="record-detail-table" aria-labelledby="staffFeedbackDetailsTitle">
+        <tbody id="staffFeedbackDetailsRows"></tbody>
+      </table>
+    </main>
+    <phone-bottom-nav active="apps"></phone-bottom-nav>
+    <notification-sheet></notification-sheet>
+    <favourite-sheet></favourite-sheet>
+  </div>
+</body>
+</html>

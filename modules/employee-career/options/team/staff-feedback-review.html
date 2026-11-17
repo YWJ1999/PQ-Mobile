@@ -17,60 +17,87 @@
     <header class="employee-career-header">
       <phone-status-bar time="9:41"></phone-status-bar>
       <div class="employee-career-header-row">
-        <a id="staffFeedbackReviewBack" class="employee-career-back" href="staff-feedback.html" aria-label="Back to Staff Feedback"><i class="fa-solid fa-chevron-left" aria-hidden="true"></i></a>
+        <a id="staffFeedbackReviewBack" class="employee-career-back" data-feedback-list-link href="staff-feedback.html" aria-label="Back to Staff Feedback"><i class="fa-solid fa-chevron-left" aria-hidden="true"></i></a>
         <div class="employee-career-heading"><h1 id="staffFeedbackReviewTitle" tabindex="-1">Review Feedback</h1></div>
         <span class="employee-career-header-spacer" aria-hidden="true"></span>
       </div>
     </header>
     <main class="main-content employee-career-content">
-      <form id="staffFeedbackReviewForm" novalidate>
-      <div class="staff-feedback-review-body">
+      <header class="staff-feedback-review-identity" aria-label="Feedback from">
+        <span class="staff-feedback-review-avatar" id="staffFeedbackReviewInitials" aria-hidden="true"></span>
+        <div>
+          <h2 id="staffFeedbackReviewName"></h2>
+          <span id="staffFeedbackReviewEmployeeId" class="staff-feedback-emp-no"></span>
+        </div>
+      </header>
+      <div class="employee-career-scope staff-feedback-review-tabs" role="tablist" aria-label="Review feedback">
+        <button id="staffFeedbackTab" class="employee-career-scope-tab active" type="button" role="tab" aria-selected="true" aria-controls="staffFeedbackPanel">Feedback</button>
+        <button id="staffReviewTab" class="employee-career-scope-tab" type="button" role="tab" aria-selected="false" tabindex="-1" aria-controls="staffReviewPanel">Review</button>
+      </div>
+      <section id="staffFeedbackPanel" class="staff-feedback-review-body" role="tabpanel" aria-labelledby="staffFeedbackTab">
         <section class="staff-feedback-review-section" aria-labelledby="staffFeedbackReviewDetailsHeading">
           <h3 id="staffFeedbackReviewDetailsHeading" class="form-section-heading form-section-heading--new">Feedback Details</h3>
           <div class="staff-feedback-review-grid">
-            <div class="staff-feedback-review-field"><label for="staffFeedbackReviewEmployeeId">Employee ID</label><input id="staffFeedbackReviewEmployeeId" class="staff-feedback-review-control" type="text" readonly></div>
-            <div class="staff-feedback-review-field"><label for="staffFeedbackReviewName">Name</label><input id="staffFeedbackReviewName" class="staff-feedback-review-control" type="text" readonly></div>
+            <div class="staff-feedback-review-field is-wide"><label for="staffFeedbackReviewFeedbackTitle">Title</label><textarea id="staffFeedbackReviewFeedbackTitle" class="staff-feedback-review-control" rows="1" readonly></textarea></div>
             <div class="staff-feedback-review-field"><label for="staffFeedbackReviewType">Type</label><input id="staffFeedbackReviewType" class="staff-feedback-review-control" type="text" readonly></div>
             <div class="staff-feedback-review-field"><label for="staffFeedbackReviewCategory">Category</label><input id="staffFeedbackReviewCategory" class="staff-feedback-review-control" type="text" readonly></div>
-            <div class="staff-feedback-review-field is-wide"><label for="staffFeedbackReviewFeedbackTitle">Title</label><input id="staffFeedbackReviewFeedbackTitle" class="staff-feedback-review-control" type="text" readonly></div>
             <div class="staff-feedback-review-field"><label for="staffFeedbackReviewDate1">Feedback Date 1</label><input id="staffFeedbackReviewDate1" class="staff-feedback-review-control" type="text" readonly></div>
             <div class="staff-feedback-review-field"><label for="staffFeedbackReviewDate2">Feedback Date 2</label><input id="staffFeedbackReviewDate2" class="staff-feedback-review-control" type="text" readonly></div>
-            <div class="staff-feedback-review-field is-wide"><label for="staffFeedbackReviewReference1">Reference 1</label><input id="staffFeedbackReviewReference1" class="staff-feedback-review-control" type="text" readonly></div>
-            <div class="staff-feedback-review-field is-wide"><label for="staffFeedbackReviewReference2">Reference 2</label><input id="staffFeedbackReviewReference2" class="staff-feedback-review-control" type="text" readonly></div>
+            <div class="staff-feedback-review-field"><label for="staffFeedbackReviewReference1">Reference 1</label><textarea id="staffFeedbackReviewReference1" class="staff-feedback-review-control" rows="1" readonly></textarea></div>
+            <div class="staff-feedback-review-field"><label for="staffFeedbackReviewReference2">Reference 2</label><textarea id="staffFeedbackReviewReference2" class="staff-feedback-review-control" rows="1" readonly></textarea></div>
             <div class="staff-feedback-review-field is-wide"><label for="staffFeedbackReviewNote">Feedback Note</label><textarea id="staffFeedbackReviewNote" class="staff-feedback-review-control" rows="2" readonly></textarea></div>
             <div class="staff-feedback-review-field is-wide"><label for="staffFeedbackReviewRemarks">Feedback Remarks</label><textarea id="staffFeedbackReviewRemarks" class="staff-feedback-review-control" rows="2" readonly></textarea></div>
             <div class="staff-feedback-review-field is-wide"><label for="staffFeedbackReviewSubmitDate">Submit Date</label><input id="staffFeedbackReviewSubmitDate" class="staff-feedback-review-control" type="text" readonly></div>
+          </div>
+        </section>
+        <section class="staff-feedback-review-section" aria-labelledby="staffFeedbackAttachmentsHeading">
+          <h3 id="staffFeedbackAttachmentsHeading" class="form-section-heading form-section-heading--new">Attachments</h3>
+          <div id="staffFeedbackReviewAttachments"></div>
+        </section>
+      </section>
+      <section id="staffReviewPanel" class="staff-feedback-review-body" role="tabpanel" aria-labelledby="staffReviewTab" hidden>
+        <section class="staff-feedback-review-section" aria-labelledby="staffFeedbackReviewInfoHeading">
+          <h3 id="staffFeedbackReviewInfoHeading" class="form-section-heading form-section-heading--new">Review Information</h3>
+          <div class="staff-feedback-review-grid">
             <div class="staff-feedback-review-field is-wide"><label for="staffFeedbackReviewReviewerComment">Reviewer Comment</label><textarea id="staffFeedbackReviewReviewerComment" class="staff-feedback-review-control" rows="2" readonly></textarea></div>
-            <div class="staff-feedback-review-field is-wide"><label for="staffFeedbackReviewReviewedBy">Reviewed By</label><input id="staffFeedbackReviewReviewedBy" class="staff-feedback-review-control" type="text" readonly></div>
-            <div class="staff-feedback-review-field is-wide"><label for="staffFeedbackReviewReviewedDate">Reviewed Date</label><input id="staffFeedbackReviewReviewedDate" class="staff-feedback-review-control" type="text" readonly></div>
+            <div class="staff-feedback-review-field"><label for="staffFeedbackReviewReviewedBy">Reviewed By</label><textarea id="staffFeedbackReviewReviewedBy" class="staff-feedback-review-control" rows="1" readonly></textarea></div>
+            <div class="staff-feedback-review-field"><label for="staffFeedbackReviewReviewedDate">Reviewed Date</label><input id="staffFeedbackReviewReviewedDate" class="staff-feedback-review-control" type="text" readonly></div>
+          </div>
+          <div class="staff-feedback-review-metrics">
+            <div class="staff-feedback-review-field"><label for="staffFeedbackSavedRating">Rating</label><input id="staffFeedbackSavedRating" class="staff-feedback-review-control" type="text" readonly></div>
+            <div class="staff-feedback-review-field"><label for="staffFeedbackSavedReward">Reward</label><textarea id="staffFeedbackSavedReward" class="staff-feedback-review-control" rows="1" readonly></textarea></div>
+            <div class="staff-feedback-review-field"><label for="staffFeedbackReviewStatus">Status</label><textarea id="staffFeedbackReviewStatus" class="staff-feedback-review-control" rows="1" readonly></textarea></div>
           </div>
         </section>
-        <section class="staff-feedback-review-section staff-feedback-review-editable" aria-labelledby="staffFeedbackReviewDecisionHeading">
-          <h3 id="staffFeedbackReviewDecisionHeading" class="form-section-heading form-section-heading--new">Review Details</h3>
-          <div class="staff-feedback-review-field">
-            <label for="staffFeedbackReward">Reward <span class="staff-feedback-required" aria-hidden="true">*</span></label>
-            <select id="staffFeedbackReward" class="staff-feedback-review-control" aria-describedby="staffFeedbackReviewError" required>
-              <option value="">Select Reward</option><option>No Reward</option><option>RM 20.00</option><option>RM 50.00</option><option>RM 100.00</option><option>Recognition Letter</option>
-            </select>
+        <form id="staffFeedbackReviewForm" novalidate>
+          <section class="staff-feedback-review-section staff-feedback-review-editable" aria-labelledby="staffFeedbackReviewDecisionHeading">
+            <h3 id="staffFeedbackReviewDecisionHeading" class="form-section-heading form-section-heading--new">Your Review</h3>
+            <div class="staff-feedback-review-grid">
+              <div class="staff-feedback-review-field">
+                <label for="staffFeedbackReward">Reward <span class="staff-feedback-required" aria-hidden="true">*</span></label>
+                <select id="staffFeedbackReward" class="staff-feedback-review-control" aria-describedby="staffFeedbackReviewError" required>
+                  <option value="">Select Reward</option><option>No Reward</option><option>RM 20.00</option><option>RM 50.00</option><option>RM 100.00</option><option>Recognition Letter</option>
+                </select>
+              </div>
+              <div class="staff-feedback-review-field">
+                <label for="staffFeedbackRating">Rating <span class="staff-feedback-required" aria-hidden="true">*</span></label>
+                <select id="staffFeedbackRating" class="staff-feedback-review-control" aria-describedby="staffFeedbackReviewError" required>
+                  <option value="">Select Rating</option><option value="1">1 - Needs Improvement</option><option value="2">2 - Fair</option><option value="3">3 - Good</option><option value="4">4 - Very Good</option><option value="5">5 - Excellent</option>
+                </select>
+              </div>
+              <div class="staff-feedback-review-field is-wide">
+                <label for="staffFeedbackComments">Comments <span class="staff-feedback-required" aria-hidden="true">*</span></label>
+                <textarea id="staffFeedbackComments" class="staff-feedback-review-control" rows="4" maxlength="2000" placeholder="Add review comments" aria-describedby="staffFeedbackReviewError" required></textarea>
+              </div>
+            </div>
+            <p id="staffFeedbackReviewError" class="staff-feedback-review-error" role="alert" hidden></p>
+          </section>
+          <div class="employee-career-form-actions staff-feedback-review-actions form-action-row">
+            <a id="staffFeedbackCancelReview" class="form-cancel-btn" data-feedback-list-link href="staff-feedback.html"><i class="fa-solid fa-xmark" aria-hidden="true"></i><span>Cancel</span></a>
+            <button type="submit" id="staffFeedbackSubmitReview" class="employee-career-button primary"><span>Submit Review</span><i class="fa-solid fa-paper-plane" aria-hidden="true"></i></button>
           </div>
-          <div class="staff-feedback-review-field">
-            <label for="staffFeedbackRating">Rating <span class="staff-feedback-required" aria-hidden="true">*</span></label>
-            <select id="staffFeedbackRating" class="staff-feedback-review-control" aria-describedby="staffFeedbackReviewError" required>
-              <option value="">Select Rating</option><option value="1">1 - Needs Improvement</option><option value="2">2 - Fair</option><option value="3">3 - Good</option><option value="4">4 - Very Good</option><option value="5">5 - Excellent</option>
-            </select>
-          </div>
-          <div class="staff-feedback-review-field">
-            <label for="staffFeedbackComments">Comments <span class="staff-feedback-required" aria-hidden="true">*</span></label>
-            <textarea id="staffFeedbackComments" class="staff-feedback-review-control" rows="4" maxlength="2000" placeholder="Add review comments" aria-describedby="staffFeedbackReviewError" required></textarea>
-          </div>
-          <p id="staffFeedbackReviewError" class="staff-feedback-review-error" role="alert" hidden></p>
-        </section>
-      </div>
-        <div class="employee-career-form-actions staff-feedback-review-actions form-action-row">
-          <a id="staffFeedbackCancelReview" class="form-cancel-btn" href="staff-feedback.html"><i class="fa-solid fa-xmark" aria-hidden="true"></i><span>Cancel</span></a>
-          <button type="submit" id="staffFeedbackSubmitReview" class="employee-career-button primary"><span>Submit</span><i class="fa-solid fa-paper-plane" aria-hidden="true"></i></button>
-        </div>
-      </form>
+        </form>
+      </section>
     </main>
     <phone-bottom-nav active="apps"></phone-bottom-nav>
   </div>

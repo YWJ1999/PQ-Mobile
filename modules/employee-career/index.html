@@ -11,7 +11,6 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="../../css/theme.css">
   <link rel="stylesheet" href="../../css/app.css">
-  <link rel="stylesheet" href="../../css/detail-popout.css">
   <link rel="stylesheet" href="css/employee-career.css">
   <link rel="stylesheet" href="css/employee-career-team.css">
   <script src="../../js/components.js"></script>
@@ -20,6 +19,7 @@
   <script src="js/staff-events-data.js"></script>
   <script src="js/vacancy-data.js"></script>
   <script src="js/vacant-position-data.js"></script>
+  <script src="js/cv-change-requests.js"></script>
   <script src="js/employee-career-pending-data.js"></script>
   <script src="js/employee-career-app.js" defer></script>
   <script src="js/employee-career-team.js" defer></script>
@@ -97,13 +97,15 @@
         </div>
       </section>
       <section id="employeeCareerStaffEvents" class="employee-career-team-events" data-career-scope="team" aria-labelledby="employeeCareerStaffEventsTitle" hidden>
-        <header class="employee-career-expiry-header"><span class="employee-career-expiry-icon" aria-hidden="true"><i class="fa-solid fa-calendar-days"></i></span><h2 id="employeeCareerStaffEventsTitle">Staff Events</h2><button type="button" id="employeeCareerEventFilterTrigger" class="employee-career-event-filter-trigger" aria-label="Open Staff Events filter. Current filter: All Events" aria-haspopup="dialog" aria-controls="employeeCareerEventFilterOverlay" aria-expanded="false"><i class="fa-solid fa-sliders" aria-hidden="true"></i></button></header>
+        <header class="employee-career-expiry-header">
+          <span class="employee-career-expiry-icon" aria-hidden="true"><i class="fa-solid fa-calendar-days"></i></span>
+          <h2 id="employeeCareerStaffEventsTitle">Staff Events</h2>
+          <span id="employeeCareerStaffEventCount" class="employee-career-event-count"></span>
+          <button type="button" id="employeeCareerEventFilterTrigger" class="employee-career-event-filter-trigger" aria-label="Open Staff Events filter. Current filter: All Events" aria-haspopup="dialog" aria-controls="employeeCareerEventFilterOverlay" aria-expanded="false"><i class="fa-solid fa-sliders" aria-hidden="true"></i></button>
+        </header>
         <div class="employee-career-event-card">
-          <table class="employee-career-event-table" aria-labelledby="employeeCareerStaffEventsTitle">
-            <colgroup><col style="width:76%"><col style="width:24%"></colgroup>
-            <thead><tr><th scope="col">Event</th><th scope="col">Count</th></tr></thead>
-            <tbody id="employeeCareerStaffEventRows"></tbody>
-          </table>
+          <ul id="employeeCareerStaffEventRows" class="employee-career-event-list" aria-labelledby="employeeCareerStaffEventsTitle"></ul>
+          <a id="employeeCareerAllEvents" class="employee-career-event-row employee-career-event-all" href="options/team/staff-event-details.html">View all events</a>
         </div>
       </section>
     </main>
@@ -138,14 +140,6 @@
           <button type="button" id="employeeCareerCloseAll" class="employee-career-sheet-close" aria-label="Close all Team options"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
         </header>
         <div id="employeeCareerAllOptionsGrid" class="employee-career-grid employee-career-all-grid" role="list"></div>
-      </section>
-    </div>
-    <div id="employeeCareerTeamEventOverlay" class="detail-popout-overlay employee-career-team-overlay" aria-hidden="true" hidden>
-      <section class="detail-popout-panel" role="dialog" aria-modal="true" aria-labelledby="employeeCareerTeamEventTitle">
-        <header class="detail-popout-header"><h2 id="employeeCareerTeamEventTitle" class="detail-popout-title"></h2><button id="employeeCareerTeamEventClose" type="button" class="detail-popout-close" aria-label="Close Staff Events"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button></header>
-        <div class="detail-popout-body" tabindex="0" role="region" aria-label="Staff event details">
-          <div id="employeeCareerTeamEventDetails"><table class="career-event-people-table"><thead><tr><th scope="col">Employee</th><th scope="col">Date</th></tr></thead><tbody id="employeeCareerTeamEventPeople"></tbody></table><p id="employeeCareerTeamEventAvailable" class="career-event-available"></p><p id="employeeCareerTeamEventEmpty" class="career-event-empty" hidden>No employee details available for this event.</p></div>
-        </div>
       </section>
     </div>
     <div id="employeeCareerEventFilterOverlay" class="employee-career-event-filter-overlay standard-filter-sheet" aria-hidden="true" hidden>

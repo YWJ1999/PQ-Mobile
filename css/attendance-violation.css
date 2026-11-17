@@ -55,7 +55,6 @@
 .violation-detail-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-shrink: 0; padding: 16px; background: linear-gradient(110deg,#5b21b6,#7c3aed); color: #fff; }
 .violation-detail-identity { min-width: 0; }
 .violation-detail-header h2 { margin: 0; font-size: 16px; font-weight: 800; overflow-wrap: anywhere; }
-.violation-detail-header .attendance-report-emp { color: rgba(255,255,255,.8); margin-bottom: 0; }
 .violation-close { display: flex; align-items: center; justify-content: center; width: 34px; height: 34px; flex-shrink: 0; border: 1px solid var(--border-subtle); border-radius: 50%; background: var(--bg-input); color: var(--text-primary); }
 .violation-detail-header .violation-close { border-color: rgba(255,255,255,.25); background: rgba(255,255,255,.16); color: #fff; }
 /* The shared popup adapter hides legacy children; retain this explicit icon. */

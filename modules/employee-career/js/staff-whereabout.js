@@ -123,7 +123,7 @@
     const body = $('staffWhereaboutDetailFields');
     body.replaceChildren();
     const date = row.date ? new Date(row.date + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : '-';
-    const fields = [['Name', row.name], ['Branch', row.branch], ['Department', row.department], ['Project', row.project], ['Task', row.task], ['State', row.state], ['Date', date], ['Description', row.description], ['Status', row.status], ['Remark', row.remark ?? row.remarks]];
+    const fields = [['Name', row.name], ['Status', row.status], ['Branch', row.branch], ['Department', row.department], ['Project', row.project], ['Task', row.task], ['State', row.state], ['Date', date], ['Description', row.description], ['Remark', row.remark ?? row.remarks]];
     fields.forEach(([label, value]) => {
       const field = element('tr', '');
       const heading = element('th', 'detail-popout-label', label);

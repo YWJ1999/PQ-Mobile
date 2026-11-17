@@ -62,7 +62,6 @@
     if (!record) return;
     const prefix = isBenefit ? 'benefit' : 'expense';
     document.getElementById(isBenefit ? 'modalEmpNameText' : 'modalExpenseEmpNameText').textContent = record.name;
-    document.getElementById(isBenefit ? 'modalEmpIdBadge' : 'modalExpenseEmpIdBadge').textContent = '#' + record.empNo;
     document.getElementById(isBenefit ? 'benefitDetailsList' : 'expenseDetailsList').innerHTML = record.details.map(detail => `
       <article class="${prefix}-detail-record">
         <div class="${prefix}-detail-period-row"><span class="${prefix}-detail-period-value">${detail.period}</span></div>

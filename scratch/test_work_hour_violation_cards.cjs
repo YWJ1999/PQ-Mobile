@@ -21,7 +21,7 @@ const puppeteer = require('puppeteer');
         await page.click('#viewContinuous [data-violation-detail]');
         await page.waitForSelector('#detailModal', { visible: true });
         assert.equal(await page.$eval('#detailName', el => el.textContent), 'LSH');
-        assert.equal(await page.$eval('#detailEmpNo', el => el.textContent), '#0000100');
+        assert.equal(await page.$('#detailEmpNo'), null);
         assert.deepEqual(await page.$$eval('#detailModal th', els => els.map(el => el.textContent)), ['Date', 'Shift', 'Clock Time']);
         assert.equal(await page.$$eval('#detailTableBody tr', els => els.length), 7);
         assert.match(await page.$eval('#detailTableBody', el => el.textContent), /10 Jan 2026/);

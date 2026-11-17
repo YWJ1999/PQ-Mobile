@@ -17,6 +17,8 @@
   <link rel="stylesheet" href="../../../css/form-section-headings.css">
   <script src="../../../js/components.js"></script>
   <script src="../../../js/app.js" defer></script>
+  <script src="../js/performance-request-form.js" defer></script>
+  <script src="../js/performance-submissions.js" defer></script>
   <script src="../js/self-evaluation-data.js" defer></script>
   <script src="../js/self-evaluation-store.js" defer></script>
   <script src="../js/self-evaluation.js" defer></script>
@@ -34,23 +36,7 @@
     </header>
     <main class="main-content performance-content self-evaluation-content">
       <div id="selfEvaluationGeneralView">
-        <section class="goal-plan-employee-form" aria-labelledby="selfEvaluationEmployeeHeading">
-          <h2 id="selfEvaluationEmployeeHeading" class="form-section-heading">Employee Details</h2>
-          <div class="goal-form-field"><label for="selfEvaluationName">Name</label><input id="selfEvaluationName" type="text" readonly></div>
-          <div class="goal-form-field"><label for="selfEvaluationPosition">Position</label><input id="selfEvaluationPosition" type="text" readonly></div>
-          <div class="goal-form-field"><label for="selfEvaluationDepartment">Department</label><input id="selfEvaluationDepartment" type="text" readonly></div>
-          <div class="goal-form-field"><label for="selfEvaluationSupervisor">Supervisor</label><input id="selfEvaluationSupervisor" type="text" readonly></div>
-          <div class="goal-form-field"><label for="selfEvaluationReportTo">Reporting To</label><input id="selfEvaluationReportTo" type="text" readonly></div>
-          <div class="goal-form-field"><label for="selfEvaluationRef">Evaluation Ref#</label><input id="selfEvaluationRef" type="text" readonly></div>
-          <div class="goal-form-grid">
-            <div class="goal-form-field"><label for="selfEvaluationPeriod">Period</label><input id="selfEvaluationPeriod" type="text" readonly></div>
-            <div class="goal-form-field"><label for="selfEvaluationType">Type</label><input id="selfEvaluationType" type="text" readonly></div>
-          </div>
-        </section>
-        <section class="goal-plan-sections" aria-label="Self Evaluation details">
-          <button type="button" class="goal-plan-section-card" data-evaluation-section="goals"><span class="goal-plan-section-icon"><i class="fa-solid fa-bullseye" aria-hidden="true"></i></span><span class="goal-plan-section-copy"><strong class="goal-plan-section-name">Goal</strong><small id="selfEvaluationGoalsSummary"></small></span><span class="goal-plan-section-link">Details <i class="fa-solid fa-chevron-right" aria-hidden="true"></i></span></button>
-          <button type="button" class="goal-plan-section-card" data-evaluation-section="competencies"><span class="goal-plan-section-icon"><i class="fa-solid fa-award" aria-hidden="true"></i></span><span class="goal-plan-section-copy"><strong class="goal-plan-section-name">Competency</strong><small id="selfEvaluationCompetenciesSummary"></small></span><span class="goal-plan-section-link">Details <i class="fa-solid fa-chevron-right" aria-hidden="true"></i></span></button>
-        </section>
+        <div id="performanceRequestFields"></div>
         <div class="goal-plan-footer self-evaluation-actions form-action-row" aria-label="Self Evaluation actions">
           <a id="selfEvaluationCancel" class="form-cancel-btn goal-plan-cancel-action" href="../index.html?scope=individual"><i class="fa-solid fa-xmark" aria-hidden="true"></i><span>Cancel</span></a>
           <button id="selfEvaluationDraft" type="button" class="goal-plan-primary-action"><i class="fa-solid fa-floppy-disk" aria-hidden="true"></i><span>Draft</span></button>

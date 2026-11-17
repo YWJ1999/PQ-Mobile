@@ -8,15 +8,22 @@
 #approvalConfirm { align-items: center; justify-content: center; padding: 16px 16px 94px; }
 #approvalConfirm .payroll-approval-panel { max-width: 380px; max-height: 100%; border-bottom: 1px solid var(--border-subtle); border-radius: 18px; }
 #approvalDetailsBody .employee-id { margin-bottom: 4px; font: 700 11.5px monospace, sans-serif; color: var(--text-muted); opacity: .8; }
-#approvalDetailsBody h3 { margin: 16px 0 8px; font-size: 12px; }
-#approvalDetailsBody .payroll-approval-table + .payroll-approval-table { margin-top: 12px; }
-#approvalDetailsBody { display: block; }
-#approvalDetailsBody h3:first-child { margin-top: 0; }
-#approvalDetailsBody .detail-popout-table { margin-bottom: 12px !important; }
-#approvalDetailsBody .detail-popout-value { white-space: pre-line; }
-#approvalDetailsBody .employee-name { display: block; }
-#approvalDetailsBody .employee-id { display: block; }
-#approvalDetailsBody .payroll-approval-file { overflow-wrap: anywhere; color: var(--purple-text); }
+#approvalDetailsBody { padding: 14px; }
+.performance-request-review { display: grid; gap: 14px; }
+.performance-request-review .goal-plan-employee-form,
+.performance-request-review .employee-career-form-card { margin: 0; }
+.performance-review-value { display: block; min-width: 0; min-height: 44px; margin: 0; padding: 11px 13px; border: 1px solid var(--border-subtle); border-radius: 13px; background: var(--bg-input); color: var(--text-primary); font-size: 12px; font-weight: 600; line-height: 1.45; white-space: pre-wrap; overflow-wrap: anywhere; }
+.performance-request-review .employee-name { display: block; }
+.performance-request-review .employee-career-form-card { border: 1px solid var(--border-subtle); background: var(--bg-card); }
+.performance-request-review .employee-career-field { display: flex; flex-direction: column; margin-bottom: 14px; }
+.performance-request-review .employee-career-fieldset { border: 0; padding: 0; }
+.performance-request-review .employee-career-form-section + .employee-career-form-section { border-top: 1px solid var(--border-subtle); }
+.performance-request-review #selfReviewEmployee { color: var(--text-muted); font: 700 11.5px monospace, sans-serif; }
+.performance-request-review .goal-plan-section-card[aria-expanded="true"] .fa-chevron-right { transform: rotate(90deg); }
+.performance-review-fields { display: grid; gap: 14px; margin: 0; }
+.performance-review-fields dt { margin-bottom: 6px; color: var(--text-secondary); font-size: 11px; font-weight: 800; }
+.performance-request-review .payroll-approval-file { overflow-wrap: anywhere; color: var(--purple-text); }
+#approvalDetailsBody .approval-comments-card { margin-top: 14px; }
 #approvalConfirmForm { display: flex; flex-direction: column; min-height: 0; }
 #approvalConfirmForm > .payroll-approval-details-body { min-height: 0; overflow-y: auto; }
 #approvalConfirmMessage { margin-bottom: 16px; font-size: 13px; line-height: 1.5; }
