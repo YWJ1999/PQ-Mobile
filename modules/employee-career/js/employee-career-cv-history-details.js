@@ -220,9 +220,11 @@
       ? `<nav class="cv-stepper" aria-label="CV request sections"><ol class="cv-step-track" role="tablist" aria-label="CV details">${tabs}</ol></nav>`
       : `<div class="cv-history-navigation"><div class="cv-history-detail-tabs" role="tablist" aria-label="CV details">${tabs}</div></div>`;
     const metadata = `<section class="cv-history-request-summary"><h3>Request overview</h3><dl class="cv-history-metadata cv-history-fields cv-history-overview">${[
-      ['Employee', employee(row)], ['Document Status', statusMarkup],
-      ['Submitted Date', display(submittedDate)], ['Document Reference', display(row.reference || row.id)],
-      ...(!approval ? [['Approver Remarks', display(row.approverRemarks)]] : [])
+      ['Employee', employee(row)],
+      ...(!approval ? [
+        ['Document Status', statusMarkup], ['Submitted Date', display(submittedDate)],
+        ['Document Reference', display(row.reference || row.id)], ['Approver Remarks', display(row.approverRemarks)]
+      ] : [])
     ].map(([label, value]) => detailRow(label, value, '', `cv-history-overview-${normalize(label)}`)).join('')}</dl></section>`;
     const panels = Object.keys(sections).map(key => {
       let content;

@@ -3,7 +3,7 @@ const path = require('node:path');
 const { pathToFileURL } = require('node:url');
 const puppeteer = require('puppeteer');
 
-const labels = ['Document Reference', 'Document Status', 'Employee', 'Employee Branch', 'Employee Department', 'Date', 'Shift', 'Submitter', 'Submit Date', 'Amended Shift', 'Shift Change Reason', 'Remarks', 'Approver Comments'];
+const labels = ['Employee', 'Employee Branch', 'Employee Department', 'Date', 'Shift', 'Submitter', 'Amended Shift', 'Shift Change Reason', 'Remarks', 'Approver Comments'];
 
 (async () => {
   const browser = await puppeteer.launch({ headless: true, executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe', args: ['--allow-file-access-from-files'] });
@@ -54,7 +54,6 @@ const labels = ['Document Reference', 'Document Status', 'Employee', 'Employee B
       assert.equal(details.legacyVisible, false);
       assert.deepEqual(details.employee, { name: 'Afifah Nasir', id: '#004177' });
       const value = label => details.rows.find(row => row.label === label).value;
-      assert.equal(value('Document Status'), 'Pending');
       assert.equal(value('Employee Branch'), '—');
       assert.equal(value('Employee Department'), 'QA Manager');
       assert.equal(value('Date'), 'Tue, 24/02/2026');
@@ -83,13 +82,10 @@ const labels = ['Document Reference', 'Document Status', 'Employee', 'Employee B
       });
       await page.screenshot({ path: path.resolve(__dirname, `attendance-feedback-clock-amendments-${theme}-${width}.png`) });
       details = await read();
-      assert.equal(value('Document Reference'), 'ATT000000000006');
-      assert.equal(value('Document Status'), 'Final Approval');
       assert.equal(value('Employee Branch'), 'USJ 20');
       assert.equal(value('Employee Department'), 'HUMAN RESOURCE');
       assert.equal(value('Date'), '1 Nov 2011');
       assert.equal(value('Shift'), '8.00AM-5.00PM');
-      assert.equal(value('Submit Date'), '2 Dec 2011');
       assert.equal(value('Amended Shift'), '8.30AM-5.30PM (W01)');
       assert.equal(value('Shift Change Reason'), 'Schedule Change');
       assert.equal(value('Remarks'), 'Changed work schedule.\nConfirmed with supervisor.');

@@ -215,13 +215,10 @@ document.addEventListener('DOMContentLoaded', () => {
     if (inventory) {
       sectionTitle(general, 'Request Details');
       table(general, [
-        ['Document Reference #', node('span', 'workplace-approval-document-ref', item.reference)],
-        ['Document Status', recordDetailStatus.create(item.status)],
         ['Employee #', '#' + item.empNo.replace(/^#+/, '')],
         ['Name', item.employeeName],
         ['Position', item.position],
         ['Department', item.department],
-        ['Submit Date', date(item.submitDate)],
         ['Item Group', item.itemGroup],
         ['Item', item.requestItem],
         ['Item Type', item.itemType],
@@ -238,7 +235,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const fields = document.createElement('guest-visit-fields');
       fields.setAttribute('readonly', '');
       visit.append(fields);
-      fields.showSubmission(item, date, recordDetailStatus.create(item.status));
+      fields.showSubmission(item, date);
     }
     const commentLabel = node('label', 'workplace-approval-comment-label', 'Approver Action Comments');
     commentLabel.htmlFor = 'approvalComments';

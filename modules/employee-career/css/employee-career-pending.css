@@ -461,19 +461,8 @@
   text-align: right;
 }
 
-.career-pending-page .cv-history-request-summary .cv-history-fields {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0;
-}
-
-.career-pending-page .cv-history-request-summary .cv-history-detail-row:first-child,
-.career-pending-page .cv-history-request-summary .cv-history-detail-row:last-child {
-  grid-column: 1 / -1;
-}
-
 .career-pending-page .cv-history-request-summary .cv-history-detail-row {
-  min-height: 58px;
+  min-height: 70px;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -482,41 +471,8 @@
   background: transparent;
 }
 
-.career-pending-page .cv-history-request-summary .cv-history-detail-row:first-child {
-  min-height: 70px;
-  border-bottom: 1px solid var(--border-subtle);
-}
-
-.career-pending-page .cv-history-request-summary .cv-history-detail-row:nth-child(2) {
-  border-top: 0;
-  border-right: 1px solid var(--border-subtle);
-}
-
-.career-pending-page .cv-history-request-summary .cv-history-detail-row:nth-child(3) {
-  border-top: 0;
-}
-
-.career-pending-page .cv-history-request-summary .cv-history-detail-row:last-child {
-  border-top: 1px solid var(--border-subtle);
-}
-
 .career-pending-page .cv-history-request-summary .cv-history-detail-row > dd {
   text-align: left;
-}
-
-.career-pending-page .cv-history-request-summary .cv-history-detail-row:nth-child(2) > dd {
-  width: max-content;
-  padding: 3px 8px;
-  border-radius: 999px;
-  background: var(--purple-subtle);
-  color: var(--purple-text);
-  font-size: 10.5px;
-  font-weight: 800;
-}
-
-.career-pending-page .cv-history-request-summary .cv-history-detail-row:last-child > dd {
-  font-family: monospace, sans-serif;
-  font-size: 11px;
 }
 
 .career-pending-page .cv-history-detail-row:has(> dd[data-cv-field='Address']),

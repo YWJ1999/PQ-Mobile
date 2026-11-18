@@ -43,13 +43,10 @@ async function shot(page, name) {
         row.querySelector('th').textContent.trim(),
         row.querySelector('td').textContent.trim()
       ])), [
-        ['Document Reference #', 'IRQ0000000000064'],
-        ['Document Status', 'Pending'],
         ['Employee #', '#EBB12'],
         ['Name', 'Farhan binti rahmat'],
         ['Position', 'GROUP HR MANAGER'],
         ['Department', 'HUMAN RESOURCE'],
-        ['Submit Date', '8 Sep 2026'],
         ['Item Group', 'OFFICE EQUIPMENT'],
         ['Item', 'LOCKER 1000'],
         ['Item Type', 'Asset'],
@@ -112,7 +109,7 @@ async function shot(page, name) {
       assert.ok(await page.$$eval(fields + ' input, ' + fields + ' select', controls => controls.every(control => control.readOnly || control.disabled)));
       assert.deepEqual(await page.$$eval('#visitDate, #visitStartTime, #visitEndTime, #visitTotalGuest, #visitLocation', inputs => inputs.map(input => input.value)), ['8 Oct 2026', '00:00', '00:00', '0', '—']);
       assert.equal(await page.$eval('#visitMeal', field => field.checked), false);
-      assert.match(await page.$eval('.visit-submission-meta', n => n.textContent), /FGV0000000000013.*Pending.*16 Aug 2024/);
+      assert.equal(await page.$('.visit-submission-meta'), null);
       assert.equal(await page.$eval('#visitAttachments', n => n.textContent), 'No attachments');
       assert.equal(await page.$(fields + ' .visit-add-record, ' + fields + ' input[type="file"]'), null);
       await shot(page, `workplace-pending-general-${theme}-${width}.png`);

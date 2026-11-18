@@ -16,7 +16,6 @@
 #workplaceApprovalDetails .payroll-approval-table th { width: 40%; border-right: 1px solid var(--border-subtle); background: var(--bg-input); }
 #workplaceApprovalDetails .payroll-approval-table td { width: 60%; background: transparent; color: var(--text-primary); }
 #workplaceApprovalDetails .payroll-approval-table .employee-name { font-size: 11.5px; font-weight: 700; }
-#workplaceApprovalDetails .workplace-approval-document-ref { font-family: monospace; font-weight: 800; }
 #workplaceApprovalDetails .payroll-approval-table tr:last-child :is(th, td) { border-bottom: 0; }
 #workplaceApprovalDetails .claim-detail-approver-comments { flex-shrink: 0; padding: 12px 14px; border: 1px solid var(--border-subtle); border-radius: 16px; background: var(--bg-card); }
 #workplaceApprovalDetails .claim-detail-approver-comments label { margin: 0 0 8px; color: var(--text-secondary); font-size: 11.5px; font-weight: 800; }

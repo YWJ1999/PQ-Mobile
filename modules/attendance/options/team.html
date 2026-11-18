@@ -117,15 +117,12 @@
           submitter = identity(name.join(' - '), id);
         }
         const rows = [
-          ['Document Reference', data.docRef],
-          ['Document Status', recordDetailStatus.create(data.documentStatus ?? data.docStatus ?? data.statusText)],
           ['Employee', identity(data.name, data.empId || data.id)],
           ['Employee Branch', data.employeeBranch ?? data.branch],
           ['Employee Department', data.employeeDepartment ?? data.department ?? data.dept],
           ['Date', data.date ?? data.attendanceDate ?? data.startDate ?? data.dates],
           ['Shift', data.originalShift ?? data.shift],
           ['Submitter', submitter],
-          ['Submit Date', data.submitDate ?? data.submittedAt],
           ['Amended Shift', data.amendedShift],
           ['Shift Change Reason', data.shiftChangeReason ?? data.reason],
           ['Remarks', data.remarks ?? data.remark],
@@ -186,50 +183,39 @@
         document.getElementById('attFeedbackDetailsGroup').hidden = !isFeedbackModal;
         document.getElementById('attOtDetailsGroup').hidden = isFeedbackModal;
         if (isFeedbackModal) renderFeedbackApprovalDetails(data);
-        for (const fieldId of ['attFieldFinalStatus', 'attFieldApprovalMethod', 'attFieldActionApprovalMethod']) {
+        for (const fieldId of ['attFieldFinalStatus', 'attFieldActionApprovalMethod']) {
           const row = document.getElementById(fieldId)?.closest('tr');
           if (row) row.hidden = isOtPlanModal;
         }
-        let planHoursVal = '0.00';
+        let planHoursVal = data.planHours ?? '—';
         let otTimesVal = data.otTimes || '0000 ,0500';
-        let actualHoursVal = '0.50';
-        let approvedHoursVal = '0.00';
+        let actualHoursVal = data.actualHours ?? '—';
+        let approvedHoursVal = data.approvedHours ?? '—';
         let shiftVal = data.amendedShift || data.shift || '8.00AM-5.30PM';
 
         const actualRow = document.getElementById('attRowActualHours');
         const approvedRow = document.getElementById('attRowApprovedHours');
+        if (actualRow) actualRow.style.display = isFeedbackModal ? 'none' : 'table-row';
+        if (approvedRow) approvedRow.style.display = isFeedbackModal ? 'none' : 'table-row';
 
         if (isOtPlanModal) {
-          if (actualRow) actualRow.style.display = 'none';
-          if (approvedRow) approvedRow.style.display = 'none';
-          setVal('attFieldDocRef', data.docRef || 'OTB000000001612');
           setVal('attFieldPlanStatus', data.planStatus || 'Submitted');
-          planHoursVal = data.planHours || '5.00';
           if (data.duration && data.duration.includes('(')) {
             const parts = data.duration.split('(');
-            planHoursVal = parts[0].replace(/[^0-9.]/g, '').trim() || '2.00';
+            planHoursVal = data.planHours ?? (parts[0].replace(/[^0-9.]/g, '').trim() || '—');
             otTimesVal = parts[1].replace(')', '').trim();
           } else if (data.otTime) {
             otTimesVal = data.otTime;
           }
-          actualHoursVal = '-';
-          approvedHoursVal = '-';
         } else if (isFeedbackModal) {
-          if (actualRow) actualRow.style.display = 'none';
-          if (approvedRow) approvedRow.style.display = 'none';
-          setVal('attFieldDocRef', data.docRef || 'AXTGEN000078881');
           setVal('attFieldPlanStatus', 'Unplanned');
           actualHoursVal = '-';
           approvedHoursVal = '-';
           planHoursVal = '-';
         } else {
-          if (actualRow) actualRow.style.display = 'table-row';
-          if (approvedRow) approvedRow.style.display = 'table-row';
-          setVal('attFieldDocRef', data.docRef || 'AXTGEN000078881');
           setVal('attFieldPlanStatus', data.planStatus || (data.type && data.type.toLowerCase().includes('plan') ? 'Planned' : 'Unplanned'));
           if (data.duration) {
-            actualHoursVal = data.actualHours || data.duration.replace(/[^0-9.]/g, '') || '0.50';
-            approvedHoursVal = data.approvedHours || '0.00';
+            actualHoursVal = data.actualHours ?? (data.duration.replace(/[^0-9.]/g, '') || '—');
           }
         }
 
@@ -248,22 +234,23 @@
           supEl.innerHTML = '<span style="font-family: monospace; font-weight: 700;">#' + rawSup + '</span>';
         }
 
-        setVal('attFieldSubmitDate', data.dates ? data.dates.split(' - ')[0] : (data.startDate || '15 Jul 2024'));
         setVal('attFieldOtDate', data.dates ? data.dates.split(' - ')[0] : (data.startDate || '15 Jul 2024'));
         setVal('attFieldShift', shiftVal);
         setVal('attFieldClockingTimes', data.clockingTimes || data.clocking || '0733,1759');
         setVal('attFieldOtTimes', otTimesVal);
-        setVal('attFieldBreakHours', '0.00');
+        setVal('attFieldBreakHours', data.breakHours ?? data.breakHrs ?? '0.00');
         setVal('attFieldPlanHours', planHoursVal);
         setVal('attFieldActualHours', actualHoursVal);
         setVal('attFieldApprovedHours', approvedHoursVal);
-        setVal('attFieldApprovalMethod', '-');
+        setVal('attFieldApprovalMethod', data.approvalMethod || '—');
         setVal('attFieldOtType', data.otType || data.type || 'OT 1.5 BEFORE WORK');
-        setVal('attFieldOtReason', data.reason || 'OTHERS');
+        setVal('attFieldOtReason', data.otReason ?? data.reason ?? 'OTHERS');
         setVal('attFieldTask', data.task || '-');
-        setVal('attFieldAllowLeaveCredit', data.allowLeaveCredit || 'No');
-        setVal('attFieldNeedTransport', data.needTransport || 'Yes');
-        setVal('attFieldRemarks', data.remark || '-');
+        const yesNo = value => value === true ? 'Yes' : value === false ? 'No' : value;
+        setVal('attFieldAllowLeaveCredit', yesNo(data.allowLeaveCredit ?? 'No'));
+        setVal('attFieldNeedTransport', yesNo(data.needTransport ?? 'Yes'));
+        setVal('attFieldRemarks', data.remarks ?? data.remark ?? '-');
+        setVal('attFieldApproverComments', data.approverComments ?? data.comments);
 
         const titleEl = document.getElementById('attDetailHeaderTitle');
         if (titleEl) {
@@ -3212,10 +3199,6 @@
             <table style="width: 100%; border-collapse: collapse; font-size: 12px; text-align: left;">
               <tbody>
                 <tr>
-                  <td style="padding: 9px 12px; border-bottom: 1px solid var(--border-subtle); border-right: 1px solid var(--border-subtle); font-weight: 700; color: var(--text-muted); background: var(--bg-input); width: 42%;">Document Reference:</td>
-                  <td style="padding: 9px 12px; border-bottom: 1px solid var(--border-subtle); color: var(--text-primary); width: 58%; font-weight: 800; font-family: monospace; letter-spacing: 0.3px;" id="attFieldDocRef">AXTGEN000078881</td>
-                </tr>
-                <tr>
                   <td style="padding: 9px 12px; border-bottom: 1px solid var(--border-subtle); border-right: 1px solid var(--border-subtle); font-weight: 700; color: var(--text-muted); background: var(--bg-input); width: 42%;">Plan Status:</td>
                   <td style="padding: 9px 12px; border-bottom: 1px solid var(--border-subtle); color: var(--text-primary); width: 58%; font-weight: 700;" id="attFieldPlanStatus">Unplanned</td>
                 </tr>
@@ -3233,10 +3216,6 @@
                 <tr>
                   <td style="padding: 9px 12px; border-bottom: 1px solid var(--border-subtle); border-right: 1px solid var(--border-subtle); font-weight: 700; color: var(--text-muted); background: var(--bg-input); width: 42%;">Supervisor:</td>
                   <td style="padding: 9px 12px; border-bottom: 1px solid var(--border-subtle); color: var(--text-primary); width: 58%; font-weight: 700;" id="attFieldSupervisor">#EBB04</td>
-                </tr>
-                <tr>
-                  <td style="padding: 9px 12px; border-bottom: 1px solid var(--border-subtle); border-right: 1px solid var(--border-subtle); font-weight: 700; color: var(--text-muted); background: var(--bg-input); width: 42%;">Submit Date:</td>
-                  <td style="padding: 9px 12px; border-bottom: 1px solid var(--border-subtle); color: var(--text-primary); width: 58%; font-weight: 700;" id="attFieldSubmitDate">3 Jul 2023</td>
                 </tr>
                 <tr>
                   <td style="padding: 9px 12px; border-bottom: 1px solid var(--border-subtle); border-right: 1px solid var(--border-subtle); font-weight: 700; color: var(--text-muted); background: var(--bg-input); width: 42%;">OT Date:</td>
@@ -3298,6 +3277,10 @@
                   <td style="padding: 9px 12px; border-bottom: 1px solid var(--border-subtle); border-right: 1px solid var(--border-subtle); font-weight: 700; color: var(--text-muted); background: var(--bg-input); width: 42%;">Remarks:</td>
                   <td style="padding: 9px 12px; border-bottom: 1px solid var(--border-subtle); color: var(--text-primary); width: 58%; font-weight: 700;" id="attFieldRemarks">UNAUTHORISED OT</td>
                 </tr>
+                <tr>
+                  <td style="padding: 9px 12px; border-bottom: 1px solid var(--border-subtle); border-right: 1px solid var(--border-subtle); font-weight: 700; color: var(--text-muted); background: var(--bg-input); width: 42%;">Approver Comments:</td>
+                  <td style="padding: 9px 12px; border-bottom: 1px solid var(--border-subtle); color: var(--text-primary); width: 58%; font-weight: 700; white-space: pre-wrap;" id="attFieldApproverComments">—</td>
+                </tr>
                 <!-- Action Approval Method inside table row -->
                 <tr>
                   <td style="padding: 9px 12px; border-bottom: 1px solid var(--border-subtle); border-right: 1px solid var(--border-subtle); font-weight: 700; color: var(--text-muted); background: var(--bg-input); width: 42%;">Action Approval Method:</td>
@@ -3314,7 +3297,7 @@
                 </tr>
                 <!-- Approver Action Comments inside table row -->
                 <tr>
-                  <td style="padding: 9px 12px; border-bottom: none; border-right: 1px solid var(--border-subtle); font-weight: 700; color: var(--text-muted); background: var(--bg-input); width: 42%; vertical-align: middle;">Approver Comments:</td>
+                  <td style="padding: 9px 12px; border-bottom: none; border-right: 1px solid var(--border-subtle); font-weight: 700; color: var(--text-muted); background: var(--bg-input); width: 42%; vertical-align: middle;">Approver Action Comments:</td>
                   <td style="padding: 6px 10px; border-bottom: none; color: var(--text-primary); width: 58%;">
                     <input type="text" placeholder="Add comments..." style="width: 100%; padding: 6px 8px; border-radius: 6px; border: 1px solid var(--border-subtle); background: var(--bg-card); color: var(--text-primary); font-size: 11.5px; outline: none; box-sizing: border-box;">
                   </td>

@@ -117,7 +117,7 @@ const tabs = [
                 const summaryLabels = await page.$$eval('#otDetailsModal .attendance-history-form-summary-list dt', nodes => nodes.map(node => node.textContent.trim()));
                 const fieldLabels = await page.$$eval('#otDetailsModal .attendance-history-form-field > label:first-child, #otDetailsModal .attendance-history-credit-field > label:first-child', nodes => nodes.map(node => node.textContent.trim()));
                 assert.deepEqual(summaryLabels, ['Document Reference', 'Plan Status', 'Employee', 'Supervisor', 'Submit Date', 'Shift', 'Clocking Times']);
-                assert.deepEqual(fieldLabels, ['OT Date', 'Start Time', 'End Time', 'Break Hours', 'Plan Hours', 'OT Type', 'OT Reason', 'Task', 'Convert to Leave Credit', 'Need Transport', 'Remarks', 'Approver Comments']);
+                assert.deepEqual(fieldLabels, ['OT Date', 'Start Time', 'End Time', 'Break Hours', 'Plan Hours', 'Actual Hours', 'Approved Hours', 'Approval Method', 'OT Type', 'OT Reason', 'Task', 'Convert to Leave Credit', 'Need Transport', 'Remarks', 'Approver Comments']);
                 assert.equal(await page.$eval('#otPlanFormTitle', node => node.textContent.trim()), 'OT Plan Details');
                 assert.equal(await page.$eval('#otDetailsModal [data-ot-form-cancel]', node => node.textContent.trim()), 'Cancel');
                 assert.deepEqual(await page.$$eval('#otDetailsModal .attendance-history-form-actions button', nodes => nodes.map(node => node.textContent.trim())), ['Cancel', 'Submit']);

@@ -98,7 +98,7 @@
     close(kind);
   }
 
-  function openOtDetailsModal(docRef, planStatus, emp, supervisor, submitDate, otDate, shift, clkTimes, startTime, endTime, breakHrs, planHrs, otType, otReason, task, allowLeaveCredit, needTransport, remarks, approverComments) {
+  function openOtDetailsModal(docRef, planStatus, emp, supervisor, submitDate, otDate, shift, clkTimes, startTime, endTime, breakHrs, planHrs, otType, otReason, task, allowLeaveCredit, needTransport, remarks, approverComments, approvalDetails = {}) {
     text('modalOtDocRef', docRef);
     setStatus('modalOtPlanStatus', planStatus);
     setEmployee('modalOt', emp);
@@ -107,6 +107,9 @@
     text('modalOtShift', shift);
     text('modalOtClockingTimes', clkTimes);
     document.getElementById('modalOtApproverComments').value = approverComments || '-';
+    for (const [field, value] of Object.entries({ ActualHours: approvalDetails.actualHours, ApprovedHours: approvalDetails.approvedHours, ApprovalMethod: approvalDetails.approvalMethod })) {
+      document.getElementById('modalOt' + field).value = value === '' || value == null ? '—' : String(value);
+    }
     const match = String(otDate || '').match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
     show('ot', {
       ref: docRef, editable: resubmittable(planStatus), punches: [],
@@ -114,7 +117,8 @@
         date: match ? `${match[3]}-${match[2]}-${match[1]}` : '',
         startTime, endTime, breakHours: breakHrs, planHours: planHrs,
         type: otType, reason: otReason, task: task === '- SELECT TASK -' ? '' : task,
-        credit: allowLeaveCredit === 'Yes', transport: needTransport === 'Yes', remarks: remarks || ''
+        credit: allowLeaveCredit === true || allowLeaveCredit === 'Yes',
+        transport: needTransport === true || needTransport === 'Yes', remarks: remarks || ''
       }
     });
   }

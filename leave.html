@@ -6491,7 +6491,6 @@
                 <table class="leave-approval-details-table" data-time-off-approval-general>
                   <tbody>
                     <tr><td>Date</td><td><span id="timeOffDetailsDate">23 Sep 2026</span></td></tr>
-                    <tr><td>Document Status</td><td><span id="timeOffDetailsDocStatus">Pending Approval</span></td></tr>
                     <tr><td>Start Time</td><td><span id="timeOffDetailsStartTime">14:30</span></td></tr>
                     <tr><td>End Time</td><td><span id="timeOffDetailsEndTime">17:00</span></td></tr>
                     <tr><td>Hours</td><td><span id="timeOffDetailsHours">2.5 Hours</span></td></tr>
@@ -6509,22 +6508,6 @@
             <div style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 18px; overflow: hidden; box-shadow: 0 4px 16px rgba(0,0,0,0.06); flex-shrink: 0;">
               <table style="width: 100%; border-collapse: collapse; font-size: 12px; text-align: left;">
                 <tbody>
-                  <!-- 1. Document Reference -->
-                  <tr>
-                    <td style="padding: 10px 14px; border-bottom: 1px solid var(--border-subtle); border-right: 1px solid var(--border-subtle); font-weight: 700; color: var(--text-muted); background: var(--bg-input); width: 38%;">Document Reference:</td>
-                    <td style="padding: 10px 14px; border-bottom: 1px solid var(--border-subtle); color: var(--text-primary); width: 62%; font-weight: 700;">
-                      <span id="lcDetailsDocRef" style="font-family: monospace; letter-spacing: 0.3px;">LVR000000000589</span>
-                    </td>
-                  </tr>
-
-                  <!-- 2. Document Status -->
-                  <tr>
-                    <td style="padding: 10px 14px; border-bottom: 1px solid var(--border-subtle); border-right: 1px solid var(--border-subtle); font-weight: 700; color: var(--text-muted); background: var(--bg-input); width: 38%;">Document Status:</td>
-                    <td style="padding: 10px 14px; border-bottom: 1px solid var(--border-subtle); color: var(--text-primary); width: 62%; font-weight: 600;">
-                      <span id="lcDetailsDocStatus">Pending Approval</span>
-                    </td>
-                  </tr>
-
                   <!-- 3. Employee -->
                   <tr>
                     <td style="padding: 10px 14px; border-bottom: 1px solid var(--border-subtle); border-right: 1px solid var(--border-subtle); font-weight: 700; color: var(--text-muted); background: var(--bg-input); width: 38%;">Employee:</td>
@@ -6562,14 +6545,6 @@
                     <td style="padding: 10px 14px; border-bottom: 1px solid var(--border-subtle); border-right: 1px solid var(--border-subtle); font-weight: 700; color: var(--text-muted); background: var(--bg-input); width: 38%;">Submitter:</td>
                     <td style="padding: 10px 14px; border-bottom: 1px solid var(--border-subtle); color: var(--text-primary); width: 62%; font-weight: 600;">
                       <span id="lcDetailsSubmitter">EBB12 - Farhan binti rahmat</span>
-                    </td>
-                  </tr>
-
-                  <!-- 8. Submit Date -->
-                  <tr>
-                    <td style="padding: 10px 14px; border-bottom: 1px solid var(--border-subtle); border-right: 1px solid var(--border-subtle); font-weight: 700; color: var(--text-muted); background: var(--bg-input); width: 38%;">Submit Date:</td>
-                    <td style="padding: 10px 14px; border-bottom: 1px solid var(--border-subtle); color: var(--text-primary); width: 62%; font-weight: 700;">
-                      <span id="lcDetailsSubmitDate">12 Jul 2024</span>
                     </td>
                   </tr>
 
@@ -10924,14 +10899,11 @@
         if (actionFooter) actionFooter.style.display = 'block';
 
         // Populate Leave Credit fields according to user screenshot
-        setElText('lcDetailsDocRef', data.docRef || 'LVR000000000589');
-        document.getElementById('lcDetailsDocStatus').replaceChildren(recordDetailStatus.create(data.docStatus || 'Pending Approval'));
         setElText('lcDetailsEmployee', data.employee || 'EBB12 - Farhan binti rahmat');
         setElText('lcDetailsCreditLeave', data.creditLeave || 'REPLACEMENT LEAVE');
         setElText('lcDetailsOffsetLeave', data.offsetLeave || '');
         setElText('lcDetailsCreditType', data.creditType || 'Working on Public Holiday');
         setElText('lcDetailsSubmitter', data.submitter || 'EBB12 - Farhan binti rahmat');
-        setElText('lcDetailsSubmitDate', data.submitDate || '12 Jul 2024');
         setElText('lcDetailsFromDate', data.fromDate || '3 Jul 2024');
         setElText('lcDetailsToDate', data.toDate || '3 Jul 2024');
         setElText('lcDetailsCreditDays', data.creditDays || data.leaveDays || '1.000');
@@ -10950,7 +10922,6 @@
         if (lcView) lcView.style.display = 'none';
         if (actionFooter) actionFooter.style.display = 'block';
 
-        document.getElementById('timeOffDetailsDocStatus').replaceChildren(recordDetailStatus.create(data.docStatus || 'Pending Approval'));
         setElText('timeOffDetailsDate', data.date || data.fromDate || data.dates || '\u2014');
         setElText('timeOffDetailsStartTime', data.startTime || '\u2014');
         setElText('timeOffDetailsEndTime', data.endTime || '\u2014');

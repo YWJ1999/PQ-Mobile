@@ -431,6 +431,7 @@
                 'Yes',
                 'Work started before normal hours',
                 'Please resubmit with signed supervisor logs',
+                { actualHours: '0.00' },
               )
             ">
             <div class="history-card-header">
@@ -475,6 +476,7 @@
                 'Yes',
                 'Emergency material checking',
                 'asd',
+                { actualHours: '0.00' },
               )
             ">
             <div class="history-card-header">
@@ -519,6 +521,7 @@
                 'No',
                 'Late night release support',
                 'Pending manager final signoff',
+                { actualHours: '4.00' },
               )
             ">
             <div class="history-card-header">
@@ -723,6 +726,9 @@
                   <div class="attendance-history-form-field"><label for="modalOtEndTime">End Time</label><input id="modalOtEndTime" type="time" data-history-field="endTime"></div>
                   <div class="attendance-history-form-field"><label for="modalOtBreakHours">Break Hours</label><input id="modalOtBreakHours" type="number" data-history-field="breakHours" min="0" step="0.01"></div>
                   <div class="attendance-history-form-field"><label for="modalOtPlanHours">Plan Hours</label><input id="modalOtPlanHours" type="number" data-history-field="planHours" min="0" step="0.01"></div>
+                  <div class="attendance-history-form-field"><label for="modalOtActualHours">Actual Hours</label><input id="modalOtActualHours" type="text" readonly></div>
+                  <div class="attendance-history-form-field"><label for="modalOtApprovedHours">Approved Hours</label><input id="modalOtApprovedHours" type="text" readonly></div>
+                  <div class="attendance-history-form-field"><label for="modalOtApprovalMethod">Approval Method</label><input id="modalOtApprovalMethod" type="text" readonly></div>
                   <div class="attendance-history-form-field"><label for="modalOtType">OT Type</label><textarea id="modalOtType" data-history-field="type" rows="2"></textarea></div>
                   <div class="attendance-history-form-field"><label for="modalOtReason">OT Reason</label><textarea id="modalOtReason" data-history-field="reason" rows="3"></textarea></div>
                   <div class="attendance-history-form-field"><label for="modalOtTask">Task</label><textarea id="modalOtTask" data-history-field="task" rows="3"></textarea></div>

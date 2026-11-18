@@ -205,16 +205,10 @@
       ] : [
         ['Employee', identity(item.employeeName, item.empNo, item.position)],
         ['Type', item.type],
-        ['Submit Date', date(item.submitDate)],
         ...(item.details || []),
         ['Approver Remarks', remarksControl(item)]
       ];
-      const rows = [
-        ['Document Reference', item.reference || item.id],
-        ['Document Status', recordDetailStatus.create(item.documentStatus || 'Submitted')],
-        ...detailFields
-      ];
-      rows.forEach(([label, value]) => {
+      detailFields.forEach(([label, value]) => {
         const row = node('tr');
         const heading = node('th', isEngagement ? 'detail-popout-label' : '', label);
         heading.scope = 'row';

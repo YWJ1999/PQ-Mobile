@@ -101,7 +101,6 @@
     .clocking-history-facts > div { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; font-size: 11.5px; line-height: 1.5; }
     .clocking-history-facts > div > span { color: var(--text-muted); font-weight: 600; }
     .clocking-history-facts strong { color: var(--text-primary); min-width: 0; text-align: right; overflow-wrap: anywhere; }
-    .clocking-history-facts .employee-id-standard { display: block; margin-bottom: 4px; color: var(--text-muted); font: 700 11.5px monospace, sans-serif; opacity: .8; }
 
     /* Purple Modal Header Styling */
     .modal-header-purple {
@@ -351,7 +350,7 @@
       <div id="viewOtHistory" style="display: none;">
         
         <!-- OT Card 1: Pending (AXT000000000101) -->
-        <a href="javascript:void(0)" data-status="pending" onclick="openOtDetailsModal('AXT000000000101', 'Pending Approve', 'SP013 - Angeline loren alan', 'EBB04 - Tech Lead', '12 Jul 2024', '12/07/2024', '8.00AM-5.30PM', '0750', '06:00', '08:00', '0', '16.00', 'OT 1.5 BEFORE WORK', 'URGENT SYSTEM MIGRATION', 'Database Maintenance', 'No', 'Yes', 'Work started before normal hours', 'Please resubmit with signed supervisor logs')" class="history-card-item">
+        <a href="javascript:void(0)" data-status="pending" onclick="openOtDetailsModal('AXT000000000101', 'Pending Approve', 'SP013 - Angeline loren alan', 'EBB04 - Tech Lead', '12 Jul 2024', '12/07/2024', '8.00AM-5.30PM', '0750', '06:00', '08:00', '0', '16.00', 'OT 1.5 BEFORE WORK', 'URGENT SYSTEM MIGRATION', 'Database Maintenance', 'No', 'Yes', 'Work started before normal hours', 'Please resubmit with signed supervisor logs', { actualHours: '0.00' })" class="history-card-item">
           <div class="history-card-header">
             <div class="history-card-heading">
               <h3 class="history-card-title">OT Plan</h3>
@@ -361,7 +360,6 @@
           </div>
           <div class="history-card-details clocking-history-facts">
             <div><span>OT Date</span><strong><time datetime="2024-07-12">Fri 12 Jul 2024</time></strong></div>
-            <div><span>Employee</span><strong>Angeline loren alan<span class="employee-id-standard">#SP013</span></strong></div>
             <div><span>OT Type</span><strong>OT 1.5 BEFORE WORK</strong></div>
             <div><span>Plan Hours</span><strong>16.00 Hrs</strong></div>
             <div><span>Actual Hours</span><strong>0.00 Hrs</strong></div>
@@ -369,7 +367,7 @@
         </a>
 
         <!-- OT Card 2: Pending (OTB000000001604) -->
-        <a href="javascript:void(0)" data-status="pending" onclick="openOtDetailsModal('OTB000000001604', 'Pending Approve', 'SP013 - Angeline loren alan', 'EBB04', '24 Oct 2023', '24/10/2023', '8.00AM-5.30PM', '0758', '20:00', '23:00', '0', '3.00', '1.5 OT', 'MATERIAL', '- SELECT TASK -', 'No', 'Yes', 'Emergency material checking', 'asd')" class="history-card-item">
+        <a href="javascript:void(0)" data-status="pending" onclick="openOtDetailsModal('OTB000000001604', 'Pending Approve', 'SP013 - Angeline loren alan', 'EBB04', '24 Oct 2023', '24/10/2023', '8.00AM-5.30PM', '0758', '20:00', '23:00', '0', '3.00', '1.5 OT', 'MATERIAL', '- SELECT TASK -', 'No', 'Yes', 'Emergency material checking', 'asd', { actualHours: '0.00' })" class="history-card-item">
           <div class="history-card-header">
             <div class="history-card-heading">
               <h3 class="history-card-title">OT Plan</h3>
@@ -379,7 +377,6 @@
           </div>
           <div class="history-card-details clocking-history-facts">
             <div><span>OT Date</span><strong><time datetime="2023-10-24">Tue 24 Oct 2023</time></strong></div>
-            <div><span>Employee</span><strong>Angeline loren alan<span class="employee-id-standard">#SP013</span></strong></div>
             <div><span>OT Type</span><strong>1.5 OT</strong></div>
             <div><span>Plan Hours</span><strong>3.00 Hrs</strong></div>
             <div><span>Actual Hours</span><strong>0.00 Hrs</strong></div>
@@ -388,7 +385,7 @@
         </a>
 
         <!-- OT Card 3: Approved (OTB000000001620) -->
-        <a href="javascript:void(0)" data-status="approved" onclick="openOtDetailsModal('OTB000000001620', 'Approved', 'SP013 - Angeline loren alan', 'EBB04', '05 Sep 2026', '05/09/2026', '8.00AM-5.30PM', '0752', '18:00', '21:00', '0', '3.00', '1.5 OT', 'SYSTEM UPGRADE', 'Server Patching', 'Yes', 'No', 'Scheduled maintenance', 'Approved by Manager')" class="history-card-item">
+        <a href="javascript:void(0)" data-status="approved" onclick="openOtDetailsModal('OTB000000001620', 'Approved', 'SP013 - Angeline loren alan', 'EBB04', '05 Sep 2026', '05/09/2026', '8.00AM-5.30PM', '0752', '18:00', '21:00', '0', '3.00', '1.5 OT', 'SYSTEM UPGRADE', 'Server Patching', 'Yes', 'No', 'Scheduled maintenance', 'Approved by Manager', { actualHours: '3.00' })" class="history-card-item">
           <div class="history-card-header">
             <div class="history-card-heading">
               <h3 class="history-card-title">OT Plan</h3>
@@ -398,7 +395,6 @@
           </div>
           <div class="history-card-details clocking-history-facts">
             <div><span>OT Date</span><strong><time datetime="2026-09-05">Sat 5 Sep 2026</time></strong></div>
-            <div><span>Employee</span><strong>Angeline loren alan<span class="employee-id-standard">#SP013</span></strong></div>
             <div><span>OT Type</span><strong>1.5 OT</strong></div>
             <div><span>Plan Hours</span><strong>3.00 Hrs</strong></div>
             <div><span>Actual Hours</span><strong>3.00 Hrs</strong></div>
@@ -407,7 +403,7 @@
         </a>
 
         <!-- OT Card 4: Rejected (OTB000000001630) -->
-        <a href="javascript:void(0)" data-status="rejected" onclick="openOtDetailsModal('OTB000000001630', 'Rejected', 'SP013 - Angeline loren alan', 'EBB04', '10 Aug 2026', '10/08/2026', '8.00AM-5.30PM', '0800', '18:00', '20:00', '0', '2.00', '1.5 OT', 'OTHER', 'Documentation', 'No', 'No', 'General documentation', 'Overtime budget exceeded')" class="history-card-item">
+        <a href="javascript:void(0)" data-status="rejected" onclick="openOtDetailsModal('OTB000000001630', 'Rejected', 'SP013 - Angeline loren alan', 'EBB04', '10 Aug 2026', '10/08/2026', '8.00AM-5.30PM', '0800', '18:00', '20:00', '0', '2.00', '1.5 OT', 'OTHER', 'Documentation', 'No', 'No', 'General documentation', 'Overtime budget exceeded', { actualHours: '0.00' })" class="history-card-item">
           <div class="history-card-header">
             <div class="history-card-heading">
               <h3 class="history-card-title">OT Plan</h3>
@@ -417,7 +413,6 @@
           </div>
           <div class="history-card-details clocking-history-facts">
             <div><span>OT Date</span><strong><time datetime="2026-08-10">Mon 10 Aug 2026</time></strong></div>
-            <div><span>Employee</span><strong>Angeline loren alan<span class="employee-id-standard">#SP013</span></strong></div>
             <div><span>OT Type</span><strong>1.5 OT</strong></div>
             <div><span>Plan Hours</span><strong>2.00 Hrs</strong></div>
             <div><span>Actual Hours</span><strong>0.00 Hrs</strong></div>
@@ -441,7 +436,6 @@
           </div>
           <div class="history-card-details clocking-history-facts">
             <div><span>Attendance Date</span><strong>31 Dec 2025</strong></div>
-            <div><span>Employee</span><strong>Farhan binti rahmat<span class="employee-id-standard">#EBB12</span></strong></div>
             <div><span>Submitted Date</span><strong>26/02/2026</strong></div>
           </div>
         </a>
@@ -457,7 +451,6 @@
           </div>
           <div class="history-card-details clocking-history-facts">
             <div><span>Attendance Date</span><strong>14 Sep 2026</strong></div>
-            <div><span>Employee</span><strong>Angeline loren alan<span class="employee-id-standard">#SP013</span></strong></div>
             <div><span>Submitted Date</span><strong>14/09/2026</strong></div>
           </div>
         </a>
@@ -473,7 +466,6 @@
           </div>
           <div class="history-card-details clocking-history-facts">
             <div><span>Attendance Date</span><strong>02 Sep 2026</strong></div>
-            <div><span>Employee</span><strong>Angeline loren alan<span class="employee-id-standard">#SP013</span></strong></div>
             <div><span>Approved Date</span><strong>02/09/2026</strong></div>
           </div>
         </a>
@@ -489,7 +481,6 @@
           </div>
           <div class="history-card-details clocking-history-facts">
             <div><span>Attendance Date</span><strong>18 Jul 2026</strong></div>
-            <div><span>Employee</span><strong>Angeline loren alan<span class="employee-id-standard">#SP013</span></strong></div>
             <div><span>Declined Date</span><strong>18/07/2026</strong></div>
           </div>
         </a>
@@ -573,7 +564,7 @@
         
         <!-- Purple Modal Header -->
         <div class="modal-header-purple" style="border-top-left-radius: 24px; border-top-right-radius: 24px;">
-          <h3>Time Off Detail</h3>
+          <h3>OT Plan Details</h3>
           <button class="modal-close-round" onclick="closeOtDetailsDirect()" aria-label="Close modal">
             <i class="fa-solid fa-xmark" style="font-size: 15px;"></i>
           </button>
@@ -608,7 +599,7 @@
                 <td class="detail-value" id="modalOtSubmitDate">24 Oct 2023</td>
               </tr>
               <tr>
-                <td class="detail-label">Date</td>
+                <td class="detail-label">OT Date</td>
                 <td class="detail-value" id="modalOtDate">24 Oct 2023</td>
               </tr>
               <tr>
@@ -628,11 +619,31 @@
                 <td class="detail-value" id="modalOtEndTime">23:00</td>
               </tr>
               <tr>
-                <td class="detail-label">Hours</td>
+                <td class="detail-label">Break Hours</td>
+                <td class="detail-value" id="modalOtBreakHours">—</td>
+              </tr>
+              <tr>
+                <td class="detail-label">Plan Hours</td>
                 <td class="detail-value" id="modalOtPlanHours" style="font-weight: 800;">3.00</td>
               </tr>
               <tr>
-                <td class="detail-label">Reason</td>
+                <td class="detail-label">Actual Hours</td>
+                <td class="detail-value" id="modalOtActualHours">—</td>
+              </tr>
+              <tr>
+                <td class="detail-label">Approved Hours</td>
+                <td class="detail-value" id="modalOtApprovedHours">—</td>
+              </tr>
+              <tr>
+                <td class="detail-label">Approval Method</td>
+                <td class="detail-value" id="modalOtApprovalMethod">—</td>
+              </tr>
+              <tr>
+                <td class="detail-label">OT Type</td>
+                <td class="detail-value" id="modalOtType">—</td>
+              </tr>
+              <tr>
+                <td class="detail-label">OT Reason</td>
                 <td class="detail-value" id="modalOtReason">MATERIAL</td>
               </tr>
               <tr>
@@ -640,8 +651,20 @@
                 <td class="detail-value" id="modalOtTask">Material handling & inventory check</td>
               </tr>
               <tr>
+                <td class="detail-label">Allow Leave Credit</td>
+                <td class="detail-value" id="modalOtCredit">—</td>
+              </tr>
+              <tr>
+                <td class="detail-label">Need Transport</td>
+                <td class="detail-value" id="modalOtTransport">—</td>
+              </tr>
+              <tr>
                 <td class="detail-label">Remarks</td>
                 <td class="detail-value" id="modalOtRemarks">Urgent overtime for material shipment</td>
+              </tr>
+              <tr>
+                <td class="detail-label">Approver Comments</td>
+                <td class="detail-value" id="modalOtApproverComments" style="white-space: pre-wrap;">—</td>
               </tr>
               <tr>
                 <td class="detail-label" colspan="2" style="border-right: none; background: rgba(124, 58, 237, 0.08); font-weight: 800; color: var(--text-primary);">Attachments</td>
@@ -848,24 +871,23 @@
         setTimeout(() => { m.style.display = 'none'; }, 250);
       }
 
-      function openOtDetailsModal(docRef, planStatus, emp, supervisor, submitDate, otDate, shift, clkTimes, startTime, endTime, breakHrs, planHrs, otType, otReason, task, allowLeaveCredit, needTransport, remarks, approverComments) {
-        if (document.getElementById('modalOtDocRef')) document.getElementById('modalOtDocRef').innerText = docRef || 'OTB000000001604';
-        const empParts = (emp || 'SP013 - Angeline loren alan').split(' - ');
-        if (document.getElementById('modalOtEmpNo')) document.getElementById('modalOtEmpNo').innerText = empParts[0] || 'SP013';
-        if (document.getElementById('modalOtEmpName')) document.getElementById('modalOtEmpName').innerText = empParts[1] || 'Angeline loren alan';
-        if (document.getElementById('modalOtSupervisor')) document.getElementById('modalOtSupervisor').innerText = supervisor || 'EBB04';
-        if (document.getElementById('modalOtSubmitDate')) document.getElementById('modalOtSubmitDate').innerText = submitDate || '24 Oct 2023';
-        if (document.getElementById('modalOtDate')) document.getElementById('modalOtDate').innerText = otDate || '24 Oct 2023';
-        if (document.getElementById('modalOtShift')) document.getElementById('modalOtShift').innerText = shift || '8.00AM-5.30PM';
-        if (document.getElementById('modalOtClockingTimes')) document.getElementById('modalOtClockingTimes').innerText = clkTimes || '0758';
-        if (document.getElementById('modalOtStartTime')) document.getElementById('modalOtStartTime').innerText = startTime || '20:00';
-        if (document.getElementById('modalOtEndTime')) document.getElementById('modalOtEndTime').innerText = endTime || '23:00';
-        if (document.getElementById('modalOtPlanHours')) document.getElementById('modalOtPlanHours').innerText = planHrs || '3.00';
-        if (document.getElementById('modalOtType')) document.getElementById('modalOtType').innerText = otType || '1.5 OT';
-        if (document.getElementById('modalOtReason')) document.getElementById('modalOtReason').innerText = otReason || 'MATERIAL';
-        if (document.getElementById('modalOtTask')) document.getElementById('modalOtTask').innerText = task || 'Material handling & inventory check';
-        if (document.getElementById('modalOtRemarks')) document.getElementById('modalOtRemarks').innerText = remarks || 'Urgent overtime for material shipment';
-        document.getElementById('modalOtPlanStatus').replaceChildren(recordDetailStatus.create(planStatus || 'To Resubmit'));
+      function openOtDetailsModal(docRef, planStatus, emp, supervisor, submitDate, otDate, shift, clkTimes, startTime, endTime, breakHrs, planHrs, otType, otReason, task, allowLeaveCredit, needTransport, remarks, approverComments, approvalDetails = {}) {
+        const [empNo, ...empName] = String(emp || '').split(' - ');
+        const yesNo = value => value === true ? 'Yes' : value === false ? 'No' : value;
+        const fields = {
+          DocRef: docRef, EmpNo: empNo ? '#' + empNo.replace(/^#+/, '') : '', EmpName: empName.join(' - '),
+          Supervisor: supervisor, SubmitDate: submitDate, Date: otDate, Shift: shift, ClockingTimes: clkTimes,
+          StartTime: startTime, EndTime: endTime, BreakHours: breakHrs, PlanHours: planHrs,
+          ActualHours: approvalDetails.actualHours, ApprovedHours: approvalDetails.approvedHours,
+          ApprovalMethod: approvalDetails.approvalMethod,
+          Type: otType, Reason: otReason, Task: task === '- SELECT TASK -' ? '' : task,
+          Credit: yesNo(allowLeaveCredit), Transport: yesNo(needTransport), Remarks: remarks,
+          ApproverComments: approverComments
+        };
+        for (const [field, value] of Object.entries(fields)) {
+          document.getElementById('modalOt' + field).textContent = value === '' || value == null ? '—' : String(value);
+        }
+        document.getElementById('modalOtPlanStatus').replaceChildren(recordDetailStatus.create(planStatus || '—'));
 
         const m = document.getElementById('otDetailsModal');
         m.style.display = 'flex';

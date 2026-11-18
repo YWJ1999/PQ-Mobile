@@ -158,12 +158,9 @@
       }));
     }
 
-    showSubmission(item, formatDate, status) {
+    showSubmission(item, formatDate) {
       const $ = id => this.querySelector('#' + id);
       const general = $('visitPanel-general');
-      const metadata = detailRows([['Document Reference', item.reference], ['Document Status', status], ['Submit Date', formatDate(item.submitDate)]]);
-      metadata.className = 'visit-submission-meta';
-      general.prepend(metadata);
 
       const location = node('input', 'claim-control');
       location.id = 'visitLocation';
