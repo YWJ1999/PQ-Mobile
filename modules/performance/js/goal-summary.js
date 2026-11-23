@@ -74,6 +74,7 @@
         node('span','history-card-ref goal-summary-employee-id',empNo ? '#' + empNo : '—')
       );
       const status = node('span','status-pill ' + statusTone + ' goal-summary-achieved-pill',percent(achieved));
+      status.dataset.recordKeyLabel = achieved == null ? 'No achievement reported' : achieved === 100 ? '100% achieved' : 'Below 100% achieved';
       header.append(heading,status);
 
       const details = node('dl','history-card-details goal-summary-employee-details');

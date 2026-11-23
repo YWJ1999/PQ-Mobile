@@ -191,7 +191,7 @@
   }
 
   function normalize(overlay, selector, closeFunction) {
-    const isPage = overlay.hasAttribute('data-approval-view');
+    const isPage = overlay.matches('[data-approval-view], [data-history-page]');
     const panel = overlay.querySelector(isPage ? ':scope > .approval-record-layout' : selector);
     const title = panel?.querySelector('h1,h2,h3');
     if (!panel || !title) return;
@@ -217,7 +217,7 @@
     for (const [id, selector, closeFunction] of definitions) {
       const overlay = document.getElementById(id);
       if (!overlay) continue;
-      if (overlay.classList.contains('attendance-history-form-overlay')) continue;
+      if (overlay.querySelector('.attendance-history-form-page')) continue;
       const options = { subtree: true, childList: true, attributes: true, attributeFilter: ['class','style','hidden'] };
       const update = () => {
         observer.disconnect();

@@ -1,6 +1,7 @@
 (() => {
   const records = Array.isArray(window.STAFF_TNA_RECORDS) ? window.STAFF_TNA_RECORDS : [];
   const $ = id => document.getElementById(id);
+  const statusTones = { Pending: 'submitted', 'Next Approval': 'submitted', Resubmit: 'resubmit', Approved: 'approved', Rejected: 'rejected' };
   const defaults = Object.freeze({ keyword: '', periodStart: '', periodEnd: '', company: '', branch: '', department: '', job: '' });
   const state = { filters: { ...defaults } };
   const form = $('staffTnaFilterForm');
@@ -8,7 +9,6 @@
   const detailOverlay = $('staffTnaDetailOverlay');
   const main = document.querySelector('main');
   let filterTrigger = null;
-  let detailTrigger = null;
   let inerted = [];
 
   function node(tagName, className = '', text = '') {
@@ -53,7 +53,7 @@
       else url.searchParams.delete(key);
     });
     url.searchParams.set('theme', document.documentElement.dataset.theme === 'light' ? 'light' : 'dark');
-    history.replaceState(null, '', url);
+    history.replaceState(history.state, '', url);
   }
 
   function matches(record) {
@@ -78,11 +78,13 @@
   }
 
   function createCard(record) {
-    const card = node('article', 'history-item-card staff-tna-card');
+    const card = node('a', 'history-item-card staff-tna-card');
+    card.href = HistoryRecordPage.href('training-need', record.id);
+    card.dataset.historyLink = '';
     card.dataset.tnaId = record.id;
-    card.dataset.status = 'submitted';
-    card.tabIndex = 0;
-    card.setAttribute('role', 'button');
+    const label = recordReviewStatusLabel(record.status);
+    const tone = statusTones[label] || 'default';
+    card.dataset.status = tone;
     const ids = {
       name: `${record.id}-employee-name`,
       employeeId: `${record.id}-employee-id`,
@@ -101,11 +103,12 @@
     empNo.id = ids.employeeId;
     heading.append(name, empNo);
     const end = node('div', 'staff-tna-card-end');
-    const status = node('span', 'card-status-badge', recordReviewStatusLabel(record.status));
+    const status = node('span', 'card-status-badge', label);
     status.id = ids.status;
-    status.dataset.status = 'submitted';
+    status.dataset.status = tone;
     status.dataset.tnaStatus = record.status;
-    const statusIcon = node('i', 'fa-solid fa-hourglass-half');
+    const icons = { approved: 'fa-check', resubmit: 'fa-rotate-left', rejected: 'fa-xmark' };
+    const statusIcon = node('i', 'fa-solid ' + (icons[tone] || 'fa-hourglass-half'));
     statusIcon.setAttribute('aria-hidden', 'true');
     status.prepend(statusIcon);
     end.append(status);
@@ -113,13 +116,7 @@
 
     const details = node('div', 'card-details-box staff-tna-card-details');
     details.append(cardDetail('Position', record.position, ids.position), cardDetail('Period', periodText(record), ids.period));
-    card.append(header, details);
-    card.addEventListener('click', () => openDetails(record, card));
-    card.addEventListener('keydown', event => {
-      if (!['Enter', ' '].includes(event.key)) return;
-      event.preventDefault();
-      openDetails(record, card);
-    });
+    card.append(header, recordSubmitDate.create(record.submittedDate), details);
     return card;
   }
 
@@ -168,7 +165,6 @@
       ['Employee', record, true],
       ['Position', record.position],
       ['Submit By', record.submittedBy],
-      ['Submit Date', dateText(record.submittedDate)],
       ['Name', record.name],
       ['Training Period', periodText(record)],
       ['Career Target', record.careerTarget],
@@ -176,6 +172,7 @@
       ['Remarks', record.remarks],
       ['Approver Remarks', record.approverRemarks]
     ];
+    recordSubmitDate.set($('staffTnaSubmitDate'), record.submittedDate);
     $('staffTnaApplicationDetails').replaceChildren(...rows.map(([label, value, employee]) => detailRow(label, value, employee)));
     $('staffTnaDetailItems').replaceChildren(...record.details.map(item => {
       const article = node('article', 'staff-tna-detail-item');
@@ -203,24 +200,6 @@
     }
     inerted.forEach(element => { element.inert = false; });
     inerted = [];
-  }
-
-  function openDetails(record, trigger) {
-    detailTrigger = trigger;
-    renderDetails(record);
-    detailOverlay.hidden = false;
-    detailOverlay.setAttribute('aria-hidden', 'false');
-    setBackgroundInert(true);
-    $('staffTnaDetailClose').focus({ preventScroll: true });
-  }
-
-  function closeDetails() {
-    if (detailOverlay.hidden) return;
-    detailOverlay.hidden = true;
-    detailOverlay.setAttribute('aria-hidden', 'true');
-    setBackgroundInert(false);
-    if (detailTrigger?.isConnected) detailTrigger.focus({ preventScroll: true });
-    detailTrigger = null;
   }
 
   function clearError() {
@@ -298,6 +277,7 @@
   }
 
   document.addEventListener('DOMContentLoaded', () => {
+    setRecordLegend($('staffTnaList'), 'Training needs analysis status', statusTones);
     const params = new URLSearchParams(location.search);
     Object.keys(defaults).forEach(key => {
       const value = params.get(key)?.trim();
@@ -320,17 +300,16 @@
     form.addEventListener('submit', applyFilter);
     form.addEventListener('input', clearError);
     filterOverlay.addEventListener('click', event => { if (event.target === filterOverlay) closeFilter(); });
-    $('staffTnaDetailClose').addEventListener('click', closeDetails);
-    $('staffTnaDetailCancel').addEventListener('click', closeDetails);
-    detailOverlay.addEventListener('click', event => { if (event.target === detailOverlay) closeDetails(); });
     document.addEventListener('keydown', event => {
-      if (event.key === 'Escape') {
-        if (!detailOverlay.hidden) { event.preventDefault(); closeDetails(); }
-        else if (!filterOverlay.hidden) { event.preventDefault(); closeFilter(); }
-        return;
-      }
-      if (!detailOverlay.hidden) trapFocus(event, detailOverlay);
-      else if (!filterOverlay.hidden) trapFocus(event, filterOverlay);
+      if (filterOverlay.hidden) return;
+      if (event.key === 'Escape') { event.preventDefault(); closeFilter(); }
+      else trapFocus(event, filterOverlay);
+    });
+    HistoryRecordPage.register((kind, id) => {
+      const record = kind === 'training-need' && records.find(row => row.id === id);
+      if (!record) return;
+      renderDetails(record);
+      return detailOverlay;
     });
     render();
     syncBack();

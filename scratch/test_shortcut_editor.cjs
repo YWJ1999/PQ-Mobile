@@ -105,6 +105,7 @@ const puppeteer = require('puppeteer');
           await page.click(input(id));
         }
         assert.equal(await page.$eval('[data-shortcut-save]', node => node.disabled), true, 'Keep at least one shortcut');
+        assert.equal(await page.$eval('[data-shortcut-save]', node => node.textContent), 'Save selected (0)');
         await page.click('[data-shortcut-reset]');
         assert.equal(await page.$eval('[data-shortcut-save]', node => node.disabled), false);
         await page.setViewport({ width, height: 480 });

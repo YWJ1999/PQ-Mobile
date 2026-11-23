@@ -28,7 +28,7 @@ const pageUrl = pathToFileURL(path.resolve(__dirname, '../modules/attendance/opt
 
     assert.ok(await page.$('#shiftPlanningActionBar'));
     assert.equal(await page.$('#shiftPlanningActionBar .bar-clear-btn'), null);
-    assert.equal(await page.$eval('#bottomMainActionBtn', node => node.textContent.trim()), 'Update');
+    assert.equal(await page.$eval('#bottomMainActionBtn', node => node.textContent.trim()), 'Review selected (0)');
     const initiallySelected = await page.$$eval('.staff-card.selected', cards => cards.length);
     assert.equal(initiallySelected, 0, 'No staff is preselected');
     assert.equal(await page.$eval('#shiftPlanningActionBar', node => getComputedStyle(node).display), 'none');
@@ -56,7 +56,7 @@ const pageUrl = pathToFileURL(path.resolve(__dirname, '../modules/attendance/opt
     await page.click('#selectAllCheckbox');
     assert.equal(await page.$$eval('.staff-card.selected', cards => cards.length), eligibleCount);
     assert.equal(await page.$$eval('.staff-card.disabled.selected', cards => cards.length), 0);
-    assert.equal(await page.$eval('#shiftPlanningActionBar', node => node.textContent.trim()), 'Update');
+    assert.equal(await page.$eval('#shiftPlanningActionBar', node => node.textContent.trim()), `Review selected (${eligibleCount})`);
     assert.equal(await page.$eval('#selectedRecordsText', node => Number(node.textContent)), eligibleCount);
     assert.equal(await page.$eval('#selectAllCheckbox', node => node.checked), true);
 
@@ -71,6 +71,7 @@ const pageUrl = pathToFileURL(path.resolve(__dirname, '../modules/attendance/opt
 
     await page.click('#bottomMainActionBtn');
     assert.equal(await page.$eval('#reviewChangesModal', node => getComputedStyle(node).display), 'flex');
+    assert.equal(await page.$eval('#confirmShiftChanges', node => node.textContent.trim()), `Apply selected (${eligibleCount})`);
     assert.equal(await page.$eval('#reviewSubtext', node => node.textContent.trim()), `${eligibleCount} staff will be updated`);
     assert.equal(await page.$eval('main, #mainContentScroll', node => node.scrollWidth <= node.clientWidth + 1), true);
     await page.evaluate(() => closeModal('reviewChangesModal'));
@@ -95,7 +96,7 @@ const pageUrl = pathToFileURL(path.resolve(__dirname, '../modules/attendance/opt
     await page.$eval('#copyEndDateInput', node => { node.value = '2026-09-24'; });
     await page.click('#selectAllCheckbox');
     assert.equal(await page.$eval('#selectedRecordsText', node => Number(node.textContent)), Number(counterText));
-    assert.equal(await page.$eval('#bottomMainActionBtn', node => node.textContent), 'Copy');
+    assert.equal(await page.$eval('#bottomMainActionBtn', node => node.textContent), `Copy selected (${counterText})`);
     await page.click('#bottomMainActionBtn');
     assert.equal(await page.$eval('#chooseDatesModal', node => getComputedStyle(node).display), 'none', 'Invalid date ranges cannot open confirmation');
     assert.match(await page.$eval('#copyDateError', node => node.textContent), /on or after/);
@@ -104,6 +105,7 @@ const pageUrl = pathToFileURL(path.resolve(__dirname, '../modules/attendance/opt
     await page.click('#bottomMainActionBtn');
     assert.equal(await page.$eval('#chooseDatesModal', node => getComputedStyle(node).display), 'flex');
     assert.match(await page.$eval('#chooseDatesModal .sheet-title', node => node.textContent), /Confirm Copy/);
+    assert.equal(await page.$eval('#confirmCopyButton', node => node.textContent.trim()), `Copy selected (${counterText})`);
     assert.match(await page.$eval('#copyReviewDateRange', node => node.textContent), /25.*Sep.*2026.*27.*Sep.*2026/);
     assert.equal(await page.$$('#copyReviewStaffListContainer .copy-review-staff').then(nodes => nodes.length), Number(counterText));
     assert.equal(await page.$$('#chooseDatesModal input[type="date"]').then(nodes => nodes.length), 0, 'Confirmation only reviews dates chosen on the page');
@@ -134,7 +136,7 @@ const pageUrl = pathToFileURL(path.resolve(__dirname, '../modules/attendance/opt
     await page.screenshot({ path: path.join(__dirname, `shift-planning-counts-${theme}.png`) });
     }
     assert.deepEqual(errors, []);
-    console.log('PASS: Shift Planning selection, dropdown affordance and Update action are consistent.');
+    console.log('PASS: Shift Planning selection, review and copy actions are consistent.');
   } finally {
     await browser.close();
   }

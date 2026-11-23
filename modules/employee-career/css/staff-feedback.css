@@ -47,8 +47,8 @@
 .staff-feedback-review-identity > div { min-width: 0; }
 .staff-feedback-review-identity h2 { margin: 0; color: var(--text-primary); font-size: 15px; font-weight: 800; line-height: 1.4; overflow-wrap: anywhere; }
 .staff-feedback-review-avatar { display: grid; place-items: center; flex: 0 0 46px; height: 46px; border-radius: 50%; background: var(--purple-subtle); color: var(--purple-text); font-size: 17px; font-weight: 800; }
-.staff-feedback-review-page .employee-career-content { margin-bottom: 88px; padding-bottom: 18px; scroll-padding-top: 60px; }
-.staff-feedback-review-page .staff-feedback-review-tabs { position: sticky; top: 0; z-index: 2; max-width: none; margin: 14px 0; background: var(--bg-phone); }
+.staff-feedback-review-page .employee-career-content { margin-bottom: 88px; padding-bottom: 18px; }
+.staff-feedback-review-page .staff-feedback-review-tabs { max-width: none; margin: 14px 0; background: var(--bg-phone); }
 .staff-feedback-review-body { display: grid; gap: 14px; }
 .staff-feedback-review-body[hidden] { display: none; }
 #staffFeedbackReviewTitle:focus { outline: none; }

@@ -307,7 +307,9 @@
         box.checked = checked.has(record.id);
         box.setAttribute('aria-label', 'Select ' + record.id + ' for ' + record.employeeName);
         card.querySelector('[data-project-approval-menu]').setAttribute('aria-label', 'Options for ' + record.id);
-        card.querySelector('.approval-record-link').href = PendingApprovalPage.href('details', record.id);
+        const link = card.querySelector('.approval-record-link');
+        link.href = PendingApprovalPage.href('details', record.id);
+        link.prepend(recordSubmitDate.create(record.submittedAt));
         card.querySelector('[data-field="date"] dd').textContent = record.dateLabel;
         card.querySelector('[data-field="normal-hours"] dd').textContent = (record.normalMinutes / 60).toFixed(2) + ' hrs';
         card.querySelector('[data-field="ot-hours"] dd').textContent = (record.overtimeMinutes / 60).toFixed(2) + ' hrs';
@@ -409,10 +411,12 @@
         if (!record) return false;
         closeOverlay(false);
         if (view === 'details') {
+          recordSubmitDate.set(document.getElementById('projectApprovalSubmitDate'), record.submittedAt);
           TimesheetView.review(document.getElementById('projectApprovalRequest'), record);
           document.getElementById('projectApprovalApproverComments').value = '';
           details.dataset.reference = id;
         } else {
+          recordSubmitDate.set(document.getElementById('projectWorkflowSubmitDate'), record.submittedAt);
           document.getElementById('projectApprovalWorkflowReference').textContent = id;
           document.getElementById('projectApprovalWorkflowName').textContent = record.employeeName;
           document.getElementById('projectApprovalWorkflowEmployeeId').textContent = '#' + String(record.employeeId).replace(/^#+/, '');

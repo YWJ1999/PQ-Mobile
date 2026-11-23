@@ -64,6 +64,8 @@
       record.guestVisit = { ...input.guestVisit, employeeName: currentEmployee.name, empNo: currentEmployee.empNo.replace(/^#/, ''),
         revision: crypto.randomUUID(), submitDate: localDate(now), submittedAt: now.toISOString() };
       record.fields.push(['Submit Date', record.guestVisit.submitDate]);
+    } else if (!record.fields.some(([label, value]) => /^(?:Submit|Submitted) Date$/i.test(label.trim()) && value)) {
+      record.fields.push(['Submit Date', localDate(new Date())]);
     }
     localStorage.setItem(key, JSON.stringify([record, ...rows.filter(row => row.id !== record.id)]));
     return record;

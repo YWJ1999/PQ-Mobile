@@ -203,6 +203,7 @@ document.addEventListener('DOMContentLoaded', () => {
     section.replaceChildren(node('h4', 'claim-detail-section-title', title));
   }
   function renderDetails(item) {
+    recordSubmitDate.set($('workplaceApprovalSubmitDate'), item.submitDate);
     guestRevision = item.guestRevision;
     const config = item.kind === 'inventory-request' ? tabConfig.inventory : tabConfig['guest-visit'];
     $('workplaceApprovalDetailsTitle').textContent = config.detailsTitle;
@@ -256,7 +257,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const employee = identity(item.employeeName, item.empNo);
     employee.classList.add('payroll-approval-workflow-person');
     const config = item.kind === 'inventory-request' ? tabConfig.inventory : tabConfig['guest-visit'];
-    request.append(node('p', 'workplace-approval-reference', item.reference), employee, fieldGrid([['Request', config.requestName], ['Submit Date', date(item.submitDate)]]));
+    request.append(node('p', 'workplace-approval-reference', item.reference), employee, recordSubmitDate.create(item.submitDate), fieldGrid([['Request', config.requestName]]));
     const steps = node('section', 'payroll-approval-workflow-step is-active');
     steps.append(node('h3', '', 'Approval Steps'), recordDetailStatus.workflowStep('Submitted'), document.createTextNode(' '), recordDetailStatus.create('Awaiting Approval'));
     const backup = PendingApprovalBackup.assigned('workplace', item.id);

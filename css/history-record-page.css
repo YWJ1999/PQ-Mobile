@@ -1,0 +1,16 @@
+@import url('./pending-approval-page.css');
+
+.phone-container.showing-history-record > :is(header, main:not([data-history-page]), .main-content, .cal-top-header, .bonus-top-header, phone-bottom-nav, .pending-selection-bar, [data-history-background]) {
+  display: none !important;
+}
+.phone-container > [data-history-page][hidden] { display: none !important; }
+.history-record-content {
+  flex: 1 1 auto;
+  min-height: 0;
+  padding: 14px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.history-card-main[data-history-link] { display: block; }
+[data-history-link] { color: inherit; text-decoration: none; }
+[data-history-link]:focus-visible { outline: 2px solid var(--purple-primary); outline-offset: 2px; }

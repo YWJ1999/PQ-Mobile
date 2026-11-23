@@ -125,20 +125,20 @@
                </div>
                <div>
                   <h3 style="font-size: 15px; font-weight: 800; color: var(--text-primary);">Pending Team Requests</h3>
-                  <p style="font-size: 11.5px; font-weight: 600; color: var(--text-muted);" id="teamPendingTotalVal">Total: RM 1,371.00</p>
+                  <p style="font-size: 11.5px; font-weight: 600; color: var(--text-muted);" id="teamPendingTotalVal"></p>
                </div>
             </div>
-            <span id="teamPendingCountVal" style="font-size: 12px; font-weight: 800; color: #ffffff; background: var(--primary-action-background); padding: 4px 12px; border-radius: 12px;">4 Requests</span>
+            <span id="teamPendingCountVal" style="font-size: 12px; font-weight: 800; color: #ffffff; background: var(--primary-action-background); padding: 4px 12px; border-radius: 12px;"></span>
          </div>
          <div class="pending-action-grid">
-           <button type="button" onclick="window.ClaimsEngine.approveAllTeamClaims()">Approve All Team Requests</button>
+           <button type="button" id="approveAllTeamClaims" onclick="window.ClaimsEngine.approveAllTeamClaims()" disabled>Approve all (0)</button>
          </div>
       </div>
 
       <!-- Pending Approval Queue -->
       <section aria-labelledby="teamQueueTitle">
          <h3 id="teamQueueTitle" style="font-size: 15px; font-weight: 800; color: var(--text-primary); margin-bottom: 14px;">Approvals Requiring Action</h3>
-         <div id="teamApprovalsQueue"></div>
+         <div id="teamApprovalsQueue" data-record-colour-view="Claim approval status" data-record-legend='{"Pending":"submitted","Final Approval":"submitted","Approved":"approved","Resubmit":"resubmit","Rejected":"rejected","Cancelled":"cancelled"}'></div>
       </section>
 
       <!-- Staff Entitlement Roster Card -->

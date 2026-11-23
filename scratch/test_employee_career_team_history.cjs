@@ -24,14 +24,16 @@ async function open(page, relative, query = '') {
 
 async function assertEmployeeCards(page, category) {
   const cards = await page.$$eval('#teamHistoryList .history-card-item', nodes => nodes.map(node => ({
-    employee: node.querySelector('.team-history-employee-identity')?.textContent.trim(),
+    employee: node.querySelector('.team-history-employee-identity .history-employee-name')?.textContent.trim(),
     position: node.querySelector('.team-history-employee-identity + .team-history-employee-position')?.textContent.trim(),
+    id: node.querySelector('.team-history-employee-id')?.textContent,
     hasDetails: Boolean(node.querySelector('.history-card-details')),
     status: node.querySelector('.status-pill')?.textContent.trim() || ''
   })));
   assert.equal(cards.length, 2, `${category} has two provisional records`);
   cards.forEach(card => {
-    assert.match(card.employee, /^[A-Z0-9-]+ - .+$/, `${category} shows the employee number before the name`);
+    assert.ok(card.employee);
+    assert.match(card.id, /^#[A-Z0-9-]+$/, `${category} shows the employee number below the name`);
     assert.ok(card.position && card.position !== '—', `${category} shows the employee's position below their name`);
     assert.equal(card.hasDetails, true, `${category} uses the bordered history detail block`);
     assert.notEqual(card.status, '', `${category} displays a status`);
@@ -40,26 +42,29 @@ async function assertEmployeeCards(page, category) {
 
 async function assertConfirmationCards(page) {
   const cards = await page.$$eval('#teamHistoryList .history-card-item', nodes => nodes.map(node => ({
-    employee: node.querySelector('.team-history-employee-identity')?.textContent.trim(),
+    employee: node.querySelector('.team-history-employee-identity .history-employee-name')?.textContent.trim(),
     position: node.querySelector('.team-history-employee-identity + .team-history-employee-position')?.textContent.trim(),
     status: node.querySelector('.status-pill')?.textContent.trim() || '',
     tone: node.dataset.status || '',
+    submitted: node.querySelector('.record-submit-date')?.textContent,
     labels: [...node.querySelectorAll('.history-card-row > span')].map(label => label.textContent.trim()),
     values: [...node.querySelectorAll('.history-card-row > strong')].map(value => value.textContent.trim())
   })));
 
   assert.deepEqual(cards, [
     {
-      employee: 'EBB01 - Aina Rahman', position: 'People Operations Executive',
+      employee: 'Aina Rahman', position: 'People Operations Executive',
       status: 'To Resubmit', tone: 'resubmit',
-      labels: ['Recommendation', 'Submitted', 'Adjustment'],
-      values: ['Confirm Employment', '4 Oct 2026', 'RM 300.00']
+      labels: ['Recommendation', 'Adjustment'],
+      submitted: 'Submit Date: 04/10/2026',
+      values: ['Confirm Employment', 'RM 300.00']
     },
     {
-      employee: 'EBB02 - Daniel Wong', position: 'Product Designer',
+      employee: 'Daniel Wong', position: 'Product Designer',
       status: 'To Resubmit', tone: 'resubmit',
-      labels: ['Recommendation', 'Submitted', 'Adjustment'],
-      values: ['Further Review', '12 Oct 2026', 'No Adjustment']
+      labels: ['Recommendation', 'Adjustment'],
+      submitted: 'Submit Date: 12/10/2026',
+      values: ['Further Review', 'No Adjustment']
     }
   ], 'Staff Confirmation cards use the approved fields, employee ID placement and To Resubmit status');
 }
@@ -107,7 +112,7 @@ async function confirmationDetailSnapshot(page) {
     assert.equal(historyEntry.disabled, false);
     assert.match(historyEntry.href, /options\/team\/history\.html\?theme=light$/);
 
-    await page.waitForFunction(() => document.activeElement.matches('#employeeCareerAllOptions .employee-career-sheet-close'));
+    await page.waitForFunction(() => document.activeElement.matches('#employeeCareerAllOptions .employee-career-sheet-close'), { polling: 50 });
     await Promise.all([
       page.waitForNavigation({ waitUntil: 'domcontentloaded' }),
       page.click('#employeeCareerAllOptionsGrid [data-option-id=team-history]')
@@ -265,8 +270,8 @@ async function confirmationDetailSnapshot(page) {
     assert.equal(await page.$eval('#teamHistoryRecordCount', node => node.textContent.trim()), '1', 'Submitted date filter updates Total Records');
     assert.equal(await page.$eval('#teamConfirmationFilterSummary', node => node.textContent.trim()), '12 Oct 2026 - 12 Oct 2026');
     assert.deepEqual(
-      await page.$$eval('#teamHistoryList .team-history-employee-identity', nodes => nodes.map(node => node.textContent.trim())),
-      ['EBB02 - Daniel Wong'],
+      await page.$$eval('#teamHistoryList .team-history-employee-identity .history-employee-name', nodes => nodes.map(node => node.textContent.trim())),
+      ['Daniel Wong'],
       'Submitted date filter includes records that sit exactly on both boundaries'
     );
     await page.click('[data-confirmation-id="SC-2026-0016"]');

@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>PeopleHCM - Team Tax Relief</title>
+  <link rel="stylesheet" href="../../../css/history-record-page.css">
+  <script src="../../../js/history-record-page.js"></script>
   <script src="../../../js/components.js"></script>
   <script src="../../../js/app.js" defer></script>
   <script src="../../../js/payroll/team-tax-relief.js?v=20261002-purple-tags" defer></script>
@@ -45,7 +47,7 @@
         <h2>Tax Relief Records</h2>
         <span id="taxReliefRecordCount" aria-live="polite">3 Records</span>
       </div>
-      <section id="taxReliefRecords" aria-label="Employee tax relief records"></section>
+      <section id="taxReliefRecords" data-record-colour-view="Tax relief status" data-record-legend='#taxReliefStatus' aria-label="Employee tax relief records"></section>
       <div id="taxReliefEmpty" class="tax-relief-empty" hidden>
         <i class="fa-regular fa-folder-open" aria-hidden="true"></i>
         <strong>No tax relief records</strong>
@@ -90,6 +92,10 @@
               <select id="taxReliefStatus" name="status">
                 <option value="all">All Status</option>
                 <option value="submitted">Pending</option>
+                <option value="resubmit">Resubmit</option>
+                <option value="approved">Approved</option>
+                <option value="rejected">Rejected</option>
+                <option value="cancelled">Cancelled</option>
               </select>
             </div>
             <div class="tax-relief-filter-field full">
@@ -105,19 +111,21 @@
       </form>
     </div>
 
-    <div id="taxReliefDetailModal" class="tax-relief-detail-overlay" role="dialog" aria-modal="true" aria-labelledby="taxReliefDetailTitle">
-      <section class="tax-relief-detail-modal">
-        <header class="tax-relief-detail-header">
-          <h2 id="taxReliefDetailTitle">Tax Relief Detail</h2>
-          <button class="tax-relief-detail-close" type="button" data-detail-close aria-label="Close details">
-            <i class="fa-solid fa-xmark" aria-hidden="true"></i>
-          </button>
+    <main id="taxReliefDetailModal" class="approval-record-page" data-history-page aria-labelledby="taxReliefDetailTitle" hidden>
+      <section class="approval-record-layout">
+        <header class="approval-page-header">
+          <phone-status-bar time="9:41"></phone-status-bar>
+          <div class="approval-page-heading">
+            <button type="button" data-history-back aria-label="Back to history"></button>
+            <h1 id="taxReliefDetailTitle" tabindex="-1">Tax Relief Detail</h1>
+          </div>
         </header>
-        <div class="tax-relief-detail-scroll">
+        <div class="history-record-content tax-relief-detail-scroll">
+          <span id="taxReliefSubmitDate" class="record-submit-date" hidden></span>
           <div id="taxReliefDetailTable" class="tax-relief-detail-table"></div>
         </div>
       </section>
-    </div>
+    </main>
 
     <app-bottom-nav active="hub"></app-bottom-nav>
   </div>

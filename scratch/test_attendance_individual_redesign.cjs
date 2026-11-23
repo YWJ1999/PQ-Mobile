@@ -53,6 +53,7 @@ const chrome = process.env.PUPPETEER_EXECUTABLE_PATH || 'C:/Program Files/Google
     assert.equal(await page.$eval('#attendanceTotalHoursLabel', node => node.textContent.trim()), 'Total Hours');
     assert.equal(await page.$eval('#attendanceTotalHoursValue', node => node.textContent.trim()), '8.00/2.00');
 
+    await page.click('[data-period="this-month"]');
     const cards = await page.$$eval('.attendance-record-card', nodes => nodes.map(node => ({
       exception: node.dataset.exception,
       historyClass: node.classList.contains('history-card-item'),
@@ -72,7 +73,8 @@ const chrome = process.env.PUPPETEER_EXECUTABLE_PATH || 'C:/Program Files/Google
       hasVerifyCheckbox: Boolean(node.querySelector('.attendance-verify-button .verify-checkbox-box')),
       hasStatusPill: node.querySelector('.attendance-verify-button')?.classList.contains('attendance-status-pill'),
       detailLabels: Array.from(node.querySelectorAll('.attendance-record-detail > span')).map(label => label.textContent.trim()),
-      timeValue: node.querySelector('.attendance-record-detail strong')?.textContent.trim(),
+      dayType: node.querySelector('.attendance-record-detail:first-child strong')?.textContent.trim(),
+      timeValue: node.querySelector('.attendance-record-detail:nth-child(2) strong')?.textContent.trim(),
       exceptionStatus: node.querySelector('.attendance-exception-status')?.textContent.replace(/\s+/g, ' ').trim(),
       statusInTopControls: Boolean(node.querySelector('.attendance-record-top .attendance-record-controls .attendance-exception-status')),
       verifyBeforeStatus: (() => {
@@ -97,7 +99,7 @@ const chrome = process.env.PUPPETEER_EXECUTABLE_PATH || 'C:/Program Files/Google
       assert.equal(card.radius, '18px');
       assert.match(card.background, /linear-gradient/);
       assert.equal(card.hasTitle, true);
-      assert.ok(card.hasDetails >= 3);
+      assert.equal(card.hasDetails, 4);
       assert.equal(card.hasDateBadge, false, 'Attendance History Card has no left date badge');
       assert.equal(card.detailsTriggerTag, 'BUTTON');
       assert.equal(card.verifyTag, 'BUTTON');
@@ -110,7 +112,8 @@ const chrome = process.env.PUPPETEER_EXECUTABLE_PATH || 'C:/Program Files/Google
       assert.match(card.reference, /^Date: /);
       assert.equal(card.hasVerifyCheckbox, true, 'Verify uses a square checkbox');
       assert.equal(card.hasStatusPill, false, 'Verify is not presented as a status pill');
-      assert.deepEqual(card.detailLabels, ['Times', 'Normal Hours', 'OT Hours']);
+      assert.deepEqual(card.detailLabels, ['Day Type', 'Clock Times', 'Normal Hours', 'OT Hours']);
+      assert.equal(card.dayType, 'Work Day');
       assert.equal(card.statusInTopControls, true, 'Exception status uses the History Card top-right placement');
       assert.equal(card.verifyBeforeStatus, true, 'Verify checkbox appears above exception status');
       assert.equal(card.hasActions, true);
@@ -119,7 +122,7 @@ const chrome = process.env.PUPPETEER_EXECUTABLE_PATH || 'C:/Program Files/Google
     assert.deepEqual(
       cards.map(card => card.timeValue),
       ['07:38', '08:09, 19:40', '08:42, 17:30'],
-      'Attendance card Times values use commas rather than dot separators'
+      'Attendance cards show comma-separated clock times'
     );
     assert.deepEqual(
       cards.map(card => ({ exception: card.exception, actions: card.actions })),

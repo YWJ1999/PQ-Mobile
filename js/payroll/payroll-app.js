@@ -483,13 +483,8 @@
 
         <!-- Card Body -->
         <div class="relief-card-body">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-            ${statusBadge}
-            <div style="font-size: 11.5px; font-weight: 700; color: var(--text-muted); display: flex; align-items: center; gap: 4px;">
-              <i class="fa-regular fa-calendar-check" style="color: var(--purple-primary);"></i>
-              <span>Submitted: <strong style="color: var(--text-primary); font-family: monospace, sans-serif;">${item.submitDate}</strong></span>
-            </div>
-          </div>
+          ${recordSubmitDate.html(item.submitDate)}
+          <div style="margin-bottom: 12px;">${statusBadge}</div>
 
           <!-- 2-Column Info Grid -->
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 14px; padding: 10px 12px;">

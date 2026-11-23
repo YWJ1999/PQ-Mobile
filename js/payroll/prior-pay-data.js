@@ -44,7 +44,6 @@
   let stagedAttachments = {}, dirty = new Set(), objectUrls = [], listScroll = 0, recordOpener = null;
   let drafts = new Map(), draftSaved = false, activeDraftRevision = null;
   let dialogCallback = null, dialogOpener = null;
-  let detailsOpener = null;
 
   function seedRecords() {
     const make = (id, company, dateFrom, dateTo, position, industry, updated = '') => ({
@@ -327,7 +326,7 @@
     document.querySelectorAll('#priorDetailView input, #priorDetailView select, #priorDetailView textarea, #priorDetailView button, #priorUpdate, #priorBack, .prior-tabs button').forEach(el => { el.disabled = value; });
     $('priorUpdate').innerHTML = value
       ? '<i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i><span>Saving</span>'
-      : '<i class="fa-solid fa-rotate" aria-hidden="true"></i><span>Update</span>';
+      : '<i class="fa-solid fa-floppy-disk" aria-hidden="true"></i><span>Save pay data</span>';
   }
   function collectChanges() {
     return Object.fromEntries([...dirty].map(section => [section, sectionValues(section)]));
@@ -396,10 +395,9 @@
     }
   }
 
-  function showRecordDetails(id) {
+  function renderRecordDetails(id) {
     const record = records.find(item => item.id === id);
     if (!record || busy || activeRecord) return;
-    detailsOpener = $('priorRecords').querySelector(`[data-record="${id}"] .prior-record-open`);
     const fields = [
       ['dateFrom', 'Start Date'], ['dateTo', 'End Date'], ['company', 'Company'],
       ['position', 'Position'], ['lastPay', 'Last Pay'], ['yearExperience', 'Year Exp'],
@@ -419,19 +417,7 @@
       row.append(term, value);
       return row;
     }));
-    $('priorRecordDetails').classList.add('active');
-    $('priorRecordDetails').setAttribute('aria-hidden', 'false');
-    for (const child of document.querySelector('.prior-phone').children) {
-      if (child !== $('priorRecordDetails')) child.inert = true;
-    }
-    $('priorRecordDetailsClose').focus({ preventScroll: true });
-  }
-  function closeRecordDetails() {
-    $('priorRecordDetails').classList.remove('active');
-    $('priorRecordDetails').setAttribute('aria-hidden', 'true');
-    for (const child of document.querySelector('.prior-phone').children) child.inert = false;
-    if (detailsOpener?.isConnected) detailsOpener.focus({ preventScroll: true });
-    detailsOpener = null;
+    return $('priorRecordDetails');
   }
   function showDialog(title, message, callback = null) {
     dialogOpener = document.activeElement;
@@ -508,7 +494,7 @@
     if (!card) return;
     const id = Number(card.dataset.record);
     if (event.target.closest('.prior-ytd')) openRecord(id, 'general', { id, selector: '.prior-ytd' });
-    else showRecordDetails(id);
+    else HistoryRecordPage.open('prior-pay', id, card.querySelector('.prior-record-open'));
   });
   tabs.forEach(tab => {
     $('tab-' + tab).addEventListener('click', () => switchTab(tab));
@@ -546,10 +532,8 @@
   $('priorCancel').addEventListener('click', goBack);
   $('priorUpdate').addEventListener('click', saveRecord);
   $('priorDraft').addEventListener('click', saveDraft);
-  $('priorInfo').addEventListener('click', () => showDialog('Prior Pay Data', 'Use Next and Back to move through General, YTD Earning Detail and Tax Reliefs. Save Draft keeps your progress. Update on the final step saves all your changes. Records and drafts are stored on this device.'));
+  $('priorInfo').addEventListener('click', () => showDialog('Prior Pay Data', 'Use Next and Back to move through General, YTD Earning Detail and Tax Reliefs. Save Draft keeps your progress. Choose Save pay data on the final step to save your changes. Records and drafts are stored on this device.'));
   $('priorRetry').addEventListener('click', init);
-  $('priorRecordDetailsClose').addEventListener('click', closeRecordDetails);
-  $('priorRecordDetails').addEventListener('click', event => { if (event.target === $('priorRecordDetails')) closeRecordDetails(); });
   $('priorDialogClose').addEventListener('click', closeDialog);
   $('priorDialogCancel').addEventListener('click', closeDialog);
   $('priorDialogConfirm').addEventListener('click', () => {
@@ -559,10 +543,9 @@
   });
   $('priorDialog').addEventListener('click', event => { if (event.target === $('priorDialog')) closeDialog(); });
   document.addEventListener('keydown', event => {
-    const detailsOpen = $('priorRecordDetails').classList.contains('active');
-    const overlay = detailsOpen ? $('priorRecordDetails') : $('priorDialog');
+    const overlay = $('priorDialog');
     if (!overlay.classList.contains('active')) return;
-    if (event.key === 'Escape') { event.preventDefault(); if (detailsOpen) closeRecordDetails(); else closeDialog(); }
+    if (event.key === 'Escape') { event.preventDefault(); closeDialog(); }
     if (event.key === 'Tab') {
       const buttons = Array.from(overlay.querySelectorAll('button')).filter(button => !button.hidden);
       const first = buttons[0], last = buttons.at(-1);
@@ -573,5 +556,5 @@
   window.addEventListener('beforeunload', event => {
     if ((dirty.size && !draftSaved) || busy) { event.preventDefault(); event.returnValue = ''; }
   });
-  init();
+  init().then(() => HistoryRecordPage.register((kind, id) => kind === 'prior-pay' && renderRecordDetails(Number(id))));
 })();

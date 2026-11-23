@@ -55,7 +55,7 @@ const TimesheetRequests = (() => {
     return [...local, ...examples].filter(sheet => !handled.has(sheet.id)).map(sheet => {
       const activities = Array.isArray(sheet.activities) ? sheet.activities : [];
       const calculated = totals(activities);
-      return { ...sheet, activities, employeeName: sheet.employeeName || previewUserName, employeeId: sheet.employeeId || sheet.empNo || 'EBB01',
+      return { ...sheet, submittedAt: sheet.submittedAt || sheet.createdAt, activities, employeeName: sheet.employeeName || previewUserName, employeeId: sheet.employeeId || sheet.empNo || 'EBB01',
         normalMinutes: sheet.normalMinutes ?? calculated.normalMinutes, overtimeMinutes: sheet.overtimeMinutes ?? calculated.overtimeMinutes,
         dateLabel: dateLabel(sheet.date) };
     });
@@ -72,8 +72,9 @@ const TimesheetRequests = (() => {
       const sheets = read(sheetsKey);
       if (sheets.some((record, i) => storedId(record, i) === sheet.id && submitted(record))) throw new Error('Timesheet already submitted');
       const index = sheets.findIndex((record, i) => storedId(record, i) === sheet.id);
-      if (index < 0) sheets.push(sheet);
-      else sheets[index] = sheet;
+      const submission = { ...sheet, submittedAt: new Date().toISOString() };
+      if (index < 0) sheets.push(submission);
+      else sheets[index] = submission;
       localStorage.setItem(sheetsKey, JSON.stringify(sheets));
       if (sameDraft) localStorage.removeItem('pq_project_timesheet_draft');
     });

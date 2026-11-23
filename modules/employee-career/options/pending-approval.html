@@ -27,7 +27,7 @@
     <main class="payroll-pending-content">
       <div id="careerPendingTabs" class="payroll-pending-tabs" role="tablist" aria-label="Approval request type"></div>
       <div class="approval-filter-summary"><div class="payroll-pending-summary-copy"><small>Current Filter</small><div class="payroll-pending-summary-value"><span id="careerPendingFilterSummary">All Requests &bull; All Dates</span></div></div><button id="careerPendingFilterTrigger" type="button" aria-label="Open pending approval filter" aria-haspopup="dialog" aria-controls="careerPendingFilter"><i class="fa-solid fa-sliders" aria-hidden="true"></i></button></div>
-      <section id="careerPendingPanel" role="tabpanel" aria-label="Pending approvals">
+      <section id="careerPendingPanel" data-record-colour-view="Approval status" data-record-legend='{"Pending Approval":"submitted","Approved":"approved","Resubmit":"resubmit","Rejected":"rejected"}' role="tabpanel" aria-label="Pending approvals">
         <div class="payroll-pending-list-heading"><h2>Pending Approvals (<span id="careerPendingCount">0</span>)</h2><label class="payroll-pending-select-all"><input id="careerPendingSelectAll" type="checkbox" disabled>Select All</label></div>
         <div id="careerPendingQueue"></div>
         <div id="careerPendingEmpty" class="payroll-pending-empty"><i class="fa-solid fa-circle-check" aria-hidden="true"></i><h3>No pending approvals</h3><p id="careerPendingEmptyText">Employee &amp; Career requests awaiting review will appear here.</p></div>

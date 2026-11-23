@@ -193,7 +193,7 @@
     const request = node('div', 'performance-request-review');
     if (record.category === 'self-review') selfReviewDetails(record, request);
     else appraisalDetails(record, request);
-    body.replaceChildren(request);
+    body.replaceChildren(recordSubmitDate.create(record.submittedAt), request);
     const comments = node('section', 'detail-popout-comments approval-comments-card');
     const label = node('label', '', 'Approver Remarks'); label.htmlFor = 'performanceApprovalComments';
     const input = node('textarea', 'detail-popout-comment-control'); input.id = label.htmlFor;
@@ -209,9 +209,9 @@
   function renderWorkflow(record) {
     $('performanceApprovalWorkflowTitle').textContent = `${names[record.category]} Workflow`;
     const employee = node('div', 'payroll-approval-workflow-person'); employee.append(person(record));
-    $('performanceApprovalWorkflowRequest').replaceChildren(field('Reference #', record.id), employee, field('Status', recordDetailStatus.create('Pending Approval')), field(record.category === 'goal-plan' ? 'Session' : 'Period', record.category === 'goal-plan' ? record.session || record.period : record.period));
+    $('performanceApprovalWorkflowRequest').replaceChildren(recordSubmitDate.create(record.submittedAt), field('Reference #', record.id), employee, field('Status', recordDetailStatus.create('Pending Approval')), field(record.category === 'goal-plan' ? 'Session' : 'Period', record.category === 'goal-plan' ? record.session || record.period : record.period));
     const submitted = node('li', 'payroll-approval-workflow-step is-complete');
-    submitted.append(field('Request Submitted', recordDetailStatus.create('Completed')), field('Submitted By', record.name), field('Submit Date', date(record.submittedAt)));
+    submitted.append(field('Request Submitted', recordDetailStatus.create('Completed')), field('Submitted By', record.name));
     const approval = node('li', 'payroll-approval-workflow-step is-active');
     approval.append(field(`${names[record.category]} Approval`, recordDetailStatus.create('Awaiting Approval')), field('Approver', record.reportingTo), field('Action Date', '—'));
     if (record.backupApprover) approval.append(person(record.backupApprover), field('Assignment', 'Backup Approver'));
@@ -242,7 +242,7 @@
     pendingAction = { ids, action, fromDetails };
     $('approvalConfirmTitle').textContent = `${actions[action]} Request${ids.length === 1 ? '' : 's'}`;
     $('approvalConfirmMessage').textContent = `${actions[action]} ${ids.length} selected ${names[category]} request${ids.length === 1 ? '' : 's'}?`;
-    $('approvalConfirmSubmit').textContent = actions[action];
+    $('approvalConfirmSubmit').textContent = trigger?.closest('#performanceApprovalBulk') ? formatSelectedAction(action, ids.length) : actions[action];
     $('approvalComments').value = fromDetails ? commentDrafts.get(ids[0]) || '' : '';
     $('approvalConfirmError').hidden = true;
     openDialog('approvalConfirm', trigger);
@@ -292,7 +292,7 @@
       menu.addEventListener('click', () => showMenu(record, menu));
       header.append(check, employee, node('span', 'payroll-approval-status', 'Pending Approval'), menu);
       const body = node('div', 'approval-card-body payroll-approval-card-body');
-      const fields = [['Submitted', date(record.submittedAt)], ['Department', record.department]];
+      const fields = [['Submit Date', record.submittedAt], ['Department', record.department]];
       if (record.category === 'goal-plan') {
         fields.push([record.session ? 'Session' : 'Period', record.session || record.period]);
       } else {

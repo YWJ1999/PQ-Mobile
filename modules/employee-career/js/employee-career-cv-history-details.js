@@ -192,8 +192,8 @@
     return { deleted, existing: (family.existing || []).filter(member => !deleted.some(other => other.id && member.id ? other.id === member.id : other.name === member.name)) };
   }
 
-  function familyTable(title, members, emptyText, group) {
-    const rows = members.map((member, index) => `<tr data-cv-family-member="${group}" data-cv-family-index="${index}"${member.changed ? ' class="cv-history-field-changed"' : ''}><td><button type="button" class="cv-history-family-member-name" aria-haspopup="dialog" aria-label="View details for ${escape(member.name || 'family member')}"><span class="cv-history-field-value">${display(member.name)}</span></button></td><td><span class="cv-history-field-value">${display(member.relation)}</span></td></tr>`).join('');
+  function familyTable(title, members, emptyText, group, approval) {
+    const rows = members.map((member, index) => `<tr data-cv-family-member="${group}" data-cv-family-index="${index}"${member.changed ? ' class="cv-history-field-changed"' : ''}><td><button type="button" class="cv-history-family-member-name"${approval ? ' aria-haspopup="dialog"' : ''} aria-label="View details for ${escape(member.name || 'family member')}"><span class="cv-history-field-value">${display(member.name)}</span></button></td><td><span class="cv-history-field-value">${display(member.relation)}</span></td></tr>`).join('');
     return `<section class="cv-history-family-section"><h3>${title}</h3><table class="history-detail-table cv-history-family-table"><thead><tr><th scope="col">Name</th><th scope="col">Relation</th></tr></thead><tbody>${rows || `<tr><td colspan="2" class="cv-history-empty-members">${emptyText}</td></tr>`}</tbody></table></section>`;
   }
 
@@ -219,10 +219,10 @@
     const navigation = approval
       ? `<nav class="cv-stepper" aria-label="CV request sections"><ol class="cv-step-track" role="tablist" aria-label="CV details">${tabs}</ol></nav>`
       : `<div class="cv-history-navigation"><div class="cv-history-detail-tabs" role="tablist" aria-label="CV details">${tabs}</div></div>`;
-    const metadata = `<section class="cv-history-request-summary"><h3>Request overview</h3><dl class="cv-history-metadata cv-history-fields cv-history-overview">${[
+    const metadata = `<section class="cv-history-request-summary"><h3>Request overview</h3>${recordSubmitDate.html(submittedDate)}<dl class="cv-history-metadata cv-history-fields cv-history-overview">${[
       ['Employee', employee(row)],
       ...(!approval ? [
-        ['Document Status', statusMarkup], ['Submitted Date', display(submittedDate)],
+        ['Document Status', statusMarkup],
         ['Document Reference', display(row.reference || row.id)], ['Approver Remarks', display(row.approverRemarks)]
       ] : [])
     ].map(([label, value]) => detailRow(label, value, '', `cv-history-overview-${normalize(label)}`)).join('')}</dl></section>`;
@@ -231,7 +231,7 @@
       if (key === 'family') {
         const { deleted, existing } = familyMembers(row);
         const requested = fieldRows(row, 'family', {}, row.changes, {approval});
-        content = familyTable('Deleted Family Member', deleted, 'No deleted family members', 'deleted') + familyTable('Existing Family Member', existing, 'No family members recorded', 'existing') + (requested ? `<section class="cv-history-family-section"><h3>Requested Family Changes</h3><dl class="cv-history-fields">${requested}</dl></section>` : '');
+        content = familyTable('Deleted Family Member', deleted, 'No deleted family members', 'deleted', approval) + familyTable('Existing Family Member', existing, 'No family members recorded', 'existing', approval) + (requested ? `<section class="cv-history-family-section"><h3>Requested Family Changes</h3><dl class="cv-history-fields">${requested}</dl></section>` : '');
       } else if (key === 'qualification') content = qualificationRecords(row, options.qualificationLayout, approval);
       else if (key === 'contacts') content = contactDetails(row, approval);
       else {
@@ -321,5 +321,5 @@
     event.preventDefault();
     selectTab(body, keys[next], true);
   }
-  window.EmployeeCareerCVHistoryDetails = {render, selectTab, keydown, selectQualificationTab, qualificationKeydown, toggleQualificationCard, openFamilyMember};
+  window.EmployeeCareerCVHistoryDetails = {render, selectTab, keydown, selectQualificationTab, qualificationKeydown, toggleQualificationCard, openFamilyMember, familyMembers};
 })();

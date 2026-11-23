@@ -32,7 +32,7 @@
   }
 
   function initClaimsApp() {
-    renderDashboardScope(activeScope);
+    renderDashboardScope(document.getElementById('approveAllTeamClaims') ? 'team' : activeScope);
     populateFormDropdowns();
   }
 
@@ -803,6 +803,11 @@
 
     container.innerHTML = '';
     const pendingCount = teamQueue.length;
+    const approveAllButton = document.getElementById('approveAllTeamClaims');
+    if (approveAllButton) {
+      approveAllButton.textContent = `Approve all (${pendingCount})`;
+      approveAllButton.disabled = pendingCount === 0;
+    }
     const totalAmt = teamQueue.reduce((acc, curr) => acc + curr.amount, 0);
 
     if (countVal) countVal.textContent = `${pendingCount} Requests`;
@@ -858,7 +863,7 @@
 
       const categoryVal = item.benefitType || item.advanceType || item.expenseType || item.medicalType || item.otType || item.travelType || item.subCatName || item.category || 'General';
       const claimDateVal = getPendingCardClaimDate(item);
-      const submitDateVal = item.submitDate || item.date || '13 Sep 2026';
+      const submitDateVal = item.submitDate || item.date || '';
       const amountStr = typeof item.amount === 'number' ? `RM ${item.amount.toFixed(2)}` : (item.amount || 'RM 0.00');
       const hoursStr = item.hours || '';
       let amountHourVal = amountStr;
@@ -956,8 +961,8 @@
         medicalType: card.getAttribute('category') || 'General Consultation',
         period: card.getAttribute('period') || '2026-09',
         claimDate: card.getAttribute('claim-date') || '12 Sep 2026',
-        submitDate: card.getAttribute('submit-date') || card.getAttribute('date') || '13 Sep 2026',
-        date: card.getAttribute('submit-date') || card.getAttribute('date') || '13 Sep 2026',
+        submitDate: card.getAttribute('submit-date') || card.getAttribute('date') || '',
+        date: card.getAttribute('submit-date') || card.getAttribute('date') || '',
         amount: amountVal,
         hours: hoursVal,
         amountHour: amountHourVal,
@@ -979,7 +984,7 @@
         hours: hoursStr,
         amountHour: amtHour,
         claimDate: item.claimDate || item.date || '12 Sep 2026',
-        submitDate: item.submitDate || item.date || '13 Sep 2026',
+        submitDate: item.submitDate || item.date || '',
         period: item.period || '2026-09',
         purpose: item.purpose || item.title || 'General claim request',
         docStatus: item.docStatus || 'Submitted',
@@ -1068,7 +1073,7 @@
     const bodyEl = document.getElementById('claimDetailsDynamicBody');
     if (bodyEl) {
       bodyEl.innerHTML = renderClaimApproverComments();
-      bodyEl.prepend(optLower.includes('benefit') ? BenefitClaimForm.create(data) : ClaimReview.create(data));
+      bodyEl.prepend(recordSubmitDate.create(data.submitDate), optLower.includes('benefit') ? BenefitClaimForm.create(data) : ClaimReview.create(data));
       bodyEl.closest('.phone-container').scrollTop = 0;
     }
 

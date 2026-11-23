@@ -79,7 +79,7 @@ const pageUrl = pathToFileURL(path.resolve(__dirname, '../modules/attendance/opt
       await page.waitForFunction(() => document.querySelector('.main-content').scrollTop > 0);
       await page.$eval('.main-content', node => { node.scrollTop = node.scrollHeight; });
       assert.equal(await page.$eval('#attendanceUpdateBtn', node => node.getBoundingClientRect().top), layout.top, 'Update remains stationary while scrolling');
-      assert.ok(await page.$eval('.attendance-record-card:last-child', card => card.getBoundingClientRect().bottom <= document.getElementById('attendanceUpdateBtn').getBoundingClientRect().top), 'Last card and its Feedback button stay above Update');
+      assert.ok(await page.$$eval('.attendance-record-card:not([hidden])', cards => cards.at(-1).getBoundingClientRect().bottom <= document.getElementById('attendanceUpdateBtn').getBoundingClientRect().top), 'Last visible card and its Feedback button stay above Update');
       await page.screenshot({ path: path.resolve(__dirname, `individual-attendance-fixed-update-${theme}-${width}-${height}.png`) });
 
       await page.click('#attendanceUpdateBtn');

@@ -26,7 +26,7 @@
       <section id="goalSummaryEmployeeView" aria-label="Employee goals for selected goal type" hidden>
         <div class="attendance-report-summary record-summary-card" aria-live="polite"><div class="attendance-report-summary-row"><record-chart-count><strong id="goalSummaryEmployeeCount" class="record-summary-value">0</strong> <span class="record-summary-label">Records</span></record-chart-count><button type="button" id="goalSummaryEmployeeViewChart" class="view-chart-btn record-chart-button"><i class="fa-solid fa-chart-simple" aria-hidden="true"></i><span>Chart</span></button></div></div>
         <h2 id="goalSummaryEmployeeType" class="goal-summary-employee-heading" hidden></h2>
-        <div id="goalSummaryEmployeeCards" class="goal-summary-employee-cards"></div>
+        <div id="goalSummaryEmployeeCards" class="goal-summary-employee-cards" data-record-colour-view="Goal achievement" data-record-legend='{"No achievement reported":"draft","Below 100% achieved":"draft","100% achieved":"approved"}'></div>
       </section>
       <section id="goalSummaryChartView" class="attendance-report-chart" aria-label="Goal Summary analysis" hidden>
         <section class="attendance-report-breakdown"><label for="goalSummaryChartMetric">BREAKDOWN BY</label><select id="goalSummaryChartMetric"></select></section>

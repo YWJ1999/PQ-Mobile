@@ -15,6 +15,8 @@
   <link rel="stylesheet" href="../../../css/payroll-history.css">
   <link rel="stylesheet" href="../css/admin.css">
   <link rel="stylesheet" href="../css/workplace-history.css">
+  <link rel="stylesheet" href="../../../css/history-record-page.css">
+  <script src="../../../js/history-record-page.js"></script>
   <script src="../../../js/components.js"></script>
   <script src="../../../js/app.js" defer></script>
   <script src="../js/admin-app.js" defer></script>
@@ -33,6 +35,10 @@
         <div class="admin-heading"><h1>History</h1></div><span aria-hidden="true"></span>
       </div>
     </header>
+    <template id="recordColourKey">
+      <h3></h3>
+      <ul class="record-key-list record-key-headers"></ul>
+    </template>
     <main class="main-content admin-content" data-record-colour-view>
       <div class="history-categories" aria-label="History categories"><div class="me-jump-bar">
         <button class="me-jump-pill active" type="button" data-history-kind="guest-visit" aria-pressed="true">Guest Visit</button>
@@ -64,15 +70,25 @@
         <div class="claim-filter-fields">
           <div class="history-date-fields"><div><label for="historyDateFrom" class="claim-filter-label">Start Date</label><input id="historyDateFrom" class="claim-control" type="date"></div><div><label for="historyDateTo" class="claim-filter-label">End Date</label><input id="historyDateTo" class="claim-control" type="date"></div></div>
           <div id="historyTypeField" hidden><label id="historyTypeLabel" for="historyType" class="claim-filter-label">Letter Type</label><div class="claim-filter-select-wrap"><select id="historyType" class="claim-filter-select"><option value="">All Types</option></select><i class="fa-solid fa-chevron-down claim-filter-chevron" aria-hidden="true"></i></div></div>
-          <div id="historyStatusField"><label id="historyStatusLabel" for="historyStatus" class="claim-filter-label">Status</label><div class="claim-filter-select-wrap"><select id="historyStatus" class="claim-filter-select"><option value="">All Statuses</option><option value="draft">Draft</option><option value="submitted">Pending</option><option value="resubmit">Resubmit</option><option value="approved">Approved</option><option value="rejected">Rejected</option><option value="cancelled">Cancelled</option></select><i class="fa-solid fa-chevron-down claim-filter-chevron" aria-hidden="true"></i></div></div>
+          <div id="historyStatusField"><label id="historyStatusLabel" for="historyStatus" class="claim-filter-label">Status</label><div class="claim-filter-select-wrap"><select id="historyStatus" class="claim-filter-select"><option value="">All Statuses</option></select><i class="fa-solid fa-chevron-down claim-filter-chevron" aria-hidden="true"></i></div></div>
           <p id="historyFilterError" class="history-filter-error" role="alert" hidden></p>
         </div>
         <button id="applyHistoryFilter" class="claim-filter-apply" type="submit">Apply Filter</button>
       </form>
     </div>
-    <div id="historyDetailsModal" class="history-detail-overlay" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="historyDetailTitle">
-      <section class="history-detail-panel"><div class="history-detail-header"><h2 id="historyDetailTitle">Guest Visit Details</h2><button id="closeHistoryDetails" type="button" aria-label="Close details"><i class="fa-solid fa-circle-xmark" aria-hidden="true"></i></button></div><div id="historyDetailBody" class="history-detail-body" tabindex="0" role="region" aria-label="Request details"></div><footer id="historyDetailActions" class="history-detail-actions" hidden></footer></section>
-    </div>
+    <main id="historyDetailsModal" class="approval-record-page" data-history-page aria-labelledby="historyDetailTitle" hidden>
+      <section class="approval-record-layout">
+        <header class="approval-page-header">
+          <phone-status-bar time="9:41"></phone-status-bar>
+          <div class="approval-page-heading">
+            <button type="button" id="closeHistoryDetails" data-history-back aria-label="Back to history"></button>
+            <h1 id="historyDetailTitle" tabindex="-1">Guest Visit Details</h1>
+          </div>
+        </header>
+        <div id="historyDetailBody" class="history-record-content history-detail-body" tabindex="0" role="region" aria-label="Request details"></div>
+        <footer id="historyDetailActions" class="history-detail-actions" hidden></footer>
+      </section>
+    </main>
   </div>
 </body>
 </html>

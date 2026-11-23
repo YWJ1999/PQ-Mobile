@@ -66,7 +66,7 @@
     <!-- Scrollable Main Content -->
     <div class="main-content" id="meMainScroll" style="padding-bottom: 90px;">
 
-      <!-- Horizontal Sticky Jump Pill Bar -->
+      <!-- Section navigation -->
       <div class="me-jump-bar-wrapper">
         <div class="me-jump-bar">
           <button class="me-jump-pill active" onclick="scrollToSec('sec-work', this)">Work</button>
@@ -851,9 +851,8 @@
       const target = document.getElementById(secId);
       const scrollContainer = document.getElementById('meMainScroll');
       if (target && scrollContainer) {
-        const targetTop = target.offsetTop - 70;
         scrollContainer.scrollTo({
-          top: targetTop,
+          top: target.offsetTop,
           behavior: 'smooth'
         });
 

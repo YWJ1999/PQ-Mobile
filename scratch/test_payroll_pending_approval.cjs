@@ -172,7 +172,7 @@ async function checkWorkflow(page, theme, category, references) {
       assert.equal(await page.$('.payroll-approval-reference'), null);
       assert.deepEqual(await page.$$eval('.approval-request-card:first-child .pending-action-grid button', nodes => nodes.map(node => node.textContent.trim())), ['Reject', 'Approve']);
       await page.click('#payrollPendingSelectAll');
-      assert.deepEqual(await page.$$eval('#payrollPendingBulk button', nodes => nodes.map(node => node.textContent.trim())), ['Reject', 'Approve']);
+      assert.deepEqual(await page.$$eval('#payrollPendingBulk button', nodes => nodes.map(node => node.textContent.trim())), ['Reject selected (10)', 'Approve selected (10)']);
       await page.click('#payrollPendingSelectAll');
       for (const width of [360, 390, 450]) {
         await page.setViewport({ width, height: 950 });

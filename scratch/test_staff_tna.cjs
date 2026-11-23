@@ -70,9 +70,9 @@ async function visibleCardIds(page) {
       value: row.querySelector('strong').textContent.trim(),
       valueAlign: getComputedStyle(row.querySelector('strong')).textAlign
     }))), [
-      { display: 'flex', label: 'Position', value: 'Group HR Manager', valueAlign: 'right' },
-      { display: 'flex', label: 'Period', value: '01 Jan 2026 – 31 Dec 2026', valueAlign: 'right' }
-    ], 'Staff TNA card details follow the Leave History left-label/right-value rows');
+      { display: 'flex', label: 'Position', value: 'Group HR Manager', valueAlign: 'left' },
+      { display: 'flex', label: 'Period', value: '01 Jan 2026 – 31 Dec 2026', valueAlign: 'left' }
+    ], 'Staff TNA keeps the remaining labels and values aligned in the details grid');
     assert.deepEqual(await page.$eval('[data-tna-id="tna-2026-001"]', card => {
       const labelledBy = card.getAttribute('aria-labelledby');
       const describedBy = card.getAttribute('aria-describedby');
@@ -171,11 +171,12 @@ async function visibleCardIds(page) {
         listBorderRadius: getComputedStyle(node).borderTopLeftRadius
       };
     }), { sectionBorderWidth: '0px', sectionBorderRadius: '0px', listBorderRadius: '0px' }, 'Application details starts as a direct square table without a card wrapper');
+    assert.equal(await page.$eval('#staffTnaSubmitDate', node => node.textContent), 'Submit Date: 12/01/2026');
     assert.deepEqual(await page.$$eval('#staffTnaApplicationDetails dt', nodes => nodes.map(node => node.textContent.trim())), [
-      'Reference #', 'Employee', 'Position', 'Submit By', 'Submit Date', 'Name', 'Training Period', 'Career Target', 'Weakness', 'Remarks', 'Approver Remarks'
+      'Reference #', 'Employee', 'Position', 'Submit By', 'Name', 'Training Period', 'Career Target', 'Weakness', 'Remarks', 'Approver Remarks'
     ]);
     assert.deepEqual(await page.$$eval('#staffTnaApplicationDetails dd', nodes => nodes.map(node => node.textContent.trim())), [
-      'TNA-2026-001', 'Farhan Binti Rahmat#EBB12', 'Group HR Manager', 'Aina Binti Salleh', '12 Jan 2026', 'Leadership Development Plan', '01 Jan 2026 – 31 Dec 2026', 'Build strategic leadership capability for regional HR operations.', 'Advanced change communication and workforce analytics.', 'Prioritise practical leadership and transformation programmes.', 'Pending review by the next approver.'
+      'TNA-2026-001', 'Farhan Binti Rahmat#EBB12', 'Group HR Manager', 'Aina Binti Salleh', 'Leadership Development Plan', '01 Jan 2026 – 31 Dec 2026', 'Build strategic leadership capability for regional HR operations.', 'Advanced change communication and workforce analytics.', 'Prioritise practical leadership and transformation programmes.', 'Pending review by the next approver.'
     ]);
     assert.equal(await page.$eval('#staffTnaApplicationDetails', list => {
       const section = list.closest('.staff-tna-detail-section').getBoundingClientRect();
@@ -197,8 +198,8 @@ async function visibleCardIds(page) {
     assert.deepEqual(await page.$eval('#staffTnaDetailCancel', node => ({
       text: node.textContent.trim(),
       footerClass: node.parentElement.className,
-      footerAlignment: getComputedStyle(node.parentElement).justifyContent
-    })), { text: 'Cancel', footerClass: 'history-detail-actions', footerAlignment: 'flex-end' }, 'View-only details use the History pop-out Cancel footer');
+      alignedAtEnd: ['flex-end', 'flow-end'].includes(getComputedStyle(node.parentElement).justifyContent)
+    })), { text: 'Cancel', footerClass: 'history-detail-actions', alignedAtEnd: true }, 'View-only details use the History pop-out Cancel footer');
     await page.click('#staffTnaDetailCancel');
     assert.equal(await page.$eval('#staffTnaDetailOverlay', node => node.hidden), true);
     assert.equal(await page.$eval('[data-tna-id="tna-2026-001"]', node => document.activeElement === node), true);

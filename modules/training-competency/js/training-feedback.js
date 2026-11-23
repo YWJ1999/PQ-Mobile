@@ -125,7 +125,8 @@
     action.href = responseUrl(record.id);
     action.setAttribute('aria-label', `Provide feedback for ${record.course}`);
     footer.append(action);
-    card.append(header, details, footer);
+    const response = responses[record.id] || record.response;
+    card.append(header, recordSubmitDate.create(response?.submittedAt), details, footer);
     return card;
   }
 
@@ -258,6 +259,7 @@
     let selectedRating = 0;
     let inertElements = [];
     const response = record ? responses[record.id] || (validResponse(record.response) ? record.response : null) : null;
+    recordSubmitDate.set($('trainingFeedbackSubmitDate'), response?.submittedAt);
     const ratings = Object.fromEntries(data.criteria.map(criterion => [criterion.id, response?.ratings[criterion.id] || 0]));
     let attachments = response ? response.attachments.map(attachment => ({ ...attachment })) : [];
     let attachmentProcessing = Promise.resolve();

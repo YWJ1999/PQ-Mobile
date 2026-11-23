@@ -61,6 +61,7 @@ const pageUrl = theme => pathToFileURL(
       await page.click('#workAssignmentAssignee-EBB12');
       await page.click('#workAssignmentAssignee-EBB27');
       assert.equal(await page.$eval('#workAssignmentAssigneeSummary', node => node.textContent.trim()), '2 assignees selected');
+      assert.equal(await page.$eval('#submitWorkAssignment', button => button.textContent.trim()), 'Assign selected (2)');
       assert.deepEqual(
         await page.$$eval('#workAssignmentAssigneeSelection .project-assignee-chip', chips => chips.map(chip => chip.textContent.trim())),
         ['Farhan binti rahmat', 'Aina Rahman']

@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>PeopleHCM - Prior Pay Data</title>
+  <link rel="stylesheet" href="../../../css/history-record-page.css">
+  <script src="../../../js/history-record-page.js"></script>
   <script src="../../../js/components.js"></script>
   <script src="../../../js/app.js" defer></script>
   <script src="../../../js/payroll/prior-pay-data.js?v=20261002-tax-year" defer></script>
@@ -104,22 +106,25 @@
             <button type="button" class="btn-submit-primary" id="priorCancel" data-page-form-cancel><i class="fa-solid fa-xmark" aria-hidden="true"></i><span>Cancel</span></button>
             <button type="button" class="btn-submit-primary" id="priorDraft"><i class="fa-solid fa-floppy-disk" aria-hidden="true"></i><span>Save Draft</span></button>
             <button type="button" class="btn-submit-primary" id="priorNext"><span>Next</span><i class="fa-solid fa-arrow-right" aria-hidden="true"></i></button>
-            <button type="button" class="btn-submit-primary" id="priorUpdate" hidden><i class="fa-solid fa-rotate" aria-hidden="true"></i><span>Update</span></button>
+            <button type="button" class="btn-submit-primary" id="priorUpdate" hidden><i class="fa-solid fa-floppy-disk" aria-hidden="true"></i><span>Save pay data</span></button>
           </div>
           <p id="priorSaveStatus" role="status" aria-live="polite" hidden></p>
         </div>
       </section>
     </main>
     <phone-bottom-nav active="apps" id="priorBottomNav"></phone-bottom-nav>
-    <div class="prior-overlay prior-record-overlay" id="priorRecordDetails" aria-hidden="true">
-      <section class="prior-record-modal" role="dialog" aria-modal="true" aria-labelledby="priorRecordDetailsTitle" tabindex="-1">
-        <div class="prior-record-modal-header">
-          <h2 id="priorRecordDetailsTitle">Prior Pay Data</h2>
-          <button type="button" id="priorRecordDetailsClose" aria-label="Close prior pay details"><i class="fa-solid fa-circle-xmark" aria-hidden="true"></i></button>
-        </div>
-        <div class="prior-record-modal-body"><dl class="prior-record-details" id="priorRecordDetailsFields"></dl></div>
+    <main id="priorRecordDetails" class="approval-record-page" data-history-page aria-labelledby="priorRecordDetailsTitle" hidden>
+      <section class="approval-record-layout">
+        <header class="approval-page-header">
+          <phone-status-bar time="9:41"></phone-status-bar>
+          <div class="approval-page-heading">
+            <button type="button" id="priorRecordDetailsClose" data-history-back aria-label="Back to history"></button>
+            <h1 id="priorRecordDetailsTitle" tabindex="-1">Prior Pay Data</h1>
+          </div>
+        </header>
+        <div class="history-record-content prior-record-modal-body"><dl class="prior-record-details" id="priorRecordDetailsFields"></dl></div>
       </section>
-    </div>
+    </main>
     <div class="prior-overlay" id="priorDialog" aria-hidden="true">
       <section class="prior-sheet" role="dialog" aria-modal="true" aria-labelledby="priorDialogTitle" aria-describedby="priorDialogText">
         <div class="prior-sheet-handle" aria-hidden="true"></div>

@@ -33,7 +33,7 @@
     const url = new URL(location.href); url.searchParams.set('theme', theme());
     url.searchParams.delete('update');
     if (Object.values(filters).some(Boolean)) url.searchParams.set('filters', JSON.stringify(filters)); else url.searchParams.delete('filters');
-    history.replaceState(null, '', url);
+    history.replaceState(history.state, '', url);
   }
   function matches(record) {
     const day = String(record.incidentDate || '').slice(0, 10);
@@ -51,8 +51,8 @@
       const header = element('div', 'incident-history-card-header');
       const identity = element('span', 'incident-history-identity');
       identity.append(element('strong', 'incident-history-name', text(record.name)), element('span', 'incident-history-id', employeeId(record)));
-      const trigger = element('button', 'incident-history-details-trigger'); trigger.type = 'button';
-      trigger.setAttribute('aria-haspopup', 'dialog'); trigger.setAttribute('aria-controls', 'incidentHistoryDetailsModal');
+      const trigger = element('a', 'incident-history-details-trigger');
+      trigger.href = HistoryRecordPage.href('incident', record.reference); trigger.dataset.historyLink = '';
       trigger.setAttribute('aria-label', `View incident details for ${text(record.name)} ${employeeId(record)}, ${dateText(record.incidentDate)}, ${text(record.incidentType)}`);
       trigger.append(identity); header.append(trigger);
       const details = element('dl', 'incident-history-details');
@@ -120,7 +120,7 @@
     });
     return list;
   }
-  function openDetails(record, trigger) {
+  function renderDetails(record) {
     const created = dateText(record.createdDate), time = /(?:T|\s)(\d{2}:\d{2})/.exec(String(record.createdDate || ''))?.[1];
     const yesNo = value => value === true ? 'Yes' : value === false ? 'No' : null;
     $('incidentHistoryDetailsRows').replaceChildren(
@@ -130,9 +130,7 @@
       detailRow('Merit', yesNo(record.merit)), detailRow('Value', record.value), detailRow('Remarks', record.remarks),
       detailRow('Is Closed?', yesNo(record.isClosed)), detailRow('Attachment', attachmentList(record))
     );
-    trigger.focus({ preventScroll: true });
-    openModal('incidentHistoryDetailsModal', trigger, $('incidentHistoryDetailsClose'));
-    $('incidentHistoryDetailsModal').querySelector('.detail-popout-body').scrollTop = 0;
+    return $('incidentHistoryDetailsModal');
   }
   const fields = { keyword: 'incidentHistoryKeyword', type: 'incidentHistoryType', start: 'incidentHistoryStart', end: 'incidentHistoryEnd' };
   function fillFilters(values) {
@@ -170,7 +168,7 @@
     }
     const card = event.target.closest('.incident-history-card'); if (!card) return;
     const record = records.find(record => record.reference === card.dataset.reference);
-    if (record) openDetails(record, card.querySelector('.incident-history-details-trigger'));
+    if (record && !event.target.closest('[data-history-link]')) HistoryRecordPage.open('incident', record.reference, card.querySelector('.incident-history-details-trigger'));
   });
   $('incidentHistoryDeleteConfirm').addEventListener('click', () => {
     if (!deleting) return;
@@ -204,4 +202,8 @@
   } catch { /* An invalid return filter opens the unfiltered History. */ }
   new MutationObserver(() => { syncBack(); syncHistoryUrl(); }).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
   syncBack(); render();
+  HistoryRecordPage.register((kind, id) => {
+    const record = kind === 'incident' && records.find(row => row.reference === id);
+    if (record) return renderDetails(record);
+  });
 })();

@@ -4,6 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>PeopleHCM - Pending Attendance Feedback</title>
+  <link rel="stylesheet" href="../../../css/history-record-page.css">
+  <script src="../../../js/history-record-page.js"></script>
+  <script src="../../../js/attendance/advice-fields.js"></script>
   <script src="../../../js/components.js"></script>
   <script src="../../../js/app.js" defer></script>
   <script src="../../../js/attendance/date-display.js"></script>
@@ -68,9 +71,10 @@
       <article class="history-card-item pending-feedback-record"
         data-status="unapproved-ot" data-date="14 Sep 2026" data-shift="8.30AM&ndash;5.30PM (W01)"
         data-times="08:09 &middot; 19:40" data-normal-hours="8.00" data-ot-hours="2.00" data-exception="Unapproved OT"
-        onclick="openAttendanceDetails(this, this.querySelector('.pending-feedback-details-trigger'))">
+        data-late-in="00:00" data-early-out="00:00" data-absent="No"
+        onclick="HistoryRecordPage.open('attendance', this.dataset.date, this.querySelector('.pending-feedback-details-trigger'))">
         <div class="history-card-header">
-          <button type="button" class="history-card-heading pending-feedback-details-trigger" aria-label="View attendance details for 14 Sep 2026" onclick="event.stopPropagation(); openAttendanceDetails(this.closest('.pending-feedback-record'), this)">
+          <button type="button" class="history-card-heading pending-feedback-details-trigger" aria-label="View attendance details for 14 Sep 2026" onclick="event.stopPropagation(); HistoryRecordPage.open('attendance', this.closest('.pending-feedback-record').dataset.date, this)">
             <h3 class="history-card-title">8.30AM&ndash;5.30PM (W01)</h3>
             <div class="history-card-ref">Mon 14 Sep 2026</div>
           </button>
@@ -79,7 +83,8 @@
           </div>
         </div>
         <div class="history-card-details">
-          <div class="attendance-history-detail"><span>Times</span><strong>08:09 &middot; 19:40</strong></div>
+          <div class="attendance-history-detail"><span>Day Type</span><strong data-day-type>Work Day</strong></div>
+          <div class="attendance-history-detail"><span>Clock Times</span><strong>08:09 &middot; 19:40</strong></div>
           <div class="attendance-history-detail"><span>Normal Hours</span><strong>8.00</strong></div>
           <div class="attendance-history-detail"><span>OT Hours</span><strong>2.00</strong></div>
           <div class="attendance-history-detail"><span>Exception</span><strong>Unapproved OT</strong></div>
@@ -93,9 +98,10 @@
       <article class="history-card-item pending-feedback-record"
         data-status="odd-clocking" data-date="15 Sep 2026" data-shift="8.30AM&ndash;5.30PM (W01)"
         data-times="07:38" data-normal-hours="0.00" data-ot-hours="0.00" data-exception="Missing Clock Out"
-        onclick="openAttendanceDetails(this, this.querySelector('.pending-feedback-details-trigger'))">
+        data-late-in="00:00" data-missing-clock-out="true" data-absent="No"
+        onclick="HistoryRecordPage.open('attendance', this.dataset.date, this.querySelector('.pending-feedback-details-trigger'))">
         <div class="history-card-header">
-          <button type="button" class="history-card-heading pending-feedback-details-trigger" aria-label="View attendance details for 15 Sep 2026" onclick="event.stopPropagation(); openAttendanceDetails(this.closest('.pending-feedback-record'), this)">
+          <button type="button" class="history-card-heading pending-feedback-details-trigger" aria-label="View attendance details for 15 Sep 2026" onclick="event.stopPropagation(); HistoryRecordPage.open('attendance', this.closest('.pending-feedback-record').dataset.date, this)">
             <h3 class="history-card-title">8.30AM&ndash;5.30PM (W01)</h3>
             <div class="history-card-ref">Tue 15 Sep 2026</div>
           </button>
@@ -104,7 +110,8 @@
           </div>
         </div>
         <div class="history-card-details">
-          <div class="attendance-history-detail"><span>Times</span><strong>07:38</strong></div>
+          <div class="attendance-history-detail"><span>Day Type</span><strong data-day-type>Work Day</strong></div>
+          <div class="attendance-history-detail"><span>Clock Times</span><strong>07:38</strong></div>
           <div class="attendance-history-detail"><span>Normal Hours</span><strong>0.00</strong></div>
           <div class="attendance-history-detail"><span>OT Hours</span><strong>0.00</strong></div>
           <div class="attendance-history-detail"><span>Exception</span><strong>Missing Clock Out</strong></div>
@@ -116,13 +123,16 @@
       </article>
     </main>
 
-    <div id="attendanceDetailsModalOverlay" class="pending-feedback-modal detail-popout-overlay" hidden onclick="closeOverlayFromBackdrop(event, 'attendanceDetailsModalOverlay')">
-      <section class="detail-popout-panel" role="dialog" aria-modal="true" aria-labelledby="attendanceDetailsTitle" onclick="event.stopPropagation()">
-        <header class="detail-popout-header">
-          <h3 id="attendanceDetailsTitle" class="detail-popout-title">Attendance Advice Approval</h3>
-          <button type="button" class="detail-popout-close" onclick="closeOverlay('attendanceDetailsModalOverlay')" aria-label="Close details"></button>
+    <main id="attendanceDetailsModalOverlay" class="approval-record-page" data-history-page aria-labelledby="attendanceDetailsTitle" hidden>
+      <section class="approval-record-layout">
+        <header class="approval-page-header">
+          <phone-status-bar time="9:41"></phone-status-bar>
+          <div class="approval-page-heading">
+            <button type="button" data-history-back aria-label="Back to history"></button>
+            <h1 id="attendanceDetailsTitle" tabindex="-1">Attendance Advice Approval</h1>
+          </div>
         </header>
-        <div class="detail-popout-body">
+        <div class="history-record-content detail-popout-body">
           <table id="attendanceDetailsMainTable" class="detail-popout-table"><tbody>
             <tr><td class="detail-popout-label">Employee #</td><td class="detail-popout-value" id="detailEmployeeNo">#EBB12</td></tr>
             <tr><td class="detail-popout-label">Name</td><td class="detail-popout-value" id="detailEmployeeName">Farhan binti rahmat</td></tr>
@@ -133,10 +143,7 @@
             <tr><td class="detail-popout-label">Supervisor</td><td class="detail-popout-value" id="detailSupervisor">&ndash;</td></tr>
             <tr><td class="detail-popout-label">Clock Times</td><td class="detail-popout-value" id="detailTimes">&ndash;</td></tr>
             <tr><td class="detail-popout-label">Normal Hours</td><td class="detail-popout-value" id="detailNormalHours">&ndash;</td></tr>
-            <tr><td class="detail-popout-label">Late In</td><td class="detail-popout-value" id="detailLateIn">&ndash;</td></tr>
-            <tr><td class="detail-popout-label">Early Out</td><td class="detail-popout-value" id="detailEarlyOut">&ndash;</td></tr>
-            <tr><td class="detail-popout-label">Time Off</td><td class="detail-popout-value" id="detailTimeOff">&ndash;</td></tr>
-            <tr><td class="detail-popout-label">Absent</td><td class="detail-popout-value" id="detailAbsent">No</td></tr>
+          </tbody><tbody id="pendingFeedbackAdviceFields"></tbody><tbody>
             <tr><td class="detail-popout-label">Approved OT Hours</td><td class="detail-popout-value" id="detailApprovedOtHours">0.00</td></tr>
             <tr><td class="detail-popout-label">Unapproved OT Hours</td><td class="detail-popout-value" id="detailUnapprovedOtHours">0.00</td></tr>
             <tr><td class="detail-popout-label">Exception</td><td class="detail-popout-value" id="detailException">&ndash;</td></tr>
@@ -161,7 +168,7 @@
           <button type="button" class="history-detail-action" data-attendance-history-action="feedback" onclick="runAttendanceHistoryAction('feedback', activeAttendanceDetailCard)">Feedback</button>
         </footer>
       </section>
-    </div>
+    </main>
 
     <div id="feedbackModalOverlay" class="pending-feedback-modal detail-popout-overlay" hidden onclick="closeOverlayFromBackdrop(event, 'feedbackModalOverlay')">
       <section class="detail-popout-panel pending-feedback-form-panel" role="dialog" aria-modal="true" aria-labelledby="feedbackTitle" onclick="event.stopPropagation()">
@@ -316,11 +323,11 @@
     function cardData(card) {
       const hasUnapprovedOt = card.dataset.status === 'unapproved-ot';
       return {
-        employeeNo: '#EBB12', employeeName: 'Farhan binti rahmat', date: card.dataset.date, shift: card.dataset.shift,
-        dayType: 'Work Day', shiftGroup: 'GROUP A', supervisor: '#EBB04', times: card.dataset.times,
-        normalHours: card.dataset.normalHours, lateIn: '–', earlyOut: '–', timeOff: '–', absent: 'No',
+        ...card.dataset,
+        employeeNo: '#EBB12', employeeName: 'Farhan binti rahmat',
+        dayType: card.querySelector('[data-day-type]').textContent, shiftGroup: 'GROUP A', supervisor: '#EBB04',
         approvedOtHours: '0.00', unapprovedOtHours: hasUnapprovedOt ? card.dataset.otHours : '0.00',
-        exception: card.dataset.exception, documentNo: '–',
+        documentNo: '–',
         overtimeInfo: hasUnapprovedOt ? { code: '–', description: 'Unapproved OT', hours: card.dataset.otHours, uot: 'Yes' } : null
       };
     }
@@ -351,11 +358,9 @@
     }
     function runAttendanceHistoryAction(kind, card) {
       if (!card) return;
-      const details = document.getElementById('attendanceDetailsModalOverlay');
-      if (details && !details.hidden) closeOverlay('attendanceDetailsModalOverlay');
       openSharedAttendanceForm(kind, card);
     }
-    function openAttendanceDetails(card, trigger) {
+    function renderAttendanceDetails(card) {
       activeAttendanceDetailCard = card;
       const data = cardData(card);
       document.getElementById('detailEmployeeNo').textContent = data.employeeNo;
@@ -367,10 +372,7 @@
       document.getElementById('detailSupervisor').textContent = data.supervisor;
       document.getElementById('detailTimes').textContent = data.times;
       document.getElementById('detailNormalHours').textContent = data.normalHours;
-      document.getElementById('detailLateIn').textContent = data.lateIn;
-      document.getElementById('detailEarlyOut').textContent = data.earlyOut;
-      document.getElementById('detailTimeOff').textContent = data.timeOff;
-      document.getElementById('detailAbsent').textContent = data.absent;
+      AttendanceAdviceFields.render(document.getElementById('pendingFeedbackAdviceFields'), data);
       document.getElementById('detailApprovedOtHours').textContent = data.approvedOtHours;
       document.getElementById('detailUnapprovedOtHours').textContent = data.unapprovedOtHours;
       document.getElementById('detailException').textContent = data.exception;
@@ -383,7 +385,7 @@
       document.getElementById('detailOtDescription').textContent = data.overtimeInfo?.description || '–';
       document.getElementById('detailOtHoursInfo').textContent = data.overtimeInfo?.hours || '–';
       document.getElementById('detailUot').textContent = data.overtimeInfo?.uot || '–';
-      openOverlay('attendanceDetailsModalOverlay', trigger);
+      return document.getElementById('attendanceDetailsModalOverlay');
     }
     function createClockCard(date, original, amended) {
       date = AttendanceDateDisplay.format(date);
@@ -497,6 +499,10 @@
         first.focus();
       }
     });
+    HistoryRecordPage.register((kind, id) => {
+      const card = kind === 'attendance' && [...document.querySelectorAll('.pending-feedback-record')].find(item => item.dataset.date === id);
+      if (card) return renderAttendanceDetails(card);
+    }, () => { activeAttendanceDetailCard = null; });
   </script>
 </body>
 </html>

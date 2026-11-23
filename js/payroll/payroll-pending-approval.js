@@ -26,6 +26,11 @@
     const match = String(value || '').match(/^(\d{4})-(\d{2})-(\d{2})$/);
     return match ? `${match[3]}/${match[2]}/${match[1]}` : '-';
   }
+  function requestDateFields(item) {
+    // Older deductions have only requestDate, which is already shown as their submission date.
+    if (item.category !== 'deduction' || !item.submitDate || !item.requestDate || item.submitDate === item.requestDate) return [];
+    return [['Request Date', date(item.requestDate)]];
+  }
   function money(amount) {
     return 'RM ' + Number(amount).toLocaleString('en-MY', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   }
@@ -116,11 +121,12 @@
     header.insertBefore(status, menu);
     const fields = item.category === 'tax'
       ? [
-          ['Submit Date', date(item.submitDate || item.requestDate)], ['Tax Relief Item', [item.rebateCode, item.rebateItem].filter(Boolean).join(' - ')],
+          ['Tax Relief Item', [item.rebateCode, item.rebateItem].filter(Boolean).join(' - ')],
           ['Description', item.description], ['Txn. Date', date(item.transactionDate)], ['Process', item.process ? 'Yes' : 'No']
         ]
       : [
-          ['Request Date', date(item.submitDate || item.requestDate)], ['Deduction Type', item.deductionType], ['Request Type', item.requestType],
+          ...requestDateFields(item),
+          ['Deduction Type', item.deductionType], ['Request Type', item.requestType],
           ...(item.stopPeriod || item.stopDate || item.stopCycle ? [
             ['Stop Period', item.stopPeriod], ['Stop Date', date(item.stopDate)], ['Stop Cycle', item.stopCycle]
           ] : [
@@ -128,6 +134,7 @@
             ['Period', item.period], ['Cycle', item.cycle]
           ])
         ];
+    fields.unshift(['Submit Date', item.submitDate || item.requestDate]);
     if (item.amount != null && item.amount !== '') fields.push(['Amount', money(item.amount)]);
     body.append(PendingApprovalPage.link(item.id, createApprovalCardDetails(fields)), createApprovalCardActions('payrollAction', { resubmit: item.category !== 'deduction' }));
     PendingApprovalBackup.showAssignment(body.lastElementChild, { scope: 'payroll', id: item.id });
@@ -200,7 +207,7 @@
   function renderDetails(item) {
     byId('payrollPendingDetailsTitle').textContent = tabNames[item.category] + ' Approval';
     releaseFiles();
-    byId('payrollPendingForm').replaceChildren(PayrollRequestFields.create(item.category, item, fileUrls));
+    byId('payrollPendingForm').replaceChildren(recordSubmitDate.create(item.submitDate || item.requestDate), PayrollRequestFields.create(item.category, item, fileUrls));
     byId('payrollPendingApproverComments').value = item.approverActionComments || '';
     const footer = document.querySelector('.payroll-approval-details-footer');
     const detailActions = detailActionButtons(item.category);
@@ -215,7 +222,8 @@
     employee.append(node('small', '', 'Employee'), node('h3', 'employee-name', item.employeeName), node('div', 'employee-id', '#' + item.empNo));
     byId('payrollPendingWorkflowRequest').replaceChildren(
       field('Document Reference', item.id), employee,
-      fieldGrid([['Document Status', recordDetailStatus.create(item.status)], [item.category === 'tax' ? 'Submit Date' : 'Request Date', submittedDate]])
+      recordSubmitDate.create(item.submitDate || item.requestDate),
+      fieldGrid([['Document Status', recordDetailStatus.create(item.status)], ...requestDateFields(item)])
     );
 
     const submitted = node('li', 'payroll-approval-workflow-step is-complete');

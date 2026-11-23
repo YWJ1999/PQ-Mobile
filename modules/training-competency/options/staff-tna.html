@@ -14,6 +14,8 @@
   <link rel="stylesheet" href="../../../css/detail-popout.css">
   <link rel="stylesheet" href="../css/training-competency.css">
   <link rel="stylesheet" href="../css/staff-tna.css">
+  <link rel="stylesheet" href="../../../css/history-record-page.css">
+  <script src="../../../js/history-record-page.js"></script>
   <script src="../../../js/components.js"></script>
   <script src="../../../js/app.js" defer></script>
   <script src="../js/staff-tna-data.js" defer></script>
@@ -70,19 +72,22 @@
         <footer class="standard-filter-footer"><button id="staffTnaApplyFilter" class="standard-filter-apply" type="submit">Apply Filter</button></footer>
       </form>
     </div>
-    <div id="staffTnaDetailOverlay" class="staff-tna-detail-overlay detail-popout-overlay" aria-hidden="true" hidden>
-      <section id="staffTnaDetailPanel" class="detail-popout-panel" role="dialog" aria-modal="true" aria-labelledby="staffTnaDetailTitle">
-        <header class="detail-popout-header">
-          <h2 id="staffTnaDetailTitle" class="detail-popout-title">Staff TNA Details</h2>
-          <button id="staffTnaDetailClose" class="detail-popout-close" type="button" aria-label="Close Staff TNA details"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
+    <main id="staffTnaDetailOverlay" class="approval-record-page" data-history-page aria-labelledby="staffTnaDetailTitle" hidden>
+      <section class="approval-record-layout" id="staffTnaDetailPanel">
+        <header class="approval-page-header">
+          <phone-status-bar time="9:41"></phone-status-bar>
+          <div class="approval-page-heading">
+            <button type="button" id="staffTnaDetailClose" data-history-back aria-label="Back to history"></button>
+            <h1 id="staffTnaDetailTitle" tabindex="-1">Staff TNA Details</h1>
+          </div>
         </header>
-        <div class="detail-popout-body staff-tna-detail-body">
+        <div class="history-record-content detail-popout-body staff-tna-detail-body">
+          <span id="staffTnaSubmitDate" class="record-submit-date" hidden></span>
           <section class="staff-tna-detail-section" aria-label="Application Details"><dl id="staffTnaApplicationDetails" class="staff-tna-detail-list"></dl></section>
           <section class="staff-tna-detail-section" aria-labelledby="staffTnaDetailsHeading"><h3 id="staffTnaDetailsHeading" class="staff-tna-detail-section-heading">Details</h3><div id="staffTnaDetailItems" class="staff-tna-detail-items"></div></section>
         </div>
-        <footer class="history-detail-actions"><button id="staffTnaDetailCancel" class="history-detail-action" type="button"><i class="fa-solid fa-ban" aria-hidden="true"></i> <span>Cancel</span></button></footer>
       </section>
-    </div>
+    </main>
   </div>
 </body>
 </html>

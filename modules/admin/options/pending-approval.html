@@ -41,6 +41,16 @@
         <span aria-hidden="true"></span>
       </div>
     </header>
+    <template id="recordColourKey">
+      <h3>Approval status</h3>
+      <ul class="record-key-list record-key-headers">
+        <li><span aria-hidden="true" style="background: var(--record-submitted-surface)"></span>Pending</li>
+        <li><span aria-hidden="true" style="background: var(--record-approved-surface)"></span>Approved</li>
+        <li><span aria-hidden="true" style="background: var(--record-draft-surface)"></span>Resubmit</li>
+        <li><span aria-hidden="true" style="background: var(--record-rejected-surface)"></span>Rejected</li>
+        <li><span aria-hidden="true" style="background: var(--record-cancelled-surface)"></span>Cancelled</li>
+      </ul>
+    </template>
     <main class="main-content payroll-pending-content">
       <div class="payroll-pending-tabs" role="tablist" aria-label="Workplace request type">
         <button class="filter-pill active" id="workplacePendingTab-guest-visit" type="button" data-workplace-tab="guest-visit" role="tab" aria-selected="true" aria-controls="workplacePendingQueue">Guest Visit</button>
@@ -83,6 +93,7 @@
           </div>
         </header>
         <div class="payroll-approval-details-body">
+          <span id="workplaceApprovalSubmitDate" class="record-submit-date" hidden></span>
           <div id="workplaceGuestVisit" class="guest-visit-page" hidden></div>
           <section id="approvalPanel-general" class="claim-detail-section" aria-label="General"></section>
           <div id="workplaceApprovalComments" class="claim-detail-approver-comments"></div>

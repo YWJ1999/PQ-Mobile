@@ -4443,9 +4443,7 @@ select option {
 
 /* Horizontal Jump Anchor Bar */
 .me-jump-bar-wrapper {
-  position: sticky;
-  top: 0;
-  z-index: 25;
+  position: relative;
   background: var(--bg-phone);
   padding: 8px 14px;
   backdrop-filter: blur(14px);
@@ -5409,6 +5407,7 @@ select option {
   display: flex;
   align-items: center;
   gap: 8px;
+  margin-bottom: 10px;
   padding: 10px 14px 4px;
   overflow-x: auto;
   scrollbar-width: none;
@@ -8151,9 +8150,7 @@ select option {
 }
 
 .change-scroller-wrapper {
-  position: sticky;
-  top: 0;
-  z-index: 10;
+  position: relative;
   background: var(--bg-phone);
   border-bottom: 1px solid var(--border-subtle);
   display: flex;

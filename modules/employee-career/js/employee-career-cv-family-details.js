@@ -88,5 +88,5 @@
     dialog.querySelector('button').focus({ preventScroll: true });
   }
 
-  window.EmployeeCareerCVFamilyDetails = { open };
+  window.EmployeeCareerCVFamilyDetails = { open, renderRows };
 })();

@@ -556,7 +556,7 @@
         </div>
 
       </div>
-      <button type="button" id="staffAttendanceUpdate" class="staff-update-button" onclick="updateStaffAttendanceVerification()" disabled hidden>Update</button>
+      <button type="button" id="staffAttendanceUpdate" class="staff-update-button" onclick="updateStaffAttendanceVerification()" disabled hidden>Verify selected (<span data-selected-count>0</span>)</button>
     </div>
 
     <div class="modal-overlay popout-mode" id="detailsModal" onclick="closeDetailsModal(event)">
@@ -699,6 +699,17 @@
   </div>
 
   <script>
+    const staffAttendanceTones = {
+      'No Exception': 'theme-green',
+      'Late In': 'theme-orange',
+      'Early Out': 'theme-blue',
+      'Absent': 'theme-red',
+      'Missing Clock': 'theme-slate',
+      'Unapproved OT': 'theme-purple'
+    };
+    setRecordLegend(document.getElementById('staffCardsContainer'), 'Staff attendance status', staffAttendanceTones);
+    const staffToneByException = new Map(Object.entries(staffAttendanceTones).map(([label, tone]) => [label.toLowerCase(), tone]));
+
     const masterStaffDataset = [
       {
         empNo: '#000008',
@@ -893,6 +904,7 @@
     function syncStaffAttendanceUpdate() {
       const updateButton = document.getElementById('staffAttendanceUpdate');
       const hasChanges = masterStaffDataset.some(item => item.verified !== staffSavedVerification.get(item.cleanEmpNo));
+      updateButton.querySelector('[data-selected-count]').textContent = masterStaffDataset.filter(item => item.verified).length;
       updateButton.disabled = !hasChanges;
       updateButton.hidden = !hasChanges;
       updateButton.closest('#view-list')?.classList.toggle('has-pending-update', hasChanges);
@@ -935,18 +947,30 @@
 
       container.replaceChildren();
       for (const item of filtered) {
-        const hasException = Boolean(item.exception && item.exception !== '-' && item.exception !== 'No Exception');
+        const exception = String(item.exception ?? '').trim();
+        const exceptionKey = exception.toLowerCase().replace(/[-_\s]+/g, ' ').trim()
+          .replace(/^missing clock (?:in|out)$/, 'missing clock') || 'no exception';
+        const hasException = exceptionKey !== 'no exception';
         const card = document.createElement('article');
-        card.className = `history-card-item staff-card-item${hasException ? ' exception-theme' : ''}`;
+        card.className = 'history-card-item staff-card-item';
+        card.classList.add(staffToneByException.get(exceptionKey) || 'theme-slate');
         card.dataset.empNo = item.cleanEmpNo;
-        card.innerHTML = '<div class="attendance-record-top history-card-header"><label class="staff-verify-control"><input type="checkbox" class="staff-verify-checkbox"><span class="staff-verify-box" aria-hidden="true"><i class="fa-solid fa-check"></i></span></label><button type="button" class="staff-card-details-trigger"><span class="staff-hdr-name"></span><span class="staff-hdr-empno"></span><span class="history-time-row"></span><span class="attendance-record-reference history-card-ref"></span></button><span class="attendance-exception-status card-status-badge"></span></div><div class="attendance-record-summary-panel history-card-details"></div><div class="staff-card-actions history-card-actions"><button type="button" class="btn-action-feedback">Feedback</button></div>';
+        card.innerHTML = '<div class="attendance-record-top history-card-header"><label class="staff-verify-control"><input type="checkbox" class="staff-verify-checkbox"><span class="staff-verify-box" aria-hidden="true"><i class="fa-solid fa-check"></i></span></label><button type="button" class="staff-card-details-trigger"><span class="staff-hdr-name"></span><span class="staff-hdr-empno"></span><span class="history-time-row"></span><span class="attendance-record-reference history-card-ref"></span></button><span class="attendance-exception-status card-status-badge"></span></div><button type="button" class="attendance-record-summary-panel history-card-details"></button><div class="staff-card-actions history-card-actions"><button type="button" class="btn-action-feedback">Feedback</button></div>';
         card.querySelector('.staff-hdr-name').textContent = item.name;
         card.querySelector('.staff-hdr-empno').textContent = `#${item.empNo.replace(/^#/, '')}`;
         card.querySelector('.history-time-row').textContent = `Shift: ${item.shift}`;
         card.querySelector('.attendance-record-reference').textContent = `Date: ${item.date}`;
         const details = card.querySelector('.staff-card-details-trigger');
+        const panel = card.querySelector('.attendance-record-summary-panel');
+        details.id = `attendance-header-${item.cleanEmpNo}`;
         details.setAttribute('aria-label', `Attendance details for ${item.name}, ${item.empNo}, ${item.date}, ${item.shift}`);
-        details.addEventListener('click', () => openDetailsModal(item.cleanEmpNo));
+        panel.id = `attendance-summary-${item.cleanEmpNo}`;
+        panel.setAttribute('aria-labelledby', details.id + ' ' + panel.id);
+        for (const trigger of [details, panel]) {
+          trigger.setAttribute('aria-haspopup', 'dialog');
+          trigger.setAttribute('aria-controls', 'detailsModal');
+          trigger.addEventListener('click', () => openDetailsModal(item.cleanEmpNo));
+        }
         const verify = card.querySelector('.staff-verify-checkbox');
         verify.checked = item.verified;
         verify.setAttribute('aria-label', `Verify attendance for ${item.name}, ${item.date}`);
@@ -954,14 +978,13 @@
         const status = card.querySelector('.attendance-exception-status');
         status.classList.toggle('is-exception', hasException);
         const statusIcon = document.createElement('i');
-        statusIcon.className = 'fa-solid ' + (!hasException ? 'fa-circle-check' : item.exception === 'Late In' ? 'fa-clock' : 'fa-triangle-exclamation');
+        statusIcon.className = 'fa-solid ' + (!hasException ? 'fa-circle-check' : exceptionKey === 'late in' ? 'fa-clock' : 'fa-triangle-exclamation');
         statusIcon.setAttribute('aria-hidden', 'true');
         const statusLabel = document.createElement('span');
-        statusLabel.textContent = hasException ? item.exception : 'No Exception';
+        statusLabel.textContent = hasException ? exception : 'No Exception';
         status.append(statusIcon, statusLabel);
-        const panel = card.querySelector('.attendance-record-summary-panel');
-        for (const [label, value] of [['Times', item.times], ['Normal Hours', item.normalHours], ['OT Hours', item.otHours]]) {
-          const row = document.createElement('div');
+        for (const [label, value] of [['Day Type', item.dayType], ['Clock Times', item.times], ['Normal Hours', item.normalHours], ['OT Hours', item.otHours]]) {
+          const row = document.createElement('span');
           row.className = 'attendance-record-detail';
           const key = document.createElement('span');
           key.textContent = label;

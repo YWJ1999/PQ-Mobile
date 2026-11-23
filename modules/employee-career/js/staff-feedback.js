@@ -64,7 +64,7 @@
     const number = String(row.empNo ?? '').trim().replace(/^#+/, '');
     return number ? '#' + number : '—';
   };
-  const statusLabel = status => status === 'Pending' ? 'Pending' : 'Responded';
+  const feedback = window.EmployeeCareerFeedbackStore;
   const recordKey = row => String(row.id || [row.empNo, row.date, row.title].join('|'));
   const savedReviews = stored(reviewStorageKey, []);
   const reviewEdits = Array.isArray(savedReviews) ? savedReviews : [];
@@ -74,13 +74,11 @@
     return { ...record, reward: edit.reward, rating: edit.rating, reviewerComment: edit.reviewerComment,
       reviewedBy: edit.reviewedBy ?? record.reviewedBy, reviewedDate: edit.reviewedDate ?? record.reviewedDate, status: edit.status };
   });
-  const historyStatus = status => statusLabel(status) === 'Pending' ? 'submitted' : 'draft';
-  const statusIcon = status => statusLabel(status) === 'Pending' ? 'fa-clock' : 'fa-reply';
-  const statusBadge = status => {
-    const badge = element('span', 'status-pill staff-feedback-status ' + historyStatus(status));
-    const icon = element('i', 'fa-solid ' + statusIcon(status));
+  const statusBadge = label => {
+    const badge = element('span', 'status-pill staff-feedback-status ' + feedback.statusTones[label]);
+    const icon = element('i', 'fa-solid ' + (label === 'Pending' ? 'fa-clock' : 'fa-reply'));
     icon.setAttribute('aria-hidden', 'true');
-    badge.append(icon, document.createTextNode(statusLabel(status) || '—'));
+    badge.append(icon, document.createTextNode(label));
     return badge;
   };
 
@@ -92,11 +90,12 @@
       (!applied.endDate || row.date <= applied.endDate) &&
       (!applied.type || row.type === applied.type) &&
       (!applied.category || row.category === applied.category) &&
-      (!applied.status || statusLabel(row.status) === applied.status)
+      (!applied.status || feedback.statusLabel(row) === applied.status)
     );
     const cards = visibleRows.map(row => {
       const card = element('article', 'history-card-item staff-feedback-card');
-      card.dataset.status = historyStatus(row.status);
+      const label = feedback.statusLabel(row);
+      card.dataset.status = feedback.statusTones[label];
       const key = recordKey(row);
       card.dataset.recordKey = key;
       const detailsTrigger = element('a', 'staff-feedback-details-trigger');
@@ -106,7 +105,7 @@
       const identity = element('div', 'history-card-heading');
       identity.append(element('h3', 'history-card-title history-time-row staff-feedback-name', row.name), element('span', 'staff-feedback-emp-no', employeeNumber(row)));
       const end = element('div', 'staff-feedback-card-end');
-      end.append(statusBadge(row.status));
+      end.append(statusBadge(label));
       header.append(identity, end);
       const body = element('dl', 'history-card-details staff-feedback-card-body');
       [['Title', row.title, ''], ['Feedback', row.feedbackNote ?? row.feedback, 'is-feedback'], ['Type', row.type, ''], ['Category', row.category, '']].forEach(([label, value, extra]) => {
@@ -124,7 +123,7 @@
         window.location.href = recordPageUrl('review', key);
       });
       actions.append(reviewButton);
-      detailsTrigger.append(header, body);
+      detailsTrigger.append(header, recordSubmitDate.create(row.submitDate), body);
       card.append(detailsTrigger, actions);
       detailsTrigger.addEventListener('click', () => rememberRecord(row, 'details'));
       detailsTrigger.addEventListener('keydown', event => {
@@ -140,7 +139,7 @@
     if (applied.startDate && applied.endDate) summary.push(`${formatDate(applied.startDate)} – ${formatDate(applied.endDate)}`);
     else if (applied.startDate) summary.push(`From ${formatDate(applied.startDate)}`);
     else if (applied.endDate) summary.push(`Until ${formatDate(applied.endDate)}`);
-    ['type', 'category', 'status'].forEach(key => { if (applied[key]) summary.push(key === 'status' ? statusLabel(applied[key]) : applied[key]); });
+    ['type', 'category', 'status'].forEach(key => { if (applied[key]) summary.push(applied[key]); });
     $('staffFeedbackFilterSummary').textContent = summary.join(' · ') || 'All Feedback';
   }
 
@@ -158,10 +157,10 @@
 
   function renderDetails(record) {
     const fields = [
-      ['Name', record.name], ['Status', statusLabel(record.status)], ['Emp #', employeeNumber(record)], ['Type', record.type], ['Category', record.category],
+      ['Name', record.name], ['Status', feedback.statusLabel(record)], ['Emp #', employeeNumber(record)], ['Type', record.type], ['Category', record.category],
       ['Title', record.title], ['Feedback Date 1', formatDate(record.feedbackDate1 ?? record.date)],
       ['Feedback Date 2', formatDate(record.feedbackDate2)], ['Feedback Note', record.feedbackNote ?? record.feedback],
-      ['Feedback Remarks', record.feedbackRemarks], ['Submit Date', formatDate(record.submitDate)],
+      ['Feedback Remarks', record.feedbackRemarks],
       ['Reviewer Comment', record.reviewerComment], ['Reviewed By', record.reviewedBy],
       ['Reviewed Date', formatDate(record.reviewedDate)], ['Rating', record.rating], ['Reward', record.reward]
     ];
@@ -178,6 +177,7 @@
     attachmentCell.append(attachmentList(record.attachments));
     attachmentRow.append(element('td', 'detail-popout-label', 'Attachment'), attachmentCell);
     rows.push(attachmentRow);
+    recordSubmitDate.set($('staffFeedbackDetailsSubmitDate'), record.submitDate);
     $('staffFeedbackDetailsRows').replaceChildren(...rows);
   }
 
@@ -246,6 +246,7 @@
     $('staffFeedbackReviewName').textContent = name || 'Employee';
     $('staffFeedbackReviewEmployeeId').textContent = employeeNumber(record);
     $('staffFeedbackReviewInitials').textContent = ((parts[0][0] || '') + (parts.length > 1 ? parts.at(-1)[0] : '')).toUpperCase() || '—';
+    recordSubmitDate.set($('staffFeedbackReviewSubmitDate'), record.submitDate);
     $('staffFeedbackReviewAttachments').replaceChildren(attachmentList(record.attachments));
     const values = {
       staffFeedbackReviewType: record.type,
@@ -257,13 +258,12 @@
       staffFeedbackReviewReference2: record.reference2,
       staffFeedbackReviewNote: record.feedbackNote ?? record.note ?? record.feedback,
       staffFeedbackReviewRemarks: record.feedbackRemarks ?? record.remarks,
-      staffFeedbackReviewSubmitDate: formatDate(record.submitDate),
       staffFeedbackReviewReviewerComment: record.reviewerComment,
       staffFeedbackReviewReviewedBy: record.reviewedBy,
       staffFeedbackReviewReviewedDate: formatDate(record.reviewedDate),
       staffFeedbackSavedRating: record.rating,
       staffFeedbackSavedReward: record.reward,
-      staffFeedbackReviewStatus: record.status ? statusLabel(record.status) : null
+      staffFeedbackReviewStatus: feedback.statusLabel(record)
     };
     Object.entries(values).forEach(([id, value]) => { $(id).value = value == null || value === '' ? '—' : value; });
     $('staffFeedbackReward').value = record.reward || '';
@@ -339,8 +339,7 @@
     }[metric];
     const counts = new Map();
     visibleRows.forEach(row => {
-      const value = row[metric] || 'Unspecified';
-      const label = metric === 'status' ? statusLabel(value) : value;
+      const label = metric === 'status' ? feedback.statusLabel(row) : (row[metric] || 'Unspecified');
       counts.set(label, (counts.get(label) || 0) + 1);
     });
     const palette = ['#a78bfa', '#f59e0b', '#34d399', '#60a5fa', '#f472b6'];
@@ -439,6 +438,7 @@
 
   function init() {
     if (document.querySelector('[data-feedback-list-link]')) { initRecordPage(); return; }
+    setRecordLegend($('staffFeedbackListView'), 'Feedback status', feedback.statusTones);
     $('staffFeedbackFilterTrigger').addEventListener('click', () => { fillFilter(applied); openOverlay('staffFeedbackFilterOverlay', 'staffFeedbackKeyword'); });
     $('staffFeedbackCloseFilter').addEventListener('click', closeOverlay);
     $('staffFeedbackResetFilter').addEventListener('click', () => { fillFilter(defaults); applyFilter(); });

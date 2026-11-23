@@ -1,11 +1,9 @@
 (() => {
   const params = new URLSearchParams(window.location.search);
   const employeeId = params.get('employee');
-  const theme = params.get('theme') === 'light' ? 'light' : 'dark';
+  const theme = document.documentElement.dataset.theme === 'light' ? 'light' : 'dark';
   const records = window.createDailyOtRecords();
   const employee = records.find(record => record.id === employeeId) || records[0];
-
-  document.documentElement.dataset.theme = theme;
 
   const listUrl = `daily-ot.html?theme=${encodeURIComponent(theme)}`;
   const backLink = document.getElementById('dailyOtBack');
@@ -56,7 +54,9 @@
 
   const actions = document.getElementById('dailyOtActions');
   function syncUpdateVisibility() {
-    actions.hidden = !document.querySelector('.daily-ot-void-checkbox:checked');
+    const count = recordsContainer.querySelectorAll('.daily-ot-void-checkbox:checked').length;
+    document.getElementById('dailyOtUpdate').textContent = formatSelectedAction('Void', count);
+    actions.hidden = count === 0;
   }
 
   document.querySelectorAll('.daily-ot-void-checkbox').forEach(checkbox => {

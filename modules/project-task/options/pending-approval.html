@@ -46,7 +46,7 @@
           <span>Select All</span>
         </label>
       </div>
-      <section class="project-approval-list" id="projectTimesheetApprovalList" aria-label="Timesheet pending approvals">
+      <section class="project-approval-list" id="projectTimesheetApprovalList" data-record-colour-view="Timesheet approval status" data-record-legend='{"Pending":"submitted","Approved":"approved","Pending Resubmit":"resubmit","Rejected":"rejected","Cancelled":"cancelled"}' aria-label="Timesheet pending approvals">
       </section>
       <template id="projectApprovalCardTemplate">
         <article class="project-approval-card" data-type="timesheet">
@@ -106,6 +106,7 @@
           </div>
         </header>
         <div class="project-approval-details-body">
+          <span id="projectApprovalSubmitDate" class="record-submit-date" hidden></span>
           <div id="projectApprovalRequest" class="project-form-page"></div>
           <section class="project-approval-comments-card" aria-labelledby="projectApprovalCommentsTitle">
             <label id="projectApprovalCommentsTitle" for="projectApprovalApproverComments">Approver Action Comments</label>
@@ -132,6 +133,7 @@
           </div>
         </header>
         <div class="project-approval-workflow-body">
+          <span id="projectWorkflowSubmitDate" class="record-submit-date" hidden></span>
           <div class="project-approval-workflow-person">
             <p id="projectApprovalWorkflowReference"></p>
             <small>Requested by</small>

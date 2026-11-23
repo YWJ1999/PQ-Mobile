@@ -5,6 +5,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>PeopleHCM - Overtime</title>
+  <link rel="stylesheet" href="../../../css/history-record-page.css">
+  <script src="../../../js/history-record-page.js"></script>
   <script src="../../../js/components.js"></script>
   <script src="../../../js/app.js" defer></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -157,10 +159,18 @@
       </div>
     </div>
 
+    <template id="recordColourKey">
+      <h3>Overtime status</h3>
+      <ul class="record-key-list record-key-headers">
+        <li><span aria-hidden="true" style="background: var(--record-rejected-surface)"></span>Unapproved OT</li>
+        <li><span aria-hidden="true" style="background: var(--record-approved-surface)"></span>Approved</li>
+      </ul>
+    </template>
+
     <div class="main-content" style="padding-top: 20px;">
       
       <!-- ================= DASHBOARD VIEW ================= -->
-      <div id="view-dashboard" style="display: block;">
+      <div id="view-dashboard" data-record-colour-view style="display: block;">
         
         <div class="hero-info-banner">
           <div class="ot-meta-stack" id="overtimeMeta">
@@ -196,7 +206,7 @@
           </div>
         </section>
 
-        <article class="history-card-item history-item-card ot-record-card" data-status="unapproved-ot" role="button" tabindex="0" aria-label="View overtime details for Mon, 14 Sep 2026" onclick="openDetails()" onkeydown="if(event.key === 'Enter' || event.key === ' '){event.preventDefault(); openDetails();}">
+        <a data-history-link href="#history/overtime/2026-09-14" class="history-card-item history-item-card ot-record-card" data-status="unapproved-ot" aria-label="View overtime details for Mon, 14 Sep 2026">
           <div class="ot-record-top history-card-header">
             <div class="ot-record-heading history-card-heading"><h2 class="history-time-row">08:09 &rarr; 19:40</h2><div class="ot-record-date history-card-ref">Date: Mon, 14 Sep 2026</div></div>
             <div class="ot-record-controls"><span class="card-status-badge ot-record-status"><i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i>Unapproved OT</span></div>
@@ -208,9 +218,9 @@
             <div class="ot-record-detail"><span>Actual Hours</span><strong>2.00</strong></div>
             <div class="ot-record-detail"><span>Approved Hours</span><strong>0.00</strong></div>
           </div>
-        </article>
+        </a>
 
-        <article class="history-card-item history-item-card ot-record-card" data-status="approved" role="button" tabindex="0" aria-label="View overtime details for Fri, 11 Sep 2026" onclick="openDetails()" onkeydown="if(event.key === 'Enter' || event.key === ' '){event.preventDefault(); openDetails();}">
+        <a data-history-link href="#history/overtime/2026-09-11" class="history-card-item history-item-card ot-record-card" data-status="approved" aria-label="View overtime details for Fri, 11 Sep 2026">
           <div class="ot-record-top history-card-header">
             <div class="ot-record-heading history-card-heading"><h2 class="history-time-row">08:15 &rarr; 19:30</h2><div class="ot-record-date history-card-ref">Date: Fri, 11 Sep 2026</div></div>
             <div class="ot-record-controls"><span class="card-status-badge ot-record-status"><i class="fa-solid fa-check" aria-hidden="true"></i>Approved</span></div>
@@ -222,7 +232,7 @@
             <div class="ot-record-detail"><span>Actual Hours</span><strong>2.00</strong></div>
             <div class="ot-record-detail"><span>Approved Hours</span><strong>2.00</strong></div>
           </div>
-        </article>
+        </a>
 
         <!-- End of Cards -->
 
@@ -292,25 +302,16 @@
     <phone-bottom-nav active="apps"></phone-bottom-nav>
 
     <!-- Overtime Details Pop Out Modal -->
-    <div id="modal-ot-details" onclick="closeDetails(event)"
-      style="position: absolute; inset: 0; background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(6px); z-index: 9999; display: none; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.3s ease; border-radius: 44px; overflow: hidden;">
-
-      <div class="popup-modal-content" onclick="event.stopPropagation()"
-        style="width: 90%; max-width: 390px; background: var(--bg-card); border-radius: 24px; box-shadow: 0 20px 50px rgba(0,0,0,0.6); border: 1px solid var(--border-subtle); transform: scale(0.95); opacity: 0; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); max-height: 85%; overflow: hidden; display: flex; flex-direction: column;">
-        
-        <!-- Purple Gradient Modal Header -->
-        <div class="modal-header-purple">
-          <div>
-            <h3 style="font-size: 17px; font-weight: 800; color: #ffffff; margin: 0;">Final OT Approval</h3>
-            <div style="font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.8); margin-top: 2px;">Ref: AXTGEN000109598</div>
+    <main id="modal-ot-details" class="approval-record-page" data-history-page aria-labelledby="modal-ot-detailsTitle" hidden>
+      <section class="approval-record-layout">
+        <header class="approval-page-header">
+          <phone-status-bar time="9:41"></phone-status-bar>
+          <div class="approval-page-heading">
+            <button type="button" data-history-back aria-label="Back to history"></button>
+            <h1 id="modal-ot-detailsTitle" tabindex="-1">Final OT Approval</h1>
           </div>
-          <button class="modal-close-round" onclick="closeDetails(true)" aria-label="Close">
-            <i class="fa-solid fa-xmark" style="font-size: 16px;"></i>
-          </button>
-        </div>
-        
-        <!-- Non-transparent Solid Scrollable Content -->
-        <div class="sheet-content" style="padding: 16px 20px 24px; overflow-y: auto; background: var(--bg-card); flex: 1;">
+        </header>
+        <div class="history-record-content sheet-content" style="padding: 16px 20px 24px; overflow-y: auto; background: var(--bg-card); flex: 1;"><div id="overtimeRequestDetails"><span class="record-submit-date">Submit Date: 14/09/2026</span>
            <div style="display: flex; flex-direction: column;">
               <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--border-subtle);">
                  <span style="font-size: 13px; font-weight: 600; color: var(--text-secondary);">Reference #</span>
@@ -334,10 +335,6 @@
               </div>
               <div style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border-subtle);">
                  <span style="font-size: 13px; font-weight: 600; color: var(--text-secondary);">Date</span>
-                 <span style="font-size: 13.5px; font-weight: 700; color: var(--text-primary);">14 Sep 2026</span>
-              </div>
-              <div style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border-subtle);">
-                 <span style="font-size: 13px; font-weight: 600; color: var(--text-secondary);">Submitted On</span>
                  <span style="font-size: 13.5px; font-weight: 700; color: var(--text-primary);">14 Sep 2026</span>
               </div>
               <div style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border-subtle);">
@@ -393,9 +390,11 @@
                  <span style="font-size: 13px; font-weight: 500; color: var(--text-muted);">No Data</span>
               </div>
            </div>
+          </div>
+          <table id="overtimeApprovedDetails" class="record-detail-table" hidden></table>
         </div>
-      </div>
-    </div>
+      </section>
+    </main>
   </div>
 
   <script>
@@ -446,32 +445,30 @@
       updateOvertimeSummary();
     }
 
-    function openDetails() {
-      const overlay = document.getElementById("modal-ot-details");
-      const popup = overlay.querySelector(".popup-modal-content");
-      overlay.style.display = "flex";
-      setTimeout(() => {
-        overlay.style.opacity = "1";
-        if (popup) {
-          popup.style.transform = "scale(1)";
-          popup.style.opacity = "1";
+    HistoryRecordPage.register((kind, id) => {
+      const page = document.getElementById('modal-ot-details');
+      const card = [...document.querySelectorAll('.ot-record-card')].find(node => node.hash === HistoryRecordPage.href(kind, id));
+      if (!card) return;
+      const approved = card.dataset.status === 'approved';
+      document.getElementById('overtimeRequestDetails').hidden = approved;
+      const table = document.getElementById('overtimeApprovedDetails');
+      table.hidden = !approved;
+      if (approved) {
+        table.replaceChildren();
+        const fields = [
+          ['Date', card.querySelector('.ot-record-date').textContent.replace(/^Date:\s*/, '')],
+          ['Status', card.querySelector('.ot-record-status').textContent],
+          ['Clock Times', card.querySelector('.history-time-row').textContent],
+          ...[...card.querySelectorAll('.ot-record-detail')].map(row => [row.firstElementChild.textContent, row.lastElementChild.textContent])
+        ];
+        for (const [label, value] of fields) {
+          const row = table.insertRow();
+          row.insertCell().textContent = label;
+          row.insertCell().textContent = value;
         }
-      }, 10);
-    }
-
-    function closeDetails(e) {
-      if (e === true || (e && (e.target.id === "modal-ot-details" || e.target.classList.contains("modal-close-round")))) {
-        if (e && e.stopPropagation) e.stopPropagation();
-        const overlay = document.getElementById("modal-ot-details");
-        const popup = overlay.querySelector(".popup-modal-content");
-        overlay.style.opacity = "0";
-        if (popup) {
-          popup.style.transform = "scale(0.95)";
-          popup.style.opacity = "0";
-        }
-        setTimeout(() => { overlay.style.display = "none"; }, 300);
       }
-    }
+      return page;
+    });
 
     function triggerOtFileUpload(type) {
       const fileInput = document.getElementById(type === 'camera' ? 'hiddenOtCameraInput' : 'hiddenOtFileInput');

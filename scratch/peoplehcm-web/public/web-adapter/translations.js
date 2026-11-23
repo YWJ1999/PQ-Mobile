@@ -84,7 +84,10 @@
     'Clocking Summary': '打卡汇总',
     'Clocking Details': '打卡详情',
     'Clocking Time': '打卡时间',
+    'Clock Times': '打卡时间',
     'Attendance Advice': '考勤建议',
+    'Amended Shift Reason': '班次调整原因',
+    'Time Amend Reason': '打卡时间调整原因',
     'Attendance Feedback': '考勤反馈',
     'Attendance Advice Approval': '考勤建议审批',
     'Attendance Feedback History': '考勤反馈记录',
@@ -146,6 +149,8 @@
     'Work Shift': '工作班次',
     'Day Shift': '日班',
     'Night Shift': '夜班',
+    'Day Type': '日期类型',
+    'Work Day': '工作日',
     'Rest Day': '休息日',
     'Off Day': '非工作日',
     'Rest / Off Day': '休息／非工作日',
@@ -596,6 +601,20 @@
     Approve: '批准',
     Reject: '驳回',
     'Approve All': '全部批准',
+    'Verify selected': '核实所选记录',
+    'Approve selected': '批准所选申请',
+    'Reject selected': '拒绝所选申请',
+    'Resubmit selected': '退回所选申请重提',
+    'Cancel selected': '取消所选申请',
+    'Review selected': '查看所选更改',
+    'Apply selected': '应用所选更改',
+    'Copy selected': '复制所选排班',
+    'Submit selected': '提交所选计划',
+    'Void selected': '作废所选记录',
+    'Assign selected': '分配给所选员工',
+    'Save pay data': '保存薪资资料',
+    'Save OT hours': '保存加班时数',
+    'Use Next and Back to move through General, YTD Earning Detail and Tax Reliefs. Save Draft keeps your progress. Choose Save pay data on the final step to save your changes. Records and drafts are stored on this device.': '使用“下一步”和“上一步”切换基本资料、年初至今收入明细和税务减免。选择“保存草稿”可保留进度。在最后一步选择“保存薪资资料”即可保存更改。记录和草稿均存储在此设备上。',
     'Reject All': '全部驳回',
     'Approve Selected': '批准所选',
     'Reject Selected': '驳回所选',
@@ -676,6 +695,7 @@
     'Request No': '申请编号',
     'Request Date': '申请日期',
     'Submitted By': '提交人',
+    'Submit Date': '提交日期',
     'Submitted On': '提交日期',
     'Approved By': '审批人',
     'Approved On': '审批日期',
@@ -718,6 +738,7 @@
     Sat: '周六',
     Sun: '周日',
     'Back to Workplace': '返回工作场所',
+    'Back to history': '返回历史记录',
     'Back to Project and Task': '返回项目与任务',
     'Schedule start date': '计划开始日期',
     'Schedule end date': '计划结束日期',
@@ -808,6 +829,13 @@
     'Action Items & Reminders': '待办事项与提醒',
   });
   const folded = new Map(Object.entries(zh).map(([key, value]) => [key.toLowerCase(), value]));
+  const attendanceFieldLabels = new Map([
+    ['Times', 'Clock Times'],
+    ['Shift Reason', 'Amended Shift Reason'],
+    ['Shift Change Reason', 'Amended Shift Reason'],
+    ['Edit Reason', 'Time Amend Reason'],
+    ['Edit Time Reason', 'Time Amend Reason'],
+  ]);
   const textState = new WeakMap();
   const attributeState = new WeakMap();
   let locale = 'en';
@@ -866,7 +894,15 @@
       return;
     const current = node.nodeValue;
     let state = textState.get(node);
-    if (!state || current !== state.last) state = { source: current, last: current };
+    if (!state || current !== state.last) {
+      let source = current;
+      if (parent.matches('label, td.detail-label, td.detail-popout-label, .attendance-record-detail > span, .attendance-history-detail > span')) {
+        const label = current.trim().replace(/[:：]$/, '');
+        const updated = attendanceFieldLabels.get(label);
+        if (updated) source = current.replace(label, updated);
+      }
+      state = { source, last: current };
+    }
     const translated = lookup(state.source);
     if (translated !== current) node.nodeValue = translated;
     state.last = translated;

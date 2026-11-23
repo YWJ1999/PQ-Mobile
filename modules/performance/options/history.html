@@ -15,6 +15,8 @@
   <link rel="stylesheet" href="../../../css/detail-popout.css">
   <link rel="stylesheet" href="../css/performance.css">
   <link rel="stylesheet" href="../css/performance-history.css">
+  <link rel="stylesheet" href="../../../css/history-record-page.css">
+  <script src="../../../js/history-record-page.js"></script>
   <script src="../../../js/components.js"></script>
   <script src="../../../js/app.js" defer></script>
   <script src="../js/work-incident-data.js" defer></script>
@@ -38,12 +40,18 @@
       <p id="incidentHistoryStatus" class="incident-history-status" role="status" aria-live="polite"></p>
     </main>
     <phone-bottom-nav active="apps"></phone-bottom-nav>
-    <div id="incidentHistoryDetailsModal" class="claim-filter-sheet detail-popout-overlay" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="incidentHistoryDetailsTitle">
-      <section class="detail-popout-panel">
-        <header class="detail-popout-header"><h2 id="incidentHistoryDetailsTitle" class="detail-popout-title">Staff Incident Details</h2><button id="incidentHistoryDetailsClose" class="detail-popout-close" type="button" data-close-modal aria-label="Close Staff Incident details"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button></header>
-        <div class="detail-popout-body" tabindex="0" role="region" aria-label="Staff Incident information"><table class="detail-popout-table" aria-label="Staff Incident details"><tbody id="incidentHistoryDetailsRows"></tbody></table></div>
+    <main id="incidentHistoryDetailsModal" class="approval-record-page" data-history-page aria-labelledby="incidentHistoryDetailsTitle" hidden>
+      <section class="approval-record-layout">
+        <header class="approval-page-header">
+          <phone-status-bar time="9:41"></phone-status-bar>
+          <div class="approval-page-heading">
+            <button type="button" id="incidentHistoryDetailsClose" data-history-back aria-label="Back to history"></button>
+            <h1 id="incidentHistoryDetailsTitle" tabindex="-1">Staff Incident Details</h1>
+          </div>
+        </header>
+        <div class="history-record-content detail-popout-body" tabindex="0" role="region" aria-label="Staff Incident information"><table class="detail-popout-table" aria-label="Staff Incident details"><tbody id="incidentHistoryDetailsRows"></tbody></table></div>
       </section>
-    </div>
+    </main>
     <div id="incidentHistoryFilterModal" class="claim-filter-sheet" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="incidentHistoryFilterTitle">
       <form id="incidentHistoryFilterForm" class="claim-filter-panel" novalidate>
         <div class="claim-filter-handle" aria-hidden="true"></div>

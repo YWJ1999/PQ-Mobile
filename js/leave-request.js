@@ -128,7 +128,7 @@ const LeaveRequest = (() => {
     id.nextElementSibling.textContent = request.department;
     const link = card.querySelector('.approval-record-link');
     link.href = PendingApprovalPage.href('details', ref);
-    link.replaceChildren(createApprovalCardDetails([['Type', request.type], ['Reason', request.reason],
+    link.replaceChildren(createApprovalCardDetails([['Submit Date', request.submitDate], ['Type', request.type], ['Reason', request.reason],
       ['Date Start', request.fromDate], ['Date End', request.toDate], ['Duration', request.duration], ['Remark', request.remark]]));
     card.querySelector('.action-btn-approve').onclick = () => singleApproveCard(card.id, request.applicant);
     card.querySelector('.action-btn-reject').onclick = () => singleRejectCard(card.id);

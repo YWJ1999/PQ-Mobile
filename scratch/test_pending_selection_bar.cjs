@@ -51,7 +51,8 @@ async function checkScreen(page, [file, tabs, queue, selectAll], theme, filterBo
           return [...card.querySelectorAll('button')].some(button =>
             visible(button) && !button.disabled && button.textContent.trim() === 'Resubmit');
         });
-        const expected = hasResubmit ? ['Resubmit', 'Reject', 'Approve'] : ['Reject', 'Approve'];
+        const expected = (hasResubmit ? ['Resubmit', 'Reject', 'Approve'] : ['Reject', 'Approve'])
+          .map(action => `${action} selected (${selected.length})`);
         const buttons = [...bar.querySelectorAll('button')];
         const labels = buttons.map(button => button.textContent.trim());
         if (JSON.stringify(labels) !== JSON.stringify(expected)) {
@@ -90,8 +91,9 @@ async function checkScreen(page, [file, tabs, queue, selectAll], theme, filterBo
       const badge = bar.querySelector('strong span').getBoundingClientRect();
       const actions = buttons.map(button => button.getBoundingClientRect());
       const first = actions[0];
-      const fullWidth = Math.abs(badge.left - left) <= 1 && badge.bottom <= first.top
-        && Math.abs(first.left - left) <= 1 && Math.abs(actions.at(-1).right - right) <= 1
+      const expectedFirstLeft = actions.length === 2 ? Math.max(left, right - 2 * 132 - 8) : left;
+      const aligned = Math.abs(badge.left - left) <= 1 && badge.bottom <= first.top
+        && Math.abs(first.left - expectedFirstLeft) <= 1 && Math.abs(actions.at(-1).right - right) <= 1
         && actions.every((rect, index) => Math.abs(rect.width - first.width) <= 1 && Math.abs(rect.top - first.top) <= 1
           && (index === 0 || rect.left >= actions[index - 1].right));
       const labelsFit = buttons.every(button => button.scrollWidth <= button.clientWidth + 1);
@@ -121,13 +123,13 @@ async function checkScreen(page, [file, tabs, queue, selectAll], theme, filterBo
       }
       scrollArea.scrollTo({ top: originalScroll, behavior: 'instant' });
       if (!all.checked) all.click();
-      checkBulkActions();
+      const allLabelsFit = checkBulkActions().every(button => button.scrollWidth <= button.clientWidth + 1);
       const multiple = count() === boxes.length;
       all.click();
       const stillChecked = [...document.querySelectorAll(queue + ' .approval-card-checkbox:checked')].some(visible);
       const cleared = !visible(bar) && !stillChecked && Math.abs(scrollArea.getBoundingClientRect().bottom - listBottom) <= 1
         && getComputedStyle(nav).borderTop === standaloneNavBorder;
-      results.push({ tab: tab?.textContent || 'Timesheet', fullWidth, labelsFit, single, multiple, cleared });
+      results.push({ tab: tab?.textContent || 'Timesheet', aligned, labelsFit, allLabelsFit, single, multiple, cleared });
     }
     if (categories.length > 1) {
       categories[0].click();
@@ -138,7 +140,7 @@ async function checkScreen(page, [file, tabs, queue, selectAll], theme, filterBo
     }
     return results;
   }, { tabs, queue, selectAll, filterBorder });
-  for (const row of results) assert.ok(row.fullWidth && row.labelsFit && row.single && row.multiple && row.cleared, file + ' ' + JSON.stringify(row));
+  for (const row of results) assert.ok(row.aligned && row.labelsFit && row.allLabelsFit && row.single && row.multiple && row.cleared, file + ' ' + JSON.stringify(row));
 }
 
 async function checkDecisions(page, file, queue) {
@@ -151,8 +153,12 @@ async function checkDecisions(page, file, queue) {
     const untouched = await cards[1].evaluate(card => card.textContent);
     await cards[0].$eval('input', box => box.click());
     await cards[last].$eval('input', box => box.click());
-    await page.click('.pending-selection-bar [data-decision="' + action + '"]');
-    assert.equal((await page.$$(cardSelector)).length, cards.length - 2);
+    const decisionButton = '.pending-selection-bar [data-decision="' + action + '"]';
+    const verb = action[0].toUpperCase() + action.slice(1);
+    assert.equal(await page.$eval(decisionButton, button => button.textContent), `${verb} selected (2)`, file);
+    await page.click(decisionButton);
+    await page.waitForFunction((selector, expected) => document.querySelectorAll(selector).length === expected, { timeout: 3000 }, cardSelector, cards.length - 2)
+      .catch(() => assert.fail(`${file} did not ${action} the two selected requests`));
     assert.equal(await page.$eval(cardSelector, card => card.textContent), untouched);
     assert.equal(await page.$eval('.pending-selection-bar', bar => bar.hidden), true);
     if (action === 'resubmit') {
@@ -195,6 +201,13 @@ async function checkDecisions(page, file, queue) {
       assert.ok(await page.$eval('#teamApprovalsFloatingBar', bar => bar.hidden), 'Leave dashboard should hide selection actions');
     }
     for (const index of [0, 1, 2, 3]) await checkDecisions(page, screens[index][0], screens[index][2]);
+    await open(page, 'modules/claims/options/team.html', 'light');
+    const claimCount = await page.$$eval('#teamApprovalsQueue .approval-request-card', cards => cards.length);
+    assert.ok(claimCount > 0);
+    assert.equal(await page.$eval('#approveAllTeamClaims', button => button.textContent), `Approve all (${claimCount})`);
+    await page.click('#approveAllTeamClaims');
+    assert.equal(await page.$$eval('#teamApprovalsQueue .approval-request-card', cards => cards.length), 0);
+    assert.deepEqual(await page.$eval('#approveAllTeamClaims', button => [button.textContent, button.disabled]), ['Approve all (0)', true]);
     assert.deepEqual(errors, []);
     console.log('PASS: docked selection bars, reachable tabs and requests, counts and decisions across all approval modules at four widths in both themes.');
   } finally {

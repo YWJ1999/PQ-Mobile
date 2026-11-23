@@ -33,8 +33,15 @@
         <span aria-hidden="true"></span>
       </div>
     </header>
+    <template id="recordColourKey">
+      <h3>Booking status</h3>
+      <ul class="record-key-list record-key-headers">
+        <li><span aria-hidden="true" style="background: var(--record-approved-surface)"></span>Confirmed</li>
+        <li><span aria-hidden="true" style="background: var(--record-draft-surface)"></span>Plan</li>
+      </ul>
+    </template>
     <main class="main-content admin-content">
-      <section id="bookingListView" aria-labelledby="bookingListTitle">
+      <section id="bookingListView" data-record-colour-view aria-labelledby="bookingListTitle">
       <div class="booking-list-heading">
         <h2 id="bookingListTitle">Current Records</h2>
         <button id="bookingAdd" type="button" class="claim-button claim-button-primary booking-add" aria-label="Add resource booking" aria-expanded="false" aria-controls="bookingEditor"><span class="booking-add-glyph" aria-hidden="true">+</span></button>

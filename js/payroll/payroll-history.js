@@ -74,7 +74,7 @@
     const list = records[recordKind] || [];
     const index = list.findIndex(record => record.id === recordId);
     if (index < 0) {
-      if (source === 'detail' && currentModal?.id === 'historyDetailsModal') closeModal();
+      if (source === 'detail' && HistoryRecordPage.active) HistoryRecordPage.back();
       render();
       window.showToast?.('Request is no longer available');
       return;
@@ -86,7 +86,7 @@
       if (record.localDraft || action === 'submit') {
         if (record.localDraft) await PayrollRequests.updateDraft(record, window.PAYROLL_CONFIG.employee, action);
         else await PayrollRequests.submitHistoryRecord(record, recordKind);
-        if (openSameRecord) closeModal();
+        if (openSameRecord) HistoryRecordPage.back();
         await refreshSavedDrafts();
         window.showToast?.(action === 'submit' ? 'Request submitted' : 'Draft discarded');
         return;
@@ -95,13 +95,13 @@
         await PayrollPendingStore.act([recordId], 'cancel');
       }
     } catch {
-      if (openSameRecord) closeModal();
+      if (openSameRecord) HistoryRecordPage.back();
       await refreshSavedDrafts();
       window.showToast?.('Unable to update this request. Check its status and try again.');
       return;
     }
     if (action === 'discard') {
-      if (openSameRecord && currentModal?.id === 'historyDetailsModal') closeModal();
+      if (openSameRecord && HistoryRecordPage.active) HistoryRecordPage.back();
       list.splice(index, 1);
       render();
       window.showToast?.('Draft discarded');
@@ -131,11 +131,9 @@
 
   function closeModal() {
     if (!currentModal) return;
-    const closingDetails = currentModal.id === 'historyDetailsModal';
     currentModal.classList.remove('is-open');
     currentModal.setAttribute('aria-hidden', 'true');
     currentModal = null;
-    if (closingDetails) activeDetail = null;
     document.querySelectorAll('.payroll-history-phone > [inert]').forEach(node => { node.inert = false; });
     opener?.focus();
     releaseAttachmentUrls();
@@ -143,6 +141,8 @@
 
   function render() {
     const category = categories[kind], active = filters[kind];
+    setRecordLegend($('payrollHistoryList').closest('main'), category.name + ' status',
+      Object.fromEntries(Object.entries(statuses).map(([tone, label]) => [label, tone])));
     document.querySelectorAll('[data-history-kind]').forEach(button => {
       const selected = button.dataset.historyKind === kind;
       button.classList.toggle('active', selected);
@@ -183,18 +183,11 @@
       card.dataset.kind = kind;
       const fields = kind === 'tax'
         ? [['Transaction Date', date(record.transactionDate)], ['Amount', money(record.amount)], ['Process (Period/Cycle)', [record.period, record.cycle].filter(Boolean).join(' / ') || '—']]
-        : [['Period', deductionPeriod(record)], ['Submit Date', date(record.submitDate || record.savedDate)], ['Cycle', deductionCycle(record)], ['Amount', money(record.amount)]];
+        : [['Period', deductionPeriod(record)], ['Cycle', deductionCycle(record)], ['Amount', money(record.amount)]];
       const referenceLine = kind === 'tax'
         ? `<div class="history-card-ref">${record.localDraft ? 'Saved draft' : `Ref: ${escape(reference(record))}`}</div>`
         : '';
-      card.innerHTML = `<div class="history-card-main" role="button" tabindex="0" aria-haspopup="dialog" aria-label="View ${escape(typeLabel(record))} details"><div class="history-card-header"><div class="history-card-heading"><div class="history-card-title-row"><h3 class="history-card-title">${escape(typeLabel(record))}</h3></div>${referenceLine}</div><span class="status-pill ${escape(record.status)}"><i class="fa-solid ${statusIcons[record.status] || 'fa-circle'}" aria-hidden="true"></i>${escape(statuses[record.status] || record.status)}</span></div><div class="history-card-details">${fields.map(([label, value]) => `<div class="history-card-row"><span>${escape(label)}</span><strong class="${label === 'Amount' ? 'history-card-amount' : ''}">${escape(value || '—')}</strong></div>`).join('')}</div>${record.localDraft ? `<p class="history-draft-note">Saved on this device · ${escape(date(record.savedDate))}</p>` : ''}</div>${renderCardActions(record)}`;
-      const main = card.querySelector('.history-card-main');
-      main.addEventListener('click', () => openDetails(record));
-      main.addEventListener('keydown', event => {
-        if (event.key !== 'Enter' && event.key !== ' ') return;
-        event.preventDefault();
-        openDetails(record);
-      });
+      card.innerHTML = `<a class="history-card-main" data-history-link href="${escape(HistoryRecordPage.href(kind, record.id))}" aria-label="View ${escape(typeLabel(record))} details"><div class="history-card-header"><div class="history-card-heading"><div class="history-card-title-row"><h3 class="history-card-title">${escape(typeLabel(record))}</h3></div>${referenceLine}</div><span class="status-pill ${escape(record.status)}"><i class="fa-solid ${statusIcons[record.status] || 'fa-circle'}" aria-hidden="true"></i>${escape(statuses[record.status] || record.status)}</span></div>${recordSubmitDate.html(record.submitDate)}<div class="history-card-details">${fields.map(([label, value]) => `<div class="history-card-row"><span>${escape(label)}</span><strong class="${label === 'Amount' ? 'history-card-amount' : ''}">${escape(value || '—')}</strong></div>`).join('')}</div>${record.localDraft ? `<p class="history-draft-note">Saved on this device · ${escape(date(record.savedDate))}</p>` : ''}</a>${renderCardActions(record)}`;
       card.querySelectorAll('[data-history-action]').forEach(button => button.addEventListener('click', selectCardAction));
       $('payrollHistoryList').append(card);
     });
@@ -248,8 +241,7 @@
       row('Reference #', reference(record)),
       row('Status', recordDetailStatus.html(statuses[record.status]), true),
       row('Emp #', employeeId, true),
-      row('Name', employeeName, true),
-      row('Submit Date', date(record.submitDate || record.savedDate))
+      row('Name', employeeName, true)
     ];
     if (recordKind === 'tax') {
       body.push(
@@ -280,15 +272,9 @@
     $('historyDetailTitle').textContent = categories[recordKind].detail;
     if (record.category && record.remarks) body.push(row('Remarks', record.remarks));
     if (record.approverActionComments) body.push(row('Approver Action Comments', record.approverActionComments));
-    $('historyDetailBody').innerHTML = `<table class="history-detail-table"><tbody>${body.join('')}</tbody></table>`;
+    $('historyDetailBody').innerHTML = `${recordSubmitDate.html(record.submitDate)}<table class="history-detail-table"><tbody>${body.join('')}</tbody></table>`;
     $('historyDetailBody').scrollTop = 0;
     renderDetailActions(record, recordKind);
-  }
-
-  function openDetails(record) {
-    activeDetail = { kind, id: record.id };
-    renderDetail(record, kind);
-    showModal($('historyDetailsModal'), $('closeHistoryDetails'));
   }
 
   function populateFilter(values) {
@@ -348,7 +334,6 @@
   $('historyFilterTrigger').addEventListener('click', () => { populateFilter(filters[kind]); showModal($('historyFilterModal'), $('closeHistoryFilter')); });
   $('resetHistoryFilter').addEventListener('click', () => populateFilter(defaults(kind)));
   $('closeHistoryFilter').addEventListener('click', closeModal);
-  $('closeHistoryDetails').addEventListener('click', closeModal);
   $('historyFilterForm').addEventListener('submit', event => {
     event.preventDefault();
     const from = $('historyDateFrom').value, to = $('historyDateTo').value;
@@ -368,7 +353,7 @@
     render();
     closeModal();
   });
-  [$('historyFilterModal'), $('historyDetailsModal')].forEach(modal => modal.addEventListener('click', event => { if (event.target === modal) closeModal(); }));
+  $('historyFilterModal').addEventListener('click', event => { if (event.target === event.currentTarget) closeModal(); });
   document.addEventListener('keydown', event => {
     if (!currentModal) return;
     if (event.key === 'Escape') { event.preventDefault(); closeModal(); return; }
@@ -393,8 +378,15 @@
   });
   window.addEventListener('storage', event => {
     if (event.key !== PayrollPendingStore.storageKey) return;
-    if (currentModal?.id === 'historyDetailsModal') closeModal();
+    if (HistoryRecordPage.active) HistoryRecordPage.back();
     refreshSavedDrafts();
   });
-  refreshSavedDrafts();
+  refreshSavedDrafts().then(() => HistoryRecordPage.register((category, id) => {
+    const record = Object.hasOwn(records, category) && records[category].find(row => String(row.id) === id);
+    if (!record) return;
+    if (kind !== category) { kind = category; render(); }
+    activeDetail = { kind, id: record.id };
+    renderDetail(record, kind);
+    return $('historyDetailsModal');
+  }, () => { activeDetail = null; releaseAttachmentUrls(); }));
 })();

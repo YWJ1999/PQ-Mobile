@@ -1170,7 +1170,7 @@
     </div> <!-- end main-content -->
 
     <div class="sticky-bottom-bar" id="shiftPlanningActionBar" hidden>
-      <button type="button" class="action-btn-primary" id="bottomMainActionBtn" onclick="handleBottomMainAction()">Update</button>
+      <button type="button" class="action-btn-primary" id="bottomMainActionBtn" onclick="handleBottomMainAction()">Review selected (0)</button>
     </div>
     <phone-bottom-nav active="apps"></phone-bottom-nav>
   </div> <!-- end view-main -->
@@ -1720,7 +1720,7 @@
       </div>
       <div class="sheet-footer">
         <button type="button" class="btn-primary" onclick="closeModal('reviewChangesModal')">Back</button>
-        <button type="button" class="btn-primary" onclick="confirmApplyChanges()">Apply changes</button>
+        <button type="button" class="btn-primary" id="confirmShiftChanges" onclick="confirmApplyChanges()">Apply selected (0)</button>
       </div>
     </div>
   </div>
@@ -1754,7 +1754,7 @@
       </div>
       <div class="sheet-footer">
         <button type="button" class="btn-primary" onclick="closeModal('chooseDatesModal')">Back</button>
-        <button type="button" class="btn-primary" id="confirmCopyButton" onclick="confirmReviewCopy()">Confirm Copy</button>
+        <button type="button" class="btn-primary" id="confirmCopyButton" onclick="confirmReviewCopy()">Copy selected (0)</button>
       </div>
     </div>
   </div>
@@ -2538,11 +2538,7 @@
       document.getElementById('staffTabView').classList.toggle('has-selection', !bar.hidden);
 
       const btn = document.getElementById('bottomMainActionBtn');
-      if (currentSelectionMode === 'change_shift') {
-        if (btn) btn.textContent = 'Update';
-      } else {
-        if (btn) btn.textContent = 'Copy';
-      }
+      btn.textContent = formatSelectedAction(currentSelectionMode === 'change_shift' ? 'Review' : 'Copy', count);
     }
 
     function handleBottomMainAction() {
@@ -2596,6 +2592,7 @@
 
     // 1. Review Changes Modal
     function openReviewChangesModal(selectedList) {
+      document.getElementById('confirmShiftChanges').textContent = formatSelectedAction('Apply', selectedList.length);
       document.getElementById('reviewSubtext').textContent = `${selectedList.length} staff will be updated`;
       document.getElementById('reviewNewShiftTitle').textContent = selectedShift.name;
 
@@ -2660,6 +2657,7 @@
       };
       const formatDate = date => date.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
       document.getElementById('chooseDatesSubtext').textContent = `${selectedList.length} staff selected`;
+      document.getElementById('confirmCopyButton').textContent = formatSelectedAction('Copy', pendingCopy.staff.length);
       document.getElementById('copyReviewSourceDate').textContent = formatDate(pendingCopy.sourceDate);
       document.getElementById('copyReviewDateRange').textContent = `${formatDate(new Date(pendingCopy.startDate + 'T00:00:00'))} – ${formatDate(new Date(pendingCopy.endDate + 'T00:00:00'))}`;
       const container = document.getElementById('copyReviewStaffListContainer');

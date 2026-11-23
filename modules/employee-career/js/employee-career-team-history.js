@@ -16,6 +16,13 @@
     draft: { tone: 'draft', icon: 'fa-file-pen' },
     rejected: { tone: 'rejected', icon: 'fa-xmark' }
   };
+  const approvalStatuses = ['Pending', 'To Resubmit', 'Approved', 'Rejected'];
+  const historyStatuses = {
+    'staff-confirmation': approvalStatuses,
+    'staff-exit': ['Pending', 'Approved'],
+    'staff-request': approvalStatuses,
+    'staff-engagement': [...approvalStatuses, 'Follow-up Required', 'Completed']
+  };
   const defaultKind = 'staff-confirmation';
   const requestedKind = new URLSearchParams(location.search).get('category');
   let kind = Object.hasOwn(labels, requestedKind) ? requestedKind : defaultKind;
@@ -140,7 +147,7 @@
   function updateUrl() {
     const url = new URL(location.href);
     url.searchParams.set('category', kind);
-    history.replaceState({}, '', url);
+    history.replaceState(history.state, '', url);
   }
 
   function statusMarkup(record) {
@@ -162,15 +169,16 @@
 
   function cardMarkup(record) {
     const status = statusMarkup(record);
-    const employee = [employeeId(record.empNo, ''), record.employeeName].filter(Boolean).join(' - ') || '—';
+    const employee = record.employeeName || '—';
+    const id = employeeId(record.empNo);
     const isConfirmation = kind === 'staff-confirmation';
     const isExit = kind === 'staff-exit';
     const isRequest = kind === 'staff-request';
     const isEngagement = kind === 'staff-engagement';
     const hasDetails = isConfirmation || isExit || isRequest || isEngagement;
-    const tag = hasDetails ? 'button' : 'article';
+    const tag = hasDetails ? 'a' : 'article';
     const fields = isConfirmation
-      ? [['Recommendation', record.recommendation], ['Submitted', formatDate(record.submittedDate)], ['Adjustment', record.adjustment]]
+      ? [['Recommendation', record.recommendation], ['Adjustment', record.adjustment]]
       : isExit || isEngagement ? [['Notice Date', formatDate(record.noticeDate)], ['Last Paid Date', formatDate(record.lastPaidDate)], ['Reason', record.reason]]
       : isRequest ? [['Request Date', formatDate(record.requestDate)], ['Require Date', formatDate(record.requiredBy)], ['Reason', record.reason]]
       : record.fields;
@@ -179,19 +187,20 @@
       fields.push(['Interviewer', [record.interviewerName, record.interviewerPosition].filter(Boolean).join(' · ')]);
     }
     const triggerAttributes = isConfirmation
-      ? `type="button" data-confirmation-id="${escape(record.id || '')}" aria-haspopup="dialog" aria-controls="teamConfirmationDetailsOverlay"`
-      : isExit ? `type="button" data-exit-id="${escape(record.id || '')}" aria-haspopup="dialog" aria-controls="teamExitDetailsOverlay"`
-      : isRequest ? `type="button" data-request-id="${escape(record.id || '')}" aria-haspopup="dialog" aria-controls="teamRequestDetailsOverlay"`
-      : isEngagement ? `type="button" data-engagement-id="${escape(record.id || '')}" aria-haspopup="dialog" aria-controls="teamEngagementDetailsOverlay"` : '';
-    const accessibleName = [employee, record.position, recordReviewStatusLabel(record.status || 'Pending')].filter(Boolean).join(', ');
+      ? `data-confirmation-id="${escape(record.id || '')}" data-history-link href="${escape(HistoryRecordPage.href(kind, record.id))}"`
+      : isExit ? `data-exit-id="${escape(record.id || '')}" data-history-link href="${escape(HistoryRecordPage.href(kind, record.id))}"`
+      : isRequest ? `data-request-id="${escape(record.id || '')}" data-history-link href="${escape(HistoryRecordPage.href(kind, record.id))}"`
+      : isEngagement ? `data-engagement-id="${escape(record.id || '')}" data-history-link href="${escape(HistoryRecordPage.href(kind, record.id))}"` : '';
+    const accessibleName = [employee, id, record.position, recordReviewStatusLabel(record.status || 'Pending')].filter(Boolean).join(', ');
     return `<${tag} ${triggerAttributes} class="history-card-item team-history-card" data-status="${status.tone}" aria-label="${hasDetails ? 'View details for ' : ''}${escape(accessibleName)}">
       <span class="history-card-header">
         <span class="history-card-heading">
-          <span class="team-history-employee-identity">${escape(employee)}</span>
+          <span class="team-history-employee-identity"><span class="history-employee-name">${escape(employee)}</span>${id ? `<span class="team-history-employee-id">${escape(id)}</span>` : ''}</span>
           <span class="team-history-employee-position">${escape(record.position || '—')}</span>
         </span>
         ${status.html}
       </span>
+      ${recordSubmitDate.html(record.submittedDate ?? record.submitDate)}
       <span class="history-card-details team-history-card-details">
         ${fieldMarkup(fields)}
       </span>
@@ -209,6 +218,8 @@
     const title = $('teamHistoryCategoryTitle');
     const count = $('teamHistoryRecordCount');
     const list = $('teamHistoryList');
+    setRecordLegend(list.closest('main'), labels[kind] + ' status',
+      Object.fromEntries(historyStatuses[kind].map(label => [label, statusMeta[label.toLowerCase()].tone])));
     const empty = $('teamHistoryEmpty');
     const emptyCopy = $('teamHistoryEmptyCopy');
     const filterBar = $('teamConfirmationFilterBar');
@@ -267,7 +278,7 @@
     returnFocus = null;
   }
 
-  function openRecordDetails(record, trigger, category) {
+  function renderRecordDetails(record, category) {
     const prefix = category === 'staff-engagement' ? 'teamEngagement' : category === 'staff-request' ? 'teamRequest' : category === 'staff-exit' ? 'teamExit' : 'teamConfirmation';
     const overlay = $(`${prefix}DetailsOverlay`);
     const display = value => value === '' || value == null ? '—' : String(value);
@@ -280,7 +291,6 @@
       ['Interviewee #', employeeId(record.intervieweeNo)],
       ['Interviewee Position', record.intervieweePosition],
       ['Submitter #', employeeId(record.submitterNo)],
-      ['Submit Date', formatDate(record.submittedDate ?? record.submitDate)],
       ['Interview Date', formatDate(record.interviewDate)],
       ['Flight Risk', record.flightRisk],
       ['Recommendation', record.recommendation],
@@ -312,7 +322,6 @@
       ['Emp #', empNo ? `#${empNo}` : null],
       ['Name', record.employeeName],
       ['Position', record.position],
-      ['Submit Date', formatDate(record.submittedDate ?? record.submitDate)],
       ['Notice Date', formatDate(record.noticeDate)],
       ['Last Service Date', formatDate(record.lastServiceDate)],
       ['Replacement Deadline', formatDate(record.replacementDeadline ?? record.replaceDeadline)],
@@ -387,9 +396,10 @@
     }
     attachmentRow.append(attachmentLabel, attachmentValue);
     rows.push(attachmentRow);
+    recordSubmitDate.set($(`${prefix}SubmitDate`), record.submittedDate ?? record.submitDate);
     $(`${prefix}DetailsRows`).replaceChildren(...rows);
     overlay.querySelector('.detail-popout-body').scrollTop = 0;
-    openOverlay(overlay, $(`${prefix}CloseDetails`), trigger);
+    return overlay;
   }
 
   function fillConfirmationFilter(values) {
@@ -570,20 +580,11 @@
       const button = event.target.closest('[data-team-history-kind]');
       if (button) selectKind(button.dataset.teamHistoryKind);
     });
-    $('teamHistoryList')?.addEventListener('click', event => {
-      const trigger = event.target.closest('[data-confirmation-id], [data-exit-id], [data-request-id], [data-engagement-id]');
-      if (!trigger) return;
-      const category = trigger.hasAttribute('data-engagement-id') ? 'staff-engagement' : trigger.hasAttribute('data-request-id') ? 'staff-request' : trigger.hasAttribute('data-exit-id') ? 'staff-exit' : 'staff-confirmation';
-      const id = trigger.dataset.engagementId ?? trigger.dataset.requestId ?? trigger.dataset.exitId ?? trigger.dataset.confirmationId;
-      const record = (data[category] || []).find(item => String(item.id) === id);
-      if (record) openRecordDetails(record, trigger, category);
-    });
     $('teamConfirmationFilterTrigger')?.addEventListener('click', openConfirmationFilter);
     $('teamExitFilterTrigger')?.addEventListener('click', openExitFilter);
     $('teamRequestFilterTrigger')?.addEventListener('click', openRequestFilter);
     $('teamEngagementFilterTrigger')?.addEventListener('click', openEngagementFilter);
     $('teamEngagementCloseFilter')?.addEventListener('click', closeOverlay);
-    $('teamEngagementCloseDetails')?.addEventListener('click', closeOverlay);
     $('teamEngagementResetFilter')?.addEventListener('click', () => {
       fillEngagementFilter(engagementDefaults);
       applyEngagementFilter();
@@ -592,11 +593,10 @@
       event.preventDefault();
       applyEngagementFilter();
     });
-    for (const id of ['teamEngagementFilterOverlay', 'teamEngagementDetailsOverlay']) $(id)?.addEventListener('click', event => {
+    for (const id of ['teamEngagementFilterOverlay']) $(id)?.addEventListener('click', event => {
       if (event.target === event.currentTarget) closeOverlay();
     });
     $('teamRequestCloseFilter')?.addEventListener('click', closeOverlay);
-    $('teamRequestCloseDetails')?.addEventListener('click', closeOverlay);
     $('teamRequestResetFilter')?.addEventListener('click', () => {
       fillRequestFilter(requestDefaults);
       applyRequestFilter();
@@ -605,7 +605,7 @@
       event.preventDefault();
       applyRequestFilter();
     });
-    for (const id of ['teamRequestFilterOverlay', 'teamRequestDetailsOverlay']) $(id)?.addEventListener('click', event => {
+    for (const id of ['teamRequestFilterOverlay']) $(id)?.addEventListener('click', event => {
       if (event.target === event.currentTarget) closeOverlay();
     });
     $('teamExitCloseFilter')?.addEventListener('click', closeOverlay);
@@ -621,8 +621,6 @@
       if (event.target === event.currentTarget) closeOverlay();
     });
     $('teamConfirmationCloseFilter')?.addEventListener('click', closeOverlay);
-    $('teamConfirmationCloseDetails')?.addEventListener('click', closeOverlay);
-    $('teamExitCloseDetails')?.addEventListener('click', closeOverlay);
     $('teamConfirmationResetFilter')?.addEventListener('click', () => {
       fillConfirmationFilter(confirmationDefaults);
       applyConfirmationFilter();
@@ -632,12 +630,6 @@
       applyConfirmationFilter();
     });
     $('teamConfirmationFilterOverlay')?.addEventListener('click', event => {
-      if (event.target === event.currentTarget) closeOverlay();
-    });
-    $('teamConfirmationDetailsOverlay')?.addEventListener('click', event => {
-      if (event.target === event.currentTarget) closeOverlay();
-    });
-    $('teamExitDetailsOverlay')?.addEventListener('click', event => {
       if (event.target === event.currentTarget) closeOverlay();
     });
     document.addEventListener('keydown', event => {
@@ -662,6 +654,12 @@
       }
     });
     render();
+    HistoryRecordPage.register((category, id) => {
+      const record = Object.hasOwn(data, category) && data[category].find(row => String(row.id) === id);
+      if (!record) return;
+      if (kind !== category) { kind = category; render(); }
+      return renderRecordDetails(record, category);
+    });
     document.querySelector(`[data-team-history-kind="${kind}"]`)?.scrollIntoView({ block: 'nearest', inline: 'nearest' });
   }
 

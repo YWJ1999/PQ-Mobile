@@ -47,7 +47,7 @@
         <div class="payroll-pending-summary-copy"><small>Current Filter</small><div class="payroll-pending-summary-value"><span id="payrollPendingFilterSummary">All Requests &bull; All Dates</span></div></div>
         <button type="button" id="payrollPendingFilterTrigger" aria-label="Open pending approval filter" aria-haspopup="dialog" aria-controls="payrollPendingFilter"><i class="fa-solid fa-sliders" aria-hidden="true"></i></button>
       </div>
-      <section id="payrollPendingPanel" role="tabpanel" aria-labelledby="payrollPendingTab-tax">
+      <section id="payrollPendingPanel" data-record-colour-view="Approval status" data-record-legend='{"Pending":"submitted","Approved":"approved","Resubmit":"resubmit","Rejected":"rejected","Cancelled":"cancelled"}' role="tabpanel" aria-labelledby="payrollPendingTab-tax">
         <div class="payroll-pending-list-heading"><h2>Pending Approvals (<span id="payrollPendingCount">0</span>)</h2><label class="payroll-pending-select-all"><input type="checkbox" id="payrollPendingSelectAll">Select All</label></div>
         <div id="payrollPendingQueue"></div>
       </section>

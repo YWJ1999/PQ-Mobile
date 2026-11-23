@@ -157,6 +157,8 @@
   overflow-wrap: anywhere;
 }
 
+.team-history-employee-id { display: block; }
+
 .team-history-employee-position {
   display: block;
   margin-top: 3px;

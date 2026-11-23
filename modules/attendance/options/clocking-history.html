@@ -4,6 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>PeopleHCM - History</title>
+  <link rel="stylesheet" href="../../../css/history-record-page.css">
+  <script src="../../../js/history-record-page.js"></script>
+  <script src="../../../js/attendance/advice-fields.js"></script>
+  <script src="../../../js/attendance/attendance-days.js"></script>
   <script src="../../../js/components.js"></script>
   <script src="../../../js/app.js" defer></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -171,10 +175,11 @@
     .detail-table-card tr {
       border-bottom: 1px solid var(--border-subtle);
     }
-    .detail-table-card tr:last-child {
+    .detail-table-card tbody:last-child tr:last-child {
       border-bottom: none;
     }
-    .detail-table-card td.detail-label {
+    .detail-table-card .detail-label {
+      text-align: left;
       width: 36%;
       padding: 11px 14px;
       font-size: 12.5px;
@@ -252,10 +257,10 @@
       </section>
 
       <!-- Clocking History List View (Separated Clock In & Clock Out) -->
-      <div id="viewClockingHistory">
+      <div id="viewClockingHistory" data-record-colour-view="Clocking status" data-record-legend='{"Normal":"normal","Overtime":"overtime","Late In":"late-in","Early Out":"early-out"}'>
         
         <!-- 17 SEP Clock Out -->
-        <a href="javascript:void(0)" onclick="openClockDetailsModal('CLK-910482', 'Clock Out', '17/09/2026 (Tue)', '17:35:12 PM', 'HQ Main Gate (GPS: 3.1390, 101.6869)', 'CC-101 HQ Ops', 'No', 'No')" data-status="normal" class="history-card-item">
+        <a data-status="normal" class="history-card-item" data-history-link href="#history/clocking/CLK-910482">
           <div class="history-card-header">
             <div class="history-card-heading">
               <h3 class="history-card-title">Clock Out</h3>
@@ -270,7 +275,7 @@
         </a>
 
         <!-- 17 SEP Clock In -->
-        <a href="javascript:void(0)" onclick="openClockDetailsModal('CLK-910481', 'Clock In', '17/09/2026 (Tue)', '08:15:04 AM', 'HQ Main Gate (GPS: 3.1390, 101.6869)', 'CC-101 HQ Ops', 'No', 'No')" data-status="normal" class="history-card-item">
+        <a data-status="normal" class="history-card-item" data-history-link href="#history/clocking/CLK-910481">
           <div class="history-card-header">
             <div class="history-card-heading">
               <h3 class="history-card-title">Clock In</h3>
@@ -285,13 +290,13 @@
         </a>
 
         <!-- 16 SEP Clock Out -->
-        <a href="javascript:void(0)" onclick="openClockDetailsModal('CLK-910399', 'Clock Out', '16/09/2026 (Mon)', '19:40:55 PM', 'HQ Rear Lobby', 'CC-101 HQ Ops', 'No', 'No')" data-status="overtime" class="history-card-item">
+        <a data-status="overtime" class="history-card-item" data-history-link href="#history/clocking/CLK-910399">
           <div class="history-card-header">
             <div class="history-card-heading">
               <h3 class="history-card-title">Clock Out</h3>
               <time class="history-card-ref" datetime="2026-09-16">Wed 16 Sep 2026</time>
             </div>
-            <span class="card-status-badge"><i class="fa-solid fa-clock" aria-hidden="true"></i>Overtime (2.17 Hrs)</span>
+            <span class="card-status-badge" data-record-key-label="Overtime"><i class="fa-solid fa-clock" aria-hidden="true"></i>Overtime (2.17 Hrs)</span>
           </div>
           <div class="history-card-details clocking-history-facts">
             <div><span>Time</span><strong>19:40</strong></div>
@@ -300,7 +305,7 @@
         </a>
 
         <!-- 16 SEP Clock In -->
-        <a href="javascript:void(0)" onclick="openClockDetailsModal('CLK-910398', 'Clock In', '16/09/2026 (Mon)', '08:09:12 AM', 'HQ Main Turnstile #2', 'CC-101 HQ Ops', 'No', 'No')" data-status="normal" class="history-card-item">
+        <a data-status="normal" class="history-card-item" data-history-link href="#history/clocking/CLK-910398">
           <div class="history-card-header">
             <div class="history-card-heading">
               <h3 class="history-card-title">Clock In</h3>
@@ -315,13 +320,13 @@
         </a>
 
         <!-- 13 SEP Clock Out -->
-        <a href="javascript:void(0)" onclick="openClockDetailsModal('CLK-909877', 'Clock Out', '13/09/2026 (Fri)', '17:15:30 PM', 'Site Project Office (GPS: 3.129, 101.678)', 'CC-202 Tech Dept', 'No', 'No')" data-status="early-out" class="history-card-item">
+        <a data-status="early-out" class="history-card-item" data-history-link href="#history/clocking/CLK-909877">
           <div class="history-card-header">
             <div class="history-card-heading">
               <h3 class="history-card-title">Clock Out</h3>
               <time class="history-card-ref" datetime="2026-09-13">Sun 13 Sep 2026</time>
             </div>
-            <span class="card-status-badge"><i class="fa-solid fa-clock" aria-hidden="true"></i>Early Out (15 mins)</span>
+            <span class="card-status-badge" data-record-key-label="Early Out"><i class="fa-solid fa-clock" aria-hidden="true"></i>Early Out (15 mins)</span>
           </div>
           <div class="history-card-details clocking-history-facts">
             <div><span>Time</span><strong>17:15</strong></div>
@@ -330,13 +335,13 @@
         </a>
 
         <!-- 13 SEP Clock In -->
-        <a href="javascript:void(0)" onclick="openClockDetailsModal('CLK-909876', 'Clock In', '13/09/2026 (Fri)', '08:42:10 AM', 'Site Project Office (GPS: 3.129, 101.678)', 'CC-202 Tech Dept', 'No', 'No')" data-status="late-in" class="history-card-item">
+        <a data-status="late-in" class="history-card-item" data-history-link href="#history/clocking/CLK-909876">
           <div class="history-card-header">
             <div class="history-card-heading">
               <h3 class="history-card-title">Clock In</h3>
               <time class="history-card-ref" datetime="2026-09-13">Sun 13 Sep 2026</time>
             </div>
-            <span class="card-status-badge"><i class="fa-solid fa-clock" aria-hidden="true"></i>Late In (12 mins)</span>
+            <span class="card-status-badge" data-record-key-label="Late In"><i class="fa-solid fa-clock" aria-hidden="true"></i>Late In (12 mins)</span>
           </div>
           <div class="history-card-details clocking-history-facts">
             <div><span>Time</span><strong>08:42</strong></div>
@@ -347,10 +352,10 @@
       </div>
 
       <!-- OT History List View -->
-      <div id="viewOtHistory" style="display: none;">
+      <div id="viewOtHistory" data-record-colour-view="OT plan status" data-record-legend='{"Pending Approve":"submitted","Pending Resubmit":"resubmit","Approved":"approved","Rejected":"rejected"}' style="display: none;">
         
         <!-- OT Card 1: Pending (AXT000000000101) -->
-        <a href="javascript:void(0)" data-status="pending" onclick="openOtDetailsModal('AXT000000000101', 'Pending Approve', 'SP013 - Angeline loren alan', 'EBB04 - Tech Lead', '12 Jul 2024', '12/07/2024', '8.00AM-5.30PM', '0750', '06:00', '08:00', '0', '16.00', 'OT 1.5 BEFORE WORK', 'URGENT SYSTEM MIGRATION', 'Database Maintenance', 'No', 'Yes', 'Work started before normal hours', 'Please resubmit with signed supervisor logs', { actualHours: '0.00' })" class="history-card-item">
+        <a data-status="pending" class="history-card-item" data-history-link href="#history/ot/AXT000000000101">
           <div class="history-card-header">
             <div class="history-card-heading">
               <h3 class="history-card-title">OT Plan</h3>
@@ -358,6 +363,7 @@
             </div>
             <span class="card-status-badge"><i class="fa-solid fa-hourglass-half" aria-hidden="true"></i>Pending Approve</span>
           </div>
+          <span class="record-submit-date">Submit Date: 12/07/2024</span>
           <div class="history-card-details clocking-history-facts">
             <div><span>OT Date</span><strong><time datetime="2024-07-12">Fri 12 Jul 2024</time></strong></div>
             <div><span>OT Type</span><strong>OT 1.5 BEFORE WORK</strong></div>
@@ -367,7 +373,7 @@
         </a>
 
         <!-- OT Card 2: Pending (OTB000000001604) -->
-        <a href="javascript:void(0)" data-status="pending" onclick="openOtDetailsModal('OTB000000001604', 'Pending Approve', 'SP013 - Angeline loren alan', 'EBB04', '24 Oct 2023', '24/10/2023', '8.00AM-5.30PM', '0758', '20:00', '23:00', '0', '3.00', '1.5 OT', 'MATERIAL', '- SELECT TASK -', 'No', 'Yes', 'Emergency material checking', 'asd', { actualHours: '0.00' })" class="history-card-item">
+        <a data-status="pending" class="history-card-item" data-history-link href="#history/ot/OTB000000001604">
           <div class="history-card-header">
             <div class="history-card-heading">
               <h3 class="history-card-title">OT Plan</h3>
@@ -375,17 +381,17 @@
             </div>
             <span class="card-status-badge"><i class="fa-solid fa-hourglass-half" aria-hidden="true"></i>Pending Approve</span>
           </div>
+          <span class="record-submit-date">Submit Date: 24/10/2023</span>
           <div class="history-card-details clocking-history-facts">
             <div><span>OT Date</span><strong><time datetime="2023-10-24">Tue 24 Oct 2023</time></strong></div>
             <div><span>OT Type</span><strong>1.5 OT</strong></div>
             <div><span>Plan Hours</span><strong>3.00 Hrs</strong></div>
             <div><span>Actual Hours</span><strong>0.00 Hrs</strong></div>
-            <div><span>Submitted Date</span><strong>24/10/2023</strong></div>
           </div>
         </a>
 
         <!-- OT Card 3: Approved (OTB000000001620) -->
-        <a href="javascript:void(0)" data-status="approved" onclick="openOtDetailsModal('OTB000000001620', 'Approved', 'SP013 - Angeline loren alan', 'EBB04', '05 Sep 2026', '05/09/2026', '8.00AM-5.30PM', '0752', '18:00', '21:00', '0', '3.00', '1.5 OT', 'SYSTEM UPGRADE', 'Server Patching', 'Yes', 'No', 'Scheduled maintenance', 'Approved by Manager', { actualHours: '3.00' })" class="history-card-item">
+        <a data-status="approved" class="history-card-item" data-history-link href="#history/ot/OTB000000001620">
           <div class="history-card-header">
             <div class="history-card-heading">
               <h3 class="history-card-title">OT Plan</h3>
@@ -393,6 +399,7 @@
             </div>
             <span class="card-status-badge"><i class="fa-solid fa-check" aria-hidden="true"></i>Approved</span>
           </div>
+          <span class="record-submit-date">Submit Date: 05/09/2026</span>
           <div class="history-card-details clocking-history-facts">
             <div><span>OT Date</span><strong><time datetime="2026-09-05">Sat 5 Sep 2026</time></strong></div>
             <div><span>OT Type</span><strong>1.5 OT</strong></div>
@@ -403,7 +410,7 @@
         </a>
 
         <!-- OT Card 4: Rejected (OTB000000001630) -->
-        <a href="javascript:void(0)" data-status="rejected" onclick="openOtDetailsModal('OTB000000001630', 'Rejected', 'SP013 - Angeline loren alan', 'EBB04', '10 Aug 2026', '10/08/2026', '8.00AM-5.30PM', '0800', '18:00', '20:00', '0', '2.00', '1.5 OT', 'OTHER', 'Documentation', 'No', 'No', 'General documentation', 'Overtime budget exceeded', { actualHours: '0.00' })" class="history-card-item">
+        <a data-status="rejected" class="history-card-item" data-history-link href="#history/ot/OTB000000001630">
           <div class="history-card-header">
             <div class="history-card-heading">
               <h3 class="history-card-title">OT Plan</h3>
@@ -411,6 +418,7 @@
             </div>
             <span class="card-status-badge"><i class="fa-solid fa-circle-xmark" aria-hidden="true"></i>Rejected</span>
           </div>
+          <span class="record-submit-date">Submit Date: 10/08/2026</span>
           <div class="history-card-details clocking-history-facts">
             <div><span>OT Date</span><strong><time datetime="2026-08-10">Mon 10 Aug 2026</time></strong></div>
             <div><span>OT Type</span><strong>1.5 OT</strong></div>
@@ -423,10 +431,10 @@
       </div>
 
       <!-- Feedback History List View -->
-      <div id="viewFeedbackHistory" style="display: none;">
+      <div id="viewFeedbackHistory" data-record-colour-view="Attendance feedback status" data-record-legend='{"Pending Approve":"submitted","Pending Review":"submitted","Pending Resubmit":"resubmit","Approved":"approved","Rejected":"rejected","Cancelled":"cancelled"}' style="display: none;">
          
         <!-- Feedback Card 1: Pending (ATT000000000432) -->
-        <a href="javascript:void(0)" data-status="pending" onclick="openFeedbackDetailsModal('ATT000000000432', 'Pending Approve', 'EBB12 - Farhan binti rahmat', 'TIMES SQUARE BRANCH', 'HUMAN RESOURCE', '31 Dec 2025', '8.00AM-5.30PM', 'EBB12 - Farhan binti rahmat', '26/02/2026', '[Comment by FARHAN BIN RAHMAT (EBB12)]\nokay')" class="history-card-item">
+        <a data-status="pending" class="history-card-item" data-history-link href="#history/feedback/ATT000000000432">
           <div class="history-card-header">
             <div class="history-card-heading">
               <h3 class="history-card-title">Attendance Feedback</h3>
@@ -434,14 +442,14 @@
             </div>
             <span class="card-status-badge"><i class="fa-solid fa-hourglass-half" aria-hidden="true"></i>Pending Approve</span>
           </div>
+          <span class="record-submit-date">Submit Date: 26/02/2026</span>
           <div class="history-card-details clocking-history-facts">
             <div><span>Attendance Date</span><strong>31 Dec 2025</strong></div>
-            <div><span>Submitted Date</span><strong>26/02/2026</strong></div>
           </div>
         </a>
 
         <!-- Feedback Card 2: Pending (ATT000000000435) -->
-        <a href="javascript:void(0)" data-status="pending" onclick="openFeedbackDetailsModal('ATT000000000435', 'Pending Review', 'SP013 - Angeline loren alan', 'HQ MAIN BRANCH', 'TECH DEPT', '14 Sep 2026', '8.30AM-5.30PM', 'SP013 - Angeline', '14/09/2026', 'Pending supervisor review')" class="history-card-item">
+        <a data-status="pending" class="history-card-item" data-history-link href="#history/feedback/ATT000000000435">
           <div class="history-card-header">
             <div class="history-card-heading">
               <h3 class="history-card-title">Attendance Feedback</h3>
@@ -449,14 +457,14 @@
             </div>
             <span class="card-status-badge"><i class="fa-solid fa-hourglass-half" aria-hidden="true"></i>Pending Review</span>
           </div>
+          <span class="record-submit-date">Submit Date: 14/09/2026</span>
           <div class="history-card-details clocking-history-facts">
             <div><span>Attendance Date</span><strong>14 Sep 2026</strong></div>
-            <div><span>Submitted Date</span><strong>14/09/2026</strong></div>
           </div>
         </a>
 
         <!-- Feedback Card 3: Approved (ATT000000000440) -->
-        <a href="javascript:void(0)" data-status="approved" onclick="openFeedbackDetailsModal('ATT000000000440', 'Approved', 'SP013 - Angeline loren alan', 'HQ MAIN BRANCH', 'TECH DEPT', '02 Sep 2026', '8.30AM-5.30PM', 'SP013 - Angeline', '02/09/2026', 'Approved by HR')" class="history-card-item">
+        <a data-status="approved" class="history-card-item" data-history-link href="#history/feedback/ATT000000000440">
           <div class="history-card-header">
             <div class="history-card-heading">
               <h3 class="history-card-title">Attendance Feedback</h3>
@@ -464,6 +472,7 @@
             </div>
             <span class="card-status-badge"><i class="fa-solid fa-check" aria-hidden="true"></i>Approved</span>
           </div>
+          <span class="record-submit-date">Submit Date: 02/09/2026</span>
           <div class="history-card-details clocking-history-facts">
             <div><span>Attendance Date</span><strong>02 Sep 2026</strong></div>
             <div><span>Approved Date</span><strong>02/09/2026</strong></div>
@@ -471,7 +480,7 @@
         </a>
 
         <!-- Feedback Card 4: Rejected (ATT000000000445) -->
-        <a href="javascript:void(0)" data-status="rejected" onclick="openFeedbackDetailsModal('ATT000000000445', 'Rejected', 'SP013 - Angeline loren alan', 'HQ MAIN BRANCH', 'TECH DEPT', '18 Jul 2026', '8.30AM-5.30PM', 'SP013 - Angeline', '18/07/2026', 'Invalid reason provided')" class="history-card-item">
+        <a data-status="rejected" class="history-card-item" data-history-link href="#history/feedback/ATT000000000445">
           <div class="history-card-header">
             <div class="history-card-heading">
               <h3 class="history-card-title">Attendance Feedback</h3>
@@ -479,6 +488,7 @@
             </div>
             <span class="card-status-badge"><i class="fa-solid fa-circle-xmark" aria-hidden="true"></i>Rejected</span>
           </div>
+          <span class="record-submit-date">Submit Date: 18/07/2026</span>
           <div class="history-card-details clocking-history-facts">
             <div><span>Attendance Date</span><strong>18 Jul 2026</strong></div>
             <div><span>Declined Date</span><strong>18/07/2026</strong></div>
@@ -490,20 +500,16 @@
     </div>
 
     <!-- Clock In Out Details Modal -->
-    <div class="modal-overlay" id="clockDetailsModal" onclick="closeClockDetailsModal(event)">
-      <div class="modal-content" onclick="event.stopPropagation()"
-        style="width: 100%; max-width: 380px; background: var(--bg-sheet); border-radius: 24px; box-shadow: 0 20px 50px rgba(0,0,0,0.6); border: 1px solid var(--border-subtle); transform: scale(0.85); opacity: 0; transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease; max-height: 85%; overflow: hidden; display: flex; flex-direction: column; box-sizing: border-box;">
-        
-        <!-- Purple Modal Header -->
-        <div class="modal-header-purple" style="border-top-left-radius: 24px; border-top-right-radius: 24px;">
-          <h3>Clocking Detail</h3>
-          <button class="modal-close-round" onclick="closeClockDetailsDirect()" aria-label="Close modal">
-            <i class="fa-solid fa-xmark" style="font-size: 15px;"></i>
-          </button>
-        </div>
-
-        <!-- Detail Table Body -->
-        <div style="padding: 16px; overflow-y: auto; flex: 1; background: var(--bg-sheet);">
+    <main id="clockDetailsModal" class="approval-record-page" data-history-page aria-labelledby="clockDetailsModalTitle" hidden>
+      <section class="approval-record-layout">
+        <header class="approval-page-header">
+          <phone-status-bar time="9:41"></phone-status-bar>
+          <div class="approval-page-heading">
+            <button type="button" data-history-back aria-label="Back to history"></button>
+            <h1 id="clockDetailsModalTitle" tabindex="-1">Clocking Detail</h1>
+          </div>
+        </header>
+        <div style="padding: 16px; overflow-y: auto; flex: 1; background: var(--bg-sheet);" class="history-record-content">
           <table class="detail-table-card">
             <tbody>
               <tr>
@@ -553,25 +559,21 @@
             </tbody>
           </table>
         </div>
-
-      </div>
-    </div>
+      </section>
+    </main>
 
     <!-- OT Document Detail Modal -->
-    <div class="modal-overlay" id="otDetailsModal" onclick="closeOtDetailsModal(event)">
-      <div class="modal-content" onclick="event.stopPropagation()"
-        style="width: 100%; max-width: 380px; background: var(--bg-sheet); border-radius: 24px; box-shadow: 0 20px 50px rgba(0,0,0,0.6); border: 1px solid var(--border-subtle); transform: scale(0.85); opacity: 0; transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease; max-height: 85%; overflow: hidden; display: flex; flex-direction: column; box-sizing: border-box;">
-        
-        <!-- Purple Modal Header -->
-        <div class="modal-header-purple" style="border-top-left-radius: 24px; border-top-right-radius: 24px;">
-          <h3>OT Plan Details</h3>
-          <button class="modal-close-round" onclick="closeOtDetailsDirect()" aria-label="Close modal">
-            <i class="fa-solid fa-xmark" style="font-size: 15px;"></i>
-          </button>
-        </div>
-
-        <!-- Detail Table Body -->
-        <div style="padding: 16px; overflow-y: auto; flex: 1; background: var(--bg-sheet);">
+    <main id="otDetailsModal" class="approval-record-page" data-history-page aria-labelledby="otDetailsModalTitle" hidden>
+      <section class="approval-record-layout">
+        <header class="approval-page-header">
+          <phone-status-bar time="9:41"></phone-status-bar>
+          <div class="approval-page-heading">
+            <button type="button" data-history-back aria-label="Back to history"></button>
+            <h1 id="otDetailsModalTitle" tabindex="-1">OT Plan Details</h1>
+          </div>
+        </header>
+        <div style="padding: 16px; overflow-y: auto; flex: 1; background: var(--bg-sheet);" class="history-record-content">
+          <span id="modalOtSubmitDate" class="record-submit-date" hidden></span>
           <table class="detail-table-card">
             <tbody>
               <tr>
@@ -593,10 +595,6 @@
               <tr>
                 <td class="detail-label">Supervisor</td>
                 <td class="detail-value" id="modalOtSupervisor">EBB04</td>
-              </tr>
-              <tr>
-                <td class="detail-label">Submit Date</td>
-                <td class="detail-value" id="modalOtSubmitDate">24 Oct 2023</td>
               </tr>
               <tr>
                 <td class="detail-label">OT Date</td>
@@ -677,25 +675,21 @@
             <span>1302f11d5a254abbb2b9a10cb3b8f00f.jpg</span>
           </div>
         </div>
-
-      </div>
-    </div>
+      </section>
+    </main>
 
     <!-- Attendance Advice Detail Modal -->
-    <div class="modal-overlay" id="feedbackDetailsModal" onclick="closeFeedbackDetailsModal(event)">
-      <div class="modal-content" onclick="event.stopPropagation()"
-        style="width: 100%; max-width: 380px; background: var(--bg-sheet); border-radius: 24px; box-shadow: 0 20px 50px rgba(0,0,0,0.6); border: 1px solid var(--border-subtle); transform: scale(0.85); opacity: 0; transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease; max-height: 85%; overflow: hidden; display: flex; flex-direction: column; box-sizing: border-box;">
-        
-        <!-- Purple Modal Header -->
-        <div class="modal-header-purple" style="border-top-left-radius: 24px; border-top-right-radius: 24px;">
-          <h3>Attendance Advice Detail</h3>
-          <button class="modal-close-round" onclick="closeFeedbackDetailsDirect()" aria-label="Close modal">
-            <i class="fa-solid fa-xmark" style="font-size: 15px;"></i>
-          </button>
-        </div>
-
-        <!-- Detail Table Body -->
-        <div style="padding: 16px; overflow-y: auto; flex: 1; background: var(--bg-sheet);">
+    <main id="feedbackDetailsModal" class="approval-record-page" data-history-page aria-labelledby="feedbackDetailsModalTitle" hidden>
+      <section class="approval-record-layout">
+        <header class="approval-page-header">
+          <phone-status-bar time="9:41"></phone-status-bar>
+          <div class="approval-page-heading">
+            <button type="button" data-history-back aria-label="Back to history"></button>
+            <h1 id="feedbackDetailsModalTitle" tabindex="-1">Attendance Advice Detail</h1>
+          </div>
+        </header>
+        <div style="padding: 16px; overflow-y: auto; flex: 1; background: var(--bg-sheet);" class="history-record-content">
+          <span id="modalFbkSubmitDate" class="record-submit-date" hidden></span>
           <table class="detail-table-card">
             <tbody>
               <tr>
@@ -731,21 +725,24 @@
                 <td class="detail-value" id="modalFbkShift">8.00AM-5.30PM</td>
               </tr>
               <tr>
-                <td class="detail-label">Submitter & Date</td>
-                <td class="detail-value" id="modalFbkSubmitter">EBB12 (26 Feb 2026)</td>
+                <td class="detail-label">Submitter</td>
+                <td class="detail-value" id="modalFbkSubmitter">EBB12</td>
               </tr>
               <tr>
                 <td class="detail-label">Amended Shift</td>
                 <td class="detail-value" id="modalFbkAmendedShift">W01 (8.00AM-5.30PM)</td>
               </tr>
               <tr>
-                <td class="detail-label">Shift Reason</td>
+                <td class="detail-label">Amended Shift Reason</td>
                 <td class="detail-value" id="modalFbkShiftReason">Swapped Shift with Teammate</td>
               </tr>
               <tr>
-                <td class="detail-label">Edit Reason</td>
+                <td class="detail-label">Time Amend Reason</td>
                 <td class="detail-value" id="modalFbkEditTimeReason">Forgotten Clock Out</td>
               </tr>
+            </tbody>
+            <tbody id="modalFbkAdviceFields"></tbody>
+            <tbody>
               <tr>
                 <td class="detail-label">Remarks</td>
                 <td class="detail-value" id="modalFbkRemarks">Doctor appointment in the morning</td>
@@ -765,9 +762,8 @@
             <span>1302f11d5a254abbb2b9a10cb3b8f00f.jpg</span>
           </div>
         </div>
-
-      </div>
-    </div>
+      </section>
+    </main>
 
     <!-- Filter Modal (Bottom Sheet) -->
     <div class="modal-overlay" id="filterModal" onclick="closeFilterModal(event)" style="align-items: flex-end; padding: 0;">
@@ -831,7 +827,7 @@
   </div>
 
     <script>
-      function openClockDetailsModal(id, type, date, time, location, costCenter, isVoided, isInvalid) {
+      function renderClockHistoryDetail(id, type, date, time, location, costCenter, isVoided, isInvalid) {
         if (document.getElementById('modalClkId')) document.getElementById('modalClkId').innerText = id || 'CLK-804291';
         if (document.getElementById('modalClkEmpNo')) document.getElementById('modalClkEmpNo').innerText = 'EBB12';
         if (document.getElementById('modalClkEmpName')) document.getElementById('modalClkEmpName').innerText = 'Farhan binti rahmat';
@@ -848,35 +844,18 @@
         if (document.getElementById('modalClkIsInvalid')) document.getElementById('modalClkIsInvalid').innerHTML = isInvalid === 'Yes'
           ? '<span style="color: #ef4444; font-weight: 800;">Yes</span>'
           : '<span style="color: #10b981; font-weight: 800;">No</span>';
-
-        const m = document.getElementById('clockDetailsModal');
-        m.style.display = 'flex';
-        setTimeout(() => {
-          m.style.opacity = '1';
-          const mc = m.querySelector('.modal-content');
-          if (mc) { mc.style.transform = 'scale(1)'; mc.style.opacity = '1'; }
-        }, 10);
-      }
-
-      function closeClockDetailsModal(e) {
-        if (e && e.target !== e.currentTarget) return;
-        closeClockDetailsDirect();
       }
 
       function closeClockDetailsDirect() {
-        const m = document.getElementById('clockDetailsModal');
-        const mc = m.querySelector('.modal-content');
-        m.style.opacity = '0';
-        if (mc) { mc.style.transform = 'scale(0.85)'; mc.style.opacity = '0'; }
-        setTimeout(() => { m.style.display = 'none'; }, 250);
+        HistoryRecordPage.back();
       }
 
-      function openOtDetailsModal(docRef, planStatus, emp, supervisor, submitDate, otDate, shift, clkTimes, startTime, endTime, breakHrs, planHrs, otType, otReason, task, allowLeaveCredit, needTransport, remarks, approverComments, approvalDetails = {}) {
+      function renderOtHistoryDetail(docRef, planStatus, emp, supervisor, submitDate, otDate, shift, clkTimes, startTime, endTime, breakHrs, planHrs, otType, otReason, task, allowLeaveCredit, needTransport, remarks, approverComments, approvalDetails = {}) {
         const [empNo, ...empName] = String(emp || '').split(' - ');
         const yesNo = value => value === true ? 'Yes' : value === false ? 'No' : value;
         const fields = {
           DocRef: docRef, EmpNo: empNo ? '#' + empNo.replace(/^#+/, '') : '', EmpName: empName.join(' - '),
-          Supervisor: supervisor, SubmitDate: submitDate, Date: otDate, Shift: shift, ClockingTimes: clkTimes,
+          Supervisor: supervisor, Date: otDate, Shift: shift, ClockingTimes: clkTimes,
           StartTime: startTime, EndTime: endTime, BreakHours: breakHrs, PlanHours: planHrs,
           ActualHours: approvalDetails.actualHours, ApprovedHours: approvalDetails.approvedHours,
           ApprovalMethod: approvalDetails.approvalMethod,
@@ -887,28 +866,12 @@
         for (const [field, value] of Object.entries(fields)) {
           document.getElementById('modalOt' + field).textContent = value === '' || value == null ? '—' : String(value);
         }
+        recordSubmitDate.set(document.getElementById('modalOtSubmitDate'), submitDate);
         document.getElementById('modalOtPlanStatus').replaceChildren(recordDetailStatus.create(planStatus || '—'));
-
-        const m = document.getElementById('otDetailsModal');
-        m.style.display = 'flex';
-        setTimeout(() => {
-          m.style.opacity = '1';
-          const mc = m.querySelector('.modal-content');
-          if (mc) { mc.style.transform = 'scale(1)'; mc.style.opacity = '1'; }
-        }, 10);
-      }
-
-      function closeOtDetailsModal(e) {
-        if (e && e.target !== e.currentTarget) return;
-        closeOtDetailsDirect();
       }
 
       function closeOtDetailsDirect() {
-        const m = document.getElementById('otDetailsModal');
-        const mc = m.querySelector('.modal-content');
-        m.style.opacity = '0';
-        if (mc) { mc.style.transform = 'scale(0.85)'; mc.style.opacity = '0'; }
-        setTimeout(() => { m.style.display = 'none'; }, 250);
+        HistoryRecordPage.back();
       }
 
       function submitOtDetailsForm() {
@@ -916,7 +879,7 @@
         closeOtDetailsDirect();
       }
 
-      function openFeedbackDetailsModal(docRef, docStatus, emp, branch, dept, date, shift, submitter, submitDate, comments) {
+      function renderFeedbackHistoryDetail(docRef, docStatus, emp, branch, dept, date, shift, submitter, submitDate, comments, amendments = {}) {
         if (document.getElementById('modalFbkDocRef')) document.getElementById('modalFbkDocRef').innerText = docRef || 'ATT000000000432';
         const empParts = (emp || 'EBB12 - Farhan binti rahmat').split(' - ');
         if (document.getElementById('modalFbkEmpNo')) document.getElementById('modalFbkEmpNo').innerText = empParts[0] || 'EBB12';
@@ -925,30 +888,15 @@
         if (document.getElementById('modalFbkDepartment')) document.getElementById('modalFbkDepartment').innerText = dept || 'HUMAN RESOURCE';
         if (document.getElementById('modalFbkDate')) document.getElementById('modalFbkDate').innerText = date || '31 Dec 2025';
         if (document.getElementById('modalFbkShift')) document.getElementById('modalFbkShift').innerText = shift || '8.00AM-5.30PM';
-        if (document.getElementById('modalFbkSubmitter')) document.getElementById('modalFbkSubmitter').innerText = `${submitter || 'EBB12'} (${submitDate || '26 Feb 2026'})`;
+        document.getElementById('modalFbkSubmitter').textContent = submitter || '—';
+        recordSubmitDate.set(document.getElementById('modalFbkSubmitDate'), submitDate);
+        AttendanceAdviceFields.render(document.getElementById('modalFbkAdviceFields'), amendments, attendanceDaysByAdviceRef[docRef]);
         if (document.getElementById('modalFbkApproverComments')) document.getElementById('modalFbkApproverComments').innerText = comments || '[Comment by FARHAN BIN RAHMAT (EBB12)] okay';
         document.getElementById('modalFbkDocStatus').replaceChildren(recordDetailStatus.create(docStatus || 'To Resubmit'));
-
-        const m = document.getElementById('feedbackDetailsModal');
-        m.style.display = 'flex';
-        setTimeout(() => {
-          m.style.opacity = '1';
-          const mc = m.querySelector('.modal-content');
-          if (mc) { mc.style.transform = 'scale(1)'; mc.style.opacity = '1'; }
-        }, 10);
-      }
-
-      function closeFeedbackDetailsModal(e) {
-        if (e && e.target !== e.currentTarget) return;
-        closeFeedbackDetailsDirect();
       }
 
       function closeFeedbackDetailsDirect() {
-        const m = document.getElementById('feedbackDetailsModal');
-        const mc = m.querySelector('.modal-content');
-        m.style.opacity = '0';
-        if (mc) { mc.style.transform = 'scale(0.85)'; mc.style.opacity = '0'; }
-        setTimeout(() => { m.style.display = 'none'; }, 250);
+        HistoryRecordPage.back();
       }
 
       function submitFeedbackDetailsForm() {
@@ -1152,5 +1100,30 @@
         updateLegacyAttendanceHistoryTotalRecords();
       });
     </script>
-</body>
+<script>
+    const attendanceHistoryFields = {
+      clocking: {
+        'CLK-910482': ['Clock Out', '17/09/2026 (Tue)', '17:35:12 PM', 'HQ Main Gate (GPS: 3.1390, 101.6869)', 'CC-101 HQ Ops', 'No', 'No'],
+        'CLK-910481': ['Clock In', '17/09/2026 (Tue)', '08:15:04 AM', 'HQ Main Gate (GPS: 3.1390, 101.6869)', 'CC-101 HQ Ops', 'No', 'No'],
+        'CLK-910399': ['Clock Out', '16/09/2026 (Mon)', '19:40:55 PM', 'HQ Rear Lobby', 'CC-101 HQ Ops', 'No', 'No'],
+        'CLK-910398': ['Clock In', '16/09/2026 (Mon)', '08:09:12 AM', 'HQ Main Turnstile #2', 'CC-101 HQ Ops', 'No', 'No'],
+        'CLK-909877': ['Clock Out', '13/09/2026 (Fri)', '17:15:30 PM', 'Site Project Office (GPS: 3.129, 101.678)', 'CC-202 Tech Dept', 'No', 'No'],
+        'CLK-909876': ['Clock In', '13/09/2026 (Fri)', '08:42:10 AM', 'Site Project Office (GPS: 3.129, 101.678)', 'CC-202 Tech Dept', 'No', 'No']
+      },
+      ot: {
+        'AXT000000000101': ['Pending Approve', 'SP013 - Angeline loren alan', 'EBB04 - Tech Lead', '12 Jul 2024', '12/07/2024', '8.00AM-5.30PM', '0750', '06:00', '08:00', '0', '16.00', 'OT 1.5 BEFORE WORK', 'URGENT SYSTEM MIGRATION', 'Database Maintenance', 'No', 'Yes', 'Work started before normal hours', 'Please resubmit with signed supervisor logs', { actualHours: '0.00' }],
+        'OTB000000001604': ['Pending Approve', 'SP013 - Angeline loren alan', 'EBB04', '24 Oct 2023', '24/10/2023', '8.00AM-5.30PM', '0758', '20:00', '23:00', '0', '3.00', '1.5 OT', 'MATERIAL', '- SELECT TASK -', 'No', 'Yes', 'Emergency material checking', 'asd', { actualHours: '0.00' }],
+        'OTB000000001620': ['Approved', 'SP013 - Angeline loren alan', 'EBB04', '05 Sep 2026', '05/09/2026', '8.00AM-5.30PM', '0752', '18:00', '21:00', '0', '3.00', '1.5 OT', 'SYSTEM UPGRADE', 'Server Patching', 'Yes', 'No', 'Scheduled maintenance', 'Approved by Manager', { actualHours: '3.00' }],
+        'OTB000000001630': ['Rejected', 'SP013 - Angeline loren alan', 'EBB04', '10 Aug 2026', '10/08/2026', '8.00AM-5.30PM', '0800', '18:00', '20:00', '0', '2.00', '1.5 OT', 'OTHER', 'Documentation', 'No', 'No', 'General documentation', 'Overtime budget exceeded', { actualHours: '0.00' }]
+      },
+      feedback: {
+        'ATT000000000432': ['Pending Approve', 'EBB12 - Farhan binti rahmat', 'TIMES SQUARE BRANCH', 'HUMAN RESOURCE', '31 Dec 2025', '8.00AM-5.30PM', 'EBB12 - Farhan binti rahmat', '26/02/2026', '[Comment by FARHAN BIN RAHMAT (EBB12)]\nokay'],
+        'ATT000000000435': ['Pending Review', 'SP013 - Angeline loren alan', 'HQ MAIN BRANCH', 'TECH DEPT', '14 Sep 2026', '8.30AM-5.30PM', 'SP013 - Angeline', '14/09/2026', 'Pending supervisor review'],
+        'ATT000000000440': ['Approved', 'SP013 - Angeline loren alan', 'HQ MAIN BRANCH', 'TECH DEPT', '02 Sep 2026', '8.30AM-5.30PM', 'SP013 - Angeline', '02/09/2026', 'Approved by HR'],
+        'ATT000000000445': ['Rejected', 'SP013 - Angeline loren alan', 'HQ MAIN BRANCH', 'TECH DEPT', '18 Jul 2026', '8.30AM-5.30PM', 'SP013 - Angeline', '18/07/2026', 'Invalid reason provided']
+      }
+    };
+  </script>
+  <script src="../../../js/attendance/history-record-route.js"></script>
+  </body>
 </html>

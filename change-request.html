@@ -11,6 +11,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/theme.css">
   <link rel="stylesheet" href="css/app.css">
+  <link rel="stylesheet" href="css/history-record-page.css">
+  <script src="js/history-record-page.js"></script>
   <script src="js/components.js"></script>
   <script src="js/app.js" defer></script>
   <script src="modules/employee-career/js/cv-change-requests.js"></script>
@@ -760,30 +762,73 @@ DAMANSARA KOTA</textarea>
     </div>
 
     <!-- History CR Bottom Sheet Modal -->
-    <div class="indicators-overlay" id="historyOverlay" onclick="toggleHistoryModal(false)" style="display: none;">
-      <div class="indicators-sheet" onclick="event.stopPropagation()" style="max-height: 85vh; overflow-y: auto;">
-        <div class="sheet-handle"></div>
-        <div class="sheet-header">
-          <div class="sheet-title">
-            <h3>CV Change Request History</h3>
-            <p>Past Change Request Submissions &amp; Field Audit Trail</p>
+    <main id="historyOverlay" class="approval-record-page" data-history-page aria-labelledby="historyOverlayTitle" hidden>
+      <section class="approval-record-layout">
+        <header class="approval-page-header">
+          <phone-status-bar time="9:41"></phone-status-bar>
+          <div class="approval-page-heading">
+            <button type="button" data-history-back aria-label="Back to history"></button>
+            <h1 id="historyOverlayTitle" tabindex="-1">CV Change Request History</h1>
           </div>
-          <button class="sheet-close-btn" onclick="toggleHistoryModal(false)">✕</button>
-        </div>
-
-        <div id="changeRequestHistoryList" style="padding: 14px; display: flex; flex-direction: column; gap: 12px;">
+        </header>
+        <div id="changeRequestHistoryList" style="padding: 14px; display: flex; flex-direction: column; gap: 12px;" class="history-record-content">
           
           <!-- Submission 1 (Pending) -->
-          <div class="change-history-item" style="cursor: pointer; transition: all 0.2s ease;" onclick="toggleHistoryDetail('hist-detail-1')">
+          <a class="change-history-item" data-history-link href="#history/change/REQ-2026-0891">
             <div class="change-history-top">
               <span class="change-history-id">REQ-2026-0891</span>
               <span class="change-history-status pending">⏳ Pending HR Approval</span>
             </div>
             <div class="change-history-title">Personal Email &amp; Passport Renewal</div>
-            <div class="change-history-date">Submitted on 5 Sep 2026 • Route: HR Operations (Click for 2 modified fields)</div>
+            <span class="record-submit-date">Submit Date: 05/09/2026</span>
+            <div class="change-history-date">Route: HR Operations</div>
+
+            <!-- Expandable Detail Breakdown -->
+          </a>
+
+          <!-- Submission 2 (Approved) -->
+          <a class="change-history-item" data-history-link href="#history/change/REQ-2025-0412">
+            <div class="change-history-top">
+              <span class="change-history-id">REQ-2025-0412</span>
+              <span class="change-history-status approved">✓ Approved by HR</span>
+            </div>
+            <div class="change-history-title">Residential Address &amp; Mobile Update</div>
+            <div class="change-history-date">Approved on 15 Jan 2025 by Admin</div>
+
+            <!-- Expandable Detail Breakdown -->
+          </a>
+
+          <!-- Submission 3 (Approved) -->
+          <a class="change-history-item" data-history-link href="#history/change/REQ-2024-0109">
+            <div class="change-history-top">
+              <span class="change-history-id">REQ-2024-0109</span>
+              <span class="change-history-status approved">✓ Approved by HR</span>
+            </div>
+            <div class="change-history-title">Marital Status &amp; Degree Certification</div>
+            <div class="change-history-date">Approved on 12 Jun 2024 by HR Operations (Click for 2 modified items)</div>
             
             <!-- Expandable Detail Breakdown -->
-            <div id="hist-detail-1" style="display: none; margin-top: 10px; padding-top: 10px; border-top: 1px dashed var(--border-subtle);">
+          </a>
+
+        </div>
+      </section>
+    </main>
+    <main id="changeHistoryDetails" class="approval-record-page" data-history-page data-history-parent="#history/requests/all" aria-labelledby="changeHistoryDetailsTitle" hidden>
+      <section class="approval-record-layout">
+        <header class="approval-page-header">
+          <phone-status-bar time="9:41"></phone-status-bar>
+          <div class="approval-page-heading">
+            <button type="button" data-history-back aria-label="Back to history"></button>
+            <h1 id="changeHistoryDetailsTitle" tabindex="-1">CV Change Request Details</h1>
+          </div>
+        </header>
+        <div id="changeHistoryDetailsBody" class="history-record-content"></div>
+      </section>
+    </main>
+    <template data-change-record="REQ-2026-0891"><div class="change-history-top">
+              <span class="change-history-id">REQ-2026-0891</span>
+              <span class="change-history-status pending">⏳ Pending HR Approval</span>
+            </div><div class="change-history-title">Personal Email &amp; Passport Renewal</div><span class="record-submit-date">Submit Date: 05/09/2026</span>
               <div style="font-size: 11px; font-weight: 800; color: var(--purple-primary); margin-bottom: 6px;">MODIFIED FIELDS BREAKDOWN:</div>
               <div style="display: flex; flex-direction: column; gap: 6px; font-size: 11px;">
                 <div style="background: var(--bg-input); padding: 8px 10px; border-radius: 8px;">
@@ -795,20 +840,11 @@ DAMANSARA KOTA</textarea>
                   <div style="color: var(--text-muted);">Original: 25/03/2015 ➔ <strong style="color: #10b981;">25/03/2030</strong></div>
                 </div>
               </div>
-            </div>
-          </div>
-
-          <!-- Submission 2 (Approved) -->
-          <div class="change-history-item" style="cursor: pointer; transition: all 0.2s ease;" onclick="toggleHistoryDetail('hist-detail-2')">
-            <div class="change-history-top">
+            </template>
+    <template data-change-record="REQ-2025-0412"><div class="change-history-top">
               <span class="change-history-id">REQ-2025-0412</span>
               <span class="change-history-status approved">✓ Approved by HR</span>
-            </div>
-            <div class="change-history-title">Residential Address &amp; Mobile Update</div>
-            <div class="change-history-date">Approved on 15 Jan 2025 by Admin (Click for 2 modified fields)</div>
-            
-            <!-- Expandable Detail Breakdown -->
-            <div id="hist-detail-2" style="display: none; margin-top: 10px; padding-top: 10px; border-top: 1px dashed var(--border-subtle);">
+            </div><div class="change-history-title">Residential Address &amp; Mobile Update</div>
               <div style="font-size: 11px; font-weight: 800; color: #10b981; margin-bottom: 6px;">APPROVED CHANGES AUDIT:</div>
               <div style="display: flex; flex-direction: column; gap: 6px; font-size: 11px;">
                 <div style="background: var(--bg-input); padding: 8px 10px; border-radius: 8px;">
@@ -820,20 +856,11 @@ DAMANSARA KOTA</textarea>
                   <div style="color: var(--text-muted);">Original: 0123456789 ➔ <strong style="color: #10b981;">0198765432</strong></div>
                 </div>
               </div>
-            </div>
-          </div>
-
-          <!-- Submission 3 (Approved) -->
-          <div class="change-history-item" style="cursor: pointer; transition: all 0.2s ease;" onclick="toggleHistoryDetail('hist-detail-3')">
-            <div class="change-history-top">
+            </template>
+    <template data-change-record="REQ-2024-0109"><div class="change-history-top">
               <span class="change-history-id">REQ-2024-0109</span>
               <span class="change-history-status approved">✓ Approved by HR</span>
-            </div>
-            <div class="change-history-title">Marital Status &amp; Degree Certification</div>
-            <div class="change-history-date">Approved on 12 Jun 2024 by HR Operations (Click for 2 modified items)</div>
-            
-            <!-- Expandable Detail Breakdown -->
-            <div id="hist-detail-3" style="display: none; margin-top: 10px; padding-top: 10px; border-top: 1px dashed var(--border-subtle);">
+            </div><div class="change-history-title">Marital Status &amp; Degree Certification</div>
               <div style="font-size: 11px; font-weight: 800; color: #10b981; margin-bottom: 6px;">APPROVED CHANGES AUDIT:</div>
               <div style="display: flex; flex-direction: column; gap: 6px; font-size: 11px;">
                 <div style="background: var(--bg-input); padding: 8px 10px; border-radius: 8px;">
@@ -845,12 +872,7 @@ DAMANSARA KOTA</textarea>
                   <div style="color: var(--text-muted);">Degree in Accounting (CGPA 3.80 / 4.00)</div>
                 </div>
               </div>
-            </div>
-          </div>
-
-        </div>
-      </div>
-    </div>
+            </template>
 
     <!-- Interactive Toast Alert -->
     <div class="bonus-toast" id="bonusToast">
@@ -1684,18 +1706,19 @@ DAMANSARA KOTA</textarea>
       toggleOverlay('menuOverlay', open);
     }
 
-    // Request History Modal Toggle
     function toggleHistoryModal(open) {
-      toggleOverlay('historyOverlay', open);
+      if (open) HistoryRecordPage.open('requests', 'all');
+      else HistoryRecordPage.back();
     }
 
-    // Toggle History Detail Breakdown
-    function toggleHistoryDetail(detailId) {
-      const el = document.getElementById(detailId);
-      if (el) {
-        el.style.display = (el.style.display === 'none' || !el.style.display) ? 'block' : 'none';
-      }
-    }
+    HistoryRecordPage.register((kind, id) => {
+      if (kind === 'requests' && id === 'all') return document.getElementById('historyOverlay');
+      if (kind !== 'change') return;
+      const template = [...document.querySelectorAll('template[data-change-record]')].find(node => node.dataset.changeRecord === id);
+      if (!template) return;
+      document.getElementById('changeHistoryDetailsBody').replaceChildren(template.content.cloneNode(true));
+      return document.getElementById('changeHistoryDetails');
+    });
 
     function submittedProfile() {
       const profile = {};
@@ -1739,12 +1762,19 @@ DAMANSARA KOTA</textarea>
       catch { showToast('Unable to submit', 'Could not save this request. Your edits are still here.'); return; }
       const list = document.getElementById('changeRequestHistoryList');
       if (list) {
-        const row = document.createElement('div');
+        const row = document.createElement('a');
         row.className = 'change-history-item';
+        const target = new URL('modules/employee-career/options/history.html', location.href);
+        target.searchParams.set('category', 'cv-change-request');
+        target.searchParams.set('theme', document.documentElement.dataset.theme);
+        target.hash = HistoryRecordPage.href('cv-change-request', request.id);
+        row.href = target.href;
         row.innerHTML = '<div class="change-history-top"><span class="change-history-id"></span><span class="change-history-status pending">Pending HR Approval</span></div><div class="change-history-title"></div><div class="change-history-date"></div>';
         row.querySelector('.change-history-id').textContent = request.id;
         row.querySelector('.change-history-title').textContent = changes.map(item => item.label).join(', ');
-        row.querySelector('.change-history-date').textContent = 'Submitted just now (' + changes.length + ' modified fields)';
+        const detail = row.querySelector('.change-history-date');
+        detail.before(recordSubmitDate.create(request.submittedAt));
+        detail.textContent = changes.length + ' modified fields';
         list.prepend(row);
       }
       modifiedFields.forEach(item => {

@@ -9,7 +9,7 @@
   <link rel="stylesheet" href="../../../../css/theme.css"><link rel="stylesheet" href="../../../../css/app.css">
   <link rel="stylesheet" href="../../css/employee-career.css"><link rel="stylesheet" href="../../css/employee-career-forms.css">
   <link rel="stylesheet" href="../../../../css/form-section-headings.css"><link rel="stylesheet" href="../../css/staff-feedback.css">
-  <script src="../../../../js/components.js"></script><script src="../../../../js/app.js" defer></script><script src="../../js/staff-feedback.js" defer></script>
+  <script src="../../../../js/components.js"></script><script src="../../../../js/app.js" defer></script><script src="../../js/employee-career-feedback-store.js" defer></script><script src="../../js/staff-feedback.js" defer></script>
 </head>
 <body class="employee-career-option-page employee-career-form-page employee-career-team-form-page staff-feedback-review-page">
   <preview-top-bar active-page="v2"></preview-top-bar>
@@ -35,6 +35,7 @@
         <button id="staffReviewTab" class="employee-career-scope-tab" type="button" role="tab" aria-selected="false" tabindex="-1" aria-controls="staffReviewPanel">Review</button>
       </div>
       <section id="staffFeedbackPanel" class="staff-feedback-review-body" role="tabpanel" aria-labelledby="staffFeedbackTab">
+        <span id="staffFeedbackReviewSubmitDate" class="record-submit-date" hidden></span>
         <section class="staff-feedback-review-section" aria-labelledby="staffFeedbackReviewDetailsHeading">
           <h3 id="staffFeedbackReviewDetailsHeading" class="form-section-heading form-section-heading--new">Feedback Details</h3>
           <div class="staff-feedback-review-grid">
@@ -47,7 +48,6 @@
             <div class="staff-feedback-review-field"><label for="staffFeedbackReviewReference2">Reference 2</label><textarea id="staffFeedbackReviewReference2" class="staff-feedback-review-control" rows="1" readonly></textarea></div>
             <div class="staff-feedback-review-field is-wide"><label for="staffFeedbackReviewNote">Feedback Note</label><textarea id="staffFeedbackReviewNote" class="staff-feedback-review-control" rows="2" readonly></textarea></div>
             <div class="staff-feedback-review-field is-wide"><label for="staffFeedbackReviewRemarks">Feedback Remarks</label><textarea id="staffFeedbackReviewRemarks" class="staff-feedback-review-control" rows="2" readonly></textarea></div>
-            <div class="staff-feedback-review-field is-wide"><label for="staffFeedbackReviewSubmitDate">Submit Date</label><input id="staffFeedbackReviewSubmitDate" class="staff-feedback-review-control" type="text" readonly></div>
           </div>
         </section>
         <section class="staff-feedback-review-section" aria-labelledby="staffFeedbackAttachmentsHeading">

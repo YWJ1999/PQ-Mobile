@@ -24,7 +24,7 @@ const puppeteer = require('puppeteer');
       totalLabel: overview.querySelector('#staff-list-total-label').textContent.trim(),
       total: overview.querySelector('#staff-list-total-value').textContent.trim(),
       chart: overview.querySelector('.view-chart-btn').textContent.trim()
-    })), { records: '8', totalLabel: 'Total Scheduled Days', total: '168.00', chart: 'Chart' });
+    })), { records: '8', totalLabel: 'Total Scheduled Days', total: '168.00', chart: 'View Chart' });
 
     const employeeCards = await page.$$eval('#details-list-container .summary-history-card', cards => cards.map(card => ({
       name: card.querySelector('.staff-name-text').textContent.trim(),
@@ -44,7 +44,7 @@ const puppeteer = require('puppeteer');
       records: overview.querySelector('#daily-record-count').textContent.trim(),
       total: overview.querySelector('#daily-total-hours').textContent.trim(),
       chart: overview.querySelector('.view-chart-btn').textContent.trim()
-    })), { records: '22', total: '176.00', chart: 'Chart' });
+    })), { records: '22', total: '176.00', chart: 'View Chart' });
     assert.equal(await page.$$eval('#daily-list-container .summary-history-card', cards => cards.length), 22);
     assert.equal(await page.$$eval('#daily-list-container .summary-history-card .fa-chevron-right', icons => icons.length), 0);
     assert.deepEqual(await page.$eval('#daily-list-container .summary-history-card', card => ({
@@ -125,7 +125,8 @@ const puppeteer = require('puppeteer');
       status: card.querySelector('.summary-history-card-end .summary-history-status').textContent.replace(/\s+/g, ' ').trim(),
       statusType: card.querySelector('.summary-history-card-end .summary-history-status').dataset.status,
       statusIcon: card.querySelector('.summary-history-card-end .summary-history-status i').classList.contains('fa-check'),
-      statusColor: getComputedStyle(card.querySelector('.summary-history-card-end .summary-history-status')).color,
+      statusUsesHeaderColor: getComputedStyle(card.querySelector('.summary-history-status')).color ===
+        getComputedStyle(card.querySelector('.summary-history-card-header')).color,
       arrows: card.querySelectorAll('.fa-chevron-right').length
     })), {
       name: 'John Tan',
@@ -139,7 +140,7 @@ const puppeteer = require('puppeteer');
       status: 'Normal',
       statusType: 'normal',
       statusIcon: true,
-      statusColor: 'rgb(5, 150, 105)',
+      statusUsesHeaderColor: true,
       arrows: 0
     });
 
@@ -166,7 +167,8 @@ const puppeteer = require('puppeteer');
         status: status.textContent.replace(/\s+/g, ' ').trim(),
         statusType: status.dataset.status,
         statusIcon: status.querySelector('i').classList.contains('fa-circle-exclamation'),
-        statusColor: getComputedStyle(status).color,
+        statusUsesHeaderColor: getComputedStyle(status).color ===
+          getComputedStyle(card.querySelector('.summary-history-card-header')).color,
         arrows: card.querySelectorAll('.fa-chevron-right').length
       };
     }), {
@@ -181,7 +183,7 @@ const puppeteer = require('puppeteer');
       status: 'Unapproved OT',
       statusType: 'exception',
       statusIcon: true,
-      statusColor: 'rgb(217, 119, 6)',
+      statusUsesHeaderColor: true,
       arrows: 0
     });
     await page.click('#daily-list-container .summary-history-card');

@@ -6,6 +6,29 @@
   const storageKey = 'peoplehcm.web.preferences';
   const inlineSeen = new WeakMap();
   const sheetSeen = new WeakMap();
+  const individualDetailsOverlay = document.querySelector('.attendance-record-card') && document.getElementById('attendanceDetailsModalOverlay');
+  // Keep the source field names as keys when the visible labels are localized.
+  const individualDetailValues = new Map(
+    Array.from(individualDetailsOverlay?.querySelectorAll('.attendance-details-main > div') || [],
+      row => [row.firstElementChild.textContent.trim(), row.lastElementChild]),
+  );
+  const individualDayType = individualDetailValues.get('Day Type')?.textContent.trim();
+  const individualClose = individualDetailsOverlay?.querySelector('.modal-close-round');
+  let individualDetailsTrigger;
+  if (individualClose) {
+    const title = individualDetailsOverlay.querySelector('h3');
+    title.id = 'attendanceDetailsTitle';
+    const dialog = individualDetailsOverlay.querySelector('.popup-modal-content');
+    dialog.setAttribute('role', 'dialog');
+    dialog.setAttribute('aria-modal', 'true');
+    dialog.setAttribute('aria-labelledby', title.id);
+    dialog.addEventListener('keydown', event => {
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        individualClose.click();
+      }
+    });
+  }
   let preferences = { theme: { primary: '#435875', mode: 'light' }, locale: 'en' };
   let pending = false;
   let stylesPending = true;
@@ -14,6 +37,12 @@
   let profileScrollAdapted = false;
   html.setAttribute('data-peoplehcm-web', '');
   html.setAttribute('data-web-native', '');
+  const adapterSource = document.currentScript?.src;
+  if (adapterSource && /\/(?:[\w-]*history|tax-relief|prior-pay-data|overtime|change-request|leave)\.html$/.test(location.pathname)) {
+    const historyPages = document.createElement('script');
+    historyPages.src = new URL('history-pages.js', adapterSource).href;
+    document.head.append(historyPages);
+  }
 
   function send(type, extra) {
     window.dispatchEvent(new CustomEvent(type, { detail: extra || {} }));
@@ -301,6 +330,152 @@
         addClass(card, 'web-summary-card');
       });
   }
+  // Keep the original cells in place: legacy detail dialogs update their values by ID.
+  const submitDateLines = new Map();
+  function adaptSubmitDates() {
+    const current = new Set();
+    function show(source, before, raw, hideSource = true) {
+      if (!before) return;
+      const text = raw.trim();
+      const match = text.match(/^(?:[a-z]{3},?\s+)?(\d{1,2})[ /]([a-z]+|\d{1,2})[ /](\d{4})(.*)$/i);
+      let formatted = '';
+      if (match) {
+        let [, day, month, year, suffix] = match;
+        if (!/^\d+$/.test(month)) {
+          const date = new Date(day + ' ' + month + ' ' + year + ' 12:00 UTC');
+          if (Number.isNaN(date.getTime())) return;
+          month = String(date.getUTCMonth() + 1);
+        }
+        formatted = day.padStart(2, '0') + '/' + month.padStart(2, '0') + '/' + year + suffix;
+      } else if (!/^(?:[-–—]|not submitted)?$/i.test(text)) return;
+      current.add(source);
+      source.toggleAttribute('data-web-submit-source', hideSource);
+      if (!formatted) {
+        submitDateLines.get(source)?.remove();
+        submitDateLines.set(source, null);
+        return;
+      }
+      let line = submitDateLines.get(source);
+      if (!line) {
+        line = document.createElement('span');
+        line.className = 'web-record-submit-date';
+        const label = document.createElement('span');
+        label.textContent = 'Submit Date:';
+        line.append(label, document.createTextNode(' '));
+        submitDateLines.set(source, line);
+      }
+      line.lastChild.nodeValue = ' ' + formatted;
+      if (line.nextElementSibling !== before) before.before(line);
+    }
+    const panels = '.history-card-details,.card-details-box,.payroll-approval-field-grid,.tax-relief-detail-table,.leave-highlight-detail-body';
+    for (const label of document.querySelectorAll(
+      '.history-card-row > :first-child,.history-card-details span:first-child,.attendance-history-fact dt,' +
+      'tr > :first-child,.payroll-approval-field > :first-child,.tax-relief-detail-row > :first-child,.leave-highlight-detail-label,.sheet-content div > span:first-child'
+    )) {
+      if (!/^(?:submit date|submitted(?: date| on)?|submission date|提交日期)\s*[:：]?$/i.test(label.textContent.trim())) continue;
+      const value = label.nextElementSibling;
+      if (value) show(label.parentElement, label.closest(panels) || label.closest('table') || label.closest('.sheet-content > *'), value.textContent);
+    }
+    for (const source of document.querySelectorAll(
+      '.payroll-approval-date,.approval-request-card span:has(>strong:only-child),.relief-card-body span:has(>strong:only-child),' +
+      '.history-card-item div:not(:has(>*))'
+    )) {
+      if (source.closest('.web-record-submit-date') || source.parentElement.closest('.payroll-approval-date')) continue;
+      const text = source.textContent.trim();
+      const match = text.match(/^(?:submit date|submitted(?: date| on)?|提交日期)\s*[:=：]\s*(.+)$/i) ||
+        (source.matches('.payroll-approval-date') && text.match(/^Request Date:\s*(.+)$/i));
+      if (!match) continue;
+      const field = source.previousElementSibling?.matches('i.fa-calendar-check') ? source.parentElement : source;
+      const statusRow = source.closest('.payroll-approval-status-row') || (field !== source && field.parentElement);
+      show(field, statusRow || source, match[1]);
+    }
+    for (const note of document.querySelectorAll('#changeRequestHistoryList .change-history-date')) {
+      const dated = note.textContent.trim().match(/^Submitted on (.+?)\s*•\s*(.+)$/i);
+      const recent = note.textContent.trim().match(/^Submitted just now\s*\((.+)\)$/i);
+      if (dated) {
+        note.dataset.webSubmitDate = dated[1];
+        note.textContent = dated[2];
+      } else if (recent) {
+        const id = note.closest('.change-history-item')?.querySelector('.change-history-id')?.textContent;
+        try {
+          const record = JSON.parse(localStorage.getItem('pq_change_request_history') || '[]').find(item => item.id === id);
+          if (record?.submittedAt) {
+            note.dataset.webSubmitDate = new Date(record.submittedAt).toLocaleDateString('en-GB');
+            note.textContent = recent[1];
+          }
+        } catch { /* The original relative date stays visible when local history is unavailable. */ }
+      }
+      if (note.dataset.webSubmitDate) show(note, note, note.dataset.webSubmitDate, false);
+    }
+    for (const [source, line] of submitDateLines) {
+      if (current.has(source)) continue;
+      source.removeAttribute('data-web-submit-source');
+      line?.remove();
+      submitDateLines.delete(source);
+    }
+  }
+  function adaptAttendanceDayTypes() {
+    const panels = document.querySelectorAll('.attendance-record-card > .attendance-record-summary-panel, .staff-card-item > .attendance-record-summary-panel, .pending-feedback-record > .history-card-details');
+    for (const panel of panels) {
+      const first = panel.firstElementChild;
+      if (!first || first.querySelector('[data-day-type]')) continue;
+      const card = panel.parentElement;
+      let dayType = individualDayType;
+      if (card.matches('.staff-card-item')) {
+        dayType = typeof masterStaffDataset === 'undefined' ? null : masterStaffDataset.find(item => item.cleanEmpNo === card.dataset.empNo)?.dayType;
+      } else if (card.matches('.pending-feedback-record')) {
+        dayType = typeof cardData === 'function' ? cardData(card).dayType : null;
+      }
+      const row = document.createElement('div');
+      row.className = first.className;
+      row.innerHTML = '<span>Day Type</span><strong data-day-type></strong>';
+      row.lastElementChild.textContent = dayType || '–';
+      panel.prepend(row);
+    }
+  }
+  function adaptAttendanceSummaryButtons() {
+    if (individualDetailsTrigger && individualDetailsOverlay.style.display === 'none') {
+      individualDetailsTrigger.focus({ preventScroll: true });
+      individualDetailsTrigger = null;
+    }
+    for (const panel of document.querySelectorAll(':is(.attendance-record-card, .staff-card-item) > div.attendance-record-summary-panel')) {
+      const card = panel.parentElement;
+      const header = card.querySelector('.attendance-card-details-trigger, .staff-card-details-trigger');
+      const individual = card.matches('.attendance-record-card');
+      const recordId = individual ? card.dataset.date : card.dataset.empNo;
+      const summary = document.createElement('button');
+      summary.type = 'button';
+      summary.className = panel.className;
+      header.id = 'attendance-header-' + recordId;
+      summary.id = 'attendance-summary-' + recordId;
+      summary.setAttribute('aria-labelledby', header.id + ' ' + summary.id);
+      for (const trigger of [header, summary]) {
+        trigger.setAttribute('aria-haspopup', 'dialog');
+        trigger.setAttribute('aria-controls', individual ? 'attendanceDetailsModalOverlay' : 'detailsModal');
+      }
+      for (const field of panel.children) {
+        const row = document.createElement('span');
+        row.className = field.className;
+        row.append(...field.childNodes);
+        summary.append(row);
+      }
+      panel.replaceWith(summary);
+      summary.addEventListener('click', () => header.click());
+      if (individual) {
+        const [times, normalHours, otHours] = summary.querySelectorAll('.attendance-record-detail strong:not([data-day-type])');
+        header.addEventListener('click', () => {
+          individualDetailValues.get('Date').textContent = card.querySelector('.attendance-record-reference').textContent.replace(/^[^:：]*[:：]\s*/, '');
+          individualDetailValues.get('Shift').textContent = card.querySelector('.history-time-row').textContent.trim();
+          individualDetailValues.get('Clock Times').textContent = times.textContent;
+          individualDetailValues.get('Normal Hours').textContent = normalHours.textContent;
+          individualDetailValues.get('Unapproved OT Hours').textContent = card.dataset.exception === 'unapproved-ot' ? otHours.textContent : '0.00';
+          individualDetailValues.get('Exception').textContent = card.querySelector('.attendance-exception-status').textContent.trim();
+          individualDetailsTrigger = document.activeElement === summary ? summary : header;
+          individualClose.focus({ preventScroll: true });
+        });
+      }
+    }
+  }
   function adaptEmployeeIds() {
     document
       .querySelectorAll(
@@ -360,6 +535,83 @@
         button.append(span);
       }
     });
+  }
+  function setActionLabel(button, label) {
+    if (!button) return;
+    const target = button.querySelector(':scope > span') || button;
+    const current = target.textContent.trim();
+    if (current === label || current === window.PeopleHcmWebI18n?.t(label)) return;
+    // The source icon renderer can leave a separate text node for each letter.
+    target.normalize();
+    const text = Array.from(target.childNodes).find(node => node.nodeType === Node.TEXT_NODE && node.textContent.trim());
+    if (text) text.textContent = text.textContent.replace(text.textContent.trim(), label);
+  }
+
+  function adaptActionLabels() {
+    const find = selector => document.querySelector(selector);
+    const countIn = selector => Number.parseInt(find(selector)?.textContent, 10) || 0;
+    const selected = (selector, action, count) => setActionLabel(find(selector), `${action} selected (${count})`);
+    switch (location.pathname.split('/').pop()) {
+      case 'attendance.html':
+        selected('#attendanceUpdateBtn', 'Verify', document.querySelectorAll('.attendance-verify-button[aria-pressed="true"]').length);
+        break;
+      case 'staff-attendance.html':
+        if (typeof masterStaffDataset !== 'undefined') {
+          selected('#staffAttendanceUpdate', 'Verify', masterStaffDataset.filter(record => record.verified).length);
+        }
+        break;
+      case 'shift-plan.html': {
+        const count = countIn('#selectedCountText');
+        const copying = find('#modeCopyDatesBtn')?.classList.contains('active');
+        selected('#bottomMainActionBtn', copying ? 'Copy' : 'Review', count);
+        selected('button[onclick="confirmApplyChanges()"]', 'Apply', count);
+        selected('button[onclick="confirmReviewCopy()"]', 'Copy', count);
+        break;
+      }
+      case 'ot-plan.html':
+        selected('button[onclick="submitOtPlan()"]', 'Submit', countIn('#selectedCountAndHoursText'));
+        break;
+      case 'daily-ot-details.html': {
+        const count = document.querySelectorAll('.daily-ot-void-checkbox:checked').length;
+        setActionLabel(find('#dailyOtUpdate'), count ? `Void selected (${count})` : 'Save OT hours');
+        break;
+      }
+      case 'pending-approval.html': {
+        const count = countIn('#payrollPendingSelectedCount, #workplacePendingSelectedCount');
+        document.querySelectorAll('#payrollPendingBulk [data-payroll-action], #workplacePendingBulk [data-approval-action]').forEach(button => {
+          const action = button.dataset.payrollAction || button.dataset.approvalAction;
+          setActionLabel(button, `${action[0].toUpperCase() + action.slice(1)} selected (${count})`);
+        });
+        break;
+      }
+      case 'leave.html': {
+        const count = countIn('#floatingSelectedCountBadge');
+        selected('#teamApprovalsFloatingBar [onclick="executeBatchReject()"]', 'Reject', count);
+        selected('#teamApprovalsFloatingBar [onclick="executeBatchApprove()"]', 'Approve', count);
+        break;
+      }
+      case 'team.html': {
+        const approveAll = find('[onclick="window.ClaimsEngine.approveAllTeamClaims()"]');
+        if (!approveAll) break;
+        if (find('#teamApprovalsQueue:empty')) window.ClaimsEngine?.renderTeamQueue();
+        const count = countIn('#teamPendingCountVal');
+        setActionLabel(approveAll, `Approve all (${count})`);
+        approveAll.disabled = count === 0;
+        break;
+      }
+      case 'work-assignment.html':
+        selected('#submitWorkAssignment', 'Assign', document.querySelectorAll('#workAssignmentAssigneeOptions input:checked').length);
+        break;
+      case 'prior-pay-data.html': {
+        const save = find('#priorUpdate');
+        if (!save?.querySelector('.fa-spinner')) setActionLabel(save, 'Save pay data');
+        const help = find('#priorDialogText');
+        if (help?.textContent.includes('Update on the final step')) {
+          help.textContent = help.textContent.replace('Update on the final step saves all your changes.', 'Choose Save pay data on the final step to save your changes.');
+        }
+        break;
+      }
+    }
   }
   function reducedMotion() {
     return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -444,8 +696,12 @@
       stylesPending = false;
     } else adaptInlineStyles();
     adaptCards();
+    adaptAttendanceDayTypes();
+    adaptAttendanceSummaryButtons();
+    adaptSubmitDates();
     adaptEmployeeIds();
     adaptChartButtons();
+    adaptActionLabels();
     adaptNativeLayout();
     if (sourceInitialized && window.PeopleHcmWebI18n)
       window.PeopleHcmWebI18n.translate(document.body);
@@ -456,6 +712,9 @@
     pending = true;
     requestAnimationFrame(refresh);
   }
+  document.addEventListener('change', event => {
+    if (event.target.matches('.daily-ot-void-checkbox')) schedule();
+  });
   const observer = new MutationObserver((records) => {
     for (const record of records) {
       if (record.target === html && record.attributeName === 'data-theme') {

@@ -1,7 +1,8 @@
 /* Workplace approvals for the local Team preview. */
 (() => {
   const key = 'peoplehcm:workplace:pending-approval:v1';
-  const statuses = ['submitted', 'approved', 'resubmit', 'rejected', 'cancelled'];
+  const actionStatuses = { approve: 'approved', resubmit: 'resubmit', reject: 'rejected', cancel: 'cancelled' };
+  const statuses = Object.freeze(['submitted', ...Object.values(actionStatuses)]);
   const initial = () => [
     {
       id: 'guest-visit-0013', reference: 'FGV0000000000013', kind: 'guest-visit',
@@ -84,8 +85,8 @@
     return [...visits, ...stored.filter(row => !row.guestRevision)];
   }
   function act(ids, action, options = {}) {
-    const status = { approve: 'approved', resubmit: 'resubmit', reject: 'rejected', cancel: 'cancelled' }[action];
-    if (!status) throw new Error('Unsupported approval action.');
+    if (!Object.hasOwn(actionStatuses, action)) throw new Error('Unsupported approval action.');
+    const status = actionStatuses[action];
     if (!Array.isArray(ids) || !ids.length || new Set(ids).size !== ids.length) throw new Error('Please select a request.');
     const stored = storedRows();
     const rows = list(stored);
@@ -105,5 +106,5 @@
     localStorage.setItem(key, JSON.stringify([...saved.values()]));
     return targets.length;
   }
-  window.WorkplacePendingStore = { list, getPending: () => list().filter(row => row.status === 'submitted'), act, guestDecisions };
+  window.WorkplacePendingStore = { statuses, list, getPending: () => list().filter(row => row.status === 'submitted'), act, guestDecisions };
 })();

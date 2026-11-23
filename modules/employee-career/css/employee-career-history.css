@@ -89,12 +89,6 @@
 @media (prefers-reduced-motion: reduce) {
   #historyDetailsModal.cv-history-mobile-sheet .cv-history-qualification-chevron { transition: none; }
 }
-#historyDetailsModal.cv-history-mobile-sheet { align-items: flex-end !important; padding: 0 !important; --detail-surface: var(--bg-phone); }
-#historyDetailsModal.cv-history-mobile-sheet .history-detail-panel { max-width: none !important; height: 94% !important; max-height: calc(100% - 16px) !important; border-radius: 22px 22px 0 0 !important; border-bottom: 0 !important; background: var(--bg-phone) !important; }
-#historyDetailsModal.cv-history-mobile-sheet .history-detail-header { flex: 0 0 auto !important; grid-template-columns: minmax(0,1fr) 44px !important; min-height: 64px !important; height: auto !important; padding: 10px 16px !important; background: linear-gradient(135deg,#7c3aed,#6d28d9) !important; color: #fff !important; }
-#historyDetailsModal.cv-history-mobile-sheet #historyDetailTitle { color: #fff !important; font-size: 16px !important; line-height: 1.4 !important; letter-spacing: -.2px !important; text-transform: none !important; white-space: normal !important; overflow: visible !important; }
-#historyDetailsModal.cv-history-mobile-sheet #closeHistoryDetails { width: 44px !important; min-width: 44px !important; height: 44px !important; min-height: 44px !important; border-radius: 50% !important; background: #fff !important; color: #7c3aed !important; }
-#historyDetailsModal.cv-history-mobile-sheet #closeHistoryDetails > .fa-xmark { color: #7c3aed !important; font-size: 17px !important; }
 #historyDetailsModal.cv-history-mobile-sheet #historyDetailBody { display: flex !important; flex-direction: column !important; gap: 0 !important; padding: 0 !important; overflow: hidden !important; background: var(--bg-phone) !important; }
 #historyDetailsModal.cv-history-mobile-sheet .cv-history-detail-scroll { flex: 1 1 auto; min-height: 0; padding: 10px 14px max(22px,env(safe-area-inset-bottom)) !important; overflow-y: auto; overflow-x: hidden; overscroll-behavior: contain; scrollbar-width: thin; }
 #historyDetailsModal.cv-history-mobile-sheet :is(.cv-history-panel-title, .cv-history-request-summary h3) { display: flex; align-items: center; gap: 8px; margin: 0 0 12px; color: var(--text-primary); font-size: 13px; font-weight: 800; line-height: 1.5; }

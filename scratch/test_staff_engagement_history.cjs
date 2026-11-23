@@ -3,7 +3,7 @@ const path = require('node:path');
 const {pathToFileURL} = require('node:url');
 const puppeteer = require('puppeteer');
 const url = pathToFileURL(path.resolve(__dirname,'../modules/employee-career/options/team/history.html')).href;
-const labels = ['Reference #','Status','Emp #','Name','Position','Interviewee #','Interviewee Position','Submitter #','Submit Date','Interview Date','Flight Risk','Recommendation','Notes','Positive Feedback','Negative Feedback','Mitigation Action','Approver Remark','Applicant Remark','Attachment'];
+const labels = ['Reference #','Status','Emp #','Name','Position','Interviewee #','Interviewee Position','Submitter #','Interview Date','Flight Risk','Recommendation','Notes','Positive Feedback','Negative Feedback','Mitigation Action','Approver Remark','Applicant Remark','Attachment'];
 (async()=>{
   const browser=await puppeteer.launch({headless:true,executablePath:'C:/Program Files/Google/Chrome/Application/chrome.exe',args:['--allow-file-access-from-files','--no-sandbox']});
   try {
@@ -26,16 +26,17 @@ const labels = ['Reference #','Status','Emp #','Name','Position','Interviewee #'
       await page.click('[data-team-history-kind="staff-request"]');
       await page.click('[data-team-history-kind="staff-engagement"]');
       const original=await page.evaluate(()=>JSON.stringify(window.EMPLOYEE_CAREER_TEAM_HISTORY_DATA['staff-engagement']));
-      const names=()=>page.$$eval('#teamHistoryList .team-history-employee-identity',nodes=>nodes.map(node=>node.textContent.trim()));
-      assert.deepEqual(await names(),['EBB01 - Aina Rahman','EBB02 - Daniel Wong'],'The card identifies the employee in the engagement record');
+      const names=()=>page.$$eval('#teamHistoryList .team-history-employee-identity .history-employee-name',nodes=>nodes.map(node=>node.textContent.trim()));
+      assert.deepEqual(await names(),['Aina Rahman','Daniel Wong'],'The card identifies the employee in the engagement record');
       assert.deepEqual(await page.$$eval('#teamHistoryList .team-history-employee-position',nodes=>nodes.map(node=>node.textContent.trim())),['People Operations Executive','Product Designer']);
       assert.deepEqual(await page.$$eval('#teamHistoryList .history-card-row:nth-child(4) strong',nodes=>nodes.map(node=>node.textContent.trim())),['ENG-REF-0021','SEG-2026-0022']);
       assert.deepEqual(await page.$$eval('#teamHistoryList .history-card-row:nth-child(5) strong',nodes=>nodes.map(node=>node.textContent.trim())),['Lee · Account Executive','Tan · Team Lead']);
       assert.deepEqual(await page.$$eval('#teamHistoryList .history-card-row',nodes=>nodes.slice(0,3).map(node=>node.lastElementChild.textContent.trim())),['1 Oct 2026','31 Oct 2026','Retention Review']);
       const first='[data-engagement-id="SEG-2026-0021"]';
       await page.click(first);
+      assert.equal(await page.$eval('#teamEngagementSubmitDate',node=>node.textContent),'Submit Date: 05/10/2026');
       assert.deepEqual(await page.$$eval('#teamEngagementDetailsRows th',nodes=>nodes.map(node=>node.textContent.trim())),labels);
-      assert.deepEqual(await page.$$eval('#teamEngagementDetailsRows td',nodes=>nodes.slice(0,-1).map(node=>node.textContent.trim())),['ENG-REF-0021','Pending','#EBB01','Aina Rahman','People Operations Executive','#004177','Finance Analyst','#009988','5 Oct 2026','8 Oct 2026','Low','Continue Development Plan','Interview notes.\nSecond line.','Strong collaboration.','Workload concerns.','Review workload.','Follow up next month.','Acknowledged.']);
+      assert.deepEqual(await page.$$eval('#teamEngagementDetailsRows td',nodes=>nodes.slice(0,-1).map(node=>node.textContent.trim())),['ENG-REF-0021','Pending','#EBB01','Aina Rahman','People Operations Executive','#004177','Finance Analyst','#009988','8 Oct 2026','Low','Continue Development Plan','Interview notes.\nSecond line.','Strong collaboration.','Workload concerns.','Review workload.','Follow up next month.','Acknowledged.']);
       assert.equal(await page.$$eval('#teamEngagementDetailsRows tr:last-child a',nodes=>nodes.length),1);
       assert.ok(await page.$eval('#teamEngagementDetailsRows tr:last-child',node=>node.textContent.includes('notes.txt')));
       await page.screenshot({path:path.join(__dirname,`staff-engagement-details-${theme}-${width}.png`)});
@@ -53,7 +54,7 @@ const labels = ['Reference #','Status','Emp #','Name','Position','Interviewee #'
       await page.setViewport({width,height:844});
       await page.click('[data-engagement-id="SEG-2026-0022"]');
       const missing=await page.$$eval('#teamEngagementDetailsRows td',nodes=>nodes.map(node=>node.textContent.trim()));
-      assert.equal(missing[5],'—');assert.equal(missing[7],'—');assert.equal(missing[8],'—');assert.equal(missing[12],'—');assert.equal(missing.at(-1),'No attachments');
+      assert.equal(missing[5],'—');assert.equal(missing[7],'—');assert.equal(await page.$eval('#teamEngagementSubmitDate',node=>node.hidden),true);assert.equal(missing[11],'—');assert.equal(missing.at(-1),'No attachments');
       await page.click('#teamEngagementCloseDetails');
       const fieldIds={keyword:'teamEngagementKeyword',startDate:'teamEngagementStartDate',endDate:'teamEngagementEndDate',status:'teamEngagementStatus'};
       const apply=async values=>{
@@ -67,12 +68,12 @@ const labels = ['Reference #','Status','Emp #','Name','Position','Interviewee #'
       await page.screenshot({path:path.join(__dirname,`staff-engagement-filter-${theme}-${width}.png`)});
       await page.keyboard.press('Escape');
       for(const [values,expected] of [
-        [{keyword:'lEE'},['EBB01 - Aina Rahman']], [{keyword:'ACCOUNT EXECUTIVE'},['EBB01 - Aina Rahman']], [{keyword:'ENG-REF-0021'},['EBB01 - Aina Rahman']],
-        [{keyword:'#004177'},['EBB01 - Aina Rahman']], [{keyword:'retention review'},['EBB01 - Aina Rahman']],
-        [{startDate:'2026-10-08',endDate:'2026-10-08'},['EBB01 - Aina Rahman']],
-        [{startDate:'2026-10-12'},['EBB02 - Daniel Wong']],
+        [{keyword:'lEE'},['Aina Rahman']], [{keyword:'ACCOUNT EXECUTIVE'},['Aina Rahman']], [{keyword:'ENG-REF-0021'},['Aina Rahman']],
+        [{keyword:'#004177'},['Aina Rahman']], [{keyword:'retention review'},['Aina Rahman']],
+        [{startDate:'2026-10-08',endDate:'2026-10-08'},['Aina Rahman']],
+        [{startDate:'2026-10-12'},['Daniel Wong']],
         [{startDate:'2026-10-05',endDate:'2026-10-05'},[]],
-        [{keyword:'Lee',startDate:'2026-10-08',endDate:'2026-10-08',status:'Submitted'},['EBB01 - Aina Rahman']],
+        [{keyword:'Lee',startDate:'2026-10-08',endDate:'2026-10-08',status:'Submitted'},['Aina Rahman']],
         [{status:'Approved'},[]]
       ]) {await apply(values);assert.deepEqual(await names(),expected,JSON.stringify(values));}
       assert.equal(await page.$eval('#teamHistoryRecordCount',node=>node.textContent.trim()),'0');
@@ -88,13 +89,13 @@ const labels = ['Reference #','Status','Emp #','Name','Position','Interviewee #'
       await page.click('#teamEngagementFilterTrigger');
       await page.$eval('#teamEngagementKeyword',node=>{node.value='Tan';});
       await page.keyboard.press('Escape');
-      assert.deepEqual(await names(),['EBB01 - Aina Rahman']);
+      assert.deepEqual(await names(),['Aina Rahman']);
       for(const category of ['staff-confirmation','staff-exit','staff-request']) {
         await page.click(`[data-team-history-kind="${category}"]`);
         assert.equal(await page.$eval('#teamHistoryRecordCount',node=>node.textContent.trim()),'2');
         assert.equal(await page.$eval('#teamEngagementFilterBar',node=>node.hidden),true);
       }
-      await page.click('[data-team-history-kind="staff-engagement"]');assert.deepEqual(await names(),['EBB01 - Aina Rahman']);
+      await page.click('[data-team-history-kind="staff-engagement"]');assert.deepEqual(await names(),['Aina Rahman']);
       await page.click('#teamEngagementFilterTrigger');await page.click('#teamEngagementResetFilter');
       assert.equal(await page.evaluate(()=>JSON.stringify(window.EMPLOYEE_CAREER_TEAM_HISTORY_DATA['staff-engagement'])),original,'Viewing and filtering preserve source records');
       assert.ok(await page.$eval('main',node=>node.scrollWidth<=node.clientWidth+1));

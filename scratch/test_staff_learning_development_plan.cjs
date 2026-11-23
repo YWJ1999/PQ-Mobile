@@ -66,8 +66,8 @@ const storageKey = 'peoplehcm.staffLearningDevelopment.records.v1';
       hasArrow: Boolean(card.querySelector('.fa-chevron-right')),
       purpleHeader: getComputedStyle(card.querySelector('.ld-card-header')).backgroundImage.includes('linear-gradient')
     }))), [
-      { title: 'Leadership & Crisis Management', labels: ['Budget Hours', 'Deadline', 'Review Month(s)', 'Progress%'], values: ['24', '31 Dec 2026', '3', '50%'], action: 'Update', hasArrow: false, purpleHeader: true },
-      { title: 'HR Analytics & Reporting', labels: ['Budget Hours', 'Deadline', 'Review Month(s)', 'Progress%'], values: ['18', '30 Nov 2026', '1', '30%'], action: 'Update', hasArrow: false, purpleHeader: true }
+      { title: 'Leadership & Crisis Management', labels: ['Budget Hours', 'Deadline', 'Review Month(s)', 'Progress%'], values: ['24', '31 Dec 2026', '3', '50%'], action: 'Manage progress', hasArrow: false, purpleHeader: true },
+      { title: 'HR Analytics & Reporting', labels: ['Budget Hours', 'Deadline', 'Review Month(s)', 'Progress%'], values: ['18', '30 Nov 2026', '1', '30%'], action: 'Manage progress', hasArrow: false, purpleHeader: true }
     ]);
 
     await Promise.all([page.waitForNavigation({ waitUntil: 'domcontentloaded' }), click('.sld-update')]);
@@ -143,7 +143,7 @@ const storageKey = 'peoplehcm.staffLearningDevelopment.records.v1';
 
     await Promise.all([page.waitForNavigation({ waitUntil: 'domcontentloaded' }), click('.sld-record-card:nth-child(2) .sld-edit')]);
     assert.equal(await page.$eval('h1', node => node.textContent.trim()), 'Edit L&D Progress');
-    assert.equal(await page.$eval('#sldSave', node => node.textContent.trim()), 'Update');
+    assert.equal(await page.$eval('#sldSave', node => node.textContent.trim()), 'Save progress');
     assert.deepEqual(await page.$$eval('#sldEditForm :is(input, textarea)', nodes => nodes.map(node => node.value)), [
       '2026-06-15', '2026-06-16', '50', '8', 'Applied the crisis response framework in a team simulation.'
     ]);

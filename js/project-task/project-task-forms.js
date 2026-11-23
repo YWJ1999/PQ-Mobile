@@ -142,6 +142,7 @@
 
     function renderAssignees() {
       const selected = selectedAssignees();
+      byId('submitWorkAssignment').querySelector('span').textContent = formatSelectedAction('Assign', selected.length);
       byId('workAssignmentAssigneeSummary').textContent = selected.length
         ? `${selected.length} assignee${selected.length === 1 ? '' : 's'} selected`
         : 'Select assignee(s)';

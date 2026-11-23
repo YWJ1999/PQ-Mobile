@@ -33,7 +33,7 @@ const url = file => pathToFileURL(path.resolve(file)).href;
     assert.ok(page.url().includes('change-password.html?theme=light'));
     assert.equal(await page.$eval('.phone-container', el => el.getBoundingClientRect().height), homeHeight);
     assert.equal(await page.$$eval('#changePasswordForm input', els => els.length), 3);
-    assert.equal(await page.$eval('.password-submit', el => el.textContent.trim()), 'Update Password');
+    assert.equal(await page.$eval('.password-submit', el => el.textContent.trim()), 'Save password');
     console.log('PASS sidebar navigation, copy, three-field form and Home phone height');
 
     const storageBefore = await page.evaluate(() => ({ ...localStorage }));

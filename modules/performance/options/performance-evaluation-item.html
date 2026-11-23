@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PeopleHCM - Update Evaluation</title>
+  <title>PeopleHCM - Edit Evaluation</title>
   <script>(() => { document.documentElement.dataset.theme = new URLSearchParams(location.search).get('theme') === 'light' ? 'light' : 'dark'; })();</script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -30,12 +30,12 @@
       <phone-status-bar time="9:41"></phone-status-bar>
       <div class="performance-header-row">
         <a id="evaluationBack" class="performance-back" href="performance-evaluation.html" data-evaluation-link aria-label="Cancel and return to evaluation"><i class="fa-solid fa-chevron-left" aria-hidden="true"></i></a>
-        <h1 id="evaluationPageTitle">Update Evaluation</h1>
+        <h1 id="evaluationPageTitle">Edit Evaluation</h1>
         <span class="performance-header-spacer" aria-hidden="true"></span>
       </div>
     </header>
     <main class="main-content performance-content performance-goal-content">
-      <form id="evaluationItemForm" aria-label="Update evaluation item" novalidate>
+      <form id="evaluationItemForm" aria-label="Edit evaluation item" novalidate>
         <div id="evaluationItemContext" class="evaluation-context" aria-label="Employee and evaluation reference"></div>
         <section class="goal-form-panel performance-goal-form self-evaluation-section" aria-labelledby="evaluationItemSectionTitle">
           <header class="goal-form-header performance-goal-form-header"><div class="self-evaluation-heading"><h2 id="evaluationItemSectionTitle">Evaluation Item</h2></div></header>
@@ -50,7 +50,7 @@
           </div>
           <footer class="goal-form-footer">
             <a id="evaluationItemCancel" class="form-cancel-btn" href="performance-evaluation.html" data-evaluation-link>Cancel</a>
-            <button id="evaluationItemUpdate" class="goal-form-save" type="submit">Update</button>
+            <button id="evaluationItemUpdate" class="goal-form-save" type="submit">Save evaluation</button>
           </footer>
         </section>
       </form>

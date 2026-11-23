@@ -205,6 +205,7 @@ async function checkSubmittedForms(page) {
         await page.click('#performanceApprovalSelectAll');
         assert.equal(await page.$eval('#performanceApprovalSelectedCount', el => el.textContent), '1');
         await page.click('#performanceApprovalBulk [data-approval-action="approve"]');
+        assert.equal(await page.$eval('#approvalConfirmSubmit', button => button.textContent), 'Approve selected (1)');
         await page.click('#approvalConfirmSubmit');
         assert.ok(await page.$('.payroll-pending-empty'));
         await page.reload();

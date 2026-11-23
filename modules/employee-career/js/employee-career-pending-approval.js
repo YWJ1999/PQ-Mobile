@@ -218,7 +218,7 @@
         tbody.append(row);
       });
       table.append(tbody);
-      body.append(table);
+      body.append(recordSubmitDate.create(item.submitDate), table);
       if (isEngagement) {
         const remarks = node('section', 'detail-popout-comments approval-comments-card');
         const label = node('label', '', 'Approver Remarks');

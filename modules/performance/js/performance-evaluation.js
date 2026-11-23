@@ -109,8 +109,8 @@
           details.append(row);
         }
         const footer = element('div', 'evaluation-card-footer');
-        const update = link(route('performance-evaluation-form.html', { evaluation: record.id }, ['kind', 'item']), 'Update', 'evaluation-update');
-        update.setAttribute('aria-label', `Update evaluation for ${record.employee.name}, ${record.evaluationRef}`);
+        const update = link(route('performance-evaluation-form.html', { evaluation: record.id }, ['kind', 'item']), 'Edit evaluation', 'evaluation-update');
+        update.setAttribute('aria-label', `Edit evaluation for ${record.employee.name}, ${record.evaluationRef}`);
         footer.append(update);
         card.append(header, details, footer);
         return card;
@@ -228,7 +228,7 @@
 
       const actions = element('div', 'goal-plan-card-actions');
       const update = link(route('performance-evaluation-item.html', { evaluation: record.id, kind: section, item: item.id }), '', 'goal-plan-card-update evaluation-update');
-      update.setAttribute('aria-label', 'Update ' + title.toLowerCase() + ': ' + item.title);
+      update.setAttribute('aria-label', 'Edit ' + title.toLowerCase() + ': ' + item.title);
       update.append(element('i', 'fa-solid fa-pen-to-square'));
       actions.append(update);
       if (section === 'goals') {
@@ -342,7 +342,7 @@
     $('evaluationItemCancel').href = returnUrl();
     if (!item) { notFound('evaluationItemForm', 'This evaluation item is unavailable. Return to the evaluation to select an item.'); return; }
 
-    $('evaluationPageTitle').textContent = adding ? 'Add Goal' : 'Update ' + title;
+    $('evaluationPageTitle').textContent = adding ? 'Add Goal' : 'Edit ' + title;
     $('evaluationItemSectionTitle').textContent = title;
     $('evaluationItemContext').replaceChildren(element('strong', 'evaluation-context-name', record.employee.name),
       element('span', 'self-evaluation-employee-id', employeeId(record.employee.empNo)),
@@ -359,7 +359,7 @@
     $('evaluationItemWeightage').value = adding ? '' : item.weightage + '%';
     $('evaluationItemRating').value = item.rating ?? '';
     $('evaluationItemRemark').value = item.remark || '';
-    $('evaluationItemUpdate').textContent = adding ? 'Add Goal' : 'Update';
+    $('evaluationItemUpdate').textContent = adding ? 'Add Goal' : 'Save evaluation';
 
     function clearError() {
       $('evaluationItemError').hidden = true;

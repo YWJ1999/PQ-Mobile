@@ -289,9 +289,15 @@
     return { name: String(attachment?.name || 'Attachment') };
   }
 
+  function submissionDate(record) {
+    // Earlier form submissions stored their timestamp as createdAt.
+    return record.submittedAt || (statusKey(historyStatus(record.status)) !== 'draft' ? record.createdAt : '');
+  }
+
   function normalizeWorkPlan(record, index) {
     return {
       id: String(record.id || 'WP-LOCAL-' + (index + 1)),
+      submittedAt: submissionDate(record),
       title: String(record.title || 'Untitled Work Plan'),
       description: String(record.description || ''),
       taskCategory: String(record.taskCategory || ''),
@@ -362,6 +368,7 @@
     return {
       ...record,
       id: String(record.id || 'TS-LOCAL-' + (index + 1)),
+      submittedAt: submissionDate(record),
       date: String(record.date || record.createdAt?.slice(0, 10) || ''),
       remark: String(record.remark || ''),
       status: historyStatus(record.status),
@@ -475,14 +482,14 @@
     const current = getProjectHistoryRecord(kind, record.id);
     const actionIsCurrent = current && getProjectHistoryActions(current).some(candidate => candidate.key === action.key);
     if (!actionIsCurrent) {
-      if (detailWasOpen) closeOverlay('projectHistoryDetailOverlay', false);
+      if (detailWasOpen) HistoryRecordPage.back();
       if (kind === 'work-plan') renderWorkPlans();
       else renderTimesheets();
       window.showToast?.('This record is no longer available for that action');
       return false;
     }
 
-    if (action.key === 'discard' && detailWasOpen) closeOverlay('projectHistoryDetailOverlay', false);
+    if (action.key === 'discard' && detailWasOpen) HistoryRecordPage.back();
     try {
       if (kind === 'timesheet' && action.key === 'submit') {
         const localDraft = current.id === 'TS-DRAFT-LOCAL';
@@ -490,7 +497,7 @@
         const draft = localDraft ? localStorage.getItem('pq_project_timesheet_draft') : null;
         await TimesheetRequests.submit({ ...current, id, status: 'Submitted', employeeName: current.employeeName || previewUserName,
           employeeId: current.employeeId || current.empNo || 'EBB01' }, draft, localDraft);
-        if (detailWasOpen) activeProjectHistoryDetail.id = id;
+        if (detailWasOpen && id !== current.id) HistoryRecordPage.replace('timesheet', id);
       } else if (kind === 'timesheet' && action.key === 'cancel' && TimesheetRequests.pending().some(sheet => sheet.id === current.id)) {
         await TimesheetRequests.decide([current.id], 'cancel');
       } else if (kind === 'timesheet' && current.id === 'TS-DRAFT-LOCAL' && action.key === 'discard') {
@@ -551,10 +558,10 @@
       createDataRow('Scheduled', formatSchedule(record)),
       createDataRow('Deadline', formatDate(record.deadline))
     );
-    card.append(createCardTop(record.title, record.id, record.status), details);
+    card.append(createCardTop(record.title, record.id, record.status), recordSubmitDate.create(record.submittedAt), details);
     const actions = createCardActions(record, 'work-plan');
     if (actions) card.append(actions);
-    makeCardInteractive(card, () => openWorkPlanDetails(record));
+    makeCardInteractive(card, () => HistoryRecordPage.open('work-plan', record.id, card));
     return card;
   }
 
@@ -569,10 +576,10 @@
       createDataRow('Normal Hours', formatMinutes(record.normalMinutes)),
       createDataRow('OT Hours', formatMinutes(record.overtimeMinutes))
     );
-    card.append(createCardTop(formatDate(record.date), record.id, record.status), details);
+    card.append(createCardTop(formatDate(record.date), record.id, record.status), recordSubmitDate.create(record.submittedAt), details);
     const actions = createCardActions(record, 'timesheet');
     if (actions) card.append(actions);
-    makeCardInteractive(card, () => openTimesheetDetails(record));
+    makeCardInteractive(card, () => HistoryRecordPage.open('timesheet', record.id, card));
     return card;
   }
 
@@ -763,11 +770,6 @@
     return content;
   }
 
-  function setDetailIcon(iconName) {
-    const icon = document.querySelector('.project-history-detail-icon i');
-    icon.className = 'fa-solid ' + iconName;
-  }
-
   function renderProjectDetailActions(record, kind) {
     const footer = byId('projectHistoryDetailActions');
     const actions = getProjectHistoryActions(record);
@@ -777,7 +779,7 @@
 
   function replaceProjectHistoryDetailContent(record, kind) {
     const content = kind === 'work-plan' ? [renderWorkPlanDetails(record)] : renderTimesheetDetails(record);
-    byId('projectHistoryDetailContent').replaceChildren(...content);
+    byId('projectHistoryDetailContent').replaceChildren(recordSubmitDate.create(record.submittedAt), ...content);
     renderProjectDetailActions(record, kind);
   }
 
@@ -785,33 +787,22 @@
     if (!activeProjectHistoryDetail) return;
     const record = getProjectHistoryRecord(activeProjectHistoryDetail.kind, activeProjectHistoryDetail.id);
     if (!record) {
-      closeOverlay('projectHistoryDetailOverlay', false);
+      HistoryRecordPage.back();
       return;
     }
     replaceProjectHistoryDetailContent(record, activeProjectHistoryDetail.kind);
   }
 
-  function openDetails(title, iconName, record, kind) {
-    const overlay = byId('projectHistoryDetailOverlay');
-    lastFocusedElement = document.activeElement;
-    activeProjectHistoryDetail = { kind, id: record.id };
-    byId('projectHistoryDetailTitle').textContent = title;
-    setDetailIcon(iconName);
+  function renderRecordPage(kind, id) {
+    if (!['work-plan', 'timesheet'].includes(kind)) return;
+    const record = getProjectHistoryRecord(kind, id);
+    if (!record) return;
+    const tab = kind === 'work-plan' ? 'workPlan' : 'timesheet';
+    if (byId(tab + 'HistoryPanel').hidden) switchHistoryTab(tab);
+    activeProjectHistoryDetail = { kind, id };
+    byId('projectHistoryDetailTitle').textContent = kind === 'work-plan' ? 'Work Plan Details' : 'Timesheet Details';
     replaceProjectHistoryDetailContent(record, kind);
-    overlay.hidden = false;
-    overlay.querySelector('.project-history-detail-sheet').scrollTop = 0;
-    requestAnimationFrame(() => {
-      overlay.classList.add('is-open');
-      byId('closeProjectHistoryDetails').focus({ preventScroll: true });
-    });
-  }
-
-  function openWorkPlanDetails(record) {
-    openDetails('Work Plan Details', 'fa-clipboard-list', record, 'work-plan');
-  }
-
-  function openTimesheetDetails(record) {
-    openDetails('Timesheet Details', 'fa-clock', record, 'timesheet');
+    return byId('projectHistoryDetailOverlay');
   }
 
   function closeOverlay(id, restoreFocus) {
@@ -819,7 +810,6 @@
     if (!overlay || overlay.hidden) return;
     overlay.classList.remove('is-open');
     overlay.hidden = true;
-    if (id === 'projectHistoryDetailOverlay') activeProjectHistoryDetail = null;
     if (restoreFocus !== false && lastFocusedElement?.isConnected) lastFocusedElement.focus({ preventScroll: true });
   }
 
@@ -836,7 +826,6 @@
   function closeAllOverlays(restoreFocus) {
     closeOverlay('workPlanHistoryFilterOverlay', restoreFocus);
     closeOverlay('timesheetHistoryFilterOverlay', restoreFocus);
-    closeOverlay('projectHistoryDetailOverlay', restoreFocus);
   }
 
   function switchHistoryTab(name, focusTab) {
@@ -896,10 +885,8 @@
       renderTimesheets();
     });
 
-    byId('closeProjectHistoryDetails').addEventListener('click', () => closeOverlay('projectHistoryDetailOverlay'));
     bindOverlayDismiss('workPlanHistoryFilterOverlay');
     bindOverlayDismiss('timesheetHistoryFilterOverlay');
-    bindOverlayDismiss('projectHistoryDetailOverlay');
 
     for (const tabName of ['workPlan', 'timesheet']) {
       const tab = byId('historyTab-' + tabName);
@@ -914,8 +901,7 @@
 
     document.addEventListener('keydown', event => {
       if (event.key !== 'Escape') return;
-      if (!byId('projectHistoryDetailOverlay').hidden) closeOverlay('projectHistoryDetailOverlay');
-      else if (!byId('timesheetHistoryFilterOverlay').hidden) closeOverlay('timesheetHistoryFilterOverlay');
+      if (!byId('timesheetHistoryFilterOverlay').hidden) closeOverlay('timesheetHistoryFilterOverlay');
       else if (!byId('workPlanHistoryFilterOverlay').hidden) closeOverlay('workPlanHistoryFilterOverlay');
     });
     window.addEventListener('storage', event => {
@@ -934,6 +920,7 @@
       renderTimesheets();
       if (activeProjectHistoryDetail?.kind === 'timesheet') refreshProjectHistoryDetails();
     });
+    HistoryRecordPage.register(renderRecordPage, () => { activeProjectHistoryDetail = null; });
     document.documentElement.dataset.projectHistoryReady = 'true';
   }
 

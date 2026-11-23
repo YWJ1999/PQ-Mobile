@@ -160,9 +160,9 @@
         ['Progress%', `${number(progress(activity))}%`, 'progress']
       ]));
       const footer = node('footer', 'ld-card-footer');
-      const update = node('a', 'ld-primary ld-update sld-update', 'Update');
+      const update = node('a', 'ld-primary ld-update sld-update', 'Manage progress');
       update.href = themedUrl('staff-learning-development-update.html', activity.id);
-      update.setAttribute('aria-label', `Update ${activity.activity}`);
+      update.setAttribute('aria-label', `Manage progress for ${activity.activity}`);
       footer.append(update);
       card.append(footer);
       return card;
@@ -217,7 +217,7 @@
     if (activeRecord) {
       document.title = 'PeopleHCM - Edit L&D Progress';
       $('sldEditPageTitle').textContent = 'Edit L&D Progress';
-      $('sldSaveLabel').textContent = 'Update';
+      $('sldSaveLabel').textContent = 'Save progress';
     }
     [
       ['sldStartInput', initial.start],

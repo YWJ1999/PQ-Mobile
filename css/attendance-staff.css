@@ -20,14 +20,10 @@
   padding: 16px;
   margin-bottom: 12px;
   border: 1px solid var(--border-subtle);
-  border-left: 5px solid #10b981;
+  border-left: 5px solid var(--record-accent);
   border-radius: 18px;
-  background: linear-gradient(135deg, var(--bg-card) 0%, rgba(16,185,129,.06) 100%);
+  background: linear-gradient(135deg, var(--bg-card), color-mix(in srgb, var(--record-accent) 6%, var(--bg-card)));
   box-shadow: var(--shadow-sm);
-}
-.staff-attendance-page .staff-card-item.exception-theme {
-  border-left-color: #f59e0b;
-  background: linear-gradient(135deg, var(--bg-card) 0%, rgba(245,158,11,.06) 100%);
 }
 .staff-attendance-page .attendance-record-top { display: grid; grid-template-columns: auto minmax(0,1fr) auto; gap: 10px; align-items: center; }
 .staff-attendance-page .staff-card-details-trigger { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; min-width: 0; padding: 0; border: 0; background: transparent; color: var(--text-primary); font: inherit; text-align: left; cursor: pointer; }
@@ -49,8 +45,7 @@
 .staff-attendance-page .verify-all-wrap .staff-verify-label { color: var(--purple-primary); font-size: 10.5px; font-weight: 800; letter-spacing: .3px; line-height: normal; text-transform: uppercase; white-space: normal; }
 .staff-attendance-page .verify-all-wrap:has(.staff-verify-checkbox:focus-visible),
 .staff-attendance-page .staff-verify-control:has(.staff-verify-checkbox:focus-visible) { outline: 3px solid rgba(124,58,237,.3); outline-offset: 4px; border-radius: 10px; }
-.staff-attendance-page .attendance-record-summary-panel { display: grid; gap: 9px; padding: 12px 14px; border: 1px solid rgba(16,185,129,.18); border-radius: 15px; background: rgba(16,185,129,.05); }
-.staff-attendance-page .exception-theme .attendance-record-summary-panel { border-color: rgba(245,158,11,.18); background: rgba(245,158,11,.05); }
+.staff-attendance-page .attendance-record-summary-panel { display: grid; gap: 9px; padding: 12px 14px; border: 1px solid color-mix(in srgb, var(--record-accent) 18%, transparent); border-radius: 15px; background: color-mix(in srgb, var(--record-accent) 5%, transparent); }
 .staff-attendance-page .attendance-record-detail { display: flex; justify-content: space-between; align-items: start; gap: 12px; }
 .staff-attendance-page .attendance-record-detail > span { color: var(--text-secondary); font-size: 11.5px; font-weight: 600; }
 .staff-attendance-page .attendance-record-detail > strong { min-width: 0; color: var(--text-primary); font-size: 12px; font-weight: 800; text-align: right; overflow-wrap: anywhere; }

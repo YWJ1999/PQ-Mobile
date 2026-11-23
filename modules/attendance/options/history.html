@@ -7,7 +7,11 @@
       content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
     />
     <title>PeopleHCM - History</title>
-    <script src="../../../js/components.js"></script>
+    <link rel="stylesheet" href="../../../css/history-record-page.css">
+  <script src="../../../js/history-record-page.js"></script>
+  <script src="../../../js/attendance/advice-fields.js"></script>
+  <script src="../../../js/attendance/attendance-days.js"></script>
+  <script src="../../../js/components.js"></script>
     <script src="../../../js/app.js" defer></script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -237,20 +241,9 @@
         </section>
 
         <!-- Clocking History List View (Separated Clock In & Clock Out) -->
-        <div id="viewClockingHistory">
+        <div id="viewClockingHistory" data-record-colour-view="Clocking status" data-record-legend='{"Normal":"normal","Overtime":"overtime","Late In":"late-in","Early Out":"early-out"}'>
           <!-- 17 SEP Clock Out -->
-          <a href="javascript:void(0)" class="history-card-item" data-status="normal" onclick="
-              openClockDetailsModal(
-                'CLK-910482',
-                'Clock Out',
-                '17/09/2026 (Tue)',
-                '17:35:12 PM',
-                'HQ Main Gate (GPS: 3.1390, 101.6869)',
-                'CC-101 HQ Ops',
-                'No',
-                'No',
-              )
-            ">
+          <a class="history-card-item" data-status="normal" data-history-link href="#history/clocking/CLK-910482">
             <div class="history-card-header">
               <div class="history-card-heading">
                 <h3 class="history-card-title">Clock Out</h3>
@@ -267,18 +260,7 @@
           </a>
 
           <!-- 17 SEP Clock In -->
-          <a href="javascript:void(0)" class="history-card-item" data-status="normal" onclick="
-              openClockDetailsModal(
-                'CLK-910481',
-                'Clock In',
-                '17/09/2026 (Tue)',
-                '08:15:04 AM',
-                'HQ Main Gate (GPS: 3.1390, 101.6869)',
-                'CC-101 HQ Ops',
-                'No',
-                'No',
-              )
-            ">
+          <a class="history-card-item" data-status="normal" data-history-link href="#history/clocking/CLK-910481">
             <div class="history-card-header">
               <div class="history-card-heading">
                 <h3 class="history-card-title">Clock In</h3>
@@ -295,24 +277,13 @@
           </a>
 
           <!-- 16 SEP Clock Out -->
-          <a href="javascript:void(0)" class="history-card-item" data-status="overtime" onclick="
-              openClockDetailsModal(
-                'CLK-910399',
-                'Clock Out',
-                '16/09/2026 (Mon)',
-                '19:40:55 PM',
-                'HQ Rear Lobby',
-                'CC-101 HQ Ops',
-                'No',
-                'No',
-              )
-            ">
+          <a class="history-card-item" data-status="overtime" data-history-link href="#history/clocking/CLK-910399">
             <div class="history-card-header">
               <div class="history-card-heading">
                 <h3 class="history-card-title">Clock Out</h3>
                 <div class="history-card-ref attendance-history-date">Wed 16 Sep 2026</div>
               </div>
-              <div class="attendance-history-card-end"><span class="card-status-badge"><i class="fa-solid fa-clock" aria-hidden="true"></i>Overtime (2.17 Hrs)</span><i class="fa-solid fa-chevron-right" aria-hidden="true"></i></div>
+              <div class="attendance-history-card-end"><span class="card-status-badge" data-record-key-label="Overtime"><i class="fa-solid fa-clock" aria-hidden="true"></i>Overtime (2.17 Hrs)</span><i class="fa-solid fa-chevron-right" aria-hidden="true"></i></div>
             </div>
             <div class="history-card-details">
               <table class="record-detail-table"><tbody>
@@ -323,18 +294,7 @@
           </a>
 
           <!-- 16 SEP Clock In -->
-          <a href="javascript:void(0)" class="history-card-item" data-status="normal" onclick="
-              openClockDetailsModal(
-                'CLK-910398',
-                'Clock In',
-                '16/09/2026 (Mon)',
-                '08:09:12 AM',
-                'HQ Main Turnstile #2',
-                'CC-101 HQ Ops',
-                'No',
-                'No',
-              )
-            ">
+          <a class="history-card-item" data-status="normal" data-history-link href="#history/clocking/CLK-910398">
             <div class="history-card-header">
               <div class="history-card-heading">
                 <h3 class="history-card-title">Clock In</h3>
@@ -351,24 +311,13 @@
           </a>
 
           <!-- 13 SEP Clock Out -->
-          <a href="javascript:void(0)" class="history-card-item" data-status="early-out" onclick="
-              openClockDetailsModal(
-                'CLK-909877',
-                'Clock Out',
-                '13/09/2026 (Fri)',
-                '17:15:30 PM',
-                'Site Project Office (GPS: 3.129, 101.678)',
-                'CC-202 Tech Dept',
-                'No',
-                'No',
-              )
-            ">
+          <a class="history-card-item" data-status="early-out" data-history-link href="#history/clocking/CLK-909877">
             <div class="history-card-header">
               <div class="history-card-heading">
                 <h3 class="history-card-title">Clock Out</h3>
                 <div class="history-card-ref attendance-history-date">Sun 13 Sep 2026</div>
               </div>
-              <div class="attendance-history-card-end"><span class="card-status-badge"><i class="fa-solid fa-clock" aria-hidden="true"></i>Early Out (15 mins)</span><i class="fa-solid fa-chevron-right" aria-hidden="true"></i></div>
+              <div class="attendance-history-card-end"><span class="card-status-badge" data-record-key-label="Early Out"><i class="fa-solid fa-clock" aria-hidden="true"></i>Early Out (15 mins)</span><i class="fa-solid fa-chevron-right" aria-hidden="true"></i></div>
             </div>
             <div class="history-card-details">
               <table class="record-detail-table"><tbody>
@@ -379,24 +328,13 @@
           </a>
 
           <!-- 13 SEP Clock In -->
-          <a href="javascript:void(0)" class="history-card-item" data-status="late-in" onclick="
-              openClockDetailsModal(
-                'CLK-909876',
-                'Clock In',
-                '13/09/2026 (Fri)',
-                '08:42:10 AM',
-                'Site Project Office (GPS: 3.129, 101.678)',
-                'CC-202 Tech Dept',
-                'No',
-                'No',
-              )
-            ">
+          <a class="history-card-item" data-status="late-in" data-history-link href="#history/clocking/CLK-909876">
             <div class="history-card-header">
               <div class="history-card-heading">
                 <h3 class="history-card-title">Clock In</h3>
                 <div class="history-card-ref attendance-history-date">Sun 13 Sep 2026</div>
               </div>
-              <div class="attendance-history-card-end"><span class="card-status-badge"><i class="fa-solid fa-clock" aria-hidden="true"></i>Late In (12 mins)</span><i class="fa-solid fa-chevron-right" aria-hidden="true"></i></div>
+              <div class="attendance-history-card-end"><span class="card-status-badge" data-record-key-label="Late In"><i class="fa-solid fa-clock" aria-hidden="true"></i>Late In (12 mins)</span><i class="fa-solid fa-chevron-right" aria-hidden="true"></i></div>
             </div>
             <div class="history-card-details">
               <table class="record-detail-table"><tbody>
@@ -408,32 +346,9 @@
         </div>
 
         <!-- OT History List View -->
-        <div id="viewOtHistory" style="display: none">
+        <div id="viewOtHistory" data-record-colour-view="OT plan status" data-record-legend='{"Pending Approve":"submitted","To Resubmit":"resubmit","Approved":"approved","Rejected":"rejected"}' style="display: none">
           <!-- OT Card 1: AXT000000000101 -->
-<article role="button" tabindex="0" onkeydown="if(event.target === this && (event.key === 'Enter' || event.key === ' ')){event.preventDefault(); this.click();}" class="history-card-item" data-status="resubmit" onclick="
-              openOtDetailsModal(
-                'AXT000000000101',
-                'Pending For Resubmission',
-                'SP013 - Angeline loren alan',
-                'EBB04 - Tech Lead',
-                '12 Jul 2024',
-                '12/07/2024',
-                '8.00AM-5.30PM',
-                '0750',
-                '06:00',
-                '08:00',
-                '0',
-                '16.00',
-                'OT 1.5 BEFORE WORK',
-                'URGENT SYSTEM MIGRATION',
-                'Database Maintenance',
-                'No',
-                'Yes',
-                'Work started before normal hours',
-                'Please resubmit with signed supervisor logs',
-                { actualHours: '0.00' },
-              )
-            ">
+<article role="button" tabindex="0" onkeydown="if(event.target === this && (event.key === 'Enter' || event.key === ' ')){event.preventDefault(); this.click();}" class="history-card-item" data-status="resubmit" onclick="HistoryRecordPage.open('ot', 'AXT000000000101', this)">
             <div class="history-card-header">
               <div class="history-card-heading">
                 <h3 class="history-card-title">OT 1.5 BEFORE WORK</h3>
@@ -441,12 +356,12 @@
               </div>
               <div class="attendance-history-card-end"><span class="card-status-badge"><i class="fa-solid fa-rotate-right" aria-hidden="true"></i>To Resubmit</span><i class="fa-solid fa-chevron-right" aria-hidden="true"></i></div>
             </div>
+            <span class="record-submit-date">Submit Date: 12/07/2024</span>
             <div class="history-card-details">
               <table class="record-detail-table"><tbody>
                 <tr class="attendance-history-detail"><td class="detail-popout-label">Date</td><td class="detail-popout-value"><strong>12/07/2024</strong></td></tr>
                 <tr class="attendance-history-detail"><td class="detail-popout-label">Plan Hours</td><td class="detail-popout-value"><strong>16.00</strong></td></tr>
                 <tr class="attendance-history-detail"><td class="detail-popout-label">Actual Hours</td><td class="detail-popout-value"><strong>0.00</strong></td></tr>
-                <tr class="attendance-history-detail"><td class="detail-popout-label">Submitted On</td><td class="detail-popout-value"><strong>12/07/2024</strong></td></tr>
               </tbody></table>
             </div>
             <div class="history-card-actions">
@@ -455,30 +370,7 @@
           </article>
 
           <!-- OT Card 2: OTB000000001604 -->
-<article role="button" tabindex="0" onkeydown="if(event.target === this && (event.key === 'Enter' || event.key === ' ')){event.preventDefault(); this.click();}" class="history-card-item" data-status="resubmit" onclick="
-              openOtDetailsModal(
-                'OTB000000001604',
-                'To Resubmit',
-                'SP013 - Angeline loren alan',
-                'EBB04',
-                '24 Oct 2023',
-                '24/10/2023',
-                '8.00AM-5.30PM',
-                '0758',
-                '20:00',
-                '23:00',
-                '0',
-                '3.00',
-                '1.5 OT',
-                'MATERIAL',
-                '- SELECT TASK -',
-                'No',
-                'Yes',
-                'Emergency material checking',
-                'asd',
-                { actualHours: '0.00' },
-              )
-            ">
+<article role="button" tabindex="0" onkeydown="if(event.target === this && (event.key === 'Enter' || event.key === ' ')){event.preventDefault(); this.click();}" class="history-card-item" data-status="resubmit" onclick="HistoryRecordPage.open('ot', 'OTB000000001604', this)">
             <div class="history-card-header">
               <div class="history-card-heading">
                 <h3 class="history-card-title">1.5 OT</h3>
@@ -486,12 +378,12 @@
               </div>
               <div class="attendance-history-card-end"><span class="card-status-badge"><i class="fa-solid fa-rotate-right" aria-hidden="true"></i>To Resubmit</span><i class="fa-solid fa-chevron-right" aria-hidden="true"></i></div>
             </div>
+            <span class="record-submit-date">Submit Date: 24/10/2023</span>
             <div class="history-card-details">
               <table class="record-detail-table"><tbody>
                 <tr class="attendance-history-detail"><td class="detail-popout-label">Date</td><td class="detail-popout-value"><strong>24/10/2023</strong></td></tr>
                 <tr class="attendance-history-detail"><td class="detail-popout-label">Plan Hours</td><td class="detail-popout-value"><strong>3.00</strong></td></tr>
                 <tr class="attendance-history-detail"><td class="detail-popout-label">Actual Hours</td><td class="detail-popout-value"><strong>0.00</strong></td></tr>
-                <tr class="attendance-history-detail"><td class="detail-popout-label">Submitted On</td><td class="detail-popout-value"><strong>24/10/2023</strong></td></tr>
               </tbody></table>
             </div>
             <div class="history-card-actions">
@@ -500,30 +392,7 @@
           </article>
 
           <!-- OT Card 3: OTB000000001611 -->
-<article role="button" tabindex="0" onkeydown="if(event.target === this && (event.key === 'Enter' || event.key === ' ')){event.preventDefault(); this.click();}" class="history-card-item" data-status="resubmit" onclick="
-              openOtDetailsModal(
-                'OTB000000001611',
-                'Pending For Resubmission',
-                'SP013 - Angeline loren alan',
-                'EBB04',
-                '12 Jul 2024',
-                '12/07/2024',
-                '8.00AM-5.30PM',
-                '0755',
-                '18:00',
-                '22:00',
-                '0',
-                '2.00',
-                '1.5 OT',
-                'PROJECT DEADLINE',
-                'Final QA Testing',
-                'Yes',
-                'No',
-                'Late night release support',
-                'Pending manager final signoff',
-                { actualHours: '4.00' },
-              )
-            ">
+<article role="button" tabindex="0" onkeydown="if(event.target === this && (event.key === 'Enter' || event.key === ' ')){event.preventDefault(); this.click();}" class="history-card-item" data-status="resubmit" onclick="HistoryRecordPage.open('ot', 'OTB000000001611', this)">
             <div class="history-card-header">
               <div class="history-card-heading">
                 <h3 class="history-card-title">1.5 OT</h3>
@@ -531,12 +400,12 @@
               </div>
               <div class="attendance-history-card-end"><span class="card-status-badge"><i class="fa-solid fa-rotate-right" aria-hidden="true"></i>To Resubmit</span><i class="fa-solid fa-chevron-right" aria-hidden="true"></i></div>
             </div>
+            <span class="record-submit-date">Submit Date: 12/07/2024</span>
             <div class="history-card-details">
               <table class="record-detail-table"><tbody>
                 <tr class="attendance-history-detail"><td class="detail-popout-label">Date</td><td class="detail-popout-value"><strong>12/07/2024</strong></td></tr>
                 <tr class="attendance-history-detail"><td class="detail-popout-label">Plan Hours</td><td class="detail-popout-value"><strong>2.00</strong></td></tr>
                 <tr class="attendance-history-detail"><td class="detail-popout-label">Actual Hours</td><td class="detail-popout-value"><strong>4.00</strong></td></tr>
-                <tr class="attendance-history-detail"><td class="detail-popout-label">Submitted On</td><td class="detail-popout-value"><strong>12/07/2024</strong></td></tr>
               </tbody></table>
             </div>
             <div class="history-card-actions">
@@ -546,22 +415,9 @@
         </div>
 
         <!-- Feedback History List View -->
-        <div id="viewFeedbackHistory" style="display: none">
+        <div id="viewFeedbackHistory" data-record-colour-view="Attendance feedback status" data-record-legend='{"Pending Approve":"submitted","Pending Review":"submitted","To Resubmit":"resubmit","Approved":"approved","Rejected":"rejected","Cancelled":"cancelled"}' style="display: none">
           <!-- Card 1: ATT000000000432 -->
-<article role="button" tabindex="0" onkeydown="if(event.target === this && (event.key === 'Enter' || event.key === ' ')){event.preventDefault(); this.click();}" class="history-card-item" data-status="resubmit" onclick="
-              openFeedbackDetailsModal(
-                'ATT000000000432',
-                'To Resubmit',
-                'EBB12 - Farhan binti rahmat',
-                'TIMES SQUARE BRANCH',
-                'HUMAN RESOURCE',
-                '31 Dec 2025',
-                '8.00AM-5.30PM',
-                'EBB12 - Farhan binti rahmat',
-                '26/02/2026',
-                '[Comment by FARHAN BIN RAHMAT (EBB12)]\nokay',
-              )
-            ">
+<article role="button" tabindex="0" onkeydown="if(event.target === this && (event.key === 'Enter' || event.key === ' ')){event.preventDefault(); this.click();}" class="history-card-item" data-status="resubmit" onclick="HistoryRecordPage.open('feedback', 'ATT000000000432', this)">
             <div class="history-card-header">
               <div class="history-card-heading">
                 <h3 class="history-card-title">Attendance Advice</h3>
@@ -569,10 +425,10 @@
               </div>
               <div class="attendance-history-card-end"><span class="card-status-badge"><i class="fa-solid fa-rotate-right" aria-hidden="true"></i>To Resubmit</span><i class="fa-solid fa-chevron-right" aria-hidden="true"></i></div>
             </div>
+            <span class="record-submit-date">Submit Date: 26/02/2026</span>
             <div class="history-card-details">
               <table class="record-detail-table"><tbody>
                 <tr class="attendance-history-detail"><td class="detail-popout-label">Date</td><td class="detail-popout-value"><strong>31 Dec 2025</strong></td></tr>
-                <tr class="attendance-history-detail"><td class="detail-popout-label">Submitted On</td><td class="detail-popout-value"><strong>26/02/2026</strong></td></tr>
               </tbody></table>
             </div>
             <div class="history-card-actions">
@@ -581,20 +437,7 @@
           </article>
 
           <!-- Card 2: ATT000000000435 -->
-<article role="button" tabindex="0" onkeydown="if(event.target === this && (event.key === 'Enter' || event.key === ' ')){event.preventDefault(); this.click();}" class="history-card-item" data-status="resubmit" onclick="
-              openFeedbackDetailsModal(
-                'ATT000000000435',
-                'To Resubmit',
-                'SP013 - Angeline loren alan',
-                'HQ MAIN BRANCH',
-                'TECH DEPT',
-                '14 Sep 2026',
-                '8.30AM-5.30PM',
-                'SP013 - Angeline',
-                '14/09/2026',
-                'Pending supervisor review',
-              )
-            ">
+<article role="button" tabindex="0" onkeydown="if(event.target === this && (event.key === 'Enter' || event.key === ' ')){event.preventDefault(); this.click();}" class="history-card-item" data-status="resubmit" onclick="HistoryRecordPage.open('feedback', 'ATT000000000435', this)">
             <div class="history-card-header">
               <div class="history-card-heading">
                 <h3 class="history-card-title">Attendance Advice</h3>
@@ -602,10 +445,10 @@
               </div>
               <div class="attendance-history-card-end"><span class="card-status-badge"><i class="fa-solid fa-rotate-right" aria-hidden="true"></i>To Resubmit</span><i class="fa-solid fa-chevron-right" aria-hidden="true"></i></div>
             </div>
+            <span class="record-submit-date">Submit Date: 14/09/2026</span>
             <div class="history-card-details">
               <table class="record-detail-table"><tbody>
                 <tr class="attendance-history-detail"><td class="detail-popout-label">Date</td><td class="detail-popout-value"><strong>14 Sep 2026</strong></td></tr>
-                <tr class="attendance-history-detail"><td class="detail-popout-label">Submitted On</td><td class="detail-popout-value"><strong>14/09/2026</strong></td></tr>
               </tbody></table>
             </div>
             <div class="history-card-actions">
@@ -616,57 +459,21 @@
       </div>
 
       <!-- Clock In Out Details Modal -->
-      <div
-        class="modal-overlay"
-        id="clockDetailsModal"
-        onclick="closeClockDetailsModal(event)"
-      >
-        <div
-          class="modal-content"
-          onclick="event.stopPropagation()"
-          style="
-            width: 100%;
-            max-width: 380px;
-            background: var(--bg-sheet);
-            border-radius: 24px;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
-            border: 1px solid var(--border-subtle);
-            transform: scale(0.85);
-            opacity: 0;
-            transition:
-              transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
-              opacity 0.3s ease;
-            max-height: 85%;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            box-sizing: border-box;
-          "
-        >
-          <!-- Purple Modal Header -->
-          <div
-            class="modal-header-purple"
-            style="border-top-left-radius: 24px; border-top-right-radius: 24px"
-          >
-            <h3>Clock In Out Details</h3>
-            <button
-              class="modal-close-round"
-              onclick="closeClockDetailsDirect()"
-              aria-label="Close modal"
-            >
-              <i class="fa-solid fa-xmark" style="font-size: 15px"></i>
-            </button>
+      <main id="clockDetailsModal" class="approval-record-page" data-history-page aria-labelledby="clockDetailsModalTitle" hidden>
+      <section class="approval-record-layout">
+        <header class="approval-page-header">
+          <phone-status-bar time="9:41"></phone-status-bar>
+          <div class="approval-page-heading">
+            <button type="button" data-history-back aria-label="Back to history"></button>
+            <h1 id="clockDetailsModalTitle" tabindex="-1">Clock In Out Details</h1>
           </div>
-
-          <!-- Detail Table Body -->
-          <div
-            style="
+        </header>
+        <div style="
               padding: 16px;
               overflow-y: auto;
               flex: 1;
               background: var(--bg-sheet);
-            "
-          >
+            " class="history-record-content">
             <table class="detail-popout-table">
               <tbody>
                 <tr><td class="detail-label">Date</td><td class="detail-value" id="modalClkDate">17/09/2026</td></tr>
@@ -681,30 +488,25 @@
               </tbody>
             </table>
           </div>
-          <footer class="attendance-history-modal-footer attendance-history-action-footer history-detail-actions">
-            <button type="button" class="attendance-history-action-cancel history-detail-action" onclick="closeClockDetailsDirect()"><i class="fa-solid fa-ban" aria-hidden="true"></i> <span>Cancel</span></button>
+        <footer class="attendance-history-modal-footer attendance-history-action-footer history-detail-actions">
+            <button type="button" class="attendance-history-action-cancel history-detail-action" data-history-back><i class="fa-solid fa-ban" aria-hidden="true"></i> <span>Cancel</span></button>
           </footer>
-        </div>
-      </div>
+      </section>
+    </main>
 
       <!-- OT Plan History Form Page -->
-      <div class="modal-overlay attendance-history-form-overlay" id="otDetailsModal">
-        <section class="modal-content attendance-history-form-page" role="dialog" aria-modal="true" aria-labelledby="otPlanFormTitle">
-          <header class="attendance-history-form-header">
-            <phone-status-bar time="9:41" style="color: #ffffff"></phone-status-bar>
-            <div class="attendance-history-form-header-row">
-              <button type="button" class="attendance-history-form-back" data-ot-form-back onclick="closeOtDetailsDirect()" aria-label="Back to OT Plan History">
-                <i class="fa-solid fa-chevron-left" aria-hidden="true"></i>
-              </button>
-              <div class="attendance-history-form-heading">
-                <h3 id="otPlanFormTitle">OT Plan Details</h3>
-              </div>
-              <span class="attendance-history-form-header-spacer" aria-hidden="true"></span>
-            </div>
-          </header>
-
-          <div class="attendance-history-modal-body attendance-history-form-body">
+      <main id="otDetailsModal" class="approval-record-page" data-history-page aria-labelledby="otPlanFormTitle" hidden>
+      <section class="approval-record-layout attendance-history-form-page">
+        <header class="approval-page-header">
+          <phone-status-bar time="9:41"></phone-status-bar>
+          <div class="approval-page-heading">
+            <button type="button" data-ot-form-back data-history-back aria-label="Back to history"></button>
+            <h1 id="otPlanFormTitle" tabindex="-1">OT Plan Details</h1>
+          </div>
+        </header>
+        <div class="history-record-content attendance-history-modal-body attendance-history-form-body">
             <form id="historyOtForm" class="attendance-history-form" onsubmit="event.preventDefault(); submitOtDetailsForm()">
+              <span id="modalOtSubmitDate" class="record-submit-date" hidden></span>
               <section class="attendance-history-form-card attendance-history-form-summary" aria-label="OT plan document details">
                 <h2 class="attendance-history-form-section-title">Document Details</h2>
                 <dl class="attendance-history-form-summary-list">
@@ -712,7 +514,6 @@
                   <div><dt>Plan Status</dt><dd id="modalOtPlanStatus">-</dd></div>
                   <div><dt>Employee</dt><dd><span class="attendance-history-detail-employee"><span id="modalOtEmpName">-</span><span id="modalOtEmpNo" class="attendance-history-detail-employee-id">-</span></span></dd></div>
                   <div><dt>Supervisor</dt><dd id="modalOtSupervisor">-</dd></div>
-                  <div><dt>Submit Date</dt><dd id="modalOtSubmitDate">-</dd></div>
                   <div><dt>Shift</dt><dd id="modalOtShift">-</dd></div>
                   <div><dt>Clocking Times</dt><dd id="modalOtClockingTimes">-</dd></div>
                 </dl>
@@ -772,32 +573,26 @@
               </section>
             </form>
           </div>
-
-          <footer class="attendance-history-form-actions attendance-history-action-footer history-detail-actions">
-            <button type="button" class="attendance-history-form-cancel attendance-history-action-cancel history-detail-action" data-ot-form-cancel onclick="closeOtDetailsDirect()"><i class="fa-solid fa-xmark" aria-hidden="true"></i><span>Cancel</span></button>
+        <footer class="attendance-history-form-actions attendance-history-action-footer history-detail-actions">
+            <button type="button" class="attendance-history-form-cancel attendance-history-action-cancel history-detail-action" data-ot-form-cancel data-history-back><i class="fa-solid fa-xmark" aria-hidden="true"></i><span>Cancel</span></button>
             <button type="submit" form="historyOtForm" class="attendance-history-form-submit attendance-history-action-submit history-detail-action" data-history-submit><span>Submit</span><i class="fa-solid fa-paper-plane" aria-hidden="true"></i></button>
           </footer>
-        </section>
-      </div>
+      </section>
+    </main>
 
       <!-- Attendance Feedback Form Page -->
-      <div class="modal-overlay attendance-history-form-overlay" id="feedbackDetailsModal">
-        <section class="modal-content attendance-history-modal attendance-history-form-page" role="dialog" aria-modal="true" aria-labelledby="feedbackPlanFormTitle">
-          <header class="attendance-history-form-header">
-            <phone-status-bar time="9:41" style="color: #ffffff"></phone-status-bar>
-            <div class="attendance-history-form-header-row">
-              <button type="button" class="attendance-history-form-back" data-feedback-form-back onclick="closeFeedbackDetailsDirect()" aria-label="Back to Attendance Feedback History">
-                <i class="fa-solid fa-chevron-left" aria-hidden="true"></i>
-              </button>
-              <div class="attendance-history-form-heading">
-                <h3 id="feedbackPlanFormTitle">Attendance Feedback</h3>
-              </div>
-              <span class="attendance-history-form-header-spacer" aria-hidden="true"></span>
-            </div>
-          </header>
-
-          <div class="attendance-history-modal-body attendance-history-form-body">
+      <main id="feedbackDetailsModal" class="approval-record-page" data-history-page aria-labelledby="feedbackPlanFormTitle" hidden>
+      <section class="approval-record-layout attendance-history-form-page">
+        <header class="approval-page-header">
+          <phone-status-bar time="9:41"></phone-status-bar>
+          <div class="approval-page-heading">
+            <button type="button" data-feedback-form-back data-history-back aria-label="Back to history"></button>
+            <h1 id="feedbackPlanFormTitle" tabindex="-1">Attendance Feedback</h1>
+          </div>
+        </header>
+        <div class="history-record-content attendance-history-modal-body attendance-history-form-body">
             <form id="historyFeedbackForm" class="attendance-history-form" onsubmit="event.preventDefault(); submitFeedbackDetailsForm()">
+              <span id="modalFbkSubmitDate" class="record-submit-date" hidden></span>
               <section class="attendance-history-form-card attendance-history-form-summary" aria-label="Attendance feedback summary">
                 <h2 class="attendance-history-form-section-title">Request Summary</h2>
                 <dl class="attendance-history-form-summary-list">
@@ -809,7 +604,6 @@
                   <div><dt>Date</dt><dd id="modalFbkDate">-</dd></div>
                   <div><dt>Shift</dt><dd id="modalFbkShift">-</dd></div>
                   <div><dt>Submitter</dt><dd><span class="attendance-history-detail-employee"><span id="modalFbkSubmitterName">-</span><span id="modalFbkSubmitterId" class="attendance-history-detail-employee-id">-</span></span></dd></div>
-                  <div><dt>Submit Date</dt><dd id="modalFbkSubmitDate">-</dd></div>
                 </dl>
               </section>
 
@@ -829,8 +623,9 @@
                 <h2 class="attendance-history-form-section-title">Feedback Details</h2>
                 <div class="attendance-history-form-fields">
                   <div class="attendance-history-form-field"><label for="modalFbkAmendedShift">Amended Shift</label><select id="modalFbkAmendedShift" data-history-field="amendedShift"><option value="">- Select Shift Type -</option><option value="W01">8.30AM-5.30PM (W01)</option><option value="W02">8.00AM-5.00PM (W02)</option><option value="W03">9.00AM-6.00PM (W03)</option><option value="FLEX">Flexible Hours</option></select></div>
-                  <div class="attendance-history-form-field"><label for="modalFbkShiftReason">Shift Change Reason</label><select id="modalFbkShiftReason" data-history-field="shiftReason"><option value="">- Select Reason -</option><option value="swap">Swapped Shift with Teammate</option><option value="coverage">Cover Colleague</option><option value="schedule">Schedule Change</option><option value="other">Other</option></select></div>
-                  <div class="attendance-history-form-field"><label for="modalFbkEditTimeReason">Edit Time Reason</label><select id="modalFbkEditTimeReason" data-history-field="editReason"><option value="">- Select Reason -</option><option value="forgot">Forgot to Clock</option><option value="clockout">Forgotten Clock Out</option><option value="device">Clocking Device Issue</option><option value="business">Official Business</option><option value="other">Other</option></select></div>
+                  <div class="attendance-history-form-field"><label for="modalFbkShiftReason">Amended Shift Reason</label><select id="modalFbkShiftReason" data-history-field="shiftReason"><option value="">- Select Reason -</option><option value="swap">Swapped Shift with Teammate</option><option value="coverage">Cover Colleague</option><option value="schedule">Schedule Change</option><option value="other">Other</option></select></div>
+                  <div class="attendance-history-form-field"><label for="modalFbkEditTimeReason">Time Amend Reason</label><select id="modalFbkEditTimeReason" data-history-field="editReason"><option value="">- Select Reason -</option><option value="forgot">Forgot to Clock</option><option value="clockout">Forgotten Clock Out</option><option value="device">Clocking Device Issue</option><option value="business">Official Business</option><option value="other">Other</option></select></div>
+                  <table class="record-detail-table" aria-label="Attendance exceptions"><tbody id="modalFbkAdviceFields"></tbody></table>
                   <div class="attendance-history-form-field"><label for="modalFbkRemarks">Remarks</label><textarea id="modalFbkRemarks" data-history-field="remarks" rows="3"></textarea></div>
                 </div>
               </section>
@@ -855,13 +650,12 @@
               </section>
             </form>
           </div>
-
-          <footer class="attendance-history-form-actions attendance-history-action-footer history-detail-actions">
-            <button type="button" class="attendance-history-form-cancel attendance-history-action-cancel history-detail-action" data-feedback-form-cancel onclick="closeFeedbackDetailsDirect()"><i class="fa-solid fa-xmark" aria-hidden="true"></i><span>Cancel</span></button>
+        <footer class="attendance-history-form-actions attendance-history-action-footer history-detail-actions">
+            <button type="button" class="attendance-history-form-cancel attendance-history-action-cancel history-detail-action" data-feedback-form-cancel data-history-back><i class="fa-solid fa-xmark" aria-hidden="true"></i><span>Cancel</span></button>
             <button type="submit" form="historyFeedbackForm" class="attendance-history-form-submit attendance-history-action-submit history-detail-action" data-history-submit><span>Submit</span><i class="fa-solid fa-paper-plane" aria-hidden="true"></i></button>
           </footer>
-        </section>
-      </div>
+      </section>
+    </main>
 
       <!-- Filter Modal (Bottom Sheet) -->
       <div
@@ -1100,7 +894,7 @@
     </div>
 
     <script>
-      function openClockDetailsModal(
+      function renderClockHistoryDetail(
         id,
         type,
         date,
@@ -1142,35 +936,6 @@
             isInvalid === "Yes"
               ? '<span style="color: #ef4444; font-weight: 800;">Yes</span>'
               : '<span style="color: #10b981; font-weight: 800;">No</span>';
-
-        const m = document.getElementById("clockDetailsModal");
-        m.style.display = "flex";
-        setTimeout(() => {
-          m.style.opacity = "1";
-          const mc = m.querySelector(".modal-content");
-          if (mc) {
-            mc.style.transform = "scale(1)";
-            mc.style.opacity = "1";
-          }
-        }, 10);
-      }
-
-      function closeClockDetailsModal(e) {
-        if (e && e.target !== e.currentTarget) return;
-        closeClockDetailsDirect();
-      }
-
-      function closeClockDetailsDirect() {
-        const m = document.getElementById("clockDetailsModal");
-        const mc = m.querySelector(".modal-content");
-        m.style.opacity = "0";
-        if (mc) {
-          mc.style.transform = "scale(0.85)";
-          mc.style.opacity = "0";
-        }
-        setTimeout(() => {
-          m.style.display = "none";
-        }, 250);
       }
 
       function upgradeAttendanceHistoryCardFacts() {
@@ -1379,5 +1144,27 @@
       }
     </script>
     <script src="../../../js/attendance/history-details.js"></script>
+  <script>
+    const attendanceHistoryFields = {
+      clocking: {
+        'CLK-910482': ['Clock Out', '17/09/2026 (Tue)', '17:35:12 PM', 'HQ Main Gate (GPS: 3.1390, 101.6869)', 'CC-101 HQ Ops', 'No', 'No'],
+        'CLK-910481': ['Clock In', '17/09/2026 (Tue)', '08:15:04 AM', 'HQ Main Gate (GPS: 3.1390, 101.6869)', 'CC-101 HQ Ops', 'No', 'No'],
+        'CLK-910399': ['Clock Out', '16/09/2026 (Mon)', '19:40:55 PM', 'HQ Rear Lobby', 'CC-101 HQ Ops', 'No', 'No'],
+        'CLK-910398': ['Clock In', '16/09/2026 (Mon)', '08:09:12 AM', 'HQ Main Turnstile #2', 'CC-101 HQ Ops', 'No', 'No'],
+        'CLK-909877': ['Clock Out', '13/09/2026 (Fri)', '17:15:30 PM', 'Site Project Office (GPS: 3.129, 101.678)', 'CC-202 Tech Dept', 'No', 'No'],
+        'CLK-909876': ['Clock In', '13/09/2026 (Fri)', '08:42:10 AM', 'Site Project Office (GPS: 3.129, 101.678)', 'CC-202 Tech Dept', 'No', 'No']
+      },
+      ot: {
+        'AXT000000000101': ['Pending For Resubmission', 'SP013 - Angeline loren alan', 'EBB04 - Tech Lead', '12 Jul 2024', '12/07/2024', '8.00AM-5.30PM', '0750', '06:00', '08:00', '0', '16.00', 'OT 1.5 BEFORE WORK', 'URGENT SYSTEM MIGRATION', 'Database Maintenance', 'No', 'Yes', 'Work started before normal hours', 'Please resubmit with signed supervisor logs', { actualHours: '0.00' }],
+        'OTB000000001604': ['To Resubmit', 'SP013 - Angeline loren alan', 'EBB04', '24 Oct 2023', '24/10/2023', '8.00AM-5.30PM', '0758', '20:00', '23:00', '0', '3.00', '1.5 OT', 'MATERIAL', '- SELECT TASK -', 'No', 'Yes', 'Emergency material checking', 'asd', { actualHours: '0.00' }],
+        'OTB000000001611': ['Pending For Resubmission', 'SP013 - Angeline loren alan', 'EBB04', '12 Jul 2024', '12/07/2024', '8.00AM-5.30PM', '0755', '18:00', '22:00', '0', '2.00', '1.5 OT', 'PROJECT DEADLINE', 'Final QA Testing', 'Yes', 'No', 'Late night release support', 'Pending manager final signoff', { actualHours: '4.00' }]
+      },
+      feedback: {
+        'ATT000000000432': ['To Resubmit', 'EBB12 - Farhan binti rahmat', 'TIMES SQUARE BRANCH', 'HUMAN RESOURCE', '31 Dec 2025', '8.00AM-5.30PM', 'EBB12 - Farhan binti rahmat', '26/02/2026', '[Comment by FARHAN BIN RAHMAT (EBB12)]\nokay'],
+        'ATT000000000435': ['To Resubmit', 'SP013 - Angeline loren alan', 'HQ MAIN BRANCH', 'TECH DEPT', '14 Sep 2026', '8.30AM-5.30PM', 'SP013 - Angeline', '14/09/2026', 'Pending supervisor review']
+      }
+    };
+  </script>
+  <script src="../../../js/attendance/history-record-route.js"></script>
   </body>
 </html>

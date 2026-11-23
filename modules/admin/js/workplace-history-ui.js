@@ -2,16 +2,19 @@ document.addEventListener('DOMContentLoaded', () => {
   const $ = id => document.getElementById(id);
   const labels = { 'guest-visit': 'Guest Visit', 'letter-request': 'Letter Request', 'inventory-request': 'Inventory Request' };
   const statuses = {
+    draft: ['Draft', 'fa-floppy-disk'],
     submitted: ['Pending', 'fa-paper-plane'],
     resubmit: ['Resubmit', 'fa-rotate-right'],
     approved: ['Approved', 'fa-check'],
     rejected: ['Rejected', 'fa-xmark'],
-    draft: ['Draft', 'fa-floppy-disk'],
     cancelled: ['Cancelled', 'fa-ban']
   };
+  const legend = $('recordColourKey').content;
+  const legendRows = legend.querySelector('ul');
+  const statusFilter = $('historyStatus');
   const { currentEmployee, referenceNumber } = window.WorkplaceHistoryStore;
   const requested = new URLSearchParams(location.search).get('category');
-  let kind = labels[requested] ? requested : 'guest-visit';
+  let kind;
   const emptyFilter = () => ({ from: '', to: '', status: '', type: '' });
   const filters = { 'guest-visit': emptyFilter(), 'letter-request': emptyFilter(), 'inventory-request': emptyFilter() };
   let records = [];
@@ -39,6 +42,25 @@ document.addEventListener('DOMContentLoaded', () => {
     return element;
   }
 
+  function selectCategory(category) {
+    kind = category;
+    // Inventory enters the approval workflow as soon as its form is submitted.
+    const supported = kind === 'inventory-request' ? window.WorkplacePendingStore.statuses : Object.keys(statuses);
+    statusFilter.length = 1; // Keep the All Statuses option.
+    legendRows.replaceChildren();
+    for (const status of supported) {
+      const [label] = statuses[status];
+      statusFilter.add(new Option(label, status));
+      const row = node('li', 'record-key-status');
+      row.dataset.status = status;
+      const swatch = node('span');
+      swatch.setAttribute('aria-hidden', 'true');
+      row.append(swatch, label);
+      legendRows.append(row);
+    }
+    statusFilter.value = filters[kind].status;
+  }
+
   function statusPill(status) {
     const [label, icon] = statuses[status] || [status || 'Unknown', 'fa-circle-info'];
     const pill = node('span', 'status-pill ' + (status || 'unknown'));
@@ -48,6 +70,11 @@ document.addEventListener('DOMContentLoaded', () => {
     return pill;
   }
 
+
+  function submissionDate(row) {
+    const fields = fieldMap(row);
+    return fieldValue(fields, 'Submit Date', 'Submitted Date') || (row.kind === 'letter-request' && row.status !== 'draft' ? row.date : '');
+  }
 
   function cardContent(row) {
     const fields = fieldMap(row);
@@ -66,7 +93,6 @@ document.addEventListener('DOMContentLoaded', () => {
       return {
         title: fieldValue(fields, 'Description') || row.title,
         rows: [
-          ['Submitted Date', date(fieldValue(fields, 'Submitted Date', 'Submit Date') || row.date)],
           ['Type', fieldValue(fields, 'Type', 'Letter Type') || row.title],
           ['Acknowledged On', date(fieldValue(fields, 'Acknowledged On'))],
           ['Reason', fieldValue(fields, 'Reason') || emptyValue]
@@ -76,7 +102,7 @@ document.addEventListener('DOMContentLoaded', () => {
     return {
       title: fieldValue(fields, 'Inventory Item', 'Request Item', 'Inventory Type') || row.title,
       rows: [
-        ['Request Date', date(fieldValue(fields, 'Request Date', 'Submit Date') || row.date)],
+        ...(fields['Request Date'] ? [['Request Date', date(fields['Request Date'])]] : []),
         ['Quantity', fieldValue(fields, 'Quantity') || emptyValue],
         ['UOM', fieldValue(fields, 'UOM', 'Unit') || emptyValue],
         ['Reason', fieldValue(fields, 'Reason') || emptyValue]
@@ -129,7 +155,6 @@ document.addEventListener('DOMContentLoaded', () => {
       ['Visit Date', date(fieldValue(fields, 'Visit Date') || row.date)],
       ['Visit Time', fieldValue(fields, 'Visit Time', 'Time') || emptyValue],
       ['Visitor', fieldValue(fields, 'Visitor', 'Total Guest') || emptyValue],
-      ['Submit Date', date(fieldValue(fields, 'Submit Date', 'Submitted Date') || row.date)],
       ['Location', fieldValue(fields, 'Location') || emptyValue],
       ['Request Meal?', fieldValue(fields, 'Request Meal?', 'Meal') || 'No'],
       ['Floor Visit?', fieldValue(fields, 'Floor Visit?') || requestFlag(otherRequest, ['floor visit'])],
@@ -203,7 +228,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const detailRows = [
       ['Reference #', referenceNumber(row, fields)],
       ['Status', recordDetailStatus.create(statuses[row.status]?.[0] || row.status)],
-      ['Submit Date', date(fieldValue(fields, 'Submit Date', 'Request Date') || row.date)],
+      ...(fields['Request Date'] ? [['Request Date', date(fields['Request Date'])]] : []),
       ['Required By', date(fieldValue(fields, 'Required By'))],
       ['Inventory Item', fieldValue(fields, 'Inventory Item', 'Request Item', 'Inventory Type') || row.title],
       ['Quantity', fieldValue(fields, 'Quantity') || emptyValue],
@@ -285,7 +310,9 @@ document.addEventListener('DOMContentLoaded', () => {
       && (!filter.to || row.date <= filter.to)
       && (!filter.status || row.status === filter.status)
       && (!filter.type || recordType(row) === filter.type));
-    document.querySelector('.admin-heading h1').textContent = kind === 'inventory-request' ? 'Inventory History' : labels[kind] + ' History';
+    const categoryTitle = kind === 'inventory-request' ? 'Inventory' : labels[kind];
+    document.querySelector('.admin-heading h1').textContent = categoryTitle + ' History';
+    legend.querySelector('h3').textContent = categoryTitle + ' status';
     $('historyCategoryTitle').textContent = labels[kind] + ' History';
     $('historyRecordHeading').hidden = false;
     $('historyRecordCount').textContent = String(rows.length);
@@ -305,10 +332,9 @@ document.addEventListener('DOMContentLoaded', () => {
       const card = node('article', 'history-card-item');
       card.dataset.recordId = row.id;
       card.dataset.status = row.status;
-      const main = node('button', 'history-card-main');
-      main.type = 'button';
-      main.setAttribute('aria-haspopup', 'dialog');
-      main.setAttribute('aria-controls', 'historyDetailsModal');
+      const main = node('a', 'history-card-main');
+      main.href = HistoryRecordPage.href(row.kind, row.id);
+      main.dataset.historyLink = '';
       const reference = referenceNumber(row);
       const description = actionDescription(row);
       main.setAttribute('aria-label', `View ${labels[row.kind]} details: ${description}`);
@@ -323,7 +349,7 @@ document.addEventListener('DOMContentLoaded', () => {
         line.append(node('span', '', label), node('strong', '', value || emptyValue));
         details.append(line);
       }
-      main.append(header, details);
+      main.append(header, recordSubmitDate.create(submissionDate(row)), details);
       card.append(main);
       const actions = node('div', 'history-card-actions');
       if (appendHistoryActions(actions, row, 'card')) card.append(actions);
@@ -343,13 +369,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function closeModal() {
     if (!modal) return;
-    const closingDetails = modal.id === 'historyDetailsModal';
     modal.classList.remove('is-open');
     modal.setAttribute('aria-hidden', 'true');
     inerted.forEach(child => { child.inert = false; });
     inerted = [];
     modal = null;
-    if (closingDetails) activeDetailRecordId = null;
     (opener?.isConnected ? opener : $('historyFilterTrigger')).focus();
   }
 
@@ -358,7 +382,7 @@ document.addEventListener('DOMContentLoaded', () => {
     $('historyFilterTitle').textContent = 'Filter';
     $('historyDateFrom').value = filter.from;
     $('historyDateTo').value = filter.to;
-    $('historyStatus').value = filter.status;
+    statusFilter.value = filter.status;
     $('historyStatusField').hidden = kind === 'guest-visit';
     $('historyStatusLabel').textContent = kind === 'letter-request' ? 'Letter Status' : 'Status';
     $('historyTypeField').hidden = kind === 'guest-visit';
@@ -372,17 +396,11 @@ document.addEventListener('DOMContentLoaded', () => {
   function renderDetails(row) {
     $('historyDetailTitle').textContent = row.kind === 'inventory-request' ? 'Inventory Details' : labels[row.kind] + ' Details';
     const body = $('historyDetailBody');
-    body.replaceChildren();
+    body.replaceChildren(recordSubmitDate.create(submissionDate(row)));
     if (row.kind === 'guest-visit') guestDetail(row, body);
     else if (row.kind === 'letter-request') letterDetail(row, body);
     else inventoryDetail(row, body);
     appendHistoryActions($('historyDetailActions'), row, 'detail');
-  }
-
-  function showDetails(row) {
-    activeDetailRecordId = row.id;
-    renderDetails(row);
-    openModal('historyDetailsModal', 'closeHistoryDetails');
   }
 
   function showActionFeedback(message) {
@@ -409,14 +427,14 @@ document.addEventListener('DOMContentLoaded', () => {
         (updatedCard?.querySelector('.history-card-main') || $('historyFilterTrigger')).focus({ preventScroll: true });
       }
     } catch {
-      if (source === 'detail' && modal?.id === 'historyDetailsModal') closeModal();
+      if (source === 'detail') HistoryRecordPage.back();
       render();
       showActionFeedback('Unable to update this request. Please try again.');
     }
   }
 
   document.querySelectorAll('[data-history-kind]').forEach(button => button.addEventListener('click', () => {
-    kind = button.dataset.historyKind;
+    selectCategory(button.dataset.historyKind);
     $('historyActionFeedback').hidden = true;
     const url = new URL(location.href);
     url.searchParams.set('category', kind);
@@ -432,7 +450,7 @@ document.addEventListener('DOMContentLoaded', () => {
       event.preventDefault();
       event.stopPropagation();
       executeHistoryAction(record, action.dataset.historyAction, 'card');
-    } else if (event.target.closest('.history-card-main')) showDetails(record);
+    }
   });
   $('historyDetailActions').addEventListener('click', event => {
     const action = event.target.closest('[data-history-action]');
@@ -461,15 +479,14 @@ document.addEventListener('DOMContentLoaded', () => {
       $('historyDateTo').focus();
       return;
     }
-    filters[kind] = { from, to, status: kind === 'guest-visit' ? '' : $('historyStatus').value, type: kind === 'guest-visit' ? '' : $('historyType').value };
+    filters[kind] = { from, to, status: kind === 'guest-visit' ? '' : statusFilter.value, type: kind === 'guest-visit' ? '' : $('historyType').value };
     render();
     closeModal();
   });
   $('closeHistoryFilter').addEventListener('click', closeModal);
-  $('closeHistoryDetails').addEventListener('click', closeModal);
-  [$('historyFilterModal'), $('historyDetailsModal')].forEach(overlay => overlay.addEventListener('click', event => {
-    if (event.target === overlay) closeModal();
-  }));
+  $('historyFilterModal').addEventListener('click', event => {
+    if (event.target === event.currentTarget) closeModal();
+  });
   document.addEventListener('keydown', event => {
     if (!modal) return;
     if (event.key === 'Escape') {
@@ -495,13 +512,22 @@ document.addEventListener('DOMContentLoaded', () => {
   });
   window.addEventListener('storage', () => {
     render();
-    if (!activeDetailRecordId || modal?.id !== 'historyDetailsModal') return;
+    if (!activeDetailRecordId) return;
     const current = records.find(record => record.id === activeDetailRecordId);
     if (!current) {
-      closeModal();
+      HistoryRecordPage.back();
       return;
     }
     renderDetails(current);
   });
+  selectCategory(Object.hasOwn(labels, requested) ? requested : 'guest-visit');
   render();
+  HistoryRecordPage.register((category, id) => {
+    const record = records.find(row => row.kind === category && row.id === id);
+    if (!record) return;
+    if (kind !== category) { selectCategory(category); render(); }
+    activeDetailRecordId = id;
+    renderDetails(record);
+    return $('historyDetailsModal');
+  }, () => { activeDetailRecordId = null; });
 });

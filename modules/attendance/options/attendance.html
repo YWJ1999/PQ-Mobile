@@ -4,6 +4,31 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>PeopleHCM - Attendance</title>
+  <script>
+    (() => {
+      const key = 'attendance:list-scroll';
+      let savedTop = 0;
+      try {
+        if (performance.getEntriesByType('navigation')[0]?.type === 'reload') {
+          savedTop = Number(sessionStorage.getItem(key));
+        }
+      } catch { /* Storage can be unavailable in private or embedded views. */ }
+
+      const restore = Number.isFinite(savedTop) && savedTop > 0;
+      if (restore) document.documentElement.classList.add('restoring-attendance-scroll');
+      // The records have been parsed at "interactive", even when deferred scripts are still loading.
+      document.addEventListener('readystatechange', () => {
+        const list = document.querySelector('.attendance-list-view .main-content');
+        if (restore) {
+          list.scrollTop = savedTop;
+          document.documentElement.classList.remove('restoring-attendance-scroll');
+        }
+        window.addEventListener('pagehide', () => {
+          try { sessionStorage.setItem(key, list.scrollTop); } catch { /* Storage is optional. */ }
+        });
+      }, { once: true });
+    })();
+  </script>
   <script src="../../../js/components.js"></script>
   <script src="../../../js/app.js" defer></script>
   <script src="../../../js/attendance/date-display.js"></script>
@@ -21,8 +46,9 @@
     .attendance-list-view > .cal-top-header { flex-shrink: 0; padding: 12px 20px 16px; }
     .attendance-header-row { display: flex; align-items: center; gap: 12px; min-height: 36px; margin-top: 4px; }
     .attendance-header-row > .header-btn { flex: 0 0 36px; }
-    .main-content { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; scroll-padding-top: 96px; margin-bottom: 0; padding: 0 16px 16px; position: relative; z-index: 10; scrollbar-width: none; }
+    .main-content { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; margin-bottom: 0; padding: 0 16px 16px; position: relative; z-index: 10; scrollbar-width: none; }
     .attendance-list-view.has-pending-update .main-content { margin-bottom: 80px; }
+    .restoring-attendance-scroll .attendance-list-view .main-content { visibility: hidden; }
     .main-content::-webkit-scrollbar { display: none; }
     
     .summary-card {
@@ -137,25 +163,9 @@
       scrollbar-color: rgba(124, 58, 237, 0.35) transparent;
     }
 
-    /* Fixed four-column period tabs */
-    .me-jump-bar-wrapper {
-      position: sticky;
-      top: 0;
-      z-index: 25;
-      background: var(--bg-phone);
-      padding: 8px 16px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
+    /* Four-column period tabs */
     .me-jump-bar-container {
-      flex: 1;
-      position: relative;
-      overflow: hidden;
-      border-radius: 14px;
-      background: var(--bg-card);
-      border: 1px solid var(--border-subtle);
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+      margin-bottom: 16px;
     }
     .me-jump-bar {
       display: grid;
@@ -282,6 +292,11 @@
       flex: 1;
       min-width: 0;
     }
+    .attendance-period-range {
+      margin-top: 2px;
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
     .toast-subtitle {
       font-size: 10px;
       font-weight: 800;
@@ -336,11 +351,11 @@
       min-width: 0;
       font-size: 12.5px;
       font-weight: 700;
-      color: var(--text-primary);
+      color: var(--text-muted);
       white-space: nowrap;
     }
     .attendance-meta-item:last-child { text-align: left; }
-    .attendance-meta-item strong { color: var(--purple-primary); font-weight: 800; }
+    .attendance-meta-item strong { color: var(--text-primary); font-weight: 800; }
 
     .attendance-total-bar {
       display: grid;
@@ -598,7 +613,11 @@
       user-select: none;
       transition: transform 0.15s ease;
     }
-    .verify-btn-all:active {
+    .verify-btn-all:disabled {
+      opacity: 0.5;
+      cursor: default;
+    }
+    .verify-btn-all:active:not(:disabled) {
       transform: scale(0.94);
     }
     .verify-checkbox-box {
@@ -1259,9 +1278,15 @@
           <i class="fa-solid fa-chevron-left" style="font-size: 16px;"></i>
         </a>
         <h1 style="font-size: 19px; font-weight: 800; color: #ffffff; margin: 0;">Attendance</h1>
+        <button type="button" class="record-key-trigger" aria-label="Attendance card legend" title="Attendance card legend" aria-haspopup="dialog">i</button>
       </div>
     </div>
-    
+
+    <template id="recordColourKey">
+      <h3>Status</h3>
+      <ul class="record-key-list record-key-headers attendance-status-key"></ul>
+    </template>
+
     <div class="main-content" style="padding-top: 20px;">
       
       <!-- Profile/Group Info Card -->
@@ -1270,15 +1295,13 @@
         <div class="attendance-meta-item">Supervisor: <strong>EBB04</strong></div>
       </div>
 
-      <!-- Sticky Period Tab Bar -->
-      <div class="me-jump-bar-wrapper" style="margin: -12px -16px 16px -16px; border-radius: 0 0 16px 16px; padding: 12px 16px;">
-        <div class="me-jump-bar-container">
-          <div class="me-jump-bar" id="meJumpBar">
-            <button class="me-jump-pill active">This Week</button>
-            <button class="me-jump-pill">Last Week</button>
-            <button class="me-jump-pill">This Month</button>
-            <button class="me-jump-pill">Last Month</button>
-          </div>
+      <!-- The sample report is current as of 15 September 2026. -->
+      <div class="me-jump-bar-container">
+        <div class="me-jump-bar" id="meJumpBar" role="group" aria-label="Attendance period" data-as-of="2026-09-15">
+          <button type="button" class="me-jump-pill active" data-period="this-week" aria-pressed="true">This Week</button>
+          <button type="button" class="me-jump-pill" data-period="last-week" aria-pressed="false">Last Week</button>
+          <button type="button" class="me-jump-pill" data-period="this-month" aria-pressed="false">This Month</button>
+          <button type="button" class="me-jump-pill" data-period="last-month" aria-pressed="false">Last Month</button>
         </div>
       </div>
 
@@ -1291,6 +1314,7 @@
           <div class="enterprise-toast-value" id="attendanceCurrentFilterValue">
             All Exceptions
           </div>
+          <div class="attendance-period-range" id="attendancePeriodRange" aria-live="polite"></div>
         </div>
         <button class="enterprise-toast-btn" type="button" onclick="event.stopPropagation(); openModal('filterModalOverlay')" title="Open Filter Options">
           <i class="fa-solid fa-sliders" style="font-size: 16px;"></i>
@@ -1302,10 +1326,10 @@
         <div class="attendance-total-summary-row">
           <div style="display: flex; flex-direction: column; gap: 2px;">
               <span class="attendance-total-label" id="attendanceTotalHoursLabel">Total Hours</span>
-              <div class="attendance-total-value" id="attendanceTotalHoursValue">8.00/2.00</div>
+              <div class="attendance-total-value" id="attendanceTotalHoursValue"></div>
           </div>
           <div class="attendance-total-actions">
-            <button class="verify-btn-all" type="button" onclick="toggleVerifyAll()" id="verifyAllBtn" title="Verify all attendance records" aria-pressed="false">
+            <button class="verify-btn-all" type="button" onclick="toggleVerifyAll()" id="verifyAllBtn" title="Verify all displayed attendance records" aria-pressed="false">
                 <div class="verify-all-box" id="verifyAllIcon">
                    <i class="fa-solid fa-check" style="color: #ffffff; font-size: 11px;"></i>
                 </div>
@@ -1315,13 +1339,15 @@
         </div>
       </div>
 
+      <p class="attendance-history-empty-state" id="attendanceEmptyState" role="status" hidden>No attendance records match these filters.</p>
+
       <!-- Attendance Card 1 (Normal) -->
       <div class="history-card-item attendance-record-card" data-exception="none" data-date="2026-09-15">
            <div class="attendance-record-top history-card-header">
               <button class="attendance-verify-button" type="button" onclick="toggleSingleVerify(this)" title="Verify this record" aria-label="Verify attendance for 15 September 2026" aria-pressed="false">
                     <span class="verify-checkbox-box" aria-hidden="true"><i class="fa-solid fa-check"></i></span>
                 </button>
-              <button class="attendance-card-details-trigger" type="button" onclick="openModal('attendanceDetailsModalOverlay')" aria-label="View attendance details for 15 September 2026">
+              <button id="attendance-header-2026-09-15" class="attendance-card-details-trigger" type="button" onclick="openAttendanceDetails(this)" aria-haspopup="dialog" aria-controls="attendanceDetailsModalOverlay" aria-label="View attendance details for 15 September 2026">
                  <span>
                     <span class="history-time-row">W01: 8.30AM – 5.30PM</span>
                     <span class="attendance-record-reference history-card-ref">Date: Tue, 15 Sep 2026</span>
@@ -1330,20 +1356,25 @@
               <span class="card-status-badge attendance-exception-status"><i class="fa-solid fa-circle-check" aria-hidden="true"></i>No Exception</span>
            </div>
 
-           <div class="attendance-record-summary-panel history-card-details">
-               <div class="attendance-record-detail">
-                   <span>Times</span>
-                   <strong>07:38</strong>
-               </div>
-               <div class="attendance-record-detail">
+           <button type="button" class="attendance-record-summary-panel history-card-details" onclick="openAttendanceDetails(this)"
+             id="attendance-summary-2026-09-15" aria-labelledby="attendance-header-2026-09-15 attendance-summary-2026-09-15" aria-haspopup="dialog" aria-controls="attendanceDetailsModalOverlay">
+               <span class="attendance-record-detail">
+                   <span>Day Type</span>
+                   <strong data-day-type>Work Day</strong>
+               </span>
+               <span class="attendance-record-detail">
+                   <span>Clock Times</span>
+                   <strong data-clock-times>07:38</strong>
+               </span>
+               <span class="attendance-record-detail">
                    <span>Normal Hours</span>
-                   <strong>0.00</strong>
-               </div>
-               <div class="attendance-record-detail">
+                   <strong data-normal-hours>0.00</strong>
+               </span>
+               <span class="attendance-record-detail">
                    <span>OT Hours</span>
-                   <strong>0.00</strong>
-               </div>
-           </div>
+                   <strong data-ot-hours>0.00</strong>
+               </span>
+           </button>
 
            <div class="attendance-card-actions history-card-actions">
                <button onclick="event.stopPropagation(); openModal('shiftChangeModalOverlay')" class="card-action-btn btn-shift-change">
@@ -1361,7 +1392,7 @@
               <button class="attendance-verify-button" type="button" onclick="toggleSingleVerify(this)" title="Verify this record" aria-label="Verify attendance for 14 September 2026" aria-pressed="false">
                     <span class="verify-checkbox-box" aria-hidden="true"><i class="fa-solid fa-check"></i></span>
                 </button>
-              <button class="attendance-card-details-trigger" type="button" onclick="openModal('attendanceDetailsModalOverlay')" aria-label="View attendance details for 14 September 2026">
+              <button id="attendance-header-2026-09-14" class="attendance-card-details-trigger" type="button" onclick="openAttendanceDetails(this)" aria-haspopup="dialog" aria-controls="attendanceDetailsModalOverlay" aria-label="View attendance details for 14 September 2026">
                  <span>
                     <span class="history-time-row">W01: 8.30AM – 5.30PM</span>
                     <span class="attendance-record-reference history-card-ref">Date: Mon, 14 Sep 2026</span>
@@ -1370,20 +1401,25 @@
               <span class="card-status-badge attendance-exception-status is-exception"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>Unapproved OT</span>
            </div>
 
-           <div class="attendance-record-summary-panel history-card-details">
-               <div class="attendance-record-detail">
-                   <span>Times</span>
-                   <strong>08:09, 19:40</strong>
-               </div>
-               <div class="attendance-record-detail">
+           <button type="button" class="attendance-record-summary-panel history-card-details" onclick="openAttendanceDetails(this)"
+             id="attendance-summary-2026-09-14" aria-labelledby="attendance-header-2026-09-14 attendance-summary-2026-09-14" aria-haspopup="dialog" aria-controls="attendanceDetailsModalOverlay">
+               <span class="attendance-record-detail">
+                   <span>Day Type</span>
+                   <strong data-day-type>Work Day</strong>
+               </span>
+               <span class="attendance-record-detail">
+                   <span>Clock Times</span>
+                   <strong data-clock-times>08:09, 19:40</strong>
+               </span>
+               <span class="attendance-record-detail">
                    <span>Normal Hours</span>
-                   <strong>8.00</strong>
-               </div>
-               <div class="attendance-record-detail">
+                   <strong data-normal-hours>8.00</strong>
+               </span>
+               <span class="attendance-record-detail">
                    <span>OT Hours</span>
-                   <strong style="color: #ef4444;">2.00</strong>
-               </div>
-           </div>
+                   <strong data-ot-hours style="color: #ef4444;">2.00</strong>
+               </span>
+           </button>
            
            <div class="attendance-card-actions history-card-actions">
                <button onclick="event.stopPropagation(); openModal('shiftChangeModalOverlay')" class="card-action-btn btn-shift-change">
@@ -1396,12 +1432,12 @@
       </div>
 
       <!-- Attendance Card 3 (Late In Exception) -->
-      <div class="history-card-item attendance-record-card late-in-theme" data-exception="late-in" data-date="2026-09-13">
+      <div class="history-card-item attendance-record-card late-in-theme" data-exception="late-in" data-late-in="12 minutes" data-date="2026-09-13">
            <div class="attendance-record-top history-card-header">
               <button class="attendance-verify-button" type="button" onclick="toggleSingleVerify(this)" title="Verify this record" aria-label="Verify attendance for 13 September 2026" aria-pressed="false">
                     <span class="verify-checkbox-box" aria-hidden="true"><i class="fa-solid fa-check"></i></span>
                 </button>
-              <button class="attendance-card-details-trigger" type="button" onclick="openModal('attendanceDetailsModalOverlay')" aria-label="View attendance details for 13 September 2026">
+              <button id="attendance-header-2026-09-13" class="attendance-card-details-trigger" type="button" onclick="openAttendanceDetails(this)" aria-haspopup="dialog" aria-controls="attendanceDetailsModalOverlay" aria-label="View attendance details for 13 September 2026">
                  <span>
                     <span class="history-time-row">W01: 8.30AM – 5.30PM</span>
                     <span class="attendance-record-reference history-card-ref">Date: Sun, 13 Sep 2026</span>
@@ -1410,33 +1446,38 @@
               <span class="card-status-badge attendance-exception-status is-exception"><i class="fa-solid fa-clock" aria-hidden="true"></i>Late In</span>
            </div>
 
-           <div class="attendance-record-summary-panel history-card-details">
-               <div class="attendance-record-detail">
-                   <span>Times</span>
-                   <strong>08:42, 17:30</strong>
-               </div>
-               <div class="attendance-record-detail">
+           <button type="button" class="attendance-record-summary-panel history-card-details" onclick="openAttendanceDetails(this)"
+             id="attendance-summary-2026-09-13" aria-labelledby="attendance-header-2026-09-13 attendance-summary-2026-09-13" aria-haspopup="dialog" aria-controls="attendanceDetailsModalOverlay">
+               <span class="attendance-record-detail">
+                   <span>Day Type</span>
+                   <strong data-day-type>Work Day</strong>
+               </span>
+               <span class="attendance-record-detail">
+                   <span>Clock Times</span>
+                   <strong data-clock-times>08:42, 17:30</strong>
+               </span>
+               <span class="attendance-record-detail">
                    <span>Normal Hours</span>
-                   <strong>7.80</strong>
-               </div>
-               <div class="attendance-record-detail">
+                   <strong data-normal-hours>7.80</strong>
+               </span>
+               <span class="attendance-record-detail">
                    <span>OT Hours</span>
-                   <strong>0.00</strong>
-               </div>
-           </div>
+                   <strong data-ot-hours>0.00</strong>
+               </span>
+           </button>
 
            <div class="attendance-card-actions history-card-actions">
                <button onclick="event.stopPropagation(); openModal('shiftChangeModalOverlay')" class="card-action-btn btn-shift-change">
                  Change Shift
                </button>
-               <button onclick="event.stopPropagation(); openFeedbackModal('13 Sep 2026', '8.30AM–5.30PM (W01)', 'Late In', { lateInMinutes: '12 minutes', lateInReason: 'Traffic Congestion' })" class="card-action-btn btn-feedback">
+               <button onclick="event.stopPropagation(); openFeedbackModal('13 Sep 2026', '8.30AM–5.30PM (W01)', 'Late In', { lateInMinutes: this.closest('.attendance-record-card').dataset.lateIn, lateInReason: 'Traffic Congestion' })" class="card-action-btn btn-feedback">
                  Feedback
                </button>
            </div>
       </div>
       
     </div>
-      <button class="attendance-update-btn" type="button" id="attendanceUpdateBtn" onclick="updateAttendanceVerification()" disabled hidden>Update</button>
+      <button class="attendance-update-btn" type="button" id="attendanceUpdateBtn" onclick="updateAttendanceVerification()" disabled hidden>Verify selected (<span data-selected-count>0</span>)</button>
     </div>
     <phone-bottom-nav active="apps"></phone-bottom-nav>
 
@@ -1446,12 +1487,12 @@
     <div id="attendanceDetailsModalOverlay" onclick="closeModal('attendanceDetailsModalOverlay', event)"
       style="position: absolute; inset: 0; background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(6px); z-index: 9999; display: none; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.3s ease; border-radius: 44px; overflow: hidden;">
 
-      <div class="popup-modal-content" onclick="event.stopPropagation()"
+      <div class="popup-modal-content" role="dialog" aria-modal="true" aria-labelledby="attendanceDetailsTitle" onclick="event.stopPropagation()"
         style="width: 90%; max-width: 390px; background: var(--bg-sheet); border-radius: 24px; box-shadow: 0 20px 50px rgba(0,0,0,0.6); border: 1px solid var(--border-subtle); transform: scale(0.95); opacity: 0; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); max-height: 85%; overflow: hidden; display: flex; flex-direction: column;">
         
         <!-- Purple Gradient Modal Header -->
         <div class="modal-header-purple">
-          <h3>Attendance Details</h3>
+          <h3 id="attendanceDetailsTitle">Attendance Details</h3>
           <button class="modal-close-round" onclick="closeModal('attendanceDetailsModalOverlay', event)" aria-label="Close">
             <i class="fa-solid fa-xmark" style="font-size: 16px;"></i>
           </button>
@@ -1470,15 +1511,15 @@
               </div>
               <div style="display: flex; justify-content: space-between; padding: 13px 0; border-bottom: 1px solid var(--border-subtle);">
                  <span style="font-size: 13px; font-weight: 600; color: var(--text-secondary);">Date</span>
-                 <span style="font-size: 13.5px; font-weight: 700; color: var(--text-primary);">15 Sep 2026</span>
+                 <span id="attendanceDetailDate" style="font-size: 13.5px; font-weight: 700; color: var(--text-primary);"></span>
               </div>
               <div style="display: flex; justify-content: space-between; padding: 13px 0; border-bottom: 1px solid var(--border-subtle);">
                  <span style="font-size: 13px; font-weight: 600; color: var(--text-secondary);">Shift</span>
-                 <span style="font-size: 13.5px; font-weight: 700; color: var(--text-primary);">8.30AM-5.30PM (W01)</span>
+                 <span id="attendanceDetailShift" style="font-size: 13.5px; font-weight: 700; color: var(--text-primary);"></span>
               </div>
               <div style="display: flex; justify-content: space-between; padding: 13px 0; border-bottom: 1px solid var(--border-subtle);">
                  <span style="font-size: 13px; font-weight: 600; color: var(--text-secondary);">Day Type</span>
-                 <span style="font-size: 13.5px; font-weight: 700; color: var(--text-primary);">Work Day</span>
+                 <span id="attendanceDetailDayType" style="font-size: 13.5px; font-weight: 700; color: var(--text-primary);"></span>
               </div>
               <div style="display: flex; justify-content: space-between; padding: 13px 0; border-bottom: 1px solid var(--border-subtle);">
                  <span style="font-size: 13px; font-weight: 600; color: var(--text-secondary);">Shift Group</span>
@@ -1490,15 +1531,15 @@
               </div>
               <div style="display: flex; justify-content: space-between; padding: 13px 0; border-bottom: 1px solid var(--border-subtle);">
                  <span style="font-size: 13px; font-weight: 600; color: var(--text-secondary);">Clock Times</span>
-                 <span style="font-size: 13.5px; font-weight: 700; color: var(--text-primary);">0738</span>
+                 <span id="attendanceDetailClockTimes" style="font-size: 13.5px; font-weight: 700; color: var(--text-primary);"></span>
               </div>
               <div style="display: flex; justify-content: space-between; padding: 13px 0; border-bottom: 1px solid var(--border-subtle);">
                  <span style="font-size: 13px; font-weight: 600; color: var(--text-secondary);">Normal Hours</span>
-                 <span style="font-size: 13.5px; font-weight: 700; color: var(--text-primary);">-</span>
+                 <span id="attendanceDetailNormalHours" style="font-size: 13.5px; font-weight: 700; color: var(--text-primary);"></span>
               </div>
               <div style="display: flex; justify-content: space-between; padding: 13px 0; border-bottom: 1px solid var(--border-subtle);">
                  <span style="font-size: 13px; font-weight: 600; color: var(--text-secondary);">Late In</span>
-                 <span style="font-size: 13.5px; font-weight: 700; color: var(--text-primary);">-</span>
+                 <span id="attendanceDetailLateIn" style="font-size: 13.5px; font-weight: 700; color: var(--text-primary);"></span>
               </div>
               <div style="display: flex; justify-content: space-between; padding: 13px 0; border-bottom: 1px solid var(--border-subtle);">
                  <span style="font-size: 13px; font-weight: 600; color: var(--text-secondary);">Early Out</span>
@@ -1518,11 +1559,11 @@
               </div>
               <div style="display: flex; justify-content: space-between; padding: 13px 0; border-bottom: 1px solid var(--border-subtle);">
                  <span style="font-size: 13px; font-weight: 600; color: var(--text-secondary);">Unapproved OT Hours</span>
-                 <span style="font-size: 13.5px; font-weight: 700; color: var(--text-primary);">0.00</span>
+                 <span id="attendanceDetailUnapprovedOt" style="font-size: 13.5px; font-weight: 700; color: var(--text-primary);"></span>
               </div>
               <div style="display: flex; justify-content: space-between; padding: 13px 0; border-bottom: 1px solid var(--border-subtle);">
                  <span style="font-size: 13px; font-weight: 600; color: var(--text-secondary);">Exception</span>
-                 <span style="font-size: 13.5px; font-weight: 700; color: var(--text-primary);">-</span>
+                 <span id="attendanceDetailException" style="font-size: 13.5px; font-weight: 700; color: var(--text-primary);"></span>
               </div>
               <div style="display: flex; justify-content: space-between; padding: 13px 0; border-bottom: 1px solid var(--border-subtle);">
                  <span style="font-size: 13px; font-weight: 600; color: var(--text-secondary);">Document #</span>
@@ -1909,8 +1950,40 @@
   </div>
   
   <script>
+    const attendanceStatusKey = document.getElementById('recordColourKey').content.querySelector('ul');
+    for (const option of document.querySelectorAll('#attendanceExceptionFilter option:not([value="all"])')) {
+      const row = document.createElement('li');
+      row.dataset.exception = option.value;
+      const swatch = document.createElement('span');
+      swatch.setAttribute('aria-hidden', 'true');
+      row.append(swatch, option.label);
+      attendanceStatusKey.append(row);
+    }
+
+    let attendanceDetailsTrigger;
+    function openAttendanceDetails(trigger) {
+      const card = trigger.closest('.attendance-record-card');
+      const value = selector => card.querySelector(selector).textContent.trim();
+      document.getElementById('attendanceDetailDate').textContent = AttendanceDateDisplay.format(card.dataset.date);
+      document.getElementById('attendanceDetailShift').textContent = value('.history-time-row');
+      document.getElementById('attendanceDetailDayType').textContent = value('[data-day-type]');
+      document.getElementById('attendanceDetailClockTimes').textContent = value('[data-clock-times]');
+      document.getElementById('attendanceDetailNormalHours').textContent = value('[data-normal-hours]');
+      document.getElementById('attendanceDetailLateIn').textContent = card.dataset.lateIn || '-';
+      document.getElementById('attendanceDetailUnapprovedOt').textContent = card.dataset.exception === 'unapproved-ot' ? value('[data-ot-hours]') : '0.00';
+      document.getElementById('attendanceDetailException').textContent = value('.attendance-exception-status');
+      attendanceDetailsTrigger = trigger;
+      openModal('attendanceDetailsModalOverlay');
+      document.querySelector('#attendanceDetailsModalOverlay .modal-close-round').focus({ preventScroll: true });
+    }
+
+    document.getElementById('attendanceDetailsModalOverlay').addEventListener('keydown', event => {
+      if (event.key === 'Escape') closeModal('attendanceDetailsModalOverlay', event);
+    });
+
     function openModal(overlayId) {
       const overlay = document.getElementById(overlayId);
+      if (overlayId === 'filterModalOverlay') attendanceExceptionFilter.value = appliedAttendanceException;
       overlay.style.display = 'flex';
       setTimeout(() => {
         overlay.style.opacity = '1';
@@ -1951,6 +2024,7 @@
       
       setTimeout(() => {
         overlay.style.display = 'none';
+        if (overlayId === 'attendanceDetailsModalOverlay') attendanceDetailsTrigger?.focus({ preventScroll: true });
         const routeParams = new URLSearchParams(window.location.search);
         if (overlayId === 'feedbackModalOverlay' && routeParams.get('feedbackFrom') === 'hours-summary') {
           const returnUrl = new URL('hours-summary.html', window.location.href);
@@ -1979,33 +2053,62 @@
       }, 300);
     }
 
-    function updateAttendanceFilterLabel() {
-      const exception = document.getElementById('attendanceExceptionFilter');
-      const label = exception?.options[exception.selectedIndex]?.text || 'All Exceptions';
-      const current = document.getElementById('attendanceCurrentFilterValue');
-      if (current) current.textContent = label;
+    const attendancePeriodBar = document.getElementById('meJumpBar');
+    const attendanceExceptionFilter = document.getElementById('attendanceExceptionFilter');
+    let appliedAttendanceException = attendanceExceptionFilter.value;
+
+    function setAttendanceException(value) {
+      appliedAttendanceException = value;
+      attendanceExceptionFilter.value = value;
+      document.getElementById('attendanceCurrentFilterValue').textContent = attendanceExceptionFilter.selectedOptions[0].label;
+      filterAttendanceRecords();
     }
 
     function resetAttendanceFilter(event) {
       event?.preventDefault();
       event?.stopPropagation();
-      document.getElementById('attendanceExceptionFilter').value = 'all';
-      updateAttendanceFilterLabel();
-      filterAttendanceRecords();
+      setAttendanceException('all');
     }
 
     function applyAttendanceFilter(event) {
-      updateAttendanceFilterLabel();
-      filterAttendanceRecords();
+      setAttendanceException(attendanceExceptionFilter.value);
       closeModal('filterModalOverlay', event);
     }
 
+    function attendancePeriodRange(period) {
+      const today = new Date();
+      const asOf = AttendanceDateDisplay.parse(attendancePeriodBar.dataset.asOf)
+        || new Date(Date.UTC(today.getFullYear(), today.getMonth(), today.getDate()));
+      const year = asOf.getUTCFullYear();
+      const month = asOf.getUTCMonth();
+      if (period === 'this-month' || period === 'last-month') {
+        const selectedMonth = period === 'last-month' ? month - 1 : month;
+        return [new Date(Date.UTC(year, selectedMonth, 1)), new Date(Date.UTC(year, selectedMonth + 1, 0))];
+      }
+      const daysSinceMonday = (asOf.getUTCDay() + 6) % 7;
+      const monday = asOf.getUTCDate() - daysSinceMonday - (period === 'last-week' ? 7 : 0);
+      return [new Date(Date.UTC(year, month, monday)), new Date(Date.UTC(year, month, monday + 6))];
+    }
+
     function filterAttendanceRecords() {
-      const exception = document.getElementById('attendanceExceptionFilter')?.value || 'all';
-      document.querySelectorAll('.attendance-record-card').forEach(card => {
-        const matchesException = exception === 'all' || card.dataset.exception === exception;
-        card.hidden = !matchesException;
-      });
+      const period = attendancePeriodBar.querySelector('[aria-pressed="true"]').dataset.period;
+      const [start, end] = attendancePeriodRange(period);
+      let hasMatches = false;
+      let normalHours = 0;
+      let otHours = 0;
+      for (const card of document.querySelectorAll('.attendance-record-card')) {
+        const date = AttendanceDateDisplay.parse(card.dataset.date);
+        const matchesException = appliedAttendanceException === 'all' || card.dataset.exception === appliedAttendanceException;
+        card.hidden = !(date && date >= start && date <= end && matchesException);
+        if (card.hidden) continue;
+        hasMatches = true;
+        normalHours += Number.parseFloat(card.querySelector('[data-normal-hours]').textContent) || 0;
+        otHours += Number.parseFloat(card.querySelector('[data-ot-hours]').textContent) || 0;
+      }
+      document.getElementById('attendancePeriodRange').textContent = AttendanceDateDisplay.formatRange(start, end);
+      document.getElementById('attendanceTotalHoursValue').textContent = normalHours.toFixed(2) + '/' + otHours.toFixed(2);
+      document.getElementById('attendanceEmptyState').hidden = hasMatches;
+      syncAttendanceVerification();
     }
 
     // Toast notification
@@ -2055,82 +2158,66 @@
     }
 
     const attendanceSavedVerification = new Map(Array.from(document.querySelectorAll('.attendance-verify-button'), button => [button, button.getAttribute('aria-pressed') === 'true']));
-    function syncAttendanceUpdateButton() {
+    function visibleAttendanceVerifyButtons() {
+      return Array.from(document.querySelectorAll('.attendance-record-card:not([hidden]) .attendance-verify-button'));
+    }
+
+    function syncAttendanceVerification() {
+      const buttons = visibleAttendanceVerifyButtons();
+      const selectedCount = buttons.filter(button => button.getAttribute('aria-pressed') === 'true').length;
+      const allVerified = buttons.length > 0 && selectedCount === buttons.length;
+      const verifyAll = document.getElementById('verifyAllBtn');
+      verifyAll.disabled = buttons.length === 0;
+      verifyAll.setAttribute('aria-pressed', String(allVerified));
+      document.getElementById('verifyAllIcon').classList.toggle('checked', allVerified);
+      document.getElementById('verifyAllText').textContent = allVerified ? 'Verified All' : 'Verify All';
+
       const updateButton = document.getElementById('attendanceUpdateBtn');
-      if (!updateButton) return;
-      const hasChanges = Array.from(document.querySelectorAll('.attendance-verify-button'))
+      const hasChanges = buttons
         .some(button => (button.getAttribute('aria-pressed') === 'true') !== attendanceSavedVerification.get(button));
+      updateButton.querySelector('[data-selected-count]').textContent = selectedCount;
       updateButton.disabled = !hasChanges;
       updateButton.hidden = !hasChanges;
       updateButton.closest('.attendance-list-view')?.classList.toggle('has-pending-update', hasChanges);
     }
-
     function updateAttendanceVerification() {
-      document.querySelectorAll('.attendance-verify-button').forEach(button => attendanceSavedVerification.set(button, button.getAttribute('aria-pressed') === 'true'));
-      syncAttendanceUpdateButton();
+      visibleAttendanceVerifyButtons().forEach(button => attendanceSavedVerification.set(button, button.getAttribute('aria-pressed') === 'true'));
+      syncAttendanceVerification();
       document.getElementById('verifyAllBtn')?.focus({ preventScroll: true });
       showToast('Attendance verification updated');
     }
 
     function toggleVerifyAll() {
-      const verifyAllIcon = document.getElementById('verifyAllIcon');
-      const verifyAllText = document.getElementById('verifyAllText');
-      const verifyAllButton = document.getElementById('verifyAllBtn');
-      const recordButtons = document.querySelectorAll('.attendance-verify-button');
-      
-      const isCurrentlyChecked = verifyAllIcon.classList.contains('checked');
-      const newState = !isCurrentlyChecked;
-      
-      if (newState) {
-        verifyAllIcon.classList.add('checked');
-        verifyAllText.textContent = 'Verified All';
-        recordButtons.forEach(button => setAttendanceVerifyState(button, true));
-        showToast('All attendance items verified');
-      } else {
-        verifyAllIcon.classList.remove('checked');
-        verifyAllText.textContent = 'Verify All';
-        recordButtons.forEach(button => setAttendanceVerifyState(button, false));
-        showToast('Unverified all items');
-      }
-      verifyAllButton?.setAttribute('aria-pressed', String(newState));
-      syncAttendanceUpdateButton();
+      const verify = document.getElementById('verifyAllBtn').getAttribute('aria-pressed') !== 'true';
+      visibleAttendanceVerifyButtons().forEach(button => setAttendanceVerifyState(button, verify));
+      syncAttendanceVerification();
+      showToast(verify ? 'All displayed records verified' : 'Displayed records unverified');
     }
 
     // Toggle Single Card Verify
     function toggleSingleVerify(container) {
       const isChecked = container.getAttribute('aria-pressed') !== 'true';
       setAttendanceVerifyState(container, isChecked);
-      
-      const recordButtons = Array.from(document.querySelectorAll('.attendance-verify-button'));
-      const allVerified = recordButtons.length > 0 && recordButtons.every(button => button.getAttribute('aria-pressed') === 'true');
-      const verifyAllIcon = document.getElementById('verifyAllIcon');
-      const verifyAllText = document.getElementById('verifyAllText');
-      const verifyAllButton = document.getElementById('verifyAllBtn');
-      
-      if (allVerified) {
-        verifyAllIcon.classList.add('checked');
-        verifyAllText.textContent = 'Verified All';
-      } else {
-        verifyAllIcon.classList.remove('checked');
-        verifyAllText.textContent = 'Verify All';
-      }
-      verifyAllButton?.setAttribute('aria-pressed', String(allVerified));
-      syncAttendanceUpdateButton();
+      syncAttendanceVerification();
       
       if (isChecked) {
         showToast('Attendance record verified');
       }
     }
 
-    // Interactive period tabs
-    document.addEventListener('DOMContentLoaded', () => {
-      const pills = document.querySelectorAll('.me-jump-pill');
-      pills.forEach(pill => {
-        pill.addEventListener('click', function() {
-          pills.forEach(p => p.classList.remove('active'));
-          this.classList.add('active');
-        });
+    const periodButtons = attendancePeriodBar.querySelectorAll('[data-period]');
+    for (const button of periodButtons) {
+      button.addEventListener('click', () => {
+        for (const tab of periodButtons) {
+          tab.classList.toggle('active', tab === button);
+          tab.setAttribute('aria-pressed', String(tab === button));
+        }
+        filterAttendanceRecords();
       });
+    }
+    filterAttendanceRecords();
+
+    document.addEventListener('DOMContentLoaded', () => {
       renderFeedbackClockCards();
       openLinkedFeedback();
       openLinkedShiftChange();

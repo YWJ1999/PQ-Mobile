@@ -1,9 +1,9 @@
 /* Tax information uses the existing Payroll page shell and theme tokens. */
 body { margin: 0; }
 body, button, a { font-family: 'Plus Jakarta Sans', sans-serif; }
-.tax-information-phone .payroll-document-main { min-height: 0; padding: 20px 16px 96px; }
+.tax-information-phone .payroll-document-main { min-height: 0; padding: 18px 16px 96px; }
 .tax-information-phone .payroll-header-action { text-decoration: none; }
-.tax-tabs { display: flex; flex: 0 0 auto; gap: 4px; margin: 18px 16px 0; padding: 4px; border: 1px solid var(--border-subtle); border-radius: 16px; background: var(--bg-card); }
+.tax-tabs { display: flex; gap: 4px; margin: 0 0 20px; padding: 4px; border: 1px solid var(--border-subtle); border-radius: 16px; background: var(--bg-card); }
 .tax-tabs button { flex: 1; min-width: 0; min-height: 44px; padding: 10px 12px; border: 0; border-radius: 12px; background: transparent; color: var(--text-muted); font-size: 12.5px; font-weight: 800; cursor: pointer; }
 .tax-tabs button[aria-selected="true"] { background: #7c3aed; color: #fff; }
 .tax-tabs button:focus-visible, .tax-information-phone [role="tabpanel"]:focus-visible { outline: 2px solid var(--purple-text); outline-offset: 3px; }

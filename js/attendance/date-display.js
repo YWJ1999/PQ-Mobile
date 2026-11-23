@@ -23,5 +23,16 @@
     const date = parse(value);
     return date ? `${weekdays[date.getUTCDay()]} ${date.getUTCDate()} ${months[date.getUTCMonth()]} ${date.getUTCFullYear()}` : String(value || '—');
   }
-  window.AttendanceDateDisplay = { parse, format };
+  function formatRange(from, to) {
+    const start = parse(from);
+    const end = parse(to);
+    if (!start || !end) return '';
+    const dayMonth = date => `${date.getUTCDate()} ${months[date.getUTCMonth()]}`;
+    const last = `${dayMonth(end)} ${end.getUTCFullYear()}`;
+    if (start.getTime() === end.getTime()) return last;
+    const first = start.getUTCFullYear() === end.getUTCFullYear()
+      ? dayMonth(start) : `${dayMonth(start)} ${start.getUTCFullYear()}`;
+    return `${first} – ${last}`;
+  }
+  window.AttendanceDateDisplay = { parse, format, formatRange };
 })();

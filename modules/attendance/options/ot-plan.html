@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>PeopleHCM - OT Planning</title>
+  <link rel="stylesheet" href="../../../css/history-record-page.css">
+  <script src="../../../js/history-record-page.js"></script>
   <script src="../../../js/components.js"></script>
   <script src="../../../js/app.js" defer></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -756,7 +758,7 @@
 <body>
   <preview-top-bar active-page="attendance"></preview-top-bar>
   <div class="phone-container" style="position: relative;">
-    <div id="view-main" class="view-container active" style="display: flex; flex-direction: column; height: 100%; overflow: hidden;">
+    <div data-history-background id="view-main" class="view-container active" style="display: flex; flex-direction: column; height: 100%; overflow: hidden;">
 
     <!-- Toast Component -->
     <div class="toast-box" id="toastNotice">
@@ -952,7 +954,7 @@
         <span style="font-size: 12px; font-weight: 700; color: var(--text-muted);">Estimated cost</span>
         <span style="font-size: 15px; font-weight: 800; color: var(--text-primary);" id="estimatedCostText">RM 86.40</span>
       </div>
-      <button type="button" class="action-btn-primary" onclick="submitOtPlan()">Submit OT plan</button>
+      <button type="button" class="action-btn-primary" id="submitOtPlanButton" onclick="submitOtPlan()">Submit selected (0)</button>
     </div>
 
     <phone-bottom-nav active="apps"></phone-bottom-nav>
@@ -960,7 +962,7 @@
 
 
     <!-- ================= VIEW: WORK SHIFT SUMMARY ================= -->
-    <div id="view-work-shift-summary" class="view-container">
+    <div data-history-background id="view-work-shift-summary" class="view-container">
       <div class="shift-top-header">
         <phone-status-bar time="9:41" style="color: #ffffff;"></phone-status-bar>
         <div class="header-nav">
@@ -1118,7 +1120,7 @@
     </div>
 
     <!-- ================= VIEW: NO WORK SUMMARY ================= -->
-    <div id="view-no-work-summary" class="view-container">
+    <div data-history-background id="view-no-work-summary" class="view-container">
       <div class="shift-top-header">
         <phone-status-bar time="9:41" style="color: #ffffff;"></phone-status-bar>
         <div class="header-nav">
@@ -1164,7 +1166,7 @@
     </div>
 
     <!-- ================= VIEW: OT PLAN SUMMARY ================= -->
-    <div id="view-ot-plan-summary" class="view-container">
+    <div data-history-background id="view-ot-plan-summary" class="view-container">
       <div class="shift-top-header">
         <phone-status-bar time="9:41" style="color: #ffffff;"></phone-status-bar>
         <div class="header-nav">
@@ -1232,7 +1234,7 @@
     </div>
 
     <!-- ================= VIEW: APPROVED OT SUMMARY ================= -->
-    <div id="view-approved-ot-summary" class="view-container">
+    <div data-history-background id="view-approved-ot-summary" class="view-container">
       <div class="shift-top-header">
         <phone-status-bar time="9:41" style="color: #ffffff;"></phone-status-bar>
         <div class="header-nav">
@@ -1280,7 +1282,7 @@
     </div>
 
     <!-- ================= VIEW: PENDING OT SUMMARY ================= -->
-    <div id="view-pending-ot-summary" class="view-container">
+    <div data-history-background id="view-pending-ot-summary" class="view-container">
       <div class="shift-top-header">
         <phone-status-bar time="9:41" style="color: #ffffff;"></phone-status-bar>
         <div class="header-nav">
@@ -1348,7 +1350,7 @@
     </div>
 
     <!-- ================= VIEW: LEAVE SUMMARY ================= -->
-    <div id="view-leave-summary" class="view-container">
+    <div data-history-background id="view-leave-summary" class="view-container">
       <div class="shift-top-header">
         <phone-status-bar time="9:41" style="color: #ffffff;"></phone-status-bar>
         <div class="header-nav">
@@ -1427,7 +1429,7 @@
     </div>
 
     <!-- ================= VIEW: WORK SHIFT EMPLOYEE DETAIL ================= -->
-    <div id="view-work-shift-detail" class="view-container">
+    <div data-history-background id="view-work-shift-detail" class="view-container">
       <div class="shift-top-header">
         <phone-status-bar time="9:41" style="color: #ffffff;"></phone-status-bar>
         <div class="header-nav">
@@ -1471,7 +1473,7 @@
     </div>
 
     <!-- ================= VIEW: NO WORK EMPLOYEE DETAIL ================= -->
-    <div id="view-no-work-detail" class="view-container">
+    <div data-history-background id="view-no-work-detail" class="view-container">
       <div class="shift-top-header">
         <phone-status-bar time="9:41" style="color: #ffffff;"></phone-status-bar>
         <div class="header-nav">
@@ -1507,7 +1509,7 @@
     </div>
 
     <!-- ================= VIEW: OT PLAN EMPLOYEE DETAIL ================= -->
-    <div id="view-ot-plan-detail" class="view-container">
+    <div data-history-background id="view-ot-plan-detail" class="view-container">
       <div class="shift-top-header">
         <phone-status-bar time="9:41" style="color: #ffffff;"></phone-status-bar>
         <div class="header-nav">
@@ -1550,7 +1552,7 @@
     </div>
 
     <!-- ================= VIEW: LEAVE EMPLOYEE DETAIL ================= -->
-    <div id="view-leave-detail" class="view-container">
+    <div data-history-background id="view-leave-detail" class="view-container">
       <div class="shift-top-header">
         <phone-status-bar time="9:41" style="color: #ffffff;"></phone-status-bar>
         <div class="header-nav">
@@ -1585,17 +1587,17 @@
       </div>
     </div>
 
-    <!-- ================= BOTTOM SHEET: STAFF OT HISTORY ================= -->
-  <div class="modal-overlay" id="staffOtHistoryModal" onclick="closeModalOnBackdrop(event, 'staffOtHistoryModal')">
-    <div class="modal-sheet" onclick="event.stopPropagation()">
-      <div class="drag-handle"></div>
-      <div class="sheet-header">
-        <div>
-          <div class="sheet-title" id="staffHistoryEmployeeName">Employee Name</div>
-        </div>
-        <button type="button" class="sheet-close-btn" onclick="closeModal('staffOtHistoryModal')" aria-label="Close OT details"><i class="fa-solid fa-xmark"></i></button>
-      </div>
-      <div class="sheet-body">
+    <!-- Staff OT history -->
+  <main id="staffOtHistoryModal" class="approval-record-page" data-history-page aria-labelledby="staffHistoryEmployeeName" hidden>
+      <section class="approval-record-layout">
+        <header class="approval-page-header">
+          <phone-status-bar time="9:41"></phone-status-bar>
+          <div class="approval-page-heading">
+            <button type="button" data-history-back aria-label="Back to history"></button>
+            <h1 id="staffHistoryEmployeeName" tabindex="-1">Staff OT History</h1>
+          </div>
+        </header>
+        <div class="history-record-content sheet-body">
         <div class="staff-history-summary">
           <div class="staff-history-summary-row record-summary-metric">
             <strong class="staff-history-summary-value" id="staffHistoryTotalRecords" data-record-count>0</strong>
@@ -1615,11 +1617,8 @@
           <div id="staffHistoryTableRows"></div>
         </div>
       </div>
-      <div class="sheet-footer">
-        <button type="button" class="btn-secondary" onclick="closeModal('staffOtHistoryModal')">Close</button>
-      </div>
-    </div>
-  </div>
+      </section>
+    </main>
 
     <!-- ================= BOTTOM SHEET 1: EDIT OT DETAILS ================= -->
   <div class="modal-overlay" id="editOtDetailsModal" onclick="closeModalOnBackdrop(event, 'editOtDetailsModal')">
@@ -2086,7 +2085,7 @@
             <div class="ot-staff-detail"><span>MTD OT</span><strong>${getStaffMtdOtHours(emp.id).toFixed(1)} h</strong></div>
           </div>
         `;
-        card.addEventListener('click', () => openStaffOtHistory(emp.id));
+        card.addEventListener('click', () => HistoryRecordPage.open('staff-ot', emp.id, card));
         card.addEventListener('keydown', event => handleStaffCardKeydown(event, emp.id));
         container.appendChild(card);
       });
@@ -2130,7 +2129,7 @@
       return getStaffOtHistory(id).reduce((total, record) => total + Number(record.hours || 0), 0);
     }
 
-    function openStaffOtHistory(id) {
+    function renderStaffOtHistory(id) {
       const employee = staffDatabase.find(item => item.id === id);
       if (!employee) return;
       const records = getStaffOtHistory(id);
@@ -2148,13 +2147,13 @@
           </div>
         `).join('')
         : '<div style="padding: 24px 14px; text-align: center; color: var(--text-muted); font-size: 12px; font-weight: 700;">No OT records available.</div>';
-      openModal('staffOtHistoryModal');
+      return document.getElementById('staffOtHistoryModal');
     }
 
     function handleStaffCardKeydown(event, id) {
       if (event.target !== event.currentTarget || (event.key !== 'Enter' && event.key !== ' ')) return;
       event.preventDefault();
-      openStaffOtHistory(id);
+      HistoryRecordPage.open('staff-ot', id, event.currentTarget);
     }
 
     function handleSelectAllCheckbox(checked) {
@@ -2335,6 +2334,7 @@
       const selectedEn = staffDatabase.filter(e => e.selected);
       const count = selectedEn.length;
       document.getElementById('selectedRecordsText').textContent = String(count);
+      document.getElementById('submitOtPlanButton').textContent = formatSelectedAction('Submit', count);
       renderOtPlanningSummary();
     }
 
@@ -2824,6 +2824,7 @@
       toast.classList.add('show');
       setTimeout(() => { toast.classList.remove('show'); }, 3000);
     }
+    HistoryRecordPage.register((kind, id) => kind === 'staff-ot' && renderStaffOtHistory(id));
   </script>
 </body>
 </html>

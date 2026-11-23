@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>PeopleHCM - Claim History</title>
+  <link rel="stylesheet" href="../../../css/history-record-page.css">
+  <script src="../../../js/history-record-page.js"></script>
   <script src="../../../js/components.js"></script>
   <script src="../../../js/claims/claim-request-store.js"></script>
   <script src="../../../js/claims/claim-application-fields.js"></script>
@@ -293,11 +295,19 @@
     </div>
 
     <!-- MODAL 2: CLAIM DETAILS POP-UP MODAL (Matching User Screenshots) -->
-    <div id="detailsModalOverlay" class="modal-overlay" onclick="if(event.target===this) closeDetailsModal()" style="align-items: center; justify-content: center; padding: 16px 16px 94px; z-index: 200;">
-      <div id="claimDetailsModalContainer" style="width: 100%; max-width: 380px; background: var(--bg-card); border-radius: 18px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.5); display: flex; flex-direction: column; max-height: 100%; border: 1px solid var(--border-subtle);">
-        <!-- Dynamically rendered by openClaimDetailsModal(item) -->
-      </div>
-    </div>
+    <main id="detailsModalOverlay" class="approval-record-page" data-history-page aria-labelledby="claimHistoryDetailTitle" hidden>
+      <section class="approval-record-layout" id="claimDetailsModalContainer">
+        <header class="approval-page-header">
+          <phone-status-bar time="9:41"></phone-status-bar>
+          <div class="approval-page-heading">
+            <button type="button" data-history-back aria-label="Back to history"></button>
+            <h1 id="claimHistoryDetailTitle" tabindex="-1">Claim Details</h1>
+          </div>
+        </header>
+        <div class="history-record-content detail-popout-body" id="claimHistoryDetailBody"></div>
+        <footer class="history-detail-actions" id="claimHistoryDetailActions" hidden></footer>
+      </section>
+    </main>
 
     <!-- MODAL 3: PERIOD & TYPE FILTER MODAL -->
     <div id="filterModalOverlay" class="claim-filter-sheet" onclick="if(event.target===this) closeDateFilterModal()">
@@ -850,7 +860,7 @@
         return `<button type="button" class="${className}${detailCancel ? ' record-primary-action' : ''}" data-claim-history-action="${action.key}" onclick="${handler}(event, '${item.id}')">${label}</button>`;
       }).join('');
       if (context === 'detail') {
-        return `<footer class="history-detail-actions" ${buttons ? '' : 'hidden'}>${buttons}</footer>`;
+        return buttons;
       }
       return buttons ? `<div class="history-card-actions">${buttons}</div>` : '';
     }
@@ -929,6 +939,10 @@
 
       const catMeta = CATEGORIES.find(c => c.id === activeTabKey) || CATEGORIES[0];
       const statusTitle = activeStatusFilter === 'resubmit' ? 'Pending Resubmit' : recordReviewStatusLabel(activeStatusFilter.charAt(0).toUpperCase() + activeStatusFilter.slice(1));
+      setRecordLegend(container.closest('[data-record-colour-view]'), activeStatusFilter ? 'Claim status' : catMeta.name + ' status', {
+        Draft: 'draft', Pending: 'submitted', 'Pending Approval': 'submitted', Resubmit: 'resubmit',
+        Approved: 'approved', Rejected: 'rejected', Cancelled: 'cancelled'
+      });
       if (headerTitle) headerTitle.textContent = activeStatusFilter ? `${statusTitle} Claim History` : catMeta.title;
 
       let items = activeStatusFilter ? STATUS_HISTORY_RECORDS : (HISTORY_DATA[activeTabKey] || []);
@@ -975,12 +989,12 @@
         card.dataset.status = displayStatus.key;
         card.setAttribute('role', 'button');
         card.tabIndex = 0;
-        card.onclick = () => openClaimDetailsModal(item);
+        card.onclick = () => HistoryRecordPage.open(activeStatusFilter ? 'status' : activeTabKey, item.id, card);
         card.onkeydown = event => {
           if (event.target.closest('button')) return;
           if (event.key === 'Enter' || event.key === ' ') {
             event.preventDefault();
-            openClaimDetailsModal(item);
+            card.click();
           }
         };
 
@@ -1019,16 +1033,11 @@
             </div>
           `;
         } else if (activeTabKey === 'travelRequest') {
-          const submitDateDisplay = item.submitDate || item.submittedDate || datesDisplay;
           detailsBlock = `
             <div class="history-card-fields">
               <div style="display: flex; justify-content: space-between; align-items: center; gap: 12px;">
                 <span style="color: var(--text-muted); font-weight: 600;">Period :</span>
                 <span style="color: var(--text-primary); font-weight: 700; font-family: monospace, sans-serif;">${periodDisplay}</span>
-              </div>
-              <div style="display: flex; justify-content: space-between; align-items: center; gap: 12px;">
-                <span style="color: var(--text-muted); font-weight: 600;">Submit Date :</span>
-                <span style="color: var(--text-primary); font-weight: 700;">${submitDateDisplay}</span>
               </div>
               <div style="display: flex; justify-content: space-between; align-items: center; gap: 12px;">
                 <span style="color: var(--text-muted); font-weight: 600;">Purpose :</span>
@@ -1122,6 +1131,7 @@
               <i class="fa-solid ${statusIcon}"></i>
             </span>
           </div>
+          ${recordSubmitDate.html(item.submitDate || item.submittedDate)}
           <div class="history-card-details">${detailsBlock}</div>
           ${actionHtml}
         `;
@@ -1156,7 +1166,7 @@
           showToast('Could not cancel the claim. Please check its status.');
           return;
         }
-        closeDetailsModal();
+        HistoryRecordPage.back();
         renderClaimHistoryList();
         showToast('Claim cancelled.');
         return;
@@ -1717,10 +1727,14 @@
       return { headerTitle, bodyHtml };
     }
 
-    function openClaimDetailsModal(item) {
-      const modal = document.getElementById('detailsModalOverlay');
-      const container = document.getElementById('claimDetailsModalContainer');
-      if (!modal || !container) return;
+    function renderClaimDetail(kind, id) {
+      const statusList = kind === 'status';
+      if (!statusList && !Object.hasOwn(HISTORY_DATA, kind)) return;
+      const items = [...savedClaimHistory(statusList ? null : kind), ...(statusList ? STATUS_HISTORY_RECORDS : HISTORY_DATA[kind])];
+      const item = items.find(row => row.id === id);
+      if (!item) return;
+      if (!statusList && activeTabKey !== kind) switchClaimTab(kind);
+      const container = document.getElementById('claimHistoryDetailBody');
       const { headerTitle, bodyHtml } = item.savedClaim && !item.savedBenefit
         ? { headerTitle: item.optionName, bodyHtml: `<div data-saved-claim-review>
             <table class="record-detail-table"><tbody>
@@ -1729,18 +1743,11 @@
             </tbody></table>
           </div>` }
         : legacyHistoryDetails(item);
-      container.innerHTML = `
-        <div style="background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%); padding: 14px 16px; display: flex; align-items: center; justify-content: space-between;">
-          <h3 style="font-size: 16px; font-weight: 800; color: #ffffff; text-transform: uppercase; margin: 0; letter-spacing: 0.3px;">${headerTitle}</h3>
-          <button type="button" onclick="closeDetailsModal()" style="background: transparent; border: none; color: #ffffff; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0;">
-            <i class="fa-solid fa-circle-xmark"></i>
-          </button>
-        </div>
-        <div style="padding: 12px 12px 24px; flex: 1 1 auto; min-height: 0; overflow-y: auto; background: var(--bg-card); color: var(--text-primary);">
-          ${bodyHtml}
-        </div>
-        ${renderClaimHistoryActions(item, 'detail')}
-      `;
+      document.getElementById('claimHistoryDetailTitle').textContent = headerTitle;
+      container.innerHTML = recordSubmitDate.html(item.submitDate || item.submittedDate) + bodyHtml;
+      const footer = document.getElementById('claimHistoryDetailActions');
+      footer.innerHTML = renderClaimHistoryActions(item, 'detail');
+      footer.hidden = !footer.childElementCount;
 
       const savedReview = container.querySelector('[data-saved-claim-review]');
       if (savedReview) {
@@ -1755,12 +1762,7 @@
           savedReview.append(label, comment);
         }
       }
-      modal.classList.add('active');
-    }
-
-    function closeDetailsModal() {
-      const modal = document.getElementById('detailsModalOverlay');
-      if (modal) modal.classList.remove('active');
+      return document.getElementById('detailsModalOverlay');
     }
 
     // Modal 3: Start Date, End Date & Benefit Type Filter Modal
@@ -1834,7 +1836,7 @@
 
     window.addEventListener('storage', event => {
       if (event.key === ClaimRequestStore.key || event.key === null) {
-        closeDetailsModal();
+        HistoryRecordPage.back();
         renderClaimHistoryList();
       }
     });
@@ -1842,6 +1844,7 @@
     // Initialize Page
     document.addEventListener('DOMContentLoaded', () => {
       switchClaimTab('benefit', true);
+      HistoryRecordPage.register(renderClaimDetail);
     });
   </script>
 </body>

@@ -24,9 +24,11 @@ const detailUrl = pathToFileURL(path.resolve(__dirname, '../modules/attendance/o
       assert.equal(await isUpdateVisible(), false, 'Update must start hidden when no Void checkbox is selected');
 
       await page.click('#dailyOtVoid0');
+      assert.equal(await page.$eval('#dailyOtUpdate', button => button.textContent), 'Void selected (1)');
       assert.equal(await isUpdateVisible(), true, 'Selecting one Void checkbox must show Update');
 
       await page.click('#dailyOtVoid1');
+      assert.equal(await page.$eval('#dailyOtUpdate', button => button.textContent), 'Void selected (2)');
       await page.click('#dailyOtVoid0');
       assert.equal(await isUpdateVisible(), true, 'Update must remain visible while any Void checkbox is selected');
 

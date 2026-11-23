@@ -36,6 +36,7 @@ const leaveUrl = pathToFileURL(path.resolve(__dirname, '..', 'leave.html')).href
         return {
           title: card?.querySelector('.cal-leave-detail-title')?.textContent.trim(),
           reference: card?.querySelector('.cal-leave-detail-reference')?.textContent.trim(),
+          submitDate: card?.querySelector('.record-submit-date')?.textContent,
           rowLabels: [...card.querySelectorAll('.cal-leave-detail-label')].map(node => node.textContent.trim()),
           usesHighlightRecord: card?.classList.contains('leave-highlight-detail-record'),
           dateHeader: dateHeader?.textContent.trim(),
@@ -50,11 +51,12 @@ const leaveUrl = pathToFileURL(path.resolve(__dirname, '..', 'leave.html')).href
 
       assert.equal(detail.title, leave.leaveType);
       assert.equal(detail.reference, `Ref: ${leave.ref}`);
-      assert.deepEqual(detail.rowLabels, ['Submitted Date', 'Duration']);
+      assert.deepEqual(detail.rowLabels, ['Duration']);
+      assert.equal(detail.submitDate, 'Submit Date: 18/09/2026');
       assert.equal(detail.usesHighlightRecord, true);
       assert.equal(detail.dateHeader, '22 Sep 2026');
       assert.match(detail.dateHeaderBackground, /linear-gradient/);
-      assert.equal(detail.detailTileCount, 2);
+      assert.equal(detail.detailTileCount, 1);
       assert.equal(detail.hasHeaderIcon, false);
       assert.equal(detail.hasHeaderTag, false);
       assert.deepEqual(detail.footerLabels, ['Cancel']);

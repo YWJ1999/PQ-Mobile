@@ -21,5 +21,11 @@
     rows.push({ id, ...editable(changes) });
     localStorage.setItem(key, JSON.stringify(rows));
   }
-  window.EmployeeCareerFeedbackStore = { all, update };
+  const statusTones = { Pending: 'submitted', Responded: 'draft' };
+  function statusLabel(row) {
+    const status = String(row.status || '').trim().toLowerCase();
+    if (status) return ['responded', 'in progress', 'resolved'].includes(status) ? 'Responded' : 'Pending';
+    return row.reviewedBy || row.reviewedDate || row.reviewerComment ? 'Responded' : 'Pending';
+  }
+  window.EmployeeCareerFeedbackStore = { all, update, statusLabel, statusTones };
 })();

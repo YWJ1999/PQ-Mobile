@@ -418,8 +418,10 @@ const detailUrl = pathToFileURL(path.resolve(__dirname, '../modules/attendance/o
       assert.equal(await editPage.$eval('#dailyOtApproved0', node => node.disabled), true);
       await editPage.click('#dailyOtVoid0');
       assert.equal(await editPage.$eval('#dailyOtApproved0', node => node.disabled), false);
-      assert.equal(await editPage.$eval('#dailyOtUpdate', node => node.textContent.trim()), 'Update');
+      assert.equal(await editPage.$eval('#dailyOtUpdate', node => node.textContent.trim()), 'Void selected (0)');
       assert.equal(await editPage.$eval('#dailyOtUpdate', node => node.querySelectorAll('i').length), 0);
+      await editPage.click('#dailyOtVoid0');
+      assert.equal(await editPage.$eval('#dailyOtUpdate', node => node.textContent.trim()), 'Void selected (1)');
       const getUpdateGeometry = () => editPage.$eval('#dailyOtActions', actions => {
         const button = actions.querySelector('#dailyOtUpdate');
         const phone = actions.closest('.phone-container');

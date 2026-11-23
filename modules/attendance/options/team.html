@@ -9,6 +9,7 @@
     <title>PeopleHCM - Team Attendance</title>
   <link rel="stylesheet" href="../../../css/pending-approval-page.css">
   <script src="../../../js/pending-approval-page.js"></script>
+  <script src="../../../js/attendance/advice-fields.js"></script>
     <script src="../../../js/components.js"></script>
 <script>
       // ATTENDANCE PENDING APPROVAL THREE-DOTS & MODAL HANDLERS
@@ -124,7 +125,8 @@
           ['Shift', data.originalShift ?? data.shift],
           ['Submitter', submitter],
           ['Amended Shift', data.amendedShift],
-          ['Shift Change Reason', data.shiftChangeReason ?? data.reason],
+          ['Amended Shift Reason', data.shiftChangeReason ?? data.reason],
+          ...AttendanceAdviceFields.entries(data),
           ['Remarks', data.remarks ?? data.remark],
           ['Approver Comments', data.approverComments ?? data.comments]
         ];
@@ -168,6 +170,7 @@
       }
 
       function renderAttendanceApprovalDetails(record) {
+        recordSubmitDate.set(document.getElementById('attendanceApprovalSubmitDate'), attendanceSubmitDate(record));
         const data = { ...record, empId: record.id, dates: record.startDate === record.endDate ? record.startDate : [record.startDate, record.endDate].filter(Boolean).join(' - ') };
         const setVal = (id, val) => {
           const el = document.getElementById(id);
@@ -1603,7 +1606,7 @@
       </div><!-- End viewMainDashboard -->
 
       <!-- Dedicated Page View Section: Pending Approval -->
-      <div id="viewPendingApprovalSection" style="display: none;">
+      <div id="viewPendingApprovalSection" data-record-colour-view="Attendance approval status" data-record-legend='{"Draft":"draft","Pending":"submitted","Approved":"approved","Resubmit":"resubmit","Rejected":"rejected"}' style="display: none;">
           <!-- 3 CATEGORY TABS FOR PENDING APPROVAL (Final OT Request | OT Plan Request | Attendance Feedback) -->
           <div style="display: flex; gap: 6px; margin-bottom: 14px;">
             <button type="button" id="staffTabFinalOT" class="filter-pill active" onclick="switchStaffApprovalTab('final_ot')"
@@ -3194,6 +3197,7 @@
         <!-- Scrollable Details Content List as Table matching leave.html -->
         <div style="flex: 1; overflow-y: auto; padding: 14px 16px 14px 16px; display: flex; flex-direction: column; gap: 14px; scrollbar-width: none; background: var(--bg-sheet);">
 
+          <span id="attendanceApprovalSubmitDate" class="record-submit-date" hidden></span>
           <div id="attFeedbackDetailsGroup" hidden></div>
           <div id="attOtDetailsGroup" style="background: var(--bg-sheet); border: 1px solid var(--border-subtle); border-radius: 16px; overflow: hidden; box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05); flex-shrink: 0;">
             <table style="width: 100%; border-collapse: collapse; font-size: 12px; text-align: left;">
@@ -3423,6 +3427,7 @@
     </script>
 
     <script>
+      const dispatchReason = "Emergency server room dispatch at 06:30 AM before shift.";
       const staffDatabase = {
         scheduled: [
           {
@@ -3777,9 +3782,9 @@
           { name: "Amanda Lee", id: "#001140", dept: "Warehouse Coordinator", category: "ot_plan", type: "Rest OT", otType: "Rest OT", reason: "Quarterly Stock Audit", startDate: "Sat, 07/03/2026", endDate: "Sat, 07/03/2026", duration: "4.0 Hours (08:00 – 12:00)", remark: "Pre-approved weekend inventory counting & warehouse audit.", docStatus: "Submitted", statusText: "Submitted" },
 
           // Attendance Feedback (Exceptions, clocking adjustments & reason submissions)
-          { name: "Afifah Nasir", id: "#004177", dept: "QA Manager", category: "feedback", type: "Attendance Feedback", reason: "Missing Clock Out", startDate: "Tue, 24/02/2026", endDate: "Tue, 24/02/2026", duration: "Full Shift", amendedShift: "08:00 AM – 05:30 PM", remark: "Turnstile reader offline at 17:05 PM during site exit. Verified by supervisor.", docStatus: "Submitted", statusText: "Submitted" },
+          { name: "Afifah Nasir", id: "#004177", dept: "QA Manager", category: "feedback", type: "Attendance Feedback", reason: "Missing Clock Out", missingClockOut: true, startDate: "Tue, 24/02/2026", endDate: "Tue, 24/02/2026", duration: "Full Shift", amendedShift: "08:00 AM – 05:30 PM", remark: "Turnstile reader offline at 17:05 PM during site exit. Verified by supervisor.", docStatus: "Submitted", statusText: "Submitted" },
           { name: "Victor Hugo", id: "#001115", dept: "Safety Specialist", category: "feedback", type: "Attendance Feedback", reason: "Geo-Location Override", startDate: "Mon, 23/02/2026", endDate: "Mon, 23/02/2026", duration: "Offsite Duty", amendedShift: "08:30 AM – 06:00 PM", remark: "Conducted external site safety audit at Port Klang facility.", docStatus: "Submitted", statusText: "Submitted" },
-          { name: "Daniel Park", id: "#001094", dept: "IT Support Specialist", category: "feedback", type: "Attendance Feedback", reason: "Late Clock In (+35m)", startDate: "Fri, 20/02/2026", endDate: "Fri, 20/02/2026", duration: "Shift Adjustment", amendedShift: "08:35 AM – 06:05 PM", remark: "Emergency server room dispatch at 06:30 AM before shift.", docStatus: "Submitted", statusText: "Submitted" },
+          { name: "Daniel Park", id: "#001094", dept: "IT Support Specialist", category: "feedback", type: "Attendance Feedback", reason: "Late Clock In (+35m)", lateInMinutes: 35, lateReason: dispatchReason, startDate: "Fri, 20/02/2026", endDate: "Fri, 20/02/2026", duration: "Shift Adjustment", amendedShift: "08:35 AM – 06:05 PM", remark: dispatchReason, docStatus: "Submitted", statusText: "Submitted" },
           { name: "Kenji Sato", id: "#001073", dept: "Maintenance Tech", category: "feedback", type: "Attendance Feedback", reason: "Biometric Punch Fail", startDate: "Thu, 19/02/2026", endDate: "Thu, 19/02/2026", duration: "Manual Verification", amendedShift: "08:00 AM – 05:30 PM", remark: "Fingerprint scanner rejected punch due to grease; manual sign-in sheet provided.", docStatus: "Draft", statusText: "Draft" }
         ],
         attendance_verification: [
@@ -3826,13 +3831,18 @@
         return attendancePendingFilter;
       }
 
+      function attendanceSubmitDate(item) {
+        // These sample requests use the start date when no separate submission date was supplied.
+        const isDraft = /draft/i.test(item.documentStatus || item.docStatus || item.statusText || item.status || '');
+        return item.submitDate || item.submittedDate || item.submittedAt || (isDraft ? '' : item.startDate);
+      }
+
       function matchesAttendancePendingFilter(item) {
         return getAttendancePendingFilter().matches({
           keyword: [item.name, item.id, item.dept, item.type, item.reason, item.remark].join(' '),
           startDate: item.startDate,
           endDate: item.endDate || item.startDate,
-          // Approval details use the request start date as the submission date in the demo data.
-          submittedAt: item.submitDate || item.startDate,
+          submittedAt: attendanceSubmitDate(item),
           outstandingDays: item.outstandingDays
         });
       }
@@ -3940,7 +3950,7 @@
           const primaryLabel = isFeedback ? 'Amended Shift' : 'Type';
           const primaryValue = isFeedback ? (item.amendedShift || item.shift || '—') : typeStr;
 
-          const fields = [['Date', startDateStr], [primaryLabel, primaryValue], ['Reason', reasonStr]];
+          const fields = [['Submit Date', attendanceSubmitDate(item)], ['Date', startDateStr], [primaryLabel, primaryValue], ['Reason', reasonStr]];
           if (isOtPlan) {
             let planHoursStr = item.planHours || '2.0 Hours';
             let otTimeStr = item.otTime || '18:00 – 20:00';
@@ -4135,7 +4145,7 @@
             const isDraft = docStatusStr.toLowerCase().includes('draft');
             const statusIcon = isDraft ? '<i class="fa-solid fa-file-pen"></i>' : '<i class="fa-solid fa-hourglass-half"></i>';
             const fields = [
-              ['Type', typeStr + (item.isUnplanned ? ' (Unplanned)' : '')], ['Reason', reasonStr],
+              ['Submit Date', attendanceSubmitDate(item)], ['Type', typeStr + (item.isUnplanned ? ' (Unplanned)' : '')], ['Reason', reasonStr],
               ['Date Start', startDateStr], ['Date End', endDateStr], ['Duration', durationStr]
             ];
             if (item.requestedBy) fields.push(['Requested On Behalf By', [item.requestedBy.name, item.requestedBy.title].filter(Boolean).join('\n')]);

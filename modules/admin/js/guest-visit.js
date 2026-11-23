@@ -379,7 +379,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!validate(generalIds, 'visit')) return;
     if (!guests.length || editingGuest !== null || guestIds.some(id => $(id).value.trim())) {
       showEntry('guest', false);
-      feedback(guests.length ? 'Please Add or Update the guest details before submitting.' : 'Please add at least one guest before submitting.', true);
+      feedback(guests.length ? 'Please save the guest details before submitting.' : 'Please add at least one guest before submitting.', true);
       $('visitGuestCompany').focus();
       return;
     }

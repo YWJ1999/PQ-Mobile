@@ -148,8 +148,8 @@
         ['Review Month(s)', activity.reviewMonths, 'review-months'], ['Progress%', `${number(progress(activity))}%`, 'progress']
       ]));
       const footer = node('footer', 'ld-card-footer');
-      const update = action('Update', 'ld-primary ld-update', url('learning-development-update.html', activity.id));
-      update.setAttribute('aria-label', `Update ${activity.activity}`);
+      const update = action('Manage progress', 'ld-primary ld-update', url('learning-development-update.html', activity.id));
+      update.setAttribute('aria-label', `Manage progress for ${activity.activity}`);
       footer.append(update);
       card.append(footer);
       return card;

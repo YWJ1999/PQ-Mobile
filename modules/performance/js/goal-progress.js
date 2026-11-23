@@ -73,7 +73,7 @@
     );
 
     const footer = node('footer', 'goal-progress-card-footer');
-    const update = node('button', 'goal-progress-update', 'Update');
+    const update = node('button', 'goal-progress-update', 'Edit progress');
     update.type = 'button';
     update.dataset.goalId = goal.id;
     update.addEventListener('click', () => showUpdate(goal.id));
@@ -259,7 +259,7 @@
     $('goalProgressEntryHeading').textContent = title;
     $('goalProgressEntryContext').textContent = `${selectedGoal().kra} · Unit: ${selectedGoal().unit}`;
     $('goalProgressTitle').textContent = title;
-    $('goalProgressBack').setAttribute('aria-label', 'Back to Update Goal Progress');
+    $('goalProgressBack').setAttribute('aria-label', 'Back to Edit Goal Progress');
     $('goalProgressOverviewView').hidden = true;
     $('goalProgressEntryView').hidden = false;
     resetScroll();
@@ -270,7 +270,7 @@
     clearForm();
     $('goalProgressEntryView').hidden = true;
     $('goalProgressOverviewView').hidden = false;
-    $('goalProgressTitle').textContent = 'Update Goal Progress';
+    $('goalProgressTitle').textContent = 'Edit Goal Progress';
     $('goalProgressBack').setAttribute('aria-label', 'Back to Goal Progress');
     renderHistory(); resetScroll();
     $('goalProgressNew').focus({ preventScroll: true });

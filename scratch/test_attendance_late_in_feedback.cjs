@@ -35,6 +35,7 @@ async function closeModal(page, id) {
         page.on('pageerror', error => pageErrors.push(error.message));
         await page.setViewport({ width, height: 844, deviceScaleFactor: 1 });
         await page.goto(`${pageUrl}?theme=${theme}`, { waitUntil: 'domcontentloaded' });
+        await page.click('[data-period="this-month"]');
 
         const lateInCards = await page.$$eval('.attendance-record-card[data-exception="late-in"]', cards => cards.map(card => ({
           hasExceptionTheme: card.classList.contains('exception-theme'),
@@ -66,7 +67,7 @@ async function closeModal(page, id) {
           hasLateInTheme: true,
           status: 'Late In',
           reference: 'Date: Sun, 13 Sep 2026',
-          detailLabels: ['Times', 'Normal Hours', 'OT Hours'],
+          detailLabels: ['Day Type', 'Clock Times', 'Normal Hours', 'OT Hours'],
           actions: ['Change Shift', 'Feedback'],
           hasVerify: true
         });

@@ -1,0 +1,185 @@
+.hours-summary-page .hours-summary-header {
+  flex: 0 0 auto;
+  padding: 0 0 14px;
+  color: #fff;
+  border-radius: 0 0 20px 20px;
+}
+
+.hours-summary-toolbar {
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr) 42px;
+  align-items: center;
+  gap: 8px;
+  margin: 8px 14px 0;
+}
+
+.hours-summary-heading {
+  min-width: 0;
+  text-align: center;
+}
+
+.hours-summary-heading h1 {
+  margin: 0;
+  color: #fff;
+  font-size: 19px;
+  font-weight: 800;
+  line-height: 1.25;
+  letter-spacing: -.025em;
+  text-wrap: balance;
+}
+
+.hours-summary-period {
+  margin: 4px 0 0;
+  color: #f1eaff;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.35;
+  font-variant-numeric: tabular-nums;
+}
+
+.hours-header-button {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, .3);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, .14);
+  color: #fff;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.hours-header-button:hover { background: rgba(255, 255, 255, .23); }
+.hours-header-button:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+.hours-summary-header.showing-details :is(.hours-header-filter, .hours-summary-period) { display: none; }
+
+.hours-summary-page .main-content {
+  min-height: 0;
+  padding: 17px 14px 44px;
+}
+
+.hours-summary-page > phone-bottom-nav { flex: 0 0 78px; }
+
+.hours-active-filters {
+  margin: 0 3px 12px;
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.hours-section + .hours-section { margin-top: 17px; }
+.hours-section h2 {
+  margin: 0 4px 8px;
+  color: var(--text-primary);
+  font-size: 16px;
+  font-weight: 800;
+  line-height: 1.35;
+  letter-spacing: -.025em;
+}
+
+.hours-metric-card {
+  padding: 3px 12px;
+  border: 1px solid var(--border-card);
+  border-radius: 18px;
+  background: var(--bg-card);
+  box-shadow: 0 2px 8px rgba(36, 42, 75, .07);
+}
+
+.hours-metrics {
+  --table-header-background: transparent;
+  --table-header-text: var(--text-secondary);
+  --table-header-divider: var(--border-subtle);
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: collapse;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.hours-metrics .total-column { width: 5rem; }
+.hours-metrics .percent-column { width: 17%; }
+
+.hours-metrics thead th {
+  height: 27px;
+  font-size: 11.5px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.hours-metrics :is(th, td):nth-child(2) {
+  padding-inline-end: 12px;
+  text-align: right;
+}
+
+.hours-metrics tbody tr {
+  border-top: 1px solid var(--border-subtle);
+  cursor: pointer;
+}
+
+.hours-metrics tbody tr:hover,
+.hours-metrics tbody tr:focus-within { background: var(--bg-card-hover); }
+.hours-metrics tbody tr:active { background: var(--bg-input); }
+
+.hours-metric-button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 44px;
+  padding: 5px 0;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.35;
+  text-align: left;
+  cursor: pointer;
+}
+
+.hours-metric-button:focus-visible { outline: 2px solid var(--purple-text); outline-offset: -2px; }
+
+.hours-metric-icon {
+  display: grid;
+  flex: 0 0 32px;
+  place-items: center;
+  height: 32px;
+  border-radius: 10px;
+  background: var(--metric-icon-bg);
+  color: var(--metric-icon-color);
+  font-size: 15px;
+}
+
+.hours-section-work { --metric-icon-bg: var(--tag-green-bg); --metric-icon-color: var(--bento-mint-icon); }
+.hours-section-overtime { --metric-icon-bg: var(--tag-blue-bg); --metric-icon-color: var(--bento-blue-icon); }
+.hours-section-exceptions { --metric-icon-bg: var(--tag-violet-bg); --metric-icon-color: var(--purple-text); }
+
+.hours-metric-total {
+  font-size: 16px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.hours-metric-percent {
+  display: block;
+  padding: 3px 2px;
+  border-radius: 999px;
+  background: var(--bg-input);
+  color: var(--text-secondary);
+  font-size: 11.5px;
+  font-weight: 700;
+  line-height: 1.35;
+  text-align: center;
+  white-space: nowrap;
+}
+
+@media (max-width: 360px) {
+  .hours-metric-card { padding-inline: 9px; }
+  .hours-metric-button { gap: 7px; }
+  .hours-metrics :is(th, td):nth-child(2) { padding-inline-end: 7px; }
+}

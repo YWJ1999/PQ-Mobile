@@ -177,7 +177,7 @@ function setTheme(theme) {
   html.setAttribute('data-theme', theme);
   const themeUrl = new URL(window.location.href);
   themeUrl.searchParams.set('theme', theme);
-  window.history.replaceState(null, '', themeUrl);
+  window.history.replaceState(window.history.state, '', themeUrl);
 
   // Update top switcher bar buttons (Dark Mode / Light Mode only)
   document.querySelectorAll('.theme-btn').forEach(btn => {
@@ -196,20 +196,7 @@ function toggleTheme() {
 }
 
 function initTheme() {
-  const path = window.location.pathname.toLowerCase();
-  let defaultTheme = document.documentElement.getAttribute('data-theme') || 'dark';
-
-  const urlParams = new URLSearchParams(window.location.search);
-  if (urlParams.get('theme')) {
-    defaultTheme = urlParams.get('theme');
-  } else if (path.includes('light')) {
-    defaultTheme = 'light';
-  } else if (path.includes('dark')) {
-    defaultTheme = 'dark';
-  } else {
-    defaultTheme = localStorage.getItem('peoplehcm_theme') || defaultTheme;
-  }
-
+  const defaultTheme = getInitialPageTheme();
   document.documentElement.setAttribute('data-theme', defaultTheme);
   document.querySelectorAll('.theme-btn').forEach(btn => {
     if (btn.getAttribute('data-set-theme') === defaultTheme) {

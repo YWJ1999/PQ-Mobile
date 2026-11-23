@@ -11,6 +11,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/theme.css">
   <link rel="stylesheet" href="css/app.css">
+  <link rel="stylesheet" href="css/history-record-page.css">
+  <script src="js/history-record-page.js"></script>
   <script src="js/components.js"></script>
   <script src="js/app.js" defer></script>
 </head>
@@ -34,7 +36,7 @@
         <div class="bonus-title-wrap">
           <h2 class="bonus-title-main">Bonus History</h2>
         </div>
-        <button class="me-options-btn" onclick="openAuditLog()" aria-label="More Options" title="Options">
+        <button class="me-options-btn" onclick="HistoryRecordPage.open('audit', 'log', this)" aria-label="More Options" title="Options">
           <i class="fa-solid fa-ellipsis-vertical" style="font-size: 16px;"></i>
         </button>
       </div>
@@ -127,6 +129,18 @@
     </div>
 
     <!-- Phone Bottom Navigation Bar -->
+    <main id="historyAuditPage" class="approval-record-page" data-history-page aria-labelledby="historyAuditTitle" hidden>
+      <section class="approval-record-layout">
+        <header class="approval-page-header">
+          <phone-status-bar time="9:41"></phone-status-bar>
+          <div class="approval-page-heading">
+            <button type="button" data-history-back aria-label="Back to history"></button>
+            <h1 id="historyAuditTitle" tabindex="-1">Bonus History Audit Log</h1>
+          </div>
+        </header>
+        <div class="history-record-content"><p id="historyAuditText"></p></div>
+      </section>
+    </main>
     <phone-bottom-nav active="me"></phone-bottom-nav>
 
     <!-- Side Drawers & Modals -->
@@ -151,24 +165,12 @@
       bonusHistoryTotalRecords.textContent = String(document.querySelectorAll('.bonus-data-table tbody > tr').length);
     }
 
-    function openAuditLog() {
-      document.getElementById('historyAuditDialog')?.remove();
-      const dialog = document.createElement('div');
-      dialog.id = 'historyAuditDialog';
-      dialog.setAttribute('role', 'dialog');
-      dialog.setAttribute('aria-modal', 'true');
-      dialog.style.cssText = 'position:absolute;inset:0;z-index:1200;display:flex;align-items:flex-end;background:rgba(15,23,42,.7);';
-      const panel = document.createElement('section');
-      panel.style.cssText = 'width:100%;padding:20px;border-radius:24px 24px 0 0;background:var(--bg-card);color:var(--text-primary);';
-      const heading = document.createElement('h2');
-      heading.textContent = 'Bonus History Audit Log';
-      const details = document.createElement('p');
-      details.textContent = tableRows().slice(1).length + ' records reviewed for Sarah Jenkins (#EBB01). Last opened ' + new Date().toLocaleString();
-      const close = document.createElement('button');
-      close.type = 'button'; close.textContent = 'Close Audit Log'; close.className = 'bonus-export-pill'; close.onclick = () => dialog.remove();
-      panel.append(heading, details, close); dialog.appendChild(panel); dialog.onclick = event => { if (event.target === dialog) dialog.remove(); };
-      document.querySelector('.phone-container').appendChild(dialog);
-    }
+    HistoryRecordPage.register((kind, id) => {
+      if (kind !== 'audit' || id !== 'log') return;
+      document.getElementById('historyAuditText').textContent = tableRows().slice(1).length
+        + ' records reviewed for Sarah Jenkins (#EBB01). Last opened ' + new Date().toLocaleString();
+      return document.getElementById('historyAuditPage');
+    });
 
     function triggerExport(format) {
       const fileBase = 'EBB01_Bonus_History';

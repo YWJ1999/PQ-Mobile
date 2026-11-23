@@ -42,7 +42,7 @@ const base = pathToFileURL(path.resolve(__dirname, '../modules/performance/optio
     assert.equal(await page.$eval('#selfEvaluationAdd', node => node.hidden), true);
     assert.ok(await page.$eval('.self-evaluation-content', node => { node.scrollTop = node.scrollHeight; return node.scrollTop >= 0 && node.scrollWidth <= node.clientWidth + 1; }));
     await Promise.all([page.waitForNavigation({ waitUntil: 'domcontentloaded' }), page.$eval('#selfEvaluationCards .self-evaluation-update', node => node.click())]);
-    assert.equal(await page.$eval('#selfEvaluationItemPageTitle', node => node.textContent.trim()), 'Update Competency');
+    assert.equal(await page.$eval('#selfEvaluationItemPageTitle', node => node.textContent.trim()), 'Edit Competency');
     await page.$eval('#selfEvaluationItemRating', node => { node.value = '4.5'; });
     await Promise.all([page.waitForNavigation({ waitUntil: 'domcontentloaded' }), page.$eval('#selfEvaluationItemForm', form => form.requestSubmit())]);
     assert.equal(await page.$$eval('#selfEvaluationCards .goal-plan-card', nodes => nodes.length), 3);

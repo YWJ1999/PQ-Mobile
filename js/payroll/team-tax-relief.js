@@ -71,7 +71,6 @@
     description: ''
   };
   let appliedFilters = { ...defaults };
-  let detailReturnFocus = null;
 
   const byId = id => document.getElementById(id);
   const escapeHtml = value => String(value ?? '')
@@ -116,6 +115,7 @@
           <span class="card-status-badge tax-relief-status ${escapeHtml(record.status)}">${escapeHtml(formatStatus(record.status))}</span>
           <i class="fa-solid fa-chevron-right tax-relief-card-chevron" aria-hidden="true"></i>
         </span>
+        ${recordSubmitDate.html(record.submitDate)}
         <span class="tax-relief-card-body history-card-details">
           <span class="tax-relief-stat-grid">
             <span class="tax-relief-stat tax-relief-stat-amount"><span class="tax-relief-stat-label">Amount</span><strong class="tax-relief-stat-value">${escapeHtml(formatMoney(record.amount))}</strong></span>
@@ -199,19 +199,18 @@
     return `<div class="tax-relief-detail-row" data-detail-key="${escapeHtml(key)}"><span>${escapeHtml(key)}</span><strong>${html ? value : escapeHtml(value || '—')}</strong></div>`;
   }
 
-  function openDetail(reference, returnFocus) {
+  function renderDetail(reference) {
     const record = records.find(item => item.reference === reference);
     if (!record) return;
-    detailReturnFocus = returnFocus;
     const attachments = record.attachments.length
       ? record.attachments.map(file => `<span class="tax-relief-file"><i class="fa-solid fa-file-word" aria-hidden="true"></i>${escapeHtml(file)}</span>`).join('')
       : '—';
+    recordSubmitDate.set(byId('taxReliefSubmitDate'), record.submitDate);
     byId('taxReliefDetailTable').innerHTML = [
       detailRow('Reference #', record.reference),
       detailRow('Status', recordDetailStatus.html(formatStatus(record.status)), true),
       detailRow('Emp #', `#${record.empNo.replace(/^#+/, '')}`),
       detailRow('Name', record.name),
-      detailRow('Submit Date', formatDate(record.submitDate)),
       detailRow('Rebate Item', record.rebateItem),
       detailRow('Transaction Date', formatDate(record.transactionDate)),
       detailRow('Description', record.description),
@@ -224,13 +223,7 @@
       detailRow('Approval Date', record.approvalDateLabel),
       detailRow('Approver Remarks', record.approverRemarks)
     ].join('');
-    byId('taxReliefDetailModal').classList.add('is-open');
-    requestAnimationFrame(() => byId('taxReliefDetailModal').querySelector('[data-detail-close]').focus({ preventScroll: true }));
-  }
-
-  function closeDetail() {
-    byId('taxReliefDetailModal').classList.remove('is-open');
-    if (detailReturnFocus?.isConnected) detailReturnFocus.focus({ preventScroll: true });
+    return byId('taxReliefDetailModal');
   }
 
   document.addEventListener('DOMContentLoaded', () => {
@@ -246,16 +239,12 @@
     });
     byId('taxReliefRecords').addEventListener('click', event => {
       const card = event.target.closest('.tax-relief-record-card');
-      if (card) openDetail(card.dataset.reference, card);
+      if (card) HistoryRecordPage.open('tax-relief', card.dataset.reference, card);
     });
-    byId('taxReliefDetailModal').querySelector('[data-detail-close]').addEventListener('click', closeDetail);
-    byId('taxReliefDetailModal').addEventListener('click', event => {
-      if (event.target === byId('taxReliefDetailModal')) closeDetail();
-    });
+    HistoryRecordPage.register((kind, reference) => kind === 'tax-relief' && renderDetail(reference));
     document.addEventListener('keydown', event => {
       if (event.key !== 'Escape') return;
-      if (byId('taxReliefDetailModal').classList.contains('is-open')) closeDetail();
-      else if (byId('taxReliefFilterModal').classList.contains('is-open')) closeFilter();
+      if (byId('taxReliefFilterModal').classList.contains('is-open')) closeFilter();
     });
   });
 })();

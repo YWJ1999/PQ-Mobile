@@ -37,36 +37,39 @@ html body :is(
 }
 
 /* Workflow statuses and attendance categories use the same palette across modules. */
-html body :is(.history-card-item, .history-item-card, .project-history-card):is(
+html body :is(.history-card-item, .history-item-card, .project-history-card, .record-key-status):is(
   [data-status="draft"], [data-status="resubmit"], [data-status="new"], .theme-blue
 ) {
   --record-accent: var(--record-draft-accent);
   --record-header-fill: var(--record-draft-surface);
 }
-html body :is(.history-card-item, .history-item-card, .project-history-card):is(
+html body :is(.history-card-item, .history-item-card, .project-history-card, .record-key-status):is(
   [data-status="approved"], [data-status="normal"], [data-status="completed"], [data-status="hired"],
-  .good-theme, .theme-green, .clocking-in-card, .attendance-record-card[data-exception="none"], .staff-card-item:not(.exception-theme)
+  .good-theme, .theme-green, .clocking-in-card
 ),
+html body :is(.history-card-item.attendance-record-card, .attendance-status-key > li)[data-exception="none"],
 html body .incident-history-card:has(.incident-history-card-header) {
   --record-accent: var(--record-approved-accent);
   --record-header-fill: var(--record-approved-surface);
 }
-html body :is(.history-card-item, .history-item-card, .project-history-card):is(
+html body :is(.history-card-item, .history-item-card, .project-history-card, .record-key-status):is(
   [data-status="submitted"], [data-status="pending"], [data-status="pending-review"], [data-status="not-attended"],
   [data-status="overtime"], [data-status="late-in"], [data-status="missing-clock-out"], .caution-theme, .theme-orange,
-  .attendance-record-card.exception-theme, .staff-card-item.exception-theme
+  .attendance-record-card.exception-theme
 ),
+html body :is(.history-card-item.attendance-record-card, .attendance-status-key > li):is([data-exception="missing-clock"], [data-exception="unapproved-ot"]),
 html body .summary-history-card:has(.summary-history-status[data-status="exception"]) {
   --record-accent: var(--record-submitted-accent);
   --record-header-fill: var(--record-submitted-surface);
 }
-html body :is(.history-card-item, .history-item-card, .project-history-card):is(
+html body :is(.history-card-item, .history-item-card, .project-history-card, .record-key-status):is(
   [data-status="rejected"], [data-status="early-out"], [data-status="unapproved-ot"], .poor-theme, .theme-red
-) {
+),
+html body :is(.history-card-item.attendance-record-card, .attendance-status-key > li)[data-exception="early-out"] {
   --record-accent: var(--record-rejected-accent);
   --record-header-fill: var(--record-rejected-surface);
 }
-html body :is(.history-card-item, .history-item-card, .project-history-card)[data-status="cancelled"] {
+html body :is(.history-card-item, .history-item-card, .project-history-card, .record-key-status):is([data-status="cancelled"], .theme-slate) {
   --record-accent: var(--record-cancelled-accent);
   --record-header-fill: var(--record-cancelled-surface);
 }
@@ -174,6 +177,18 @@ html body .history-card-item:has(.history-card-header) :is(.history-card-main, .
   padding: 0 !important;
   border-radius: 0;
 }
+button.attendance-record-summary-panel {
+  width: 100%;
+  box-sizing: border-box;
+  font: inherit;
+  color: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+button.attendance-record-summary-panel:focus-visible {
+  outline: 2px solid var(--purple-text);
+  outline-offset: 2px;
+}
 
 /* Record details follow the approval-card grid: two fields per row,
    with each label above its value inside the single inset panel. */
@@ -183,6 +198,24 @@ html .phone-container :is(.history-card-details, .summary-history-details, .card
   align-items: start;
   gap: 10px 12px !important;
   text-align: left;
+}
+
+.record-submit-date {
+  display: block;
+  margin: 0 0 10px;
+  color: var(--text-muted);
+  text-align: start;
+  font-size: 10.5px;
+  font-weight: 700;
+  line-height: 1.4;
+  font-variant-numeric: tabular-nums;
+}
+.record-submit-date[hidden] { display: none; }
+:is(.history-card-header, .record-card-header, .project-history-card-top, .summary-history-card-header) + .record-submit-date {
+  margin-top: 12px;
+}
+html body .phone-container :is(.history-card-item, .history-item-card, .project-history-card) .record-submit-date:not([hidden]) + :is(.history-card-details, .card-details-box, .project-history-card-details) {
+  margin-top: 0 !important;
 }
 
 /* Older History renderers wrap their fields in an extra group. */
@@ -290,17 +323,32 @@ button.record-key-trigger[hidden] { display: none; }
 .record-key-dialog::backdrop { background: rgba(15,23,42,.6); }
 .record-key-dialog header { position: sticky; top: 0; display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; color: #fff; background: var(--card-header-purple-background); }
 .record-key-dialog h2 { margin: 0; font-size: 16px; }
-.record-key-dialog header button { width: 36px; height: 36px; border: 1px solid rgba(255,255,255,.4); border-radius: 10px; background: transparent; color: inherit; font-size: 22px; cursor: pointer; }
+.record-key-dialog .record-key-close {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(255,255,255,.16);
+  color: #fff;
+  cursor: pointer;
+}
+.record-key-close::before, .record-key-close::after {
+  content: "";
+  grid-area: 1 / 1;
+  width: 18px;
+  border-top: 2px solid currentColor;
+  border-radius: 2px;
+  transform: rotate(45deg);
+}
+.record-key-close::after { transform: rotate(-45deg); }
 .record-key-body { padding: 16px; }
-.record-key-body h3, .record-key-body summary { color: var(--text-primary); font-size: 13px; font-weight: 800; }
-.record-key-body summary { cursor: pointer; }
-.record-key-body details { margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--border-subtle); }
-.record-key-body details h3 { margin: 15px 0 0; }
+.record-key-body h3 { color: var(--text-primary); font-size: 13px; font-weight: 800; }
 .record-key-list { list-style: none; margin: 8px 0 0; padding: 0; }
 .record-key-list li { display: flex; align-items: center; gap: 10px; padding: 4px 0; color: var(--text-secondary); font-size: 12px; line-height: 1.5; }
 .record-key-list li > span { flex: none; width: 23px; height: 14px; border-radius: 4px; border: 1px solid var(--border-subtle); }
-.record-key-days li > span { width: 16px; height: 16px; border-radius: 2px; }
-.record-key-days li:last-child > span { border: 2px solid #fff0ab; }
-.record-key-dots li > span { width: 10px; height: 10px; border-radius: 50%; }
+.attendance-status-key li > span, .record-key-status > span { background: var(--record-header-fill, var(--card-header-purple-background)); }
 .record-key-dialog :focus-visible { outline: 2px solid var(--purple-text); outline-offset: 2px; }
 .record-key-dialog header button:focus-visible { outline-color: #fff; }

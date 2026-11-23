@@ -135,7 +135,8 @@ const url = pathToFileURL(path.resolve(__dirname, '../modules/employee-career/op
         return rect.left >= 0 && rect.right <= innerWidth && node.scrollWidth <= node.clientWidth + 1;
       }), 'Review form stays within a 360px viewport');
       const readOnlyDetails = await page.$$eval('#staffFeedbackPanel [readonly]', nodes => nodes.map(node => [node.labels[0].textContent.trim(), node.value]));
-      assert.deepEqual(readOnlyDetails.map(([label]) => label), ['Title', 'Type', 'Category', 'Feedback Date 1', 'Feedback Date 2', 'Reference 1', 'Reference 2', 'Feedback Note', 'Feedback Remarks', 'Submit Date']);
+      assert.deepEqual(readOnlyDetails.map(([label]) => label), ['Title', 'Type', 'Category', 'Feedback Date 1', 'Feedback Date 2', 'Reference 1', 'Reference 2', 'Feedback Note', 'Feedback Remarks']);
+      assert.equal(await page.$eval('#staffFeedbackReviewSubmitDate', node => node.textContent), 'Submit Date: 05/10/2026');
       assert.deepEqual(Object.fromEntries(readOnlyDetails), {
         'Type': 'Suggestion',
         'Category': 'Policy',
@@ -145,8 +146,7 @@ const url = pathToFileURL(path.resolve(__dirname, '../modules/employee-career/op
         'Reference 1': 'FB-0001',
         'Reference 2': '—',
         'Feedback Note': 'Could we allow a flexible start time for the morning shift? This would help staff manage their daily commute.',
-        'Feedback Remarks': 'For consideration at the next team discussion.',
-        'Submit Date': '5 Oct 2026'
+        'Feedback Remarks': 'For consideration at the next team discussion.'
       });
       await page.focus('#staffFeedbackTab');
       await page.keyboard.press('ArrowRight');
@@ -282,10 +282,11 @@ const url = pathToFileURL(path.resolve(__dirname, '../modules/employee-career/op
     await navigate('.staff-feedback-details-trigger');
     await page.reload({ waitUntil: 'networkidle0' });
     const details = await page.$$eval('#staffFeedbackDetailsTable tr', rows => Object.fromEntries(rows.map(row => [row.cells[0].textContent.trim(), row.cells[1].textContent.trim()])));
+    assert.equal(await page.$eval('#staffFeedbackDetailsSubmitDate', node => node.textContent), 'Submit Date: 04/09/2026');
     assert.deepEqual(details, {
       'Emp #': '#004177', 'Name': 'Ahmad Rafy', 'Type': 'Suggestion', 'Category': 'Policy', 'Title': 'Shift suggestion',
       'Feedback Date 1': '2 Sept 2026', 'Feedback Date 2': '3 Sept 2026', 'Feedback Note': 'Start at 8 or 9 AM.',
-      'Feedback Remarks': 'For morning shifts.', 'Submit Date': '4 Sept 2026', 'Reviewer Comment': 'Review next week.',
+      'Feedback Remarks': 'For morning shifts.', 'Reviewer Comment': 'Review next week.',
       'Reviewed By': 'Sarah Tan', 'Reviewed Date': '5 Sept 2026', 'Rating': '0', 'Reward': '0', 'Status': 'Pending', 'Attachment': 'shift-note.txtinvalid.txt'
     }, 'The clicked filtered record supplies every detail field, including zero values');
     assert.equal(await page.$$eval('#staffFeedbackDetailsTable a', nodes => nodes.length), 1, 'Unsafe attachment URLs do not become links');
@@ -333,8 +334,9 @@ const url = pathToFileURL(path.resolve(__dirname, '../modules/employee-career/op
     await apply({ staffFeedbackKeyword: '#004177', staffFeedbackType: 'Suggestion', staffFeedbackCategory: 'Policy', staffFeedbackStatus: 'Pending' });
     assert.equal(await page.$eval('#staffFeedbackTotal', node => node.textContent), '1');
     await navigate('.staff-feedback-review-button');
-    assert.deepEqual(await page.$$eval('#staffFeedbackPanel [readonly]', nodes => nodes.slice(-4).map(node => node.value)),
-      ['External-42', 'Start at 8 or 9 AM.', 'For morning shifts.', '4 Sept 2026']);
+    assert.deepEqual(await page.$$eval('#staffFeedbackPanel [readonly]', nodes => nodes.slice(-3).map(node => node.value)),
+      ['External-42', 'Start at 8 or 9 AM.', 'For morning shifts.']);
+    assert.equal(await page.$eval('#staffFeedbackReviewSubmitDate', node => node.textContent), 'Submit Date: 04/09/2026');
     assert.equal(await page.$$eval('#staffFeedbackReviewAttachments a', nodes => nodes.length), 1);
     await page.click('#staffReviewTab');
     assert.deepEqual(await page.$$eval('#staffReviewPanel [readonly]', nodes => nodes.map(node => node.value)),

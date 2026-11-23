@@ -3,6 +3,22 @@
    Zero build tool required. 100% offline & file:// compatible.
    ======================================================== */
 
+// Resolve the theme in the head so the first frame uses the same colors as the theme switcher.
+function getInitialPageTheme() {
+  const requested = new URLSearchParams(location.search).get('theme');
+  if (requested) return requested;
+  const path = location.pathname.toLowerCase();
+  if (path.includes('light')) return 'light';
+  if (path.includes('dark')) return 'dark';
+  const fallback = document.documentElement.dataset.theme || 'dark';
+  try {
+    return localStorage.getItem('peoplehcm_theme') || fallback;
+  } catch {
+    return fallback;
+  }
+}
+document.documentElement.dataset.theme = getInitialPageTheme();
+
 const previewUserName = 'Sarah Jenkins';
 const recordDeleteLabel = 'Delete Record';
 const recordDeleteLabelHTML = `<i class="fa-regular fa-trash-can" aria-hidden="true"></i><span>${recordDeleteLabel}</span>`;
@@ -17,6 +33,46 @@ function recordReviewStatusLabel(value) {
   const label = String(value ?? '').trim();
   return /^(?:submit(?:ted)?|pending)$/i.test(label) ? 'Pending' : label;
 }
+
+// A view declares its full set of card labels and their header tones, even with no records.
+function setRecordLegend(view, heading, entries) {
+  view.dataset.recordColourView = heading;
+  view.dataset.recordLegend = JSON.stringify(entries);
+}
+
+const recordSubmitDate = (() => {
+  const months = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
+  const pad = number => String(number).padStart(2, '0');
+  function format(value) {
+    const text = String(value ?? '').trim();
+    if (!text || /^(?:[-–—]|not submitted|dd\/mm\/yyyy)$/i.test(text)) return '';
+    const iso = /^(\d{4})-(\d{2})-(\d{2})$/.exec(text);
+    if (iso) return `${iso[3]}/${iso[2]}/${iso[1]}`;
+    if (/^\d{4}-\d{2}-\d{2}T/.test(text)) {
+      const instant = new Date(text);
+      if (!Number.isNaN(instant.getTime())) return instant.toLocaleDateString('en-GB');
+    }
+    // Leave records can include a time after the calendar date.
+    const dated = /^(?:(?:Mon|Tue|Wed|Thu|Fri|Sat|Sun),?\s+)?(\d{1,2})[ /]([a-z]+|\d{1,2})[ /](\d{4})(.*)$/i.exec(text);
+    if (!dated) return text;
+    const [, day, month, year, time] = dated;
+    const number = /^\d+$/.test(month) ? Number(month) : months.indexOf(month.slice(0, 3).toLowerCase()) + 1;
+    return number ? `${pad(day)}/${pad(number)}/${year}${time}` : text;
+  }
+  function set(element, value) {
+    const date = format(value);
+    element.classList.add('record-submit-date');
+    element.hidden = !date;
+    element.textContent = date ? 'Submit Date: ' + date : '';
+    return element;
+  }
+  const create = value => set(document.createElement('span'), value);
+  function html(value) {
+    const line = create(value);
+    return line.hidden ? '' : line.outerHTML;
+  }
+  return { format, set, create, html };
+})();
 
 // Read-only record details share a palette independent of the card header and action buttons.
 const recordDetailStatus = (() => {
@@ -1453,6 +1509,10 @@ function createApprovalCardActions(actionKey, options) {
   return renderApprovalButtons(document.createElement('div'), actionKey, options);
 }
 
+function formatSelectedAction(action, count) {
+  return `${action.charAt(0).toUpperCase()}${action.slice(1)} selected (${count})`;
+}
+
 class BulkApprovalActions extends HTMLElement {
   static get observedAttributes() { return ['resubmit']; }
 
@@ -1472,13 +1532,24 @@ class BulkApprovalActions extends HTMLElement {
       const button = card?.querySelector('button.action-btn-resubmit:enabled:not([aria-disabled="true"])');
       return button && button.getClientRects().length > 0;
     });
+    this.selectedCount = checked.length;
     this.toggleAttribute('resubmit', canResubmit);
+    this.updateLabels();
+  }
+
+  updateLabels() {
+    const key = this.getAttribute('action-key') || 'decision';
+    for (const button of this.children) {
+      const text = formatSelectedAction(button.dataset[key], this.selectedCount ?? 0);
+      if (button.textContent !== text) button.textContent = text;
+    }
   }
 
   render() {
     renderApprovalButtons(this, this.getAttribute('action-key') || 'decision', {
       resubmit: this.hasAttribute('resubmit')
     });
+    this.updateLabels();
   }
 }
 customElements.define('bulk-approval-actions', BulkApprovalActions);
@@ -1500,11 +1571,10 @@ function createApprovalCardDetails(fields) {
   details.className = 'approval-card-details';
   for (const [label, value] of fields) {
     const text = value == null || value === '' ? '-' : value;
-    if (/^(Submit Date|Submitted Date|Submitted)$/.test(label)) {
-      const submitted = document.createElement('p');
-      submitted.className = 'approval-card-submitted';
-      submitted.textContent = `${label}: ${text}`;
-      summary.append(submitted);
+    if (/^(?:Submit Date|Submitted Date|Submitted On|Submitted)$/i.test(label)) {
+      const submitted = recordSubmitDate.create(value);
+      submitted.classList.add('approval-card-submitted');
+      if (!submitted.hidden) summary.append(submitted);
       continue;
     }
     const row = document.createElement('div');
@@ -1515,7 +1585,7 @@ function createApprovalCardDetails(fields) {
     row.append(term, description);
     details.append(row);
   }
-  summary.append(details);
+  if (details.childElementCount) summary.append(details);
   return summary;
 }
 

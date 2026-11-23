@@ -50,7 +50,7 @@ const puppeteer = require('puppeteer');
         cards.forEach(card => {
           assert.equal(card.radius, '20px');
           assert.ok(card.title && card.fits && !card.dateBadge);
-          assert.deepEqual(card.labels, ['Times', 'Normal Hours', 'OT Hours', 'Exception']);
+          assert.deepEqual(card.labels, ['Day Type', 'Clock Times', 'Normal Hours', 'OT Hours', 'Exception']);
           assert.ok(card.statusAtRight, 'Exception uses the top-right History status slot');
           assert.equal(card.feedbackColor, 'rgb(255, 255, 255)');
           assert.equal(card.feedbackBackground, 'linear-gradient(135deg, rgb(124, 58, 237) 0%, rgb(109, 40, 217) 100%)');
@@ -61,8 +61,8 @@ const puppeteer = require('puppeteer');
             { text: 'Feedback', hasIcon: false }
           ]);
         });
-        assert.deepEqual(cards[0].values, ['08:09 · 19:40', '8.00', '2.00', 'Unapproved OT']);
-        assert.deepEqual(cards[1].values, ['07:38', '0.00', '0.00', 'Missing Clock Out']);
+        assert.deepEqual(cards[0].values, ['Work Day', '08:09 · 19:40', '8.00', '2.00', 'Unapproved OT']);
+        assert.deepEqual(cards[1].values, ['Work Day', '07:38', '0.00', '0.00', 'Missing Clock Out']);
         assert.deepEqual(cards.map(card => card.status), ['Unapproved OT', 'Unpaired Clock Entry']);
         assert.ok(await page.$eval('.main-content', node => node.scrollWidth <= node.clientWidth + 1));
         if (width === 390) await page.screenshot({ path: path.join(__dirname, `pending_attendance_feedback_${theme}.png`) });

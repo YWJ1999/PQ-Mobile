@@ -1,7 +1,6 @@
 (() => {
   const params = new URLSearchParams(location.search);
-  const theme = params.get('theme') === 'light' ? 'light' : 'dark';
-  document.documentElement.dataset.theme = theme;
+  const theme = document.documentElement.dataset.theme === 'light' ? 'light' : 'dark';
 
   const employees = {
     EBB01: {

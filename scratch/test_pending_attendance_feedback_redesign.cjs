@@ -20,7 +20,7 @@ async function assertOverlayFitsAtWidths(page, selector) {
   for (const width of [360, 390, 420]) {
     await page.setViewport({ width, height: 950 });
     const fits = await page.$eval(selector, overlay => {
-      const panel = overlay.querySelector('.detail-popout-panel');
+      const panel = overlay.querySelector('.approval-record-layout');
       const phone = document.querySelector('.phone-container');
       const panelRect = panel.getBoundingClientRect();
       const phoneRect = phone.getBoundingClientRect();
@@ -112,19 +112,19 @@ async function assertOverlayFitsAtWidths(page, selector) {
         assert.deepEqual(layout.cards.map(card => card.date), ['Mon 14 Sep 2026', 'Tue 15 Sep 2026']);
         assert.deepEqual(layout.cards.map(card => card.status), ['Unapproved OT', 'Unpaired Clock Entry']);
         layout.cards.forEach((card, cardIndex) => {
-          assert.equal(card.radius, '20px');
-          assert.equal(card.padding, '16px 18px');
+          assert.equal(card.radius, '18px');
+          assert.equal(card.padding, '18px');
           assert.ok(card.title);
-          assert.deepEqual(card.labels, ['Times', 'Normal Hours', 'OT Hours', 'Exception']);
+          assert.deepEqual(card.labels, ['Day Type', 'Clock Times', 'Normal Hours', 'OT Hours', 'Exception']);
           assert.deepEqual(card.actions, ['Change Shift', 'Feedback']);
-          assert.equal(card.detailGap, '7px');
-          assert.equal(card.detailRadius, '14px');
+          assert.equal(card.detailGap, '10px');
+          assert.equal(card.detailRadius, '12px');
           assert.equal(card.detailRowsAreBorderless, true);
-          assert.equal(card.actionsLayout, 'flex');
-          assert.equal(card.actionsAlignment, 'flex-end');
+          assert.equal(card.actionsLayout, 'grid');
+          assert.equal(card.actionsAlignment, 'end');
           assert.equal(card.actionsStayOnOneRow, true);
           assert.equal(card.titleStaysOnOneLine, true, theme + '/' + width + 'px card ' + cardIndex + ' title must stay on one line');
-          assert.deepEqual(card.actionRadii, ['20px', '20px']);
+          assert.deepEqual(card.actionRadii, ['12px', '12px']);
           assert.equal(card.compactActions, true);
           assert.equal(card.hasChevron, false);
           assert.equal(card.semanticDetailsButton, true);
@@ -136,7 +136,7 @@ async function assertOverlayFitsAtWidths(page, selector) {
       await waitForOverlay(page, '#attendanceDetailsModalOverlay', true);
       await assertOverlayFitsAtWidths(page, '#attendanceDetailsModalOverlay');
       const details = await page.evaluate(() => ({
-        title: document.querySelector('#attendanceDetailsModalOverlay h3')?.textContent.trim(),
+        title: document.querySelector('#attendanceDetailsModalOverlay h1')?.textContent.trim(),
         classes: document.querySelector('#attendanceDetailsModalOverlay').className,
         labels: [...document.querySelectorAll('#attendanceDetailsMainTable .detail-popout-label')].map(node => node.textContent.trim()),
         values: [...document.querySelectorAll('#attendanceDetailsMainTable .detail-popout-value')].map(node => node.textContent.trim()),
@@ -148,15 +148,17 @@ async function assertOverlayFitsAtWidths(page, selector) {
         overtimeRows: [...document.querySelectorAll('#detailOvertimeInfoTable tr')].map(row => [...row.cells].map(cell => cell.textContent.trim()).join(' '))
       }));
       assert.equal(details.title, 'Attendance Advice Approval');
-      assert.match(details.classes, /detail-popout-overlay/);
+      assert.match(details.classes, /approval-record-page/);
       assert.deepEqual(details.labels, [
         'Employee #', 'Name', 'Date', 'Shift', 'Day Type', 'Shift Group', 'Supervisor', 'Clock Times',
-        'Normal Hours', 'Late In', 'Early Out', 'Time Off', 'Absent', 'Approved OT Hours',
+        'Normal Hours', 'Late In Minutes', 'Late Reason', 'Early Out Minutes', 'Early Out Reason',
+        'Time Off Minutes', 'Time Off Reason', 'Absent', 'Absent Reason', 'Leave Code', 'Approved OT Hours',
         'Unapproved OT Hours', 'Exception', 'Document #'
       ]);
       assert.deepEqual(details.values, [
         '#EBB12', 'Farhan binti rahmat', '15 Sep 2026', '8.30AM–5.30PM (W01)', 'Work Day', 'GROUP A',
-        '#EBB04', '07:38', '0.00', '–', '–', '–', 'No', '0.00', '0.00', 'Missing Clock Out', '–'
+        '#EBB04', '07:38', '0.00', '0', 'Not applicable', 'Clock-out missing', '-', '-',
+        '-', 'No', 'Not applicable', '-', '0.00', '0.00', 'Missing Clock Out', '–'
       ]);
       assert.equal(details.hasLeaveSection, false);
       assert.equal(details.overtimeHidden, true);
@@ -168,7 +170,7 @@ async function assertOverlayFitsAtWidths(page, selector) {
       await page.keyboard.press('Tab');
       await page.keyboard.up('Shift');
       assert.equal(await page.$eval('#attendanceDetailsModalOverlay', overlay => overlay.contains(document.activeElement)), true);
-      await page.click('#attendanceDetailsModalOverlay .detail-popout-close');
+      await page.click('#attendanceDetailsModalOverlay [data-history-back]');
       await waitForOverlay(page, '#attendanceDetailsModalOverlay', false);
       await page.waitForFunction(() => document.activeElement.classList.contains('pending-feedback-details-trigger'));
       assert.equal(await page.evaluate(() => document.activeElement.classList.contains('pending-feedback-details-trigger') && document.activeElement.closest('.pending-feedback-record').dataset.date === '15 Sep 2026'), true);
@@ -195,7 +197,7 @@ async function assertOverlayFitsAtWidths(page, selector) {
         matchingSectionHeadingStyles: true,
         overtimeRows: ['OT Code –', 'Description Unapproved OT', 'OT Hours 2.00', 'UOT Yes']
       });
-      await page.click('#attendanceDetailsModalOverlay .detail-popout-close');
+      await page.click('#attendanceDetailsModalOverlay [data-history-back]');
       await waitForOverlay(page, '#attendanceDetailsModalOverlay', false);
 
       assert.deepEqual(errors, []);

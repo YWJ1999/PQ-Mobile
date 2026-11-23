@@ -54,7 +54,7 @@
       return;
     }
     const title = sectionTitle();
-    $('selfEvaluationItemPageTitle').textContent = adding ? 'Add Goal' : `Update ${title}`;
+    $('selfEvaluationItemPageTitle').textContent = adding ? 'Add Goal' : `Edit ${title}`;
     $('selfEvaluationItemSectionTitle').textContent = adding ? 'Goal' : title;
     if (adding) {
       $('selfEvaluationItemTitle').readOnly = false;

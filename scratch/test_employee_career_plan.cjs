@@ -85,15 +85,15 @@ const fileUrl = (relative, query = '') => pathToFileURL(path.join(root, relative
 
       assert.deepEqual(
         await page.$$eval('.employee-career-form-actions > *', nodes => nodes.map(node => node.textContent.trim())),
-        ['Cancel', 'Update'],
-        'Career Plan provides only Cancel and Update actions'
+        ['Cancel', 'Save career plan'],
+        'Career Plan provides Cancel and Save career plan actions'
       );
       await page.click('#careerPlanSubmit');
       assert.equal(await page.$eval('#employeeCareerToast', node => node.textContent.trim()), 'Career plan updated successfully');
 
       assert.ok(await page.$('#careerPlanCancel'), 'Career Plan provides Cancel');
       assert.equal(await page.$('#careerPlanSave'), null, 'Career Plan removes Save');
-      assert.ok(await page.$('#careerPlanSubmit'), 'Career Plan provides Update');
+      assert.ok(await page.$('#careerPlanSubmit'), 'Career Plan provides a save action');
       assert.ok(await page.$eval('main', node => node.scrollWidth <= node.clientWidth + 1), `${theme} Career Plan fits a 390px viewport`);
     }
 

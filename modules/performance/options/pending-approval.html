@@ -50,7 +50,7 @@
         <div class="payroll-pending-summary-copy"><small>Current Filter</small><div class="payroll-pending-summary-value"><span id="performanceApprovalFilterSummary">All Requests &bull; All Dates</span></div></div>
         <button id="performanceApprovalFilterTrigger" type="button" aria-label="Open pending approval filter" aria-haspopup="dialog" aria-controls="performanceApprovalFilter"><i class="fa-solid fa-sliders" aria-hidden="true"></i></button>
       </div>
-      <section id="performanceApprovalPanel" role="tabpanel" aria-labelledby="approvalTab-goal-plan">
+      <section id="performanceApprovalPanel" data-record-colour-view="Approval status" data-record-legend='{"Pending Approval":"submitted","Approved":"approved","Resubmit":"resubmit","Rejected":"rejected"}' role="tabpanel" aria-labelledby="approvalTab-goal-plan">
         <div class="payroll-pending-list-heading"><h2>Pending Approvals (<span id="performanceApprovalCount">0</span>)</h2><label class="payroll-pending-select-all"><input id="performanceApprovalSelectAll" type="checkbox">Select All</label></div>
         <div id="performanceApprovalQueue" aria-live="polite"></div>
       </section>

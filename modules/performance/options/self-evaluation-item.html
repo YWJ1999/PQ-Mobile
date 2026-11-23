@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PeopleHCM - Update Self Evaluation</title>
+  <title>PeopleHCM - Edit Self Evaluation</title>
   <script>(() => { document.documentElement.dataset.theme = new URLSearchParams(location.search).get('theme') === 'light' ? 'light' : 'dark'; })();</script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -28,12 +28,12 @@
       <phone-status-bar time="9:41"></phone-status-bar>
       <div class="performance-header-row">
         <a id="selfEvaluationItemBack" class="performance-back" href="self-evaluation.html" aria-label="Cancel and return to Self Evaluation"><i class="fa-solid fa-chevron-left" aria-hidden="true"></i></a>
-        <h1 id="selfEvaluationItemPageTitle">Update Self Evaluation</h1>
+        <h1 id="selfEvaluationItemPageTitle">Edit Self Evaluation</h1>
         <span class="performance-header-spacer" aria-hidden="true"></span>
       </div>
     </header>
     <main class="main-content performance-content performance-goal-content self-evaluation-content">
-      <form id="selfEvaluationItemForm" class="goal-form-panel performance-goal-form self-evaluation-section" aria-label="Update Self Evaluation item" novalidate>
+      <form id="selfEvaluationItemForm" class="goal-form-panel performance-goal-form self-evaluation-section" aria-label="Edit Self Evaluation item" novalidate>
         <header class="goal-form-header performance-goal-form-header">
           <div class="self-evaluation-heading"><h2 id="selfEvaluationItemSectionTitle">Evaluation Item</h2></div>
         </header>
@@ -48,7 +48,7 @@
         </div>
         <footer class="goal-form-footer">
           <a id="selfEvaluationItemCancel" class="form-cancel-btn" href="self-evaluation.html"><i class="fa-solid fa-xmark" aria-hidden="true"></i><span>Cancel</span></a>
-          <button id="selfEvaluationItemSave" class="goal-form-save" type="submit"><i class="fa-solid fa-floppy-disk" aria-hidden="true"></i><span>Update</span></button>
+          <button id="selfEvaluationItemSave" class="goal-form-save" type="submit"><i class="fa-solid fa-floppy-disk" aria-hidden="true"></i><span>Save evaluation</span></button>
         </footer>
       </form>
       <div id="selfEvaluationItemNotFound" class="self-evaluation-empty" role="alert" hidden><strong>Evaluation item not found</strong><p>Return to Self Evaluation and select another item.</p></div>

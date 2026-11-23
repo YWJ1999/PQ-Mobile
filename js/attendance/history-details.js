@@ -1,11 +1,9 @@
-/* Record-specific forms for Attendance History; shared popout styles own presentation. */
+/* Attendance history keeps editable drafts per record while navigating between pages. */
 (function () {
   const drafts = new Map();
   const active = { ot: null, feedback: null };
   const prefixes = { ot: 'modalOt', feedback: 'modalFbk' };
   const overlays = { ot: 'otDetailsModal', feedback: 'feedbackDetailsModal' };
-  const closeTimers = { ot: null, feedback: null };
-  const returnFocus = { ot: null, feedback: null };
   const resubmittable = status => /resubmit|resubmission/i.test(status || '');
   const text = (id, value) => { document.getElementById(id).textContent = value ?? '-'; };
   const fullDate = value => {
@@ -29,8 +27,6 @@
 
   function show(kind, record) {
     const overlay = document.getElementById(overlays[kind]);
-    window.clearTimeout(closeTimers[kind]);
-    returnFocus[kind] = document.activeElement;
     active[kind] = record;
     const prefix = prefixes[kind];
     const saved = drafts.get(kind + ':' + record.ref);
@@ -53,22 +49,6 @@
       renderPunches();
     }
     overlay.querySelector('.attendance-history-modal-body').scrollTop = 0;
-    overlay.style.display = 'flex';
-    requestAnimationFrame(() => {
-      overlay.style.opacity = '1';
-      overlay.classList.add('is-open');
-      overlay.querySelector(kind === 'ot' ? '[data-ot-form-back]' : '[data-feedback-form-back]')?.focus({ preventScroll: true });
-    });
-  }
-
-  function close(kind) {
-    const overlay = document.getElementById(overlays[kind]);
-    overlay.classList.remove('is-open');
-    overlay.style.opacity = '0';
-    closeTimers[kind] = window.setTimeout(() => {
-      overlay.style.display = 'none';
-      returnFocus[kind]?.focus?.({ preventScroll: true });
-    }, 280);
   }
 
   function capture(kind) {
@@ -86,7 +66,7 @@
   function saveDraft(kind) {
     capture(kind);
     if (typeof showToast === 'function') showToast('Attendance advice draft saved');
-    close(kind);
+    HistoryRecordPage.back();
   }
 
   function submit(kind) {
@@ -95,15 +75,15 @@
     if (!form.reportValidity()) return;
     capture(kind);
     if (typeof showToast === 'function') showToast(kind === 'ot' ? 'OT Plan Details Submitted' : 'Attendance Advice Submitted');
-    close(kind);
+    HistoryRecordPage.back();
   }
 
-  function openOtDetailsModal(docRef, planStatus, emp, supervisor, submitDate, otDate, shift, clkTimes, startTime, endTime, breakHrs, planHrs, otType, otReason, task, allowLeaveCredit, needTransport, remarks, approverComments, approvalDetails = {}) {
+  function renderOtHistoryDetail(docRef, planStatus, emp, supervisor, submitDate, otDate, shift, clkTimes, startTime, endTime, breakHrs, planHrs, otType, otReason, task, allowLeaveCredit, needTransport, remarks, approverComments, approvalDetails = {}) {
     text('modalOtDocRef', docRef);
     setStatus('modalOtPlanStatus', planStatus);
     setEmployee('modalOt', emp);
     text('modalOtSupervisor', supervisor);
-    text('modalOtSubmitDate', submitDate);
+    recordSubmitDate.set(document.getElementById('modalOtSubmitDate'), submitDate);
     text('modalOtShift', shift);
     text('modalOtClockingTimes', clkTimes);
     document.getElementById('modalOtApproverComments').value = approverComments || '-';
@@ -123,7 +103,7 @@
     });
   }
 
-  function openFeedbackDetailsModal(docRef, docStatus, emp, branch, dept, date, shift, submitter, submitDate, comments, amendments = {}) {
+  function renderFeedbackHistoryDetail(docRef, docStatus, emp, branch, dept, date, shift, submitter, submitDate, comments, amendments = {}) {
     text('modalFbkDocRef', docRef);
     setStatus('modalFbkDocStatus', docStatus);
     setEmployee('modalFbk', emp);
@@ -131,7 +111,8 @@
     text('modalFbkDepartment', dept);
     text('modalFbkDate', date);
     text('modalFbkShift', shift);
-    text('modalFbkSubmitDate', submitDate);
+    recordSubmitDate.set(document.getElementById('modalFbkSubmitDate'), submitDate);
+    AttendanceAdviceFields.render(document.getElementById('modalFbkAdviceFields'), amendments, attendanceDaysByAdviceRef[docRef]);
     const [submitterId, ...submitterName] = String(submitter || '').split(' - ');
     text('modalFbkSubmitterName', submitterName.join(' - ') || '-');
     text('modalFbkSubmitterId', submitterId ? '#' + submitterId.replace(/^#/, '') : '-');
@@ -297,10 +278,7 @@
   }
 
   Object.assign(window, {
-    openOtDetailsModal, openFeedbackDetailsModal,
-    closeOtDetailsDirect: () => close('ot'), closeFeedbackDetailsDirect: () => close('feedback'),
-    closeOtDetailsModal: event => { if (event.target === event.currentTarget) close('ot'); },
-    closeFeedbackDetailsModal: event => { if (event.target === event.currentTarget) close('feedback'); },
+    renderOtHistoryDetail, renderFeedbackHistoryDetail,
     submitOtDetailsForm: () => submit('ot'), submitFeedbackDetailsForm: () => submit('feedback'),
     saveHistoryDetailDraft: saveDraft, handleHistoryFiles, triggerHistoryUpload
   });

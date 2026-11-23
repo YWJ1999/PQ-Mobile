@@ -19,85 +19,47 @@ const puppeteer = require('puppeteer');
     const referencePage = await browser.newPage();
     await referencePage.setViewport({ width: 390, height: 844, deviceScaleFactor: 1 });
     await referencePage.goto(pathToFileURL(path.resolve(__dirname, '../modules/attendance/options/hours-summary.html')).href, { waitUntil: 'networkidle0' });
-    await page.addStyleTag({ content: '* { transition: none !important; animation: none !important; }' });
-    await referencePage.addStyleTag({ content: '* { transition: none !important; animation: none !important; }' });
-    await page.$$eval('.modern-card', cards => cards.forEach(card => card.style.setProperty('transition', 'none', 'important')));
-    await referencePage.$$eval('.modern-card', cards => cards.forEach(card => card.style.setProperty('transition', 'none', 'important')));
-    const paletteSnapshot = target => target.evaluate(() => {
-      const read = (cardSelector, bubbleSelector) => {
-        const card = document.querySelector(cardSelector);
-        const bubble = card.querySelector(bubbleSelector);
-        const title = card.querySelector('.card-theme-title');
-        const primary = card.querySelector('.summary-card-primary');
-        const secondary = card.querySelector('.summary-card-secondary') || document.querySelector(cardSelector + ' .summary-card-secondary');
-        const cardStyle = getComputedStyle(card);
-        return {
-          backgroundColor: cardStyle.backgroundColor,
-          backgroundImage: cardStyle.backgroundImage,
-          borderColor: cardStyle.borderColor,
-          bubbleBackground: getComputedStyle(bubble).backgroundColor,
-          bubbleColor: getComputedStyle(bubble).color,
-          titleColor: getComputedStyle(title).color,
-          primaryColor: getComputedStyle(primary).color,
-          secondaryColor: getComputedStyle(secondary).color
-        };
-      };
+    const expectedSections = [
+      ['Work & Attendance', ['Scheduled Work Days', 'Normal Present Days', 'Normal Work Hours', 'Odd Clocking Days']],
+      ['Overtime Analytics', ['Normal OT Hours', 'Other OT Hours', 'Unapproved OT Hours', 'Plan OT Hours']],
+      ['Exceptions & Leave', ['Absent OT Hours', 'Absent Days', 'Leave Hours', 'Lost Hours']]
+    ];
+
+    const readSections = target => target.$$eval('.hours-section', sections => sections.map(section => {
+      const table = section.querySelector('table');
+      const rows = [...table.tBodies[0].rows];
+      const icon = rows[0].querySelector('.hours-metric-icon');
       return {
-        work: read('.card-work-section', '.bubble-green'),
-        overtime: read('.card-ot-section', '.bubble-blue'),
-        exceptions: read('.card-ex-section', '.bubble-purple')
+        title: section.querySelector('h2').textContent.trim(),
+        columns: [...table.tHead.rows[0].cells].slice(1).map(cell => cell.textContent.trim()),
+        names: rows.map(row => row.querySelector('button').textContent.trim()),
+        cellsFit: rows.every(row => [...row.cells].every(cell => cell.scrollWidth <= cell.clientWidth + 1)),
+        card: getComputedStyle(section.querySelector('.hours-metric-card')).backgroundColor,
+        icon: getComputedStyle(icon).color,
+        percent: getComputedStyle(rows[0].querySelector('.hours-metric-percent')).backgroundColor
       };
-    });
+    }));
+
+    for (const current of [page, referencePage]) {
+      await current.addStyleTag({ content: '* { transition: none !important; animation: none !important; }' });
+      assert.equal(await current.$eval('.hours-summary-header #filterSummaryText', el => el.textContent), '16 Aug – 14 Sep 2026');
+      assert.equal(await current.$$eval('.hours-metric-percent', nodes => nodes.filter(node => node.textContent === '—').length), 2);
+    }
     for (const theme of ['light', 'dark']) {
-      await page.evaluate(value => document.documentElement.setAttribute('data-theme', value), theme);
-      await referencePage.evaluate(value => document.documentElement.setAttribute('data-theme', value), theme);
-      assert.deepEqual(await paletteSnapshot(page), await paletteSnapshot(referencePage), 'Staff Hours card palettes must exactly match Hours Summary in ' + theme + ' mode');
+      for (const width of [320, 390, 420]) {
+        for (const current of [page, referencePage]) {
+          await current.setViewport({ width, height: 844 });
+          await current.evaluate(value => document.documentElement.setAttribute('data-theme', value), theme);
+        }
+        const sections = await readSections(page);
+        assert.deepEqual(sections, await readSections(referencePage), 'Both reports use the same table layout and colors');
+        assert.deepEqual(sections.map(section => [section.title, section.names]), expectedSections);
+        assert.ok(sections.every(section => section.cellsFit), 'Staff values fit at ' + width + 'px');
+        sections.forEach(section => assert.deepEqual(section.columns, ['Total', '%']));
+        assert.equal(new Set(sections.map(section => section.icon)).size, 3, 'Each group has a distinct icon color');
+      }
     }
     await referencePage.close();
-
-    assert.deepEqual(await page.$$eval('.dashboard-section-header h2', nodes => nodes.map(node => node.textContent.trim())), [
-      'Work & Attendance',
-      'Overtime Analytics',
-      'Exceptions & Leave'
-    ]);
-    assert.equal(await page.$$eval('.section-badge, .section-title-icon', nodes => nodes.length), 0, 'Staff and individual Hours Summary section headers must match');
-
-    const sections = await page.$$eval('#view-dashboard > div:is(.bento-group-work, .ot-grid-matrix, .exceptions-bento-matrix)', groups => groups.map(group => ({
-      labels: [...group.querySelectorAll('.card-theme-title')].map(node => node.textContent.trim()),
-      cards: group.querySelectorAll('.summary-kpi-card').length,
-      fullWidthCards: group.querySelectorAll('.full-width').length,
-      columns: getComputedStyle(group).gridTemplateColumns.split(' ').length
-    })));
-    assert.deepEqual(sections, [
-      { labels: ['Scheduled Work Days', 'Normal Present Days', 'Normal Work Hours', 'Odd Clocking Days'], cards: 4, fullWidthCards: 0, columns: 2 },
-      { labels: ['Normal OT Hours', 'Other OT Hours', 'Unapproved OT Hours', 'Plan OT Hours'], cards: 4, fullWidthCards: 0, columns: 2 },
-      { labels: ['Absent OT Hours', 'Absent Days', 'Leave Hours', 'Lost Hours'], cards: 4, fullWidthCards: 0, columns: 2 }
-    ]);
-
-    assert.deepEqual(await page.$$eval('.summary-kpi-card', cards => cards.map(card => ({
-      hasHeader: Boolean(card.querySelector('.summary-card-header')),
-      hasValues: Boolean(card.querySelector('.summary-card-values')),
-      minHeight: getComputedStyle(card).minHeight,
-      direction: getComputedStyle(card).flexDirection
-    }))), Array.from({ length: 12 }, () => ({ hasHeader: true, hasValues: true, minHeight: '126px', direction: 'column' })));
-
-    await page.evaluate(() => document.documentElement.setAttribute('data-theme', 'light'));
-    assert.deepEqual(await page.$eval('.exceptions-bento-matrix .summary-kpi-card', card => {
-      const cardStyle = getComputedStyle(card);
-      const iconStyle = getComputedStyle(card.querySelector('.bubble-purple'));
-      const percentStyle = getComputedStyle(card.parentElement.querySelector('.summary-card-secondary'));
-      return {
-        usesPurpleGradient: cardStyle.backgroundImage.includes('linear-gradient'),
-        avoidsRoseBorder: cardStyle.borderColor !== 'rgb(254, 205, 211)',
-        iconColor: iconStyle.color,
-        percentColor: percentStyle.color
-      };
-    }), {
-      usesPurpleGradient: true,
-      avoidsRoseBorder: true,
-      iconColor: 'rgb(124, 58, 237)',
-      percentColor: 'rgb(124, 58, 237)'
-    }, 'Exceptions & Leave must keep the purple Hours Summary palette in light mode');
 
     assert.deepEqual(await page.evaluate(() => ({
       scheduled: document.getElementById('statScheduledDays').textContent.trim(),
@@ -151,6 +113,7 @@ const puppeteer = require('puppeteer');
       planOt: document.getElementById('statPlannedOt').textContent.trim(),
       leaveHours: document.getElementById('statLeaveHours').textContent.trim()
     })), { scheduled: '42', present: '40', normalHours: '320.00', planOt: '8.00', leaveHours: '16.00' });
+    assert.equal(await page.$eval('#hoursFilterDetails', node => node.innerText), 'Tech Global Ltd');
     assert.equal(await page.$eval('.main-content', node => node.scrollWidth <= node.clientWidth + 1), true);
     assert.deepEqual(errors, []);
 

@@ -10,6 +10,8 @@
   <script src="js/pending-approval-page.js"></script>
   <script src="js/leave-request.js"></script>
   <link rel="stylesheet" href="css/leave-request-review.css">
+  <link rel="stylesheet" href="css/history-record-page.css">
+  <script src="js/history-record-page.js"></script>
   <script src="js/components.js"></script>
   <script src="js/app.js" defer></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -4548,7 +4550,7 @@
       <!-- ==========================================
            VIEW 3C: MY PERSONAL APPLICATION HISTORY (INDIVIDUAL)
            ========================================== -->
-      <div id="viewMyLeaveHistory" data-record-colour-view style="display: none; margin-top: 14px;">
+      <div id="viewMyLeaveHistory" data-record-colour-view="Leave history status" style="display: none; margin-top: 14px;">
 
         <!-- HISTORY CATEGORY TABS -->
         <div style="display: flex; gap: 8px; margin-bottom: 14px;">
@@ -5440,7 +5442,7 @@
       <!-- ==========================================
            VIEW 7: TEAM APPROVALS (PURPLE EXECUTIVE BATCH STYLE)
            ========================================== -->
-      <div id="viewTeamApprovals" data-record-colour-view style="display: none; margin-top: 10px;">
+      <div id="viewTeamApprovals" data-record-colour-view="Approval status" data-record-legend='{"Pending Approval":"submitted","Resubmitted":"resubmit","Approved":"approved","Rejected":"rejected"}' style="display: none; margin-top: 10px;">
 
         <!-- 3 CATEGORY TABS (LEAVE | LEAVE CREDIT | TIME OFF - MATCHING USER SPECIFICATION) -->
         <div style="display: flex; gap: 8px; margin-bottom: 14px;">
@@ -6312,6 +6314,58 @@
     </div>
 
     <!-- VIEW DETAILS MODAL -->
+    <main id="historyDetailsModalOverlay" class="approval-record-page" data-history-page aria-labelledby="historyDetailsModalTitle" hidden>
+      <style>
+      #historyDetailsModalOverlay .history-details-dialog {
+        background: var(--bg-card) !important;
+      }
+      #historyDetailsModalOverlay .history-details-body {
+        background: var(--bg-card);
+        scrollbar-color: rgba(148, 163, 184, 0.9) transparent;
+      }
+      #historyDetailsModalOverlay .history-details-table {
+        table-layout: fixed;
+      }
+      #historyDetailsModalOverlay .history-details-table td {
+        padding: 7px 10px !important;
+        border: 1px solid var(--border-subtle) !important;
+        background: var(--bg-card);
+        color: var(--text-primary);
+        font-size: 11.5px;
+        line-height: 1.35;
+        vertical-align: top;
+        overflow-wrap: anywhere;
+      }
+      #historyDetailsModalOverlay .history-details-table td:first-child:not([colspan]) {
+        width: 42% !important;
+        background: var(--bg-input);
+        color: var(--text-muted);
+        font-weight: 700;
+      }
+      #historyDetailsModalOverlay .history-details-table td:nth-child(2) {
+        width: 58% !important;
+        font-weight: 600;
+      }
+    </style>
+      <section class="approval-record-layout">
+        <header class="approval-page-header">
+          <phone-status-bar time="9:41"></phone-status-bar>
+          <div class="approval-page-heading">
+            <button type="button" data-history-back aria-label="Back to history"></button>
+            <h1 id="historyDetailsModalTitle" tabindex="-1">Leave Details</h1>
+          </div>
+        </header>
+        <div class="history-record-content history-details-body" style="flex: 1 1 auto; min-height: 0; overflow-y: auto; padding: 12px 12px 24px;">
+        <span id="leaveHistorySubmitDate" class="record-submit-date" hidden></span>
+        <table class="history-details-table" style="width: 100%; border-collapse: collapse; font-size: 11.5px; text-align: left;">
+          <tbody id="historyDetailsTableBody">
+            <!-- Populated by JS -->
+          </tbody>
+        </table>
+      </div>
+        <footer id="historyDetailsActions" class="history-detail-actions" hidden></footer>
+      </section>
+    </main>
     <main id="approvalDetailsModalOverlay" class="approval-record-page" data-approval-view="details" aria-labelledby="approvalDetailsModalHeaderTitle" hidden>
       <style>
         #approvalDetailsModalOverlay .details-modal-body::-webkit-scrollbar {
@@ -6476,6 +6530,7 @@
         <!-- Scrollable Form Body -->
         <div class="details-modal-body" style="flex: 1 1 auto; overflow-y: auto; padding: 14px 16px 24px 16px; display: flex; flex-direction: column; gap: 14px; min-height: 0;">
           
+          <span id="leaveApprovalSubmitDate" class="record-submit-date" hidden></span>
           <div id="standardLeaveDetailsView" style="display: flex; flex-direction: column; gap: 14px;">
             <div id="leaveApprovalForm"></div>
             <section class="leave-approval-comments claim-detail-approver-comments">
@@ -7000,7 +7055,7 @@
 
 
     <!-- CALENDAR DATE DETAILS BOTTOM SHEET DRAWER -->
-    <div class="indicators-overlay" id="calDateDetailsDrawerOverlay" onclick="closeCalDateDetailsModal(event)">
+    <div class="indicators-overlay" id="calDateDetailsDrawerOverlay" data-history-background onclick="closeCalDateDetailsModal(event)">
       <div class="indicators-sheet" onclick="event.stopPropagation()" style="max-height: 80vh; overflow-y: auto;">
         <div class="sheet-handle"></div>
         <div class="sheet-header">
@@ -8635,11 +8690,8 @@
                 </div>
               </div>
               <div class="cal-calendar-highlight-content">
+                ${recordSubmitDate.html(itemData.submittedDate)}
                 <div class="leave-highlight-detail-body">
-                  <div class="leave-highlight-detail-field">
-                    <div class="leave-highlight-detail-label cal-leave-detail-label">Submitted Date</div>
-                    <div class="leave-highlight-detail-description cal-leave-detail-value">${itemData.submittedDate || '-'}</div>
-                  </div>
                   <div class="leave-highlight-detail-field">
                     <div class="leave-highlight-detail-label cal-leave-detail-label">Duration</div>
                     <div class="leave-highlight-detail-days cal-leave-detail-value">${durText}</div>
@@ -8927,18 +8979,18 @@
       renderHistoryCards();
     }
 
+    const leaveHistoryStatuses = {
+      submitted: { icon: '⏳', label: 'Pending' },
+      pending: { icon: '⏳', label: 'Pending' },
+      resubmit: { icon: '↩', label: 'Resubmit' },
+      approved: { icon: '✅', label: 'Approved' },
+      rejected: { icon: '❌', label: 'Rejected' },
+      cancelled: { icon: '🚫', label: 'Cancelled' },
+      draft: { icon: '💾', label: 'Draft' }
+    };
     function getStatusBadgeHTML(status) {
-      const map = {
-        'submitted': { icon: '⏳', label: 'Pending' },
-        'pending': { icon: '⏳', label: 'Pending' },
-        'resubmit': { icon: '↩', label: 'Resubmit' },
-        'approved': { icon: '✅', label: 'Approved' },
-        'rejected': { icon: '❌', label: 'Rejected' },
-        'cancelled': { icon: '🚫', label: 'Cancelled' },
-        'draft': { icon: '💾', label: 'Draft' },
-      };
-      const s = map[status] || map['submitted'];
-      return `<span class="card-status-badge" data-status="${status}">${s.icon} ${s.label}</span>`;
+      const s = leaveHistoryStatuses[status] || leaveHistoryStatuses.submitted;
+      return `<span class="card-status-badge" data-status="${status}" data-record-key-label="${s.label}">${s.icon} ${s.label}</span>`;
     }
 
     function getStatusBorderColor(status) {
@@ -8998,7 +9050,7 @@
       }
       const actionHTML = buildHistoryActionsHTML(item);
       return `
-        <div class="history-item-card" onclick="openHistoryDetailsModal('${item.ref}')" data-status="${item.status}" data-ref="${item.ref}" data-type="${item.type}">
+        <div class="history-item-card" role="link" tabindex="0" onclick="HistoryRecordPage.open(currentHistoryTab, this.dataset.ref, this)" onkeydown="if(event.target === this &amp;&amp; event.key === 'Enter') this.click()" data-status="${item.status}" data-ref="${item.ref}" data-type="${item.type}">
           <div class="record-card-header" style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px;">
             <div style="flex: 1; min-width: 0; padding-right: 8px;">
               <h3 style="font-size: 14.5px; font-weight: 800; color: var(--text-primary); margin: 0;">${item.request ? item.title : getLeaveTypeLabel(item.type)}</h3>
@@ -9006,6 +9058,7 @@
             </div>
             ${getStatusBadgeHTML(item.status)}
           </div>
+          ${recordSubmitDate.html(item.submittedDate)}
           <div class="card-details-box" style="border-radius: 14px; padding: 12px; font-size: 11.5px; margin-top: 10px; display: flex; flex-direction: column; gap: 7px;">
             <div style="display: flex; justify-content: space-between; align-items: center;"><span style="color: var(--text-muted); font-weight: 600;">Dates</span><strong style="color: var(--text-primary); font-weight: 800;">${item.dates}</strong></div>
             <div style="display: flex; justify-content: space-between; align-items: center;"><span style="color: var(--text-muted); font-weight: 600;">Days / Hours</span><strong style="color: var(--text-primary); font-weight: 800;">${item.daysHours}</strong></div>
@@ -9018,7 +9071,7 @@
     function buildCreditCardHTML(item) {
       const actionHTML = buildHistoryActionsHTML(item);
       return `
-        <div class="history-item-card" onclick="openHistoryDetailsModal('${item.ref}')" data-status="${item.status}" data-ref="${item.ref}" data-type="${item.type || 'replacement'}">
+        <div class="history-item-card" role="link" tabindex="0" onclick="HistoryRecordPage.open(currentHistoryTab, this.dataset.ref, this)" onkeydown="if(event.target === this &amp;&amp; event.key === 'Enter') this.click()" data-status="${item.status}" data-ref="${item.ref}" data-type="${item.type || 'replacement'}">
           <div class="record-card-header" style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px;">
             <div style="flex: 1; min-width: 0; padding-right: 8px;">
               <h3 style="font-size: 14.5px; font-weight: 800; color: var(--text-primary); margin: 0;">${item.title}</h3>
@@ -9026,6 +9079,7 @@
             </div>
             ${getStatusBadgeHTML(item.status)}
           </div>
+          ${recordSubmitDate.html(item.submittedDate)}
           <div class="card-details-box" style="border-radius: 14px; padding: 12px; font-size: 11.5px; margin-top: 10px; display: flex; flex-direction: column; gap: 7px;">
             <div style="display: flex; justify-content: space-between; align-items: center;"><span style="color: var(--text-muted); font-weight: 600;">Effective Date</span><strong style="color: var(--text-primary);">${item.effectiveDate}</strong></div>
             <div style="display: flex; justify-content: space-between; align-items: center;"><span style="color: var(--text-muted); font-weight: 600;">Expiry Date</span><strong style="color: var(--text-primary);">${item.expiryDate}</strong></div>
@@ -9037,7 +9091,7 @@
 
     function buildOffTimeCardHTML(item) {
       return `
-        <div class="history-item-card" onclick="openHistoryDetailsModal('${item.ref}')" data-status="${item.status}" data-ref="${item.ref}">
+        <div class="history-item-card" role="link" tabindex="0" onclick="HistoryRecordPage.open(currentHistoryTab, this.dataset.ref, this)" onkeydown="if(event.target === this &amp;&amp; event.key === 'Enter') this.click()" data-status="${item.status}" data-ref="${item.ref}">
           <div class="record-card-header" style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px;">
             <div style="flex: 1; min-width: 0; padding-right: 8px;">
               <h3 style="font-size: 14.5px; font-weight: 800; color: var(--text-primary); margin: 0;">Time Off</h3>
@@ -9045,6 +9099,7 @@
             </div>
             ${getStatusBadgeHTML(item.status)}
           </div>
+          ${recordSubmitDate.html(item.submittedDate)}
           <div class="card-details-box" style="border-radius: 14px; padding: 12px; font-size: 11.5px; margin-top: 10px; display: flex; flex-direction: column; gap: 7px;">
             <div style="display: flex; justify-content: space-between; align-items: center;"><span style="color: var(--text-muted); font-weight: 600;">Event Date</span><strong style="color: var(--text-primary); font-weight: 800;">${item.date}</strong></div>
             <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-top: 2px;"><span style="color: var(--text-muted); font-weight: 600;">Reason</span><strong style="color: var(--text-primary); text-align: right; max-width: 60%; font-weight: 600;">${item.reason}</strong></div>
@@ -9107,6 +9162,11 @@
       const emptyEl = document.getElementById('historyEmptyState');
       if (!container) return;
 
+      const supported = currentHistoryTab === 'leave' ? ['draft', 'submitted', 'resubmit', 'approved', 'rejected', 'cancelled']
+        : ['submitted', 'resubmit', 'approved', 'rejected', 'cancelled'];
+      const names = { leave: 'Leave', credit: 'Credit', offtime: 'Time off' };
+      setRecordLegend(document.getElementById('viewMyLeaveHistory'), names[currentHistoryTab] + ' history status',
+        Object.fromEntries(supported.map(status => [leaveHistoryStatuses[status].label, status])));
       const data = getHistoryDataForTab(currentHistoryTab);
 
       const refVal = (document.getElementById('modalHistoryRefInput')?.value || '').trim().toLowerCase();
@@ -9242,8 +9302,8 @@
           }
           renderHistoryCards();
           const overlay = document.getElementById('historyDetailsModalOverlay');
-          if (overlay && overlay.dataset.ref === ref && overlay.style.display !== 'none') {
-            openHistoryDetailsModal(ref);
+          if (overlay && !overlay.hidden && overlay.dataset.ref === ref) {
+            renderLeaveHistoryDetail(currentHistoryTab, ref);
             setHistoryActionPending(ref, true);
           }
           if (typeof showToast === 'function') showToast(`✅ Successfully ${newStatus === 'submitted' ? 'Applied' : 'Cancelled'}`);
@@ -9251,34 +9311,37 @@
           pendingHistoryActions.delete(ref);
           setHistoryActionPending(ref, false);
           const nextFocus = document.querySelector('#historyDetailsActions .history-detail-action:not(:disabled)')
-            || document.querySelector('[aria-label="Close leave details"]');
+            || document.querySelector('#historyDetailsModalOverlay [data-history-back]');
           nextFocus?.focus({ preventScroll: true });
         }
       }, 400);
     }
 
-    function openHistoryDetailsModal(ref) {
-      let item = getHistoryDataForTab('leave').find(d => d.ref === ref) ||
-                 HISTORY_CREDIT_DATA.find(d => d.ref === ref) || 
-                 HISTORY_OFFTIME_DATA.find(d => d.ref === ref);
+    function renderLeaveHistoryDetail(kind, ref) {
+      if (kind === 'calendar') return renderCalendarLeaveDetail(ref);
+      if (!['leave', 'credit', 'offtime'].includes(kind)) return;
+      const item = getHistoryDataForTab(kind).find(row => row.ref === ref);
       if (!item) return;
+      if (document.getElementById('viewMyLeaveHistory').style.display === 'none') showLeaveSection('viewMyLeaveHistory');
+      if (currentHistoryTab !== kind) switchHistoryTab(kind);
 
       const tbody = document.getElementById('historyDetailsTableBody');
       if (!tbody) return;
 
+      recordSubmitDate.set(document.getElementById('leaveHistorySubmitDate'), item.request?.submitDate || item.submittedDate);
       const statusBadge = recordDetailStatus.html(item.status.charAt(0).toUpperCase() + item.status.slice(1));
       const titleEl = document.getElementById('historyDetailsModalTitle');
       let rows = [];
 
-      const isCredit = ref.startsWith('CR') || ref.startsWith('LVR') || currentHistoryTab === 'credit';
-      const isOffTime = ref.startsWith('OT') || ref.startsWith('VGP') || currentHistoryTab === 'offtime';
+      const isCredit = kind === 'credit';
+      const isOffTime = kind === 'offtime';
 
       if (item.request) {
         const data = item.request;
         titleEl.textContent = 'Leave Detail';
         const values = [
           ['Reference #', data.docRef], ['Leave Status', item.status], ['Submitter', data.submitter],
-          ['Submit Date', data.submitDate], ['Name', data.applicant], ['Leave Year', data.leaveYear],
+          ['Name', data.applicant], ['Leave Year', data.leaveYear],
           ['Leave Type', data.type], ['Cutoff Period', data.cutoffPeriod], ['Block Leave', data.blockLeave],
           ['Start Date', data.fromDate], ['End Date', data.toDate], ['Duration', data.duration], ['Days', data.leaveDays]
         ];
@@ -9321,7 +9384,6 @@
           { label: 'Reference #', value: item.ref },
           { label: 'Leave Credit Status', value: statusBadge },
           { label: 'Submitter', value: 'EBB12 - Farhan binti rahmat' },
-          { label: 'Submit Date', value: item.submittedDate || '8 Sep 2026' },
           { label: 'Emp#', value: 'EBB12' },
           { label: 'Name', value: 'Farhan binti rahmat' },
           { label: 'Leave Year', value: item.creditYear || '2026' },
@@ -9347,7 +9409,6 @@
           { label: 'Submitter', value: 'EBB12 - Farhan binti rahmat' },
           { label: 'Branch', value: 'TIMES SQUARE BRANCH' },
           { label: 'Department', value: 'HUMAN RESOURCE' },
-          { label: 'Submit Date', value: item.submittedDate || '09/09/2026, 08:30 AM' },
           { label: 'Emp#', value: 'EBB12' },
           { label: 'Name', value: 'Farhan binti rahmat' },
           { label: 'Leave Year', value: '2026' },
@@ -9403,24 +9464,10 @@
       const overlay = document.getElementById('historyDetailsModalOverlay');
       if (overlay) overlay.dataset.ref = ref;
 
-      showHistoryDetailsModal();
+      return overlay;
     }
 
-    function showHistoryDetailsModal() {
-      const overlay = document.getElementById('historyDetailsModalOverlay');
-      const phoneContainer = document.querySelector('.phone-container');
-      if (!overlay) return;
-      if (phoneContainer && overlay.parentElement !== phoneContainer) {
-        phoneContainer.appendChild(overlay);
-      }
-      overlay.style.display = 'flex';
-    }
-
-    function closeHistoryDetailsModal(e) {
-      if (e && e.target !== e.currentTarget) return;
-      const overlay = document.getElementById('historyDetailsModalOverlay');
-      if (overlay) overlay.style.display = 'none';
-    }
+    window.addEventListener('DOMContentLoaded', () => HistoryRecordPage.register(renderLeaveHistoryDetail));
 
     function closeHistoryFilterModal(event) {
       const overlay = document.getElementById('historyFilterModalOverlay');
@@ -9754,46 +9801,30 @@
       }
     };
 
-    function openTeamMemberLeaveDetails(name, defaultData = null) {
-      let data = TEAM_LEAVE_DETAILS[name];
-      if (!data && defaultData) {
-        data = {
-          ref: 'GEN0000000023327',
-          empNo: defaultData.empNo || 'EBB09',
-          name: defaultData.name || name,
-          type: (defaultData.leaveType || 'MEDICAL LEAVE').replace(/^[^\w]+/, '').toUpperCase().trim(),
-          startDate: '5 Sep 2026',
-          endDate: '5 Sep 2026',
-          duration: '1.000 Days',
-          session: 'Full Day',
-          status: defaultData.status || 'Approved',
-          reason: defaultData.remark || '',
-          reliever: '',
-          remarks: ''
-        };
-      }
-      if (!data) {
-        data = {
-          ref: 'GEN0000000023323',
-          empNo: 'EBB09',
-          name: name,
-          type: 'MEDICAL LEAVE',
-          startDate: '5 Sep 2026',
-          endDate: '5 Sep 2026',
-          duration: '1.000 Days',
-          session: 'Full Day',
-          status: 'Approved',
-          reason: '',
-          reliever: '',
-          remarks: ''
-        };
-      }
+    function openTeamMemberLeaveDetails(name, entry) {
+      const day = entry && Object.keys(dateLeaveData).find(day => dateLeaveData[day].staff.includes(entry));
+      const id = day ? day + '/' + entry.empNo : TEAM_LEAVE_DETAILS[name]?.ref;
+      if (id) HistoryRecordPage.open('calendar', id);
+    }
 
+    function renderCalendarLeaveDetail(id) {
+      const [day, empNo] = id.split('/');
+      const calendarDay = Object.hasOwn(dateLeaveData, day) && dateLeaveData[day];
+      const entry = calendarDay && calendarDay.staff.find(person => person.empNo === empNo);
+      const data = entry ? {
+        ref: 'GEN0000000023327', empNo: entry.empNo, name: entry.name,
+        type: entry.leaveType.replace(/^[^\w]+/, '').toUpperCase().trim(),
+        startDate: calendarDay.dateStr, endDate: calendarDay.dateStr,
+        duration: '1.000 Days', session: 'Full Day', status: entry.status,
+        reason: entry.remark, reliever: '', remarks: ''
+      } : Object.values(TEAM_LEAVE_DETAILS).find(row => row.ref === id);
+      if (!data) return;
       const tbody = document.getElementById('historyDetailsTableBody');
       if (!tbody) return;
 
       const titleEl = document.getElementById('historyDetailsModalTitle');
       if (titleEl) titleEl.innerText = 'Leave Detail';
+      recordSubmitDate.set(document.getElementById('leaveHistorySubmitDate'), data.submittedDate);
 
       const rows = [
         { label: 'Reference', value: data.ref },
@@ -9824,7 +9855,11 @@
       });
       tbody.innerHTML = html;
 
-      showHistoryDetailsModal();
+      const page = document.getElementById('historyDetailsModalOverlay');
+      delete page.dataset.ref;
+      document.getElementById('historyDetailsActions').replaceChildren();
+      document.getElementById('historyDetailsActions').hidden = true;
+      return page;
     }
 
     const dateLeaveData = {
@@ -10796,7 +10831,7 @@
         leaveYear: extraData.leaveYear || '2026',
         cutoffPeriod: extraData.cutoffPeriod || '01/01/2026 – 31/12/2026',
         submitter: extraData.submitter || applicant || 'Afifah Nasir',
-        submitDate: extraData.submitDate || (dates ? dates.split(' - ')[0] : '23 Feb 2026'),
+        submitDate: extraData.submitDate,
         fromDate: extraData.fromDate || (dates ? dates.split(' - ')[0] : '23 Feb 2026'),
         toDate: extraData.toDate || (dates ? dates.split(' - ')[1] || dates.split(' - ')[0] : '25 Feb 2026'),
         leaveDays: extraData.leaveDays || '3.000',
@@ -10824,8 +10859,12 @@
 
     }
 
+    function leaveApprovalCardData(card) {
+      return { ...JSON.parse(card.dataset.request), submitDate: card.dataset.submitDate };
+    }
+
     function openLeaveApprovalOptions(button) {
-      const data = JSON.parse(button.closest('[data-approval-id]').dataset.request);
+      const data = leaveApprovalCardData(button.closest('[data-approval-id]'));
       openApprovalThreeDotsMenu(data.applicant, data.type, data.dates, data.duration, data.reason, data);
     }
 
@@ -10877,6 +10916,7 @@
     }
 
     function renderLeaveApprovalDetails(data) {
+      recordSubmitDate.set(document.getElementById('leaveApprovalSubmitDate'), data.submitDate);
       const setElText = (id, val) => {
         const el = document.getElementById(id);
         if (el) el.innerText = (val !== undefined && val !== null) ? val : '';
@@ -11003,6 +11043,10 @@
     });
 
     document.addEventListener('approval-list-return', updateBatchApprovalCount);
+    document.querySelectorAll('#teamApprovalsListContainer [data-submit-date]').forEach(card => {
+      card.querySelector('.approval-record-link').prepend(recordSubmitDate.create(card.dataset.submitDate));
+    });
+
     window.addEventListener('DOMContentLoaded', () => PendingApprovalPage.register({
       render(view, id) {
         const card = document.querySelector('#teamApprovalsListContainer [data-approval-id="' + CSS.escape(id) + '"]');
@@ -11011,7 +11055,7 @@
         if (card) {
           if (!document.getElementById('viewTeamApprovals').getClientRects().length) showLeaveSection('viewTeamApprovals');
           if (currentApprovalCategory !== card.dataset.category) switchApprovalCategory(card.dataset.category);
-          currentSelectedApprovalData = leaveApprovalData(JSON.parse(card.dataset.request));
+          currentSelectedApprovalData = leaveApprovalData(leaveApprovalCardData(card));
         }
         if (view === 'details') renderLeaveApprovalDetails(currentSelectedApprovalData);
         return true;
@@ -12021,60 +12065,6 @@
   </div>
 
   <!-- HISTORY DETAILS MODAL -->
-  <div id="historyDetailsModalOverlay" onclick="closeHistoryDetailsModal(event)"
-    style="display: none; position: absolute; inset: 0; background: rgba(15, 23, 42, 0.65); z-index: 200; align-items: center; justify-content: center; padding: 16px 16px 94px; backdrop-filter: blur(8px); border-radius: inherit; overflow: hidden;">
-    <style>
-      #historyDetailsModalOverlay .history-details-dialog {
-        background: var(--bg-card) !important;
-      }
-      #historyDetailsModalOverlay .history-details-body {
-        background: var(--bg-card);
-        scrollbar-color: rgba(148, 163, 184, 0.9) transparent;
-      }
-      #historyDetailsModalOverlay .history-details-table {
-        table-layout: fixed;
-      }
-      #historyDetailsModalOverlay .history-details-table td {
-        padding: 7px 10px !important;
-        border: 1px solid var(--border-subtle) !important;
-        background: var(--bg-card);
-        color: var(--text-primary);
-        font-size: 11.5px;
-        line-height: 1.35;
-        vertical-align: top;
-        overflow-wrap: anywhere;
-      }
-      #historyDetailsModalOverlay .history-details-table td:first-child:not([colspan]) {
-        width: 42% !important;
-        background: var(--bg-input);
-        color: var(--text-muted);
-        font-weight: 700;
-      }
-      #historyDetailsModalOverlay .history-details-table td:nth-child(2) {
-        width: 58% !important;
-        font-weight: 600;
-      }
-    </style>
-    <div class="history-details-dialog" onclick="event.stopPropagation()"
-      style="width: 100%; max-width: 380px; max-height: 100%; border-radius: 18px; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.5); border: 1px solid var(--border-subtle);">
-      <!-- Header -->
-      <div style="background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%); padding: 14px 16px; display: flex; align-items: center; justify-content: space-between;">
-        <h2 id="historyDetailsModalTitle" style="color: #fff; margin: 0; font-size: 16px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.3px;">Leave Details</h2>
-        <button type="button" onclick="closeHistoryDetailsModal()" aria-label="Close leave details" style="background: transparent; border: none; color: #fff; font-size: 20px; padding: 0; display: flex; align-items: center; justify-content: center; cursor: pointer;">
-          <i class="fa-solid fa-circle-xmark"></i>
-        </button>
-      </div>
-      <!-- Body (Table) -->
-      <div class="history-details-body" style="flex: 1 1 auto; min-height: 0; overflow-y: auto; padding: 12px 12px 24px;">
-        <table class="history-details-table" style="width: 100%; border-collapse: collapse; font-size: 11.5px; text-align: left;">
-          <tbody id="historyDetailsTableBody">
-            <!-- Populated by JS -->
-          </tbody>
-        </table>
-      </div>
-      <footer id="historyDetailsActions" class="history-detail-actions" hidden></footer>
-    </div>
-  </div>
 
 <script>
     const leaveHighlightDetailsData = {

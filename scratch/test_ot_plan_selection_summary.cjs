@@ -26,6 +26,7 @@ const pageUrl = pathToFileURL(path.resolve(__dirname, '../modules/attendance/opt
     );
     assert.equal(await page.$eval('#listCounterText', node => node.textContent.trim()), '6');
     assert.equal(await page.$eval('#selectedRecordsText', node => node.textContent.trim()), '2');
+    assert.equal(await page.$eval('#submitOtPlanButton', node => node.textContent.trim()), 'Submit selected (2)');
     assert.equal(await page.$eval('#selectAllControl span', node => node.textContent.trim()), 'Select All');
     assert.equal(await page.$('#selectedCountAndHoursText'), null);
     assert.equal(await page.$('#stickySelectionBar .bar-clear-btn'), null);
@@ -37,11 +38,13 @@ const pageUrl = pathToFileURL(path.resolve(__dirname, '../modules/attendance/opt
 
     await page.click('#selectAllCheckbox');
     assert.equal(await page.$eval('#selectedRecordsText', node => node.textContent.trim()), '6');
+    assert.equal(await page.$eval('#submitOtPlanButton', node => node.textContent.trim()), 'Submit selected (6)');
     assert.equal(await page.$eval('#selectAllCheckbox', checkbox => checkbox.checked), true);
     assert.equal(await page.$$eval('.ot-staff-card.selected', cards => cards.length), 6);
 
     await page.click('#selectAllCheckbox');
     assert.equal(await page.$eval('#selectedRecordsText', node => node.textContent.trim()), '0');
+    assert.equal(await page.$eval('#submitOtPlanButton', node => node.textContent.trim()), 'Submit selected (0)');
     assert.equal(await page.$eval('#selectAllCheckbox', checkbox => checkbox.checked), false);
     assert.equal(await page.$$eval('.ot-staff-card.selected', cards => cards.length), 0);
     assert.deepEqual(errors, []);

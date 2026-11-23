@@ -35,33 +35,31 @@
       </div>
     </div>
 
-    <!-- Sub-Calendar Category Selector Strip (Ultra-short pill labels: All, Leave, Roster, Book, Train, Meet, Staff) -->
-    <div class="cal-category-strip">
-      <button class="cal-category-pill active" id="pillSubAll" onclick="setSubCalendar('all')">
-        <i class="fa-solid fa-layer-group"></i> All
-      </button>
-      <button class="cal-category-pill" id="pillSubLeave" onclick="setSubCalendar('leave')">
-        <i class="fa-solid fa-umbrella-beach"></i> Leave
-      </button>
-      <button class="cal-category-pill" id="pillSubRoster" onclick="setSubCalendar('roster')">
-        <i class="fa-solid fa-clock"></i> Roster
-      </button>
-      <button class="cal-category-pill" id="pillSubBooking" onclick="setSubCalendar('booking')">
-        <i class="fa-solid fa-building"></i> Book
-      </button>
-      <button class="cal-category-pill" id="pillSubTraining" onclick="setSubCalendar('training')">
-        <i class="fa-solid fa-graduation-cap"></i> Train
-      </button>
-      <button class="cal-category-pill" id="pillSubMeeting" onclick="setSubCalendar('meeting')">
-        <i class="fa-solid fa-handshake"></i> Meet
-      </button>
-      <button class="cal-category-pill" id="pillSubSubordinate" onclick="setSubCalendar('subordinate')">
-        <i class="fa-solid fa-users"></i> Staff
-      </button>
-    </div>
-
     <!-- Scrollable Main Content -->
-    <div class="main-content" style="padding: 10px 0 90px;">
+    <div class="main-content" style="padding: 0 0 90px;">
+      <div class="cal-category-strip">
+        <button class="cal-category-pill active" id="pillSubAll" onclick="setSubCalendar('all')">
+          <i class="fa-solid fa-layer-group"></i> All
+        </button>
+        <button class="cal-category-pill" id="pillSubLeave" onclick="setSubCalendar('leave')">
+          <i class="fa-solid fa-umbrella-beach"></i> Leave
+        </button>
+        <button class="cal-category-pill" id="pillSubRoster" onclick="setSubCalendar('roster')">
+          <i class="fa-solid fa-clock"></i> Roster
+        </button>
+        <button class="cal-category-pill" id="pillSubBooking" onclick="setSubCalendar('booking')">
+          <i class="fa-solid fa-building"></i> Book
+        </button>
+        <button class="cal-category-pill" id="pillSubTraining" onclick="setSubCalendar('training')">
+          <i class="fa-solid fa-graduation-cap"></i> Train
+        </button>
+        <button class="cal-category-pill" id="pillSubMeeting" onclick="setSubCalendar('meeting')">
+          <i class="fa-solid fa-handshake"></i> Meet
+        </button>
+        <button class="cal-category-pill" id="pillSubSubordinate" onclick="setSubCalendar('subordinate')">
+          <i class="fa-solid fa-users"></i> Staff
+        </button>
+      </div>
 
       <!-- Interactive Month Calendar Card (Matching User Reference Screenshot) -->
       <div class="cal-card-box">

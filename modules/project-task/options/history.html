@@ -12,6 +12,8 @@
   <link rel="stylesheet" href="../../../css/app.css">
   <link rel="stylesheet" href="../../../css/project-task.css">
   <link rel="stylesheet" href="../../../css/detail-popout.css">
+  <link rel="stylesheet" href="../../../css/history-record-page.css">
+  <script src="../../../js/history-record-page.js"></script>
   <script src="../../../js/components.js"></script>
   <script src="../../../js/app.js" defer></script>
   <script src="../../../js/project-task/timesheet-requests.js" defer></script>
@@ -35,7 +37,7 @@
         <button type="button" class="project-history-tab" id="historyTab-timesheet" role="tab" aria-selected="false" aria-controls="timesheetHistoryPanel" tabindex="-1"><span>Timesheet</span></button>
       </div>
 
-      <section class="project-history-panel" id="workPlanHistoryPanel" role="tabpanel" aria-labelledby="historyTab-workPlan">
+      <section class="project-history-panel" id="workPlanHistoryPanel" data-record-colour-view="Work plan status" data-record-legend='{"Draft":"draft","Pending":"submitted","Pending Approval":"submitted","Resubmit":"resubmit","Approved":"approved","Rejected":"rejected","Cancelled":"cancelled"}' role="tabpanel" aria-labelledby="historyTab-workPlan">
         <div class="project-history-filter-bar">
           <div class="project-history-filter-copy">
             <span class="project-history-filter-kicker">Current Filter</span>
@@ -55,7 +57,7 @@
         <div class="project-history-list" id="workPlanHistoryList" aria-live="polite"></div>
       </section>
 
-      <section class="project-history-panel" id="timesheetHistoryPanel" role="tabpanel" aria-labelledby="historyTab-timesheet" hidden>
+      <section class="project-history-panel" id="timesheetHistoryPanel" data-record-colour-view="Timesheet status" data-record-legend='{"Draft":"draft","Pending":"submitted","Pending Approval":"submitted","Pending Resubmit":"resubmit","Approved":"approved","Rejected":"rejected","Cancelled":"cancelled"}' role="tabpanel" aria-labelledby="historyTab-timesheet" hidden>
         <div class="project-history-filter-bar">
           <div class="project-history-filter-copy">
             <span class="project-history-filter-kicker">Current Filter</span>
@@ -187,23 +189,19 @@
       </div>
     </div>
 
-    <div class="project-history-detail-overlay" id="projectHistoryDetailOverlay" hidden>
-      <div class="project-history-detail-sheet" role="dialog" aria-modal="true" aria-labelledby="projectHistoryDetailTitle">
-        <div class="project-history-sheet-handle" aria-hidden="true"></div>
-        <div class="project-history-detail-header">
-          <div class="project-history-detail-heading">
-            <span class="project-history-detail-icon"><i class="fa-solid fa-clock-rotate-left" aria-hidden="true"></i></span>
-            <div>
-              <span>History Record</span>
-              <h2 id="projectHistoryDetailTitle">Details</h2>
-            </div>
+    <main id="projectHistoryDetailOverlay" class="approval-record-page" data-history-page aria-labelledby="projectHistoryDetailTitle" hidden>
+      <section class="approval-record-layout">
+        <header class="approval-page-header">
+          <phone-status-bar time="9:41"></phone-status-bar>
+          <div class="approval-page-heading">
+            <button type="button" id="closeProjectHistoryDetails" data-history-back aria-label="Back to history"></button>
+            <h1 id="projectHistoryDetailTitle" tabindex="-1">Details</h1>
           </div>
-          <button type="button" class="project-history-filter-close" id="closeProjectHistoryDetails" aria-label="Close details"><i class="fa-solid fa-circle-xmark" aria-hidden="true"></i></button>
-        </div>
-        <div class="project-history-detail-content" id="projectHistoryDetailContent"></div>
+        </header>
+        <div class="history-record-content project-history-detail-content" id="projectHistoryDetailContent"></div>
         <div class="history-detail-actions" id="projectHistoryDetailActions" hidden></div>
-      </div>
-    </div>
+      </section>
+    </main>
 
     <phone-bottom-nav active="apps"></phone-bottom-nav>
     <left-profile-drawer></left-profile-drawer>

@@ -1,28 +1,27 @@
-
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"><!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>PeopleHCM - Hours Summary</title>
   <script src="../../../js/components.js"></script>
+  <script src="../../../js/attendance/date-display.js"></script>
+  <script src="../../../js/attendance/attendance-days.js"></script>
   <script src="../../../js/app.js" defer></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="../../../css/theme.css">
   <link rel="stylesheet" href="../../../css/app.css">
   <link rel="stylesheet" href="../../../css/claim-forms.css">
+  <link rel="stylesheet" href="../../../css/attendance-hours-summary.css">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
     body { background-color: var(--bg-page); display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 100vh; color: var(--text-primary); padding: 20px 0; }
     .phone-container { width: 100%; max-width: 420px; height: 900px; background: var(--bg-phone); border-radius: 44px; overflow: hidden; box-shadow: var(--shadow-phone); position: relative; display: flex; flex-direction: column; }
-    .main-content { flex: 1; overflow-y: auto; padding: 16px 16px 130px !important; position: relative; z-index: 10; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+    .main-content { flex: 1; overflow-y: auto; position: relative; z-index: 10; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
     .main-content::-webkit-scrollbar { display: none; }
-    .hours-filter-trigger { width: 100%; text-align: left; font-family: inherit; }
-    .hours-filter-trigger .claim-filter-value { display: block; line-height: 1.5; overflow-wrap: anywhere; }
-    .hours-filter-trigger .claim-icon-button { width: 44px; height: 44px; flex-basis: 44px; }
-    .hours-filter-trigger:focus-visible { outline: 2px solid var(--purple-text); outline-offset: 3px; }
     #modal-filter .claim-filter-panel { display: flex; flex-direction: column; overflow: hidden; background: var(--bg-sheet); }
     #modal-filter .claim-filter-handle, #modal-filter .claim-filter-header, #modal-filter .claim-filter-apply { flex: 0 0 auto; }
     #modal-filter .claim-filter-fields { min-height: 0; overflow-y: auto; padding: 3px; overscroll-behavior: contain; scrollbar-width: thin; }
@@ -34,15 +33,6 @@
     [data-theme="dark"] #modal-filter input { color-scheme: dark; }
     [data-theme="light"] #modal-filter input { color-scheme: light; }
     
-    .cal-top-header {
-      background: linear-gradient(135deg, #4c1d95 0%, #6d28d9 50%, #7c3aed 100%);
-      padding: 12px 16px 14px;
-      border-bottom-left-radius: 22px;
-      border-bottom-right-radius: 22px;
-      box-shadow: 0 8px 24px rgba(76, 29, 149, 0.28);
-      position: relative;
-      z-index: 20;
-    }
 
     /* ================= ENTERPRISE TOAST FILTER BAR ================= */
     .enterprise-toast-bar {
@@ -204,191 +194,6 @@
       background: linear-gradient(90deg, #34d399, #10b981);
       border-radius: 4px;
     }
-
-    /* ================= SECTION HEADERS ================= */
-    .dashboard-section-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 12px;
-      margin-top: 8px;
-    }
-    .dashboard-section-header h2 {
-      font-size: 14px;
-      font-weight: 800;
-      color: var(--text-primary);
-      letter-spacing: 0.2px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .section-title-icon {
-      font-size: 15px;
-    }
-    .section-badge {
-      font-size: 10.5px;
-      font-weight: 800;
-      padding: 3px 8px;
-      border-radius: 8px;
-    }
-    .badge-green { background: rgba(16, 185, 129, 0.15); color: #34d399; }
-    .badge-blue { background: rgba(59, 130, 246, 0.15); color: #60a5fa; }
-    .badge-orange { background: rgba(245, 158, 11, 0.15); color: #fbbf24; }
-
-    /* ================= BENTO & MODERN CARDS ================= */
-    .summary-grid {
-      display: none;
-    }
-    
-
-    .card-head {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 10px;
-    }
-    .icon-bubble {
-      width: 32px;
-      height: 32px;
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .bg-green-subtle { background: rgba(16, 185, 129, 0.15); }
-    .bg-emerald-subtle { background: rgba(5, 150, 105, 0.15); }
-
-    .pill-tag {
-      font-size: 10.5px;
-      font-weight: 800;
-      padding: 3px 8px;
-      border-radius: 10px;
-    }
-    .pill-green { background: rgba(16, 185, 129, 0.15); color: #34d399; }
-    .pill-teal { background: rgba(20, 184, 166, 0.15); color: #2dd4bf; }
-    .pill-blue { background: rgba(59, 130, 246, 0.15); color: #60a5fa; }
-    .pill-indigo { background: rgba(99, 102, 241, 0.15); color: #818cf8; }
-    .pill-purple { background: rgba(168, 85, 247, 0.15); color: #c084fc; }
-    .pill-amber { background: rgba(245, 158, 11, 0.15); color: #fbbf24; }
-    .pill-rose { background: rgba(244, 63, 94, 0.15); color: #fb7185; }
-    .pill-muted { background: rgba(255, 255, 255, 0.06); color: var(--text-muted); }
-
-    .card-metric-val {
-      font-size: 24px;
-      font-weight: 900;
-      color: var(--text-primary);
-      line-height: 1;
-      margin-bottom: 4px;
-    }
-    .card-metric-val .val-sub {
-      font-size: 13px;
-      font-weight: 700;
-      color: var(--text-muted);
-      margin-left: 2px;
-    }
-    .card-metric-title {
-      font-size: 12px;
-      font-weight: 700;
-      color: var(--text-secondary);
-    }
-    
-    .text-teal { color: #2dd4bf !important; }
-    .text-blue { color: #60a5fa !important; }
-    .text-amber { color: #fbbf24 !important; }
-    .text-purple { color: #c084fc !important; }
-    .text-rose { color: #fb7185 !important; }
-
-    .card-inline-layout {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 10px;
-    }
-    .mini-bar-track {
-      width: 100%;
-      height: 5px;
-      background: rgba(255, 255, 255, 0.08);
-      border-radius: 4px;
-      overflow: hidden;
-    }
-    .mini-bar-fill.fill-teal {
-      height: 100%;
-      background: linear-gradient(90deg, #14b8a6, #2dd4bf);
-      border-radius: 4px;
-    }
-
-    /* OT Grid */
-    .ot-grid-matrix {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 12px;
-      margin-bottom: 24px;
-    }
-    .card-ot-blue { border-left: 3.5px solid #3b82f6; }
-    .card-ot-indigo { border-left: 3.5px solid #6366f1; }
-    .card-ot-amber { border-left: 3.5px solid #f59e0b; }
-    .ot-icon { font-size: 16px; }
-
-    /* Exceptions Matrix */
-    .exceptions-bento-matrix {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      margin-bottom: 24px;
-    }
-    .strip-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border-subtle);
-      border-radius: 16px;
-      padding: 12px 16px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      cursor: pointer;
-      transition: transform 0.2s;
-    }
-    .strip-card:active { transform: scale(0.98); }
-    .strip-left {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-    .strip-dot {
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-    }
-    .strip-dot.green { background: #10b981; box-shadow: 0 0 6px rgba(16, 185, 129, 0.5); }
-    .strip-dot.muted { background: var(--text-muted); opacity: 0.4; }
-    .strip-title {
-      font-size: 12.5px;
-      font-weight: 700;
-      color: var(--text-primary);
-    }
-    .strip-sub {
-      font-size: 10.5px;
-      font-weight: 600;
-      color: var(--text-muted);
-    }
-    .strip-val {
-      font-size: 18px;
-      font-weight: 900;
-      color: var(--text-primary);
-    }
-    .strip-val .val-unit {
-      font-size: 12px;
-      font-weight: 700;
-      color: var(--text-muted);
-    }
-    
-    .strip-split-row {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 10px;
-    }
-    .card-purple-mini { border-left: 3.5px solid #a855f7; }
-    .card-rose-mini { border-left: 3.5px solid #f43f5e; }
-    .mini-head { margin-bottom: 8px; }
 
     /* Modal Styling */
     .modal-overlay {
@@ -865,181 +670,6 @@
       --tag-blue-bg: rgba(59, 130, 246, 0.2);
     }
 
-    .bento-group-work,
-    .ot-grid-matrix,
-    .exceptions-bento-matrix {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 10px;
-      margin-bottom: 20px;
-    }
-
-    .modern-card {
-      border-radius: 18px !important;
-      padding: 13px 13px !important;
-      display: flex !important;
-      align-items: center !important;
-      gap: 10px !important;
-      cursor: pointer !important;
-      transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease !important;
-    }
-    .modern-card:hover {
-      transform: translateY(-2px) !important;
-    }
-    .modern-card:active {
-      transform: scale(0.97) !important;
-    }
-    .modern-card.full-width {
-      grid-column: span 2;
-    }
-
-    .card-text-col {
-      display: flex;
-      flex-direction: column;
-      min-width: 0;
-    }
-    .card-icon-bubble {
-      width: 36px !important;
-      height: 36px !important;
-      border-radius: 50% !important;
-      display: flex !important;
-      align-items: center !important;
-      justify-content: center !important;
-      flex-shrink: 0 !important;
-      transition: transform 0.15s ease;
-    }
-    .modern-card:hover .card-icon-bubble {
-      transform: scale(1.06);
-    }
-    .card-theme-title {
-      font-size: 13px !important;
-      font-weight: 800 !important;
-      line-height: 1.2 !important;
-      margin-bottom: 2px !important;
-      letter-spacing: -0.1px;
-    }
-    .card-theme-sub {
-      font-size: 10.5px !important;
-      font-weight: 600 !important;
-      line-height: 1.2 !important;
-    }
-    .card-big-num {
-      font-size: 14px !important;
-      font-weight: 800 !important;
-    }
-    .summary-kpi-card {
-      min-height: 126px;
-      padding: 14px !important;
-      flex-direction: column !important;
-      align-items: stretch !important;
-      justify-content: flex-start !important;
-      gap: 12px !important;
-    }
-    .summary-card-header {
-      display: flex;
-      align-items: center;
-      gap: 9px;
-      min-width: 0;
-    }
-    .summary-card-header .card-theme-title {
-      margin-bottom: 0 !important;
-      text-wrap: balance;
-    }
-    .summary-card-values {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 3px;
-      margin-top: auto;
-      padding-left: 0;
-      min-height: 45px;
-      text-align: center;
-    }
-    .summary-card-primary {
-      font-size: 24px;
-      font-weight: 850;
-      line-height: 0.95;
-      letter-spacing: -0.7px;
-      font-variant-numeric: tabular-nums;
-    }
-    .summary-card-secondary {
-      font-size: 15px;
-      font-weight: 800;
-      line-height: 1;
-      letter-spacing: -0.2px;
-      font-variant-numeric: tabular-nums;
-      white-space: nowrap;
-    }
-    .card-work-section .summary-card-primary { color: var(--bento-mint-title); }
-    .card-work-section .summary-card-secondary { color: var(--bento-mint-icon); }
-    .card-ot-section .summary-card-primary { color: var(--bento-blue-title); }
-    .card-ot-section .summary-card-secondary { color: var(--bento-blue-icon); }
-    .card-ex-section .summary-card-primary { color: var(--text-primary); }
-    .card-ex-section .summary-card-secondary { color: var(--purple-text); }
-
-    /* Section 1: Work & Attendance (Matches Positive mint stat on Home Page) */
-    .card-work-section {
-      background: var(--bento-mint-bg) !important;
-      border: 1px solid var(--bento-mint-border) !important;
-      box-shadow: 0 4px 14px rgba(16, 185, 129, 0.06);
-    }
-    .bubble-green {
-      background: var(--tag-green-bg) !important;
-      color: var(--bento-mint-icon) !important;
-    }
-    .green-title {
-      color: var(--bento-mint-title) !important;
-    }
-    .green-sub {
-      color: var(--bento-mint-sub) !important;
-    }
-    .green-progress-bg {
-      background: var(--tag-green-bg) !important;
-    }
-    .green-progress-fill {
-      background: var(--bento-mint-icon) !important;
-    }
-
-    /* Section 2: Overtime Analytics (Matches Blue theme on Home Page) */
-    .card-ot-section {
-      background: var(--bento-blue-bg) !important;
-      border: 1px solid var(--bento-blue-border) !important;
-      box-shadow: 0 4px 14px rgba(59, 130, 246, 0.06);
-    }
-    .bubble-blue {
-      background: var(--tag-blue-bg) !important;
-      color: var(--bento-blue-icon) !important;
-    }
-    .blue-title {
-      color: var(--bento-blue-title) !important;
-    }
-    .blue-sub {
-      color: var(--bento-blue-sub) !important;
-    }
-
-    /* Section 3: Exceptions & Leave follows the purple History palette. */
-    .card-ex-section {
-      background: linear-gradient(135deg, var(--bg-card) 0%, rgba(124, 58, 237, 0.06) 100%) !important;
-      border: 1px solid var(--purple-border) !important;
-      box-shadow: 0 4px 14px rgba(124, 58, 237, 0.06);
-    }
-    .bubble-purple {
-      background: var(--tag-violet-bg) !important;
-      color: var(--purple-primary) !important;
-    }
-    .purple-title {
-      color: var(--text-primary) !important;
-    }
-    .purple-sub {
-      color: var(--purple-text) !important;
-    }
-    .purple-progress-bg {
-      background: var(--tag-violet-bg) !important;
-    }
-    .purple-progress-fill {
-      background: var(--purple-primary) !important;
-    }
-
     /* Default / Fallback */
     [data-theme="light"] .detail-list-item {
       background: #ffffff;
@@ -1372,223 +1002,117 @@
 
   <preview-top-bar active-page="attendance"></preview-top-bar>
 
-  <div class="phone-container">
-    <div class="cal-top-header">
-      <phone-status-bar time="9:41" style="color: #ffffff;"></phone-status-bar>
-      <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 8px;">
-        <div style="display: flex; align-items: center; gap: 14px;">
-          <button class="header-btn" onclick="goBack()" aria-label="Back" style="background: rgba(255, 255, 255, 0.15); border: 1px solid rgba(255, 255, 255, 0.2); width: 40px; height: 40px; border-radius: 14px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #ffffff; backdrop-filter: blur(8px);">
-            <i class="fa-solid fa-chevron-left" style="font-size: 18px;"></i>
-          </button>
-          <h1 id="headerTitle" style="font-size: 20px; font-weight: 800; color: #ffffff; margin: 0; letter-spacing: 0.2px;">Hours Summary</h1>
+  <div class="phone-container hours-summary-page">
+    <header class="cal-top-header hours-summary-header">
+      <phone-status-bar time="9:41"></phone-status-bar>
+      <div class="hours-summary-toolbar">
+        <button type="button" class="hours-header-button" onclick="goBack()" aria-label="Back"><i class="fa-solid fa-chevron-left" aria-hidden="true"></i></button>
+        <div class="hours-summary-heading">
+          <h1 id="headerTitle">Hours Summary</h1>
+          <p class="hours-summary-period" id="filterSummaryText">16 Aug – 14 Sep 2026</p>
         </div>
-        
+        <button type="button" class="hours-header-button hours-header-filter hours-filter-trigger" onclick="openFilterModal()" aria-label="Filter hours summary" aria-haspopup="dialog" aria-controls="modal-filter" aria-describedby="filterSummaryText"><i class="fa-solid fa-sliders" aria-hidden="true"></i></button>
       </div>
-    </div>
-    
-    <div class="main-content" style="padding-top: 20px;">
-      
-      <!-- ================= DASHBOARD VIEW ================= -->
-      <div id="view-dashboard" style="display: block;">
-        <button type="button" class="claim-filter-bar hours-filter-trigger" onclick="openFilterModal()" aria-haspopup="dialog" aria-controls="modal-filter">
-          <span class="claim-filter-copy">
-            <span class="claim-eyebrow">Filter</span>
-            <span class="claim-filter-value" id="filterSummaryText">16/08/2026 – 14/09/2026</span>
-          </span>
-          <span class="claim-icon-button" aria-hidden="true"><i class="fa-solid fa-sliders"></i></span>
-        </button>
-        
+    </header>
 
-
-        <!-- Section 1: Work & Attendance -->
-        <div class="dashboard-section-header">
-          <h2>Work & Attendance</h2>
-        </div>
-
-        <div class="bento-group-work">
-          <!-- Card 1: Scheduled Work Days -->
-          <div class="modern-card summary-kpi-card card-work-section" onclick="openListDetails('Scheduled Work Days')">
-            <div class="summary-card-header">
-              <div class="card-icon-bubble bubble-green">
-                <i class="fa-solid fa-calendar-days" style="font-size: 16px;"></i>
-              </div>
-              <div class="card-theme-title green-title">Scheduled Work Days</div>
-            </div>
-            <div class="summary-card-values">
-              <span class="summary-card-primary">22</span>
-              <span class="summary-card-secondary">100%</span>
-            </div>
+    <div class="main-content">
+      <div id="view-dashboard">
+        <p class="hours-active-filters" id="hoursFilterDetails" hidden></p>
+        <section class="hours-section hours-section-work">
+          <h2 id="hours-work">Work &amp; Attendance</h2>
+          <div class="history-card-item hours-metric-card">
+            <table class="hours-metrics" aria-labelledby="hours-work">
+              <colgroup><col><col class="total-column"><col class="percent-column"></colgroup>
+              <thead><tr><th scope="col" aria-label="Metric"></th><th scope="col">Total</th><th scope="col" aria-label="Percentage">%</th></tr></thead>
+              <tbody class="bento-group-work">
+                <tr class="summary-kpi-card" onclick="openListDetails('Scheduled Work Days')">
+                  <th scope="row"><button type="button" class="hours-metric-button"><span class="hours-metric-icon" aria-hidden="true"><i class="fa-solid fa-calendar-days"></i></span><span>Scheduled Work Days</span></button></th>
+                  <td class="hours-metric-total">22</td>
+                  <td><span class="hours-metric-percent">100%</span></td>
+                </tr>
+                <tr class="summary-kpi-card" onclick="openListDetails('Normal Present Days')">
+                  <th scope="row"><button type="button" class="hours-metric-button"><span class="hours-metric-icon" aria-hidden="true"><i class="fa-solid fa-circle-check"></i></span><span>Normal Present Days</span></button></th>
+                  <td class="hours-metric-total">22</td>
+                  <td><span class="hours-metric-percent">100%</span></td>
+                </tr>
+                <tr class="summary-kpi-card" onclick="openListDetails('Normal Work Hours')">
+                  <th scope="row"><button type="button" class="hours-metric-button"><span class="hours-metric-icon" aria-hidden="true"><i class="fa-solid fa-clock"></i></span><span>Normal Work Hours</span></button></th>
+                  <td class="hours-metric-total">176.00</td>
+                  <td><span class="hours-metric-percent">100%</span></td>
+                </tr>
+                <tr class="summary-kpi-card" onclick="openListDetails('Odd Clocking Days')">
+                  <th scope="row"><button type="button" class="hours-metric-button"><span class="hours-metric-icon" aria-hidden="true"><i class="fa-solid fa-circle-exclamation"></i></span><span>Odd Clocking Days</span></button></th>
+                  <td class="hours-metric-total" id="odd-clocking-day-count">0</td>
+                  <td><span class="hours-metric-percent">0%</span></td>
+                </tr>
+              </tbody>
+            </table>
           </div>
+        </section>
 
-          <!-- Card 2: Normal Present Days -->
-          <div class="modern-card summary-kpi-card card-work-section" onclick="openListDetails('Normal Present Days')">
-            <div class="summary-card-header">
-              <div class="card-icon-bubble bubble-green">
-                <i class="fa-solid fa-circle-check" style="font-size: 16px;"></i>
-              </div>
-              <div class="card-theme-title green-title">Normal Present Days</div>
-            </div>
-            <div class="summary-card-values">
-              <span class="summary-card-primary">22</span>
-              <span class="summary-card-secondary">100%</span>
-            </div>
+        <section class="hours-section hours-section-overtime">
+          <h2 id="hours-overtime">Overtime Analytics</h2>
+          <div class="history-card-item hours-metric-card">
+            <table class="hours-metrics" aria-labelledby="hours-overtime">
+              <colgroup><col><col class="total-column"><col class="percent-column"></colgroup>
+              <thead><tr><th scope="col" aria-label="Metric"></th><th scope="col">Total</th><th scope="col" aria-label="Percentage">%</th></tr></thead>
+              <tbody class="ot-grid-matrix">
+                <tr class="summary-kpi-card" onclick="openListDetails('Normal OT Hours')">
+                  <th scope="row"><button type="button" class="hours-metric-button"><span class="hours-metric-icon" aria-hidden="true"><i class="fa-solid fa-stopwatch"></i></span><span>Normal OT Hours</span></button></th>
+                  <td class="hours-metric-total">4.50</td>
+                  <td><span class="hours-metric-percent">3%</span></td>
+                </tr>
+                <tr class="summary-kpi-card" onclick="openListDetails('Other OT Hours')">
+                  <th scope="row"><button type="button" class="hours-metric-button"><span class="hours-metric-icon" aria-hidden="true"><i class="fa-solid fa-moon"></i></span><span>Other OT Hours</span></button></th>
+                  <td class="hours-metric-total" id="other-ot-hours-total">0.00</td>
+                  <td><span class="hours-metric-percent">0%</span></td>
+                </tr>
+                <tr class="summary-kpi-card" onclick="openListDetails('Unapproved OT Hours')">
+                  <th scope="row"><button type="button" class="hours-metric-button"><span class="hours-metric-icon" aria-hidden="true"><i class="fa-solid fa-triangle-exclamation"></i></span><span>Unapproved OT Hours</span></button></th>
+                  <td class="hours-metric-total" id="unapproved-ot-hours-total">14.62</td>
+                  <td><span class="hours-metric-percent">8%</span></td>
+                </tr>
+                <tr class="summary-kpi-card" onclick="openListDetails('OT Plan Hours')">
+                  <th scope="row"><button type="button" class="hours-metric-button"><span class="hours-metric-icon" aria-hidden="true"><i class="fa-solid fa-calendar-check"></i></span><span>Plan OT Hours</span></button></th>
+                  <td class="hours-metric-total" id="plan-ot-hours-total">0.00</td>
+                  <td aria-label="Not applicable"><span class="hours-metric-percent">—</span></td>
+                </tr>
+              </tbody>
+            </table>
           </div>
+        </section>
 
-          <!-- Card 3: Normal Work Hours -->
-          <div class="modern-card summary-kpi-card card-work-section" onclick="openListDetails('Normal Work Hours')">
-            <div class="summary-card-header">
-              <div class="card-icon-bubble bubble-green">
-                <i class="fa-solid fa-clock" style="font-size: 16px;"></i>
-              </div>
-              <div class="card-theme-title green-title">Normal Work Hours</div>
-            </div>
-            <div class="summary-card-values">
-              <span class="summary-card-primary">176.00</span>
-              <span class="summary-card-secondary">100%</span>
-            </div>
+        <section class="hours-section hours-section-exceptions">
+          <h2 id="hours-exceptions">Exceptions &amp; Leave</h2>
+          <div class="history-card-item hours-metric-card">
+            <table class="hours-metrics" aria-labelledby="hours-exceptions">
+              <colgroup><col><col class="total-column"><col class="percent-column"></colgroup>
+              <thead><tr><th scope="col" aria-label="Metric"></th><th scope="col">Total</th><th scope="col" aria-label="Percentage">%</th></tr></thead>
+              <tbody class="exceptions-bento-matrix">
+                <tr class="summary-kpi-card" onclick="openListDetails('Absent OT Hours')">
+                  <th scope="row"><button type="button" class="hours-metric-button"><span class="hours-metric-icon" aria-hidden="true"><i class="fa-solid fa-clock-rotate-left"></i></span><span>Absent OT Hours</span></button></th>
+                  <td class="hours-metric-total" id="absent-ot-hours-total">0.00</td>
+                  <td aria-label="Not applicable"><span class="hours-metric-percent">—</span></td>
+                </tr>
+                <tr class="summary-kpi-card" onclick="openListDetails('Absent Days')">
+                  <th scope="row"><button type="button" class="hours-metric-button"><span class="hours-metric-icon" aria-hidden="true"><i class="fa-solid fa-user-xmark"></i></span><span>Absent Days</span></button></th>
+                  <td class="hours-metric-total" id="absent-day-count">0</td>
+                  <td><span class="hours-metric-percent">0%</span></td>
+                </tr>
+                <tr class="summary-kpi-card" onclick="openListDetails('Leave Hours')">
+                  <th scope="row"><button type="button" class="hours-metric-button"><span class="hours-metric-icon" aria-hidden="true"><i class="fa-solid fa-plane-departure"></i></span><span>Leave Hours</span></button></th>
+                  <td class="hours-metric-total" id="leave-hours-total">0.00</td>
+                  <td><span class="hours-metric-percent">0%</span></td>
+                </tr>
+                <tr class="summary-kpi-card" onclick="openListDetails('Lost Hours')">
+                  <th scope="row"><button type="button" class="hours-metric-button"><span class="hours-metric-icon" aria-hidden="true"><i class="fa-solid fa-circle-minus"></i></span><span>Lost Hours</span></button></th>
+                  <td class="hours-metric-total" id="lost-hours-total">0.00</td>
+                  <td><span class="hours-metric-percent">0%</span></td>
+                </tr>
+              </tbody>
+            </table>
           </div>
-
-          <!-- Card 4: Odd Clocking Days -->
-          <div class="modern-card summary-kpi-card card-work-section" onclick="openListDetails('Odd Clocking Days')">
-            <div class="summary-card-header">
-              <div class="card-icon-bubble bubble-green">
-                <i class="fa-solid fa-circle-exclamation" style="font-size: 16px;"></i>
-              </div>
-              <div class="card-theme-title green-title">Odd Clocking Days</div>
-            </div>
-            <div class="summary-card-values">
-              <span class="summary-card-primary" id="odd-clocking-day-count">0</span>
-              <span class="summary-card-secondary">0%</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Section 2: Overtime Analytics -->
-        <div class="dashboard-section-header">
-          <h2>Overtime Analytics</h2>
-        </div>
-
-        <div class="ot-grid-matrix">
-          <!-- Card 4: Normal OT Hours -->
-          <div class="modern-card summary-kpi-card card-ot-section" onclick="openListDetails('Normal OT Hours')">
-            <div class="summary-card-header">
-              <div class="card-icon-bubble bubble-blue">
-                <i class="fa-solid fa-stopwatch" style="font-size: 16px;"></i>
-              </div>
-              <div class="card-theme-title blue-title">Normal OT Hours</div>
-            </div>
-            <div class="summary-card-values">
-              <span class="summary-card-primary">4.50</span>
-              <span class="summary-card-secondary">3%</span>
-            </div>
-          </div>
-
-          <!-- Card 5: Other OT Hours -->
-          <div class="modern-card summary-kpi-card card-ot-section" onclick="openListDetails('Other OT Hours')">
-            <div class="summary-card-header">
-              <div class="card-icon-bubble bubble-blue">
-                <i class="fa-solid fa-moon" style="font-size: 16px;"></i>
-              </div>
-              <div class="card-theme-title blue-title">Other OT Hours</div>
-            </div>
-            <div class="summary-card-values">
-              <span class="summary-card-primary" id="other-ot-hours-total">0.00</span>
-              <span class="summary-card-secondary">0%</span>
-            </div>
-          </div>
-
-          <!-- Card 6: Unapproved OT Hours -->
-          <div class="modern-card summary-kpi-card card-ot-section" onclick="openListDetails('Unapproved OT Hours')">
-            <div class="summary-card-header">
-              <div class="card-icon-bubble bubble-blue">
-                <i class="fa-solid fa-triangle-exclamation" style="font-size: 16px;"></i>
-              </div>
-              <div class="card-theme-title blue-title">Unapproved OT Hours</div>
-            </div>
-            <div class="summary-card-values">
-              <span class="summary-card-primary" id="unapproved-ot-hours-total">14.62</span>
-              <span class="summary-card-secondary">8%</span>
-            </div>
-          </div>
-
-          <!-- Card 7: OT Plan Hours -->
-          <div class="modern-card summary-kpi-card card-ot-section" onclick="openListDetails('OT Plan Hours')">
-            <div class="summary-card-header">
-              <div class="card-icon-bubble bubble-blue">
-                <i class="fa-solid fa-calendar-check" style="font-size: 16px;"></i>
-              </div>
-              <div class="card-theme-title blue-title">Plan OT Hours</div>
-            </div>
-            <div class="summary-card-values">
-              <span class="summary-card-primary" id="plan-ot-hours-total">0.00</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Section 3: Exceptions & Leave -->
-        <div class="dashboard-section-header">
-          <h2>Exceptions & Leave</h2>
-        </div>
-
-        <div class="exceptions-bento-matrix">
-          <!-- Card 8: Absent OT Hours -->
-          <div class="modern-card summary-kpi-card card-ex-section" onclick="openListDetails('Absent OT Hours')">
-            <div class="summary-card-header">
-              <div class="card-icon-bubble bubble-purple">
-                <i class="fa-solid fa-clock-rotate-left" style="font-size: 16px;"></i>
-              </div>
-              <div class="card-theme-title purple-title">Absent OT Hours</div>
-            </div>
-            <div class="summary-card-values">
-              <span id="absent-ot-hours-total" class="summary-card-primary">0.00</span>
-            </div>
-          </div>
-
-          <!-- Card 9: Absent Days -->
-          <div class="modern-card summary-kpi-card card-ex-section" onclick="openListDetails('Absent Days')">
-            <div class="summary-card-header">
-              <div class="card-icon-bubble bubble-purple">
-                <i class="fa-solid fa-user-xmark" style="font-size: 16px;"></i>
-              </div>
-              <div class="card-theme-title purple-title">Absent Days</div>
-            </div>
-            <div class="summary-card-values">
-              <span id="absent-day-count" class="summary-card-primary">0</span>
-              <span class="summary-card-secondary">0%</span>
-            </div>
-          </div>
-
-          <!-- Card 11: Leave Hours -->
-          <div class="modern-card summary-kpi-card card-ex-section" onclick="openListDetails('Leave Hours')">
-            <div class="summary-card-header">
-              <div class="card-icon-bubble bubble-purple">
-                <i class="fa-solid fa-plane-departure" style="font-size: 16px;"></i>
-              </div>
-              <div class="card-theme-title purple-title">Leave Hours</div>
-            </div>
-            <div class="summary-card-values">
-              <span id="leave-hours-total" class="summary-card-primary">0.00</span>
-              <span class="summary-card-secondary">0%</span>
-            </div>
-          </div>
-
-          <!-- Card 12: Lost Hours -->
-          <div class="modern-card summary-kpi-card card-ex-section" onclick="openListDetails('Lost Hours')">
-            <div class="summary-card-header">
-              <div class="card-icon-bubble bubble-purple">
-                <i class="fa-solid fa-circle-minus" style="font-size: 16px;"></i>
-              </div>
-              <div class="card-theme-title purple-title">Lost Hours</div>
-            </div>
-            <div class="summary-card-values">
-              <span id="lost-hours-total" class="summary-card-primary">0.00</span>
-              <span class="summary-card-secondary">0%</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Scroll Clearance Spacer -->
-        <div style="height: 120px; width: 100%; pointer-events: none;"></div>
+        </section>
       </div>
 
       <!-- ================= CHART VIEW (Full Page) ================= -->
@@ -1601,7 +1125,7 @@
           <div class="summary-list-row">
             <record-chart-count><strong id="list-record-count" class="record-summary-value">22</strong> <span class="record-summary-label">Records</span></record-chart-count>
             <button id="btn-chart-toggle" class="view-chart-btn record-chart-button" type="button" onclick="setView('chart')" style="display: none;">
-              <i class="fa-solid fa-chart-simple" aria-hidden="true"></i><span>Chart</span>
+              <i class="fa-solid fa-chart-pie" aria-hidden="true"></i><span>View Chart</span>
             </button>
           </div>
           <div class="summary-list-divider" aria-hidden="true"></div>
@@ -1614,7 +1138,7 @@
         </div>
 
         <!-- LIST CONTAINER -->
-        <div id="details-list-container" style="display: flex; flex-direction: column; gap: 10px;">
+        <div id="details-list-container" data-record-colour-view="Hours summary" style="display: flex; flex-direction: column; gap: 10px;">
           <!-- Dynamically populated by JS or initial items -->
         </div>
         <div style="height: 120px; width: 100%; pointer-events: none;"></div>
@@ -1992,7 +1516,7 @@
     const sampleOddClockingDays = [
       { day: 'Mon', date: '09 Feb', fullDate: '9 Feb 2026', shift: '8.30:17.30W', clockTimes: '17:40', clockRaw: '1740' },
       { day: 'Fri', date: '16 Jan', fullDate: '16 Jan 2026', shift: '1000:1900', shiftFull: '10.00AM–7.00PM', clockTimes: '19:00', clockRaw: '1900', canFeedback: false },
-      { day: 'Wed', date: '31 Dec', fullDate: '31 Dec 2025', shift: '0800:1730', shiftFull: '8.00AM–5.30PM', clockTimes: '07:02', clockRaw: '0702' },
+      attendanceDaysByAdviceRef.ATT000000000432,
       { day: 'Wed', date: '24 Dec', fullDate: '24 Dec 2025', shift: '0800:1730', shiftFull: '8.00AM–5.30PM', clockTimes: '07:37', clockRaw: '0737', canFeedback: false },
       { day: 'Tue', date: '23 Dec', fullDate: '23 Dec 2025', shift: '0800:1730', shiftFull: '8.00AM–5.30PM', clockTimes: '07:13', clockRaw: '0713', canFeedback: false },
       { day: 'Mon', date: '22 Dec', fullDate: '22 Dec 2025', shift: '0800:1730', shiftFull: '8.00AM–5.30PM', clockTimes: '07:34', clockRaw: '0734' },
@@ -2137,6 +1661,7 @@
 
       const items = getSummaryRecords(title);
       currentDetailItems = items;
+      const showStatus = title === "Normal Present Days" || title === "Normal Work Hours";
 
       const normalizedTitle = title.toLowerCase();
       const themeColor = normalizedTitle.includes("absent") || normalizedTitle.includes("leave") || normalizedTitle.includes("lost")
@@ -2145,6 +1670,11 @@
           ? "blue"
           : "green";
 
+      if (showStatus) {
+        setRecordLegend(container, "Attendance status", { Normal: "normal", Overtime: "submitted", "Unapproved OT": "submitted", "Odd Clocking": "submitted" });
+      } else {
+        setRecordLegend(container, "Hours summary", { [title]: "theme-" + themeColor });
+      }
       if (countValue) countValue.textContent = String(items.length);
       if (totalHoursValue) totalHoursValue.textContent = getSummaryTotalHours(title, items).toFixed(2);
 
@@ -2160,7 +1690,7 @@
 
       container.innerHTML = items.map((item, index) => {
         const hasException = Boolean(item.exception && item.exception !== "-");
-        const statusBadge = title === "Normal Present Days" || title === "Normal Work Hours"
+        const statusBadge = showStatus
           ? `<span class="card-status-badge summary-history-status" data-status="${hasException ? 'exception' : 'normal'}"><i class="fa-solid ${hasException ? 'fa-circle-exclamation' : 'fa-check'}" aria-hidden="true"></i><span>${hasException ? item.exception : 'Normal'}</span></span>`
           : "";
         const detailRows = getSummaryCardRows(title, item).map(row => {
@@ -2411,6 +1941,7 @@
 
     function setView(view) {
       currentView = view;
+      document.querySelector('.hours-summary-header').classList.toggle('showing-details', view !== 'dashboard');
       document.getElementById("view-dashboard").style.display = view === "dashboard" ? "block" : "none";
       document.getElementById("view-list").style.display = view === "list" ? "block" : "none";
       document.getElementById("view-chart").style.display = view === "chart" ? "block" : "none";
@@ -2513,21 +2044,14 @@
       const startDate = document.getElementById('filterStartDate').value;
       const endDate = document.getElementById('filterEndDate').value;
       const minimumHours = Number(document.getElementById('filterMinHours').value) || 0;
-      const formatDate = value => value.split('-').reverse().join('/');
-      // Keep the existing static summary data; this prototype has no summary query.
-      document.getElementById('filterSummaryText').textContent =
-        formatDate(startDate) + ' – ' + formatDate(endDate) +
-        (minimumHours > 0 ? ' • Min ' + minimumHours + 'h' : '');
+      document.getElementById('filterSummaryText').textContent = AttendanceDateDisplay.formatRange(startDate, endDate);
+      const details = document.getElementById('hoursFilterDetails');
+      details.textContent = minimumHours > 0 ? 'Min ' + minimumHours + 'h' : '';
+      details.hidden = minimumHours === 0;
       closeFilterModal(true);
     }
 
     // ================= THEME SWITCHER LOGIC =================
-    function initTheme() {
-      const savedTheme = localStorage.getItem('peoplehcm_theme') || 'dark';
-      document.documentElement.setAttribute('data-theme', savedTheme);
-      updateThemeIcon(savedTheme);
-    }
-
     function toggleTheme() {
       const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
       const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
@@ -2548,8 +2072,7 @@
       }
     }
 
-    // Initialize theme on initial load
-    initTheme();
+    updateThemeIcon(document.documentElement.dataset.theme);
 
     // Initialize list on initial page load if required
     document.getElementById('odd-clocking-day-count').textContent = '0';

@@ -69,7 +69,7 @@
     <p class="shortcut-save-error" role="alert" hidden></p>
     <div class="notification-filter-footer">
       <button type="button" class="notification-filter-cancel" data-shortcut-cancel>Cancel</button>
-      <button type="button" class="notification-filter-apply" data-shortcut-save>Save shortcuts</button>
+      <button type="button" class="notification-filter-apply" data-shortcut-save>Save selected (0)</button>
     </div>`;
   phone.appendChild(dialog);
   const options = dialog.querySelector('.shortcut-options');
@@ -124,6 +124,7 @@
     dialog.querySelector('#shortcutSelectionHint').textContent = draftIds.length >= limit
       ? 'Remove a shortcut to add another.' : 'Select at least one shortcut.';
     saveButton.disabled = draftIds.length === 0;
+    saveButton.textContent = formatSelectedAction('Save', draftIds.length);
     error.hidden = true;
   }
 

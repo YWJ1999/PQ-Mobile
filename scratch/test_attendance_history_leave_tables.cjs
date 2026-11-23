@@ -127,8 +127,8 @@ function actionSnapshot(button) {
           const expectedLabels = tab === 'clocking'
             ? ['Time', 'Cost Center']
             : tab === 'ot'
-              ? ['Date', 'Plan Hours', 'Actual Hours', 'Submitted On']
-              : ['Date', 'Submitted On'];
+              ? ['Date', 'Plan Hours', 'Actual Hours']
+              : ['Date'];
           assert.equal(cards.length, tab === 'clocking' ? 6 : tab === 'ot' ? 3 : 2);
           cards.forEach(card => {
             assert.equal(card.hasTable, false, `${theme} ${width}px ${tab}: list cards must not look like tables`);

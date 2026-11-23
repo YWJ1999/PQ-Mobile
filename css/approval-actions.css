@@ -94,13 +94,6 @@ html .phone-container input.approval-card-checkbox:disabled { opacity: .5; curso
   font-variant-numeric: tabular-nums;
   white-space: pre-line;
 }
-.approval-card-submitted {
-  margin: 0 0 10px;
-  color: var(--text-muted);
-  font-size: 10.5px;
-  font-weight: 700;
-  line-height: 1.4;
-}
 .approval-card-body > .pending-action-grid { margin-top: 12px; }
 .approval-backup-assignment { margin: 5px 0 9px; color: var(--text-secondary); font-size: 11.5px; font-weight: 650; overflow-wrap: anywhere; }
 .pending-selection-bar {

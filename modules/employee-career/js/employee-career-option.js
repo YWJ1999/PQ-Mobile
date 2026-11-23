@@ -1,7 +1,5 @@
 (() => {
-  const requested = new URLSearchParams(location.search).get('theme');
-  const theme = requested === 'light' ? 'light' : 'dark';
-  document.documentElement.dataset.theme = theme;
+  const theme = document.documentElement.dataset.theme === 'light' ? 'light' : 'dark';
   function init() {
     document.querySelectorAll('[data-option-back]').forEach(link => {
       const url = new URL(link.getAttribute('href'), location.href);

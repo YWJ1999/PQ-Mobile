@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>PeopleHCM - Payroll History</title>
+  <link rel="stylesheet" href="../../../css/history-record-page.css">
+  <script src="../../../js/history-record-page.js"></script>
   <script src="../../../js/components.js"></script>
   <script src="../../../js/app.js" defer></script>
   <script src="../../../js/payroll/payroll-config.js" defer></script>
@@ -80,13 +82,19 @@
         <button id="applyHistoryFilter" class="claim-filter-apply" type="submit">Apply Filter</button>
       </form>
     </div>
-    <div id="historyDetailsModal" class="history-detail-overlay" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="historyDetailTitle">
-      <section class="history-detail-panel">
-        <div class="history-detail-header"><h2 id="historyDetailTitle">Tax Relief Detail</h2><button id="closeHistoryDetails" type="button" aria-label="Close details"><i class="fa-solid fa-circle-xmark" aria-hidden="true"></i></button></div>
-        <div id="historyDetailBody" class="history-detail-body"></div>
+    <main id="historyDetailsModal" class="approval-record-page" data-history-page aria-labelledby="historyDetailTitle" hidden>
+      <section class="approval-record-layout">
+        <header class="approval-page-header">
+          <phone-status-bar time="9:41"></phone-status-bar>
+          <div class="approval-page-heading">
+            <button type="button" id="closeHistoryDetails" data-history-back aria-label="Back to history"></button>
+            <h1 id="historyDetailTitle" tabindex="-1">Tax Relief Detail</h1>
+          </div>
+        </header>
+        <div id="historyDetailBody" class="history-record-content history-detail-body"></div>
         <footer id="historyDetailActions" class="history-detail-actions" hidden></footer>
       </section>
-    </div>
+    </main>
   </div>
 </body>
 </html>
