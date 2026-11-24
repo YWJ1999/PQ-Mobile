@@ -61,7 +61,7 @@ const summaryUrl = pathToFileURL(path.resolve(__dirname, '../modules/attendance/
       assert.equal(await page.$eval('#fbMetaShift', node => node.innerText), '8.30AM–5.30PM (W01)');
       assert.equal(await page.$eval('html', node => node.dataset.theme), theme);
       assert.deepEqual(await page.$$eval('#feedbackModalOverlay .pill-tab', nodes => nodes.map(node => node.innerText.replace(/\s+/g, ' ').trim())), ['+ Sun 8 Feb 2026', '+ Mon 9 Feb 2026', '+ Tue 10 Feb 2026']);
-      assert.deepEqual(await page.$$eval('.fb-clock-date-label', nodes => nodes.map(node => node.innerText)), ['Mon 9 Feb 2026']);
+      assert.deepEqual(await page.$$eval('.fb-clock-date-label, .fb-clock-bottom-date', nodes => nodes.map(node => node.innerText)), ['9 Feb', '9 Feb']);
       assert.equal(await page.$eval('.fb-clock-pill-blue', node => node.innerText), '17:40');
       assert.equal(await page.$eval('.fb-clock-pill-white', node => node.innerText), '17:40');
       assert.equal(await page.$eval('#fbMetaEmployeeName', node => node.innerText), 'Farhan binti rahmat');
@@ -74,7 +74,7 @@ const summaryUrl = pathToFileURL(path.resolve(__dirname, '../modules/attendance/
       await page.setViewport({ width: 390, height: 950 });
       assert.equal(await page.$eval('#fbAmendReasonSelect', node => node.value), '', 'No amendment reason is assumed');
       await page.click('#feedbackModalOverlay .pill-tab:last-child');
-      assert.deepEqual(await page.$$eval('.fb-clock-date-label', nodes => nodes.map(node => node.innerText)), ['Mon 9 Feb 2026', 'Tue 10 Feb 2026']);
+      assert.deepEqual(await page.$$eval('.fb-clock-date-label, .fb-clock-bottom-date', nodes => nodes.map(node => node.innerText)), ['9 Feb', '9 Feb', '10 Feb', '10 Feb']);
       await page.waitForFunction(() => getComputedStyle(document.getElementById('feedbackModalOverlay')).opacity === '1');
       await page.screenshot({ path: path.resolve(__dirname, 'hours_summary_odd_feedback_form_' + theme + '.png') });
       await Promise.all([page.waitForNavigation({ waitUntil: 'networkidle0' }), page.click('[data-feedback-back]')]);

@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="../../../assets/vendor/fontawesome-6.7.2/css/all.min.css">
   <link rel="stylesheet" href="../../../css/theme.css">
   <link rel="stylesheet" href="../../../css/app.css">
   <link rel="stylesheet" href="../../../css/claim-forms.css">
@@ -487,7 +487,8 @@
       font-weight: 900;
       line-height: 1.3;
     }
-    .summary-history-date {
+    .summary-history-date,
+    .summary-history-shift {
       color: var(--purple-text);
       font-size: 11px;
       font-weight: 800;
@@ -923,6 +924,7 @@
     </div>
   </div>
 
+  <script src="../../../js/attendance/hours-summary-legend.js"></script>
   <script>
     let currentView = "dashboard"; // dashboard | list | daily | chart
     let mainTitle = "Staff Hours Summary";
@@ -1198,7 +1200,7 @@
       if (title === "Normal Present Days") {
         setRecordLegend(container, "Attendance rate", { "Over 90%": "theme-green", "60–90%": "theme-orange", "30–59%": "theme-purple", "Below 30%": "theme-red" });
       } else {
-        setRecordLegend(container, "Hours summary", { [title]: "theme-" + theme });
+        HoursSummaryLegend.records(container, title, theme, getStaffLegendRecords);
       }
       currentStaffItems = getStaffMetricItems(title);
       const isDirectRecordSummary = title === "Odd Clocking Days" ||
@@ -1240,7 +1242,7 @@
                 '<h3 class="staff-name-text">' + item.name + '</h3>' +
                 '<div class="summary-history-employee-id">' + employeeId + '</div>' +
                 '<div class="summary-history-date">' + item.day + ', ' + item.fullDate + '</div>' +
-              '</div></div>' +
+              '</div>' + HoursSummaryLegend.cardInfo(title, HoursSummaryLegend.recordLabels(title, item)) + '</div>' +
               '<div class="summary-history-details">' + detailRows + '</div>' +
             '</article>';
         }).join("");
@@ -1260,7 +1262,7 @@
             '<div class="summary-history-card-header" data-record-key-label="' + band.label + '"><div class="summary-history-card-heading">' +
               '<h3 class="staff-name-text">' + item.name + '</h3>' +
               '<div class="summary-history-employee-id">' + employeeId + '</div>' +
-            '</div></div>' +
+            '</div>' + HoursSummaryLegend.cardInfo(title, band.label ? [band.label] : [], 'rate') + '</div>' +
             '<div class="summary-history-details">' + detailRows + '</div>' +
           '</article>';
       }).join("");
@@ -1346,6 +1348,7 @@
           timeOff: isLeave ? "08:00" : "-",
           absent: isAbsent ? "Yes" : "No",
           approvedOt: isApprovedOt ? perRecord.toFixed(2) : "0.00",
+          otherOt: title === "Other OT Hours" ? perRecord.toFixed(2) : "0.00",
           unapprovedOt: hasUnapprovedException ? unapprovedHours.toFixed(2) : "0.00",
           planHours: isPlannedOt ? perRecord.toFixed(2) : "0.00",
           absentOtHours: isAbsentOt ? perRecord.toFixed(2) : "0.00",
@@ -1361,6 +1364,10 @@
           uot: hasUnapprovedException ? "Yes" : isPlannedOt ? "No" : "-"
         };
       });
+    }
+
+    function getStaffLegendRecords(title) {
+      return sampleStaffData.flatMap(staff => buildStaffAttendanceRecords(staff, title));
     }
 
     function getDailyCardRows(item, title) {
@@ -1409,9 +1416,9 @@
       const container = document.getElementById("daily-list-container");
       const theme = getStaffCardBand(selectedStaff, listActiveTitle).theme;
       if (listActiveTitle === "Normal Present Days") {
-        setRecordLegend(container, "Attendance status", { Normal: "theme-" + theme, "Odd Clocking": "submitted", "Unapproved OT": "submitted" });
+        HoursSummaryLegend.attendance(container, currentDailyItems, "theme-" + theme, ["Odd Clocking", "Unapproved OT"]);
       } else {
-        setRecordLegend(container, "Hours summary", { [listActiveTitle]: "theme-" + theme });
+        HoursSummaryLegend.records(container, listActiveTitle, theme, () => currentDailyItems);
       }
       document.getElementById("daily-record-count").textContent = String(currentDailyItems.length);
       document.getElementById("daily-total-hours").textContent = getDailyTotalHours(selectedStaff, listActiveTitle).toFixed(2);
@@ -1420,29 +1427,25 @@
         return;
       }
       container.innerHTML = currentDailyItems.map(function (item, index) {
+        const date = `${item.day}, ${item.fullDate}`;
         const isNormalPresentDay = listActiveTitle === "Normal Present Days";
         const employeeId = item.empNo.startsWith("#") ? item.empNo : "#" + item.empNo;
         const rows = getDailyCardRows(item, listActiveTitle).map(function (row) {
           return '<div class="summary-history-detail"><span>' + row[0] + '</span> <strong>' + row[1] + '</strong></div>';
         }).join("");
-        const hasException = Boolean(item.exception && item.exception !== "-");
-        const statusBadge = isNormalPresentDay
-          ? '<span class="card-status-badge summary-history-status" data-status="' + (hasException ? "exception" : "normal") + '">' +
-            '<i class="fa-solid ' + (hasException ? "fa-circle-exclamation" : "fa-check") + '" aria-hidden="true"></i>' +
-            '<span>' + (hasException ? item.exception : "Normal") + '</span></span>'
-          : "";
+        const labels = HoursSummaryLegend.recordLabels(listActiveTitle, item);
         const heading = isNormalPresentDay
           ? '<h3 class="staff-name-text">' + item.name + '</h3>' +
             '<div class="summary-history-employee-id">' + employeeId + '</div>' +
-            '<div class="summary-history-date">' + item.day + ', ' + item.fullDate + '</div>'
-          : '<h3 class="history-time-row">' + item.shift + '</h3>' +
-            '<div class="summary-history-date">' + item.day + ', ' + item.fullDate + '</div>';
+            '<div class="summary-history-date">' + date + '</div>'
+          : `<h3 class="history-time-row">${date}</h3>` +
+            `<div class="summary-history-shift">${item.shift}</div>`;
         return '<article class="history-card-item summary-history-card theme-' + theme + '" role="button" tabindex="0" ' +
           'aria-label="View attendance details for ' + item.fullDate + '" onclick="openAttendanceDetailsByIndex(' + index + ')" ' +
           'onkeydown="if(event.key === &quot;Enter&quot; || event.key === &quot; &quot;){event.preventDefault();openAttendanceDetailsByIndex(' + index + ');}">' +
             '<div class="summary-history-card-header"><div class="summary-history-card-heading">' +
               heading +
-            '</div>' + (statusBadge ? '<div class="summary-history-card-end">' + statusBadge + '</div>' : '') + '</div>' +
+            '</div>' + HoursSummaryLegend.cardInfo(listActiveTitle, labels, isNormalPresentDay ? "attendance" : "record") + '</div>' +
             '<div class="summary-history-details">' + rows + '</div>' +
           '</article>';
       }).join("");

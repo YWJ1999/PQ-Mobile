@@ -28,7 +28,7 @@ const tabs = [
             return {
               ref: node.querySelector('.history-card-ref')?.textContent.trim(),
               date: node.querySelector('.attendance-history-date')?.textContent.trim(),
-              labels: [...node.querySelectorAll('.attendance-history-fact-label')].map(node => node.textContent.trim()),
+              labels: [...node.querySelectorAll('dl dt')].map(node => node.textContent.trim()),
               title: node.querySelector('.history-card-title')?.textContent.trim(),
               badge: node.querySelector('.card-status-badge')?.textContent.trim(),
               statusAtRight: (() => {
@@ -37,8 +37,8 @@ const tabs = [
                 return !!badge && badge.getBoundingClientRect().left >= heading.right;
               })(),
               dateBadge: !!node.querySelector('.history-date-badge'),
-              details: [...node.querySelectorAll('.attendance-history-fact')].map(row => row.textContent.replace(/\s+/g, ' ').trim()),
-              fits: node.scrollWidth <= node.clientWidth + 1 && [...node.querySelectorAll('.history-card-title,.card-status-badge,.attendance-history-fact-value')].every(child => {
+              details: [...node.querySelectorAll('dl > div')].map(row => row.textContent.replace(/\s+/g, ' ').trim()),
+              fits: node.scrollWidth <= node.clientWidth + 1 && [...node.querySelectorAll('.history-card-title,.card-status-badge,dl dd')].every(child => {
                 const childRect = child.getBoundingClientRect();
                 return childRect.right <= rect.right + 1 && childRect.left >= rect.left - 1;
               }),
@@ -53,7 +53,8 @@ const tabs = [
             });
             assert.deepEqual(cards.map(card => card.title), ['Clock Out', 'Clock In', 'Clock Out', 'Clock In', 'Clock Out', 'Clock In']);
           } else {
-            assert.deepEqual(cards.map(card => card.ref), tab.refs.map(ref => 'Document Reference: ' + ref), `${theme} ${width}px ${tab.key}: all reference numbers remain visible`);
+            const prefix = tab.key === 'ot' ? 'Ref: ' : 'Document Reference: ';
+            assert.deepEqual(cards.map(card => card.ref), tab.refs.map(ref => prefix + ref), `${theme} ${width}px ${tab.key}: all reference numbers remain visible`);
           }
           assert.ok(cards.every(card => card.title && card.badge && card.details.length && !card.dateBadge && card.fits), `${theme} ${width}px ${tab.key}: shared history layout fits`);
           cards.flatMap(card => card.employees).forEach(employee => { assert.match(employee.id, /^#/); assert.ok(employee.name && employee.below); });
@@ -62,8 +63,12 @@ const tabs = [
           }
           if (tab.key === 'ot') {
             assert.deepEqual(await page.$$eval('#viewOtHistory .history-submit-btn', nodes => nodes.map(node => node.textContent.trim())), ['Submit', 'Submit', 'Submit']);
-            cards.forEach(card => assert.deepEqual(card.labels, ['Date', 'Plan Hours', 'Actual Hours']));
-            assert.ok(cards[2].details.some(detail => detail.includes('Actual Hours') && detail.includes('4.00')));
+            assert.deepEqual(cards.map(card => card.title), ['Fri, 12 Jul 2024', 'Tue, 24 Oct 2023', 'Fri, 12 Jul 2024']);
+            cards.forEach(card => {
+              assert.ok(card.statusAtRight);
+              assert.deepEqual(card.labels, ['OT Type', 'Submit Date', 'Plan Hours', 'Actual Hours']);
+            });
+            assert.ok(cards[2].details.some(detail => detail.includes('Actual Hours') && detail.includes('4.00 hrs')));
           }
           if (tab.key === 'feedback') {
             cards.forEach(card => assert.deepEqual(card.labels, ['Date']));

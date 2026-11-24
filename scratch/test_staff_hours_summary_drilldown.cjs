@@ -48,12 +48,12 @@ const puppeteer = require('puppeteer');
     assert.equal(await page.$$eval('#daily-list-container .summary-history-card', cards => cards.length), 22);
     assert.equal(await page.$$eval('#daily-list-container .summary-history-card .fa-chevron-right', icons => icons.length), 0);
     assert.deepEqual(await page.$eval('#daily-list-container .summary-history-card', card => ({
-      title: card.querySelector('.history-time-row').textContent.trim(),
-      date: card.querySelector('.summary-history-date').textContent.trim(),
+      date: card.querySelector('.summary-history-card-heading > h3:first-child').textContent.trim(),
+      shift: card.querySelector('h3 + .summary-history-shift').textContent.trim(),
       rows: [...card.querySelectorAll('.summary-history-detail')].map(row => row.textContent.replace(/\s+/g, ' ').trim())
     })), {
-      title: '8:30 AM - 5:30 PM (GROUP A)',
       date: 'Mon, 14 Sep 2026',
+      shift: '8:30 AM - 5:30 PM (GROUP A)',
       rows: ['Clock Times 08:30 - 17:30', 'Scheduled Hours 8.00']
     });
 

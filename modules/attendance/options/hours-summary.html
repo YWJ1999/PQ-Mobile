@@ -6,12 +6,13 @@
   <title>PeopleHCM - Hours Summary</title>
   <script src="../../../js/components.js"></script>
   <script src="../../../js/attendance/date-display.js"></script>
+  <script src="../../../js/attendance/advice-fields.js"></script>
   <script src="../../../js/attendance/attendance-days.js"></script>
   <script src="../../../js/app.js" defer></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="../../../assets/vendor/fontawesome-6.7.2/css/all.min.css">
   <link rel="stylesheet" href="../../../css/theme.css">
   <link rel="stylesheet" href="../../../css/app.css">
   <link rel="stylesheet" href="../../../css/claim-forms.css">
@@ -357,6 +358,12 @@
       border-left: 5px solid #7c3aed;
       background: linear-gradient(135deg, var(--bg-card) 0%, rgba(124, 58, 237, 0.06) 100%);
     }
+    html body .hours-summary-page .summary-history-card.no-record-status {
+      --record-accent: var(--border-subtle);
+      --record-header-fill: var(--bg-card);
+      --record-header-ink: var(--text-primary);
+      --record-header-muted: var(--text-secondary);
+    }
     .history-card-item.summary-history-card:hover { box-shadow: var(--shadow-card); }
     .history-card-item.summary-history-card:active { transform: scale(0.985); }
     .history-card-item.summary-history-card:focus-visible {
@@ -392,7 +399,7 @@
       font-weight: 900;
       line-height: 1.3;
     }
-    .summary-history-date {
+    .summary-history-shift {
       color: var(--purple-text);
       font-size: 11px;
       font-weight: 800;
@@ -1267,6 +1274,7 @@
     </div>
   </div>
 
+  <script src="../../../js/attendance/hours-summary-legend.js"></script>
   <script>
     let currentView = "dashboard"; // dashboard | list | chart
     let mainTitle = "Hours Summary";
@@ -1661,20 +1669,10 @@
 
       const items = getSummaryRecords(title);
       currentDetailItems = items;
-      const showStatus = title === "Normal Present Days" || title === "Normal Work Hours";
+      const cards = HoursSummaryLegend.individual(container, title, items);
+      const isAttendanceBadge = title === "Normal Present Days" || title === "Normal Work Hours";
+      const badgeKind = isAttendanceBadge ? "attendance" : title === "Odd Clocking Days" ? "clocking" : "record";
 
-      const normalizedTitle = title.toLowerCase();
-      const themeColor = normalizedTitle.includes("absent") || normalizedTitle.includes("leave") || normalizedTitle.includes("lost")
-        ? "purple"
-        : normalizedTitle.includes("ot") || normalizedTitle.includes("overtime")
-          ? "blue"
-          : "green";
-
-      if (showStatus) {
-        setRecordLegend(container, "Attendance status", { Normal: "normal", Overtime: "submitted", "Unapproved OT": "submitted", "Odd Clocking": "submitted" });
-      } else {
-        setRecordLegend(container, "Hours summary", { [title]: "theme-" + themeColor });
-      }
       if (countValue) countValue.textContent = String(items.length);
       if (totalHoursValue) totalHoursValue.textContent = getSummaryTotalHours(title, items).toFixed(2);
 
@@ -1689,10 +1687,8 @@
       }
 
       container.innerHTML = items.map((item, index) => {
-        const hasException = Boolean(item.exception && item.exception !== "-");
-        const statusBadge = showStatus
-          ? `<span class="card-status-badge summary-history-status" data-status="${hasException ? 'exception' : 'normal'}"><i class="fa-solid ${hasException ? 'fa-circle-exclamation' : 'fa-check'}" aria-hidden="true"></i><span>${hasException ? item.exception : 'Normal'}</span></span>`
-          : "";
+        const date = `${item.day}, ${item.fullDate}`;
+        const { tone, labels } = cards[index];
         const detailRows = getSummaryCardRows(title, item).map(row => {
           const statusClass = row.label === "Exception"
             ? (row.value && row.value !== "-" ? "is-exception" : "is-clear")
@@ -1701,22 +1697,30 @@
         }).join("");
 
         return `
-          <article class="history-card-item summary-history-card theme-${themeColor}" role="button" tabindex="0"
+          <article class="history-card-item summary-history-card ${tone || 'no-record-status'}" role="button" tabindex="0"
             aria-label="View attendance details for ${item.fullDate}"
             onclick="openAttendanceDetailsByIndex(${index})"
             onkeydown="if(event.target === this && (event.key === 'Enter' || event.key === ' ')){event.preventDefault(); openAttendanceDetailsByIndex(${index});}">
             <div class="summary-history-card-header">
               <div class="summary-history-card-heading">
-                <h3 class="history-time-row">${item.shift}</h3>
-                <div class="summary-history-date">${item.day}, ${item.fullDate}</div>
+                <h3 class="history-time-row">${date}</h3>
+                <div class="summary-history-shift">${item.shift}</div>
               </div>
-              ${statusBadge ? `<div class="summary-history-card-end">${statusBadge}</div>` : ""}
+              ${HoursSummaryLegend.cardInfo(title, labels, badgeKind)}
             </div>
             <div class="summary-history-details">${detailRows}</div>
             ${feedbackSummaryTitles.includes(title) && item.canFeedback !== false ? `<div class="summary-history-actions"><button type="button" class="card-action-btn btn-feedback" data-summary-feedback onclick="event.stopPropagation(); openSummaryFeedback(${index})"><span>Feedback</span></button></div>` : ""}
           </article>
         `;
       }).join("");
+      container.querySelectorAll(".summary-history-card-header").forEach((header, index) => {
+        const { labels } = cards[index];
+        if (!labels.length) return;
+        const description = labels.join(", ");
+        header.dataset.recordKeyLabel = labels[0];
+        header.title = description;
+        header.parentElement.setAttribute("aria-label", `View attendance details for ${items[index].fullDate}, ${description}`);
+      });
     }
 
     function openListDetails(title) {
@@ -1746,6 +1750,7 @@
         feedbackEmployeeName: data.name,
         feedbackEmployeeNo: data.empNo
       });
+      url.hash = new URLSearchParams(AttendanceAdviceFields.formValues(data)).toString();
       window.location.href = url.href;
     }
 

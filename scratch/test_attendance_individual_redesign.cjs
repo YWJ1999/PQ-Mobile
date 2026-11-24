@@ -368,7 +368,8 @@ const chrome = process.env.PUPPETEER_EXECUTABLE_PATH || 'C:/Program Files/Google
     );
     assert.deepEqual(
       feedbackDetails.labels,
-      ['Amended Shift', 'Time Amend Reason', 'Remarks', 'Attachments'],
+      ['Amended Shift', 'Time Amend Reason', 'Late In Minutes', 'Late Reason', 'Early Out Minutes', 'Early Out Reason',
+        'Time Off Minutes', 'Time Off Reason', 'Absent', 'Absent Reason', 'Leave Code', 'Remarks', 'Attachments'],
       'Feedback Details contains only the requested fields'
     );
     assert.deepEqual(feedbackDetails.actions, ['Cancel', 'Draft', 'Submit'], 'Attendance Feedback has the complete form action set');

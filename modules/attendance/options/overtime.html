@@ -7,93 +7,19 @@
   <title>PeopleHCM - Overtime</title>
   <link rel="stylesheet" href="../../../css/history-record-page.css">
   <script src="../../../js/history-record-page.js"></script>
+  <script src="../../../js/attendance/date-display.js"></script>
   <script src="../../../js/components.js"></script>
   <script src="../../../js/app.js" defer></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="../../../assets/vendor/fontawesome-6.7.2/css/all.min.css">
   <link rel="stylesheet" href="../../../css/theme.css">
   <link rel="stylesheet" href="../../../css/app.css">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: "Plus Jakarta Sans", sans-serif; -webkit-tap-highlight-color: transparent; }
     body { background-color: var(--bg-page); display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 100vh; color: var(--text-primary); padding: 20px 0; }
     .phone-container { width: 100%; max-width: 420px; height: 900px; background: var(--bg-phone); border-radius: 44px; overflow: hidden; box-shadow: var(--shadow-phone); position: relative; display: flex; flex-direction: column; }
-    .main-content { flex: 1; overflow-y: auto; padding: 0 16px 90px; position: relative; z-index: 10; scrollbar-width: none; }
-    .main-content::-webkit-scrollbar { display: none; }
-    
-    .cal-top-header {
-      background: linear-gradient(135deg, #2e1065 0%, #4c1d95 50%, #6d28d9 100%);
-      padding: 12px 16px 14px;
-      border-bottom-left-radius: 30px;
-      border-bottom-right-radius: 30px;
-      box-shadow: 0 12px 32px rgba(76, 29, 149, 0.4);
-      position: relative;
-      z-index: 20;
-    }
-
-    /* Tabs (Segmented Control Container) */
-    .pill-tabs-container {
-      display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      background: var(--bg-card);
-      border: 1px solid var(--border-subtle);
-      border-radius: 20px;
-      padding: 5px;
-      gap: 4px;
-      margin-top: 10px;
-      margin-bottom: 24px;
-      overflow-x: hidden;
-      box-shadow: var(--shadow-sm);
-    }
-
-    .pill-tab {
-      width: 100%;
-      min-width: 0;
-      padding: 7px 3px;
-      border-radius: 14px;
-      border: 1px solid transparent;
-      font-size: clamp(10px, 3vw, 12.5px);
-      font-weight: 700;
-      line-height: 1.2;
-      color: var(--text-secondary);
-      background: transparent;
-      cursor: pointer;
-      white-space: nowrap;
-      justify-content: center;
-      flex-shrink: 1;
-      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    .pill-tab:hover {
-      color: var(--text-primary);
-      background: rgba(124, 58, 237, 0.08);
-    }
-    .pill-tab:active {
-      transform: scale(0.96);
-    }
-    .pill-tab.active {
-      background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
-      color: #ffffff;
-      font-weight: 800;
-      box-shadow: 0 4px 14px rgba(124, 58, 237, 0.35);
-      border-color: transparent;
-    }
-
-    /* Modern Top Info Banner */
-    .hero-info-banner {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: var(--bg-card);
-      border: 1px solid var(--border-subtle);
-      border-radius: 16px;
-      padding: 14px 16px;
-      margin-bottom: 12px;
-      box-shadow: var(--shadow-sm);
-    }
-    .hero-stat .label { font-size: 11.5px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
-    .hero-stat .value { font-size: 15px; font-weight: 800; color: var(--text-primary); margin-top: 4px; }
-    .hero-stat .accent { color: #a78bfa; font-size: 26px; font-weight: 900; line-height: 1; margin-top: 2px; }
 
     /* Pop Out Modal Styling */
     .modal-header-purple {
@@ -125,19 +51,6 @@
       transform: scale(1.05);
     }
 
-    /* Custom Switch for Leave Credit */
-    .modern-switch {
-      width: 52px; height: 32px; background: rgba(150, 150, 150, 0.25); border-radius: 32px;
-      position: relative; cursor: pointer; transition: 0.3s;
-      border: 1px solid var(--border-card);
-    }
-    .modern-switch.on { background: #7c3aed; border-color: #7c3aed; }
-    .modern-switch-thumb {
-      width: 24px; height: 24px; background: #ffffff; border-radius: 50%;
-      position: absolute; top: 3px; left: 4px; transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-    }
-    .modern-switch.on .modern-switch-thumb { transform: translateX(20px); }
   </style>
   <link rel="stylesheet" href="../../../css/attendance-overtime.css">
   <link rel="stylesheet" href="../../../css/form-section-headings.css">
@@ -147,17 +60,22 @@
   <div class="phone-container">
     
     <!-- Top App Header -->
-    <div class="cal-top-header">
-      <phone-status-bar time="9:41" style="color: #ffffff;"></phone-status-bar>
-      <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 8px;">
-        <div style="display: flex; align-items: center; gap: 14px;">
-          <button class="header-btn" onclick="goBack()" aria-label="Back" style="background: rgba(255, 255, 255, 0.15); border: 1px solid rgba(255, 255, 255, 0.2); width: 40px; height: 40px; border-radius: 14px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #ffffff; backdrop-filter: blur(8px);">
-            <i class="fa-solid fa-chevron-left" style="font-size: 18px;"></i>
+    <header class="cal-top-header">
+      <phone-status-bar time="9:41"></phone-status-bar>
+      <div class="ot-toolbar">
+        <button type="button" class="header-btn" onclick="goBack()" aria-label="Back">
+          <i class="fa-solid fa-chevron-left" aria-hidden="true"></i>
+        </button>
+        <h1 id="headerTitle" tabindex="-1">Overtime</h1>
+        <div class="ot-header-actions" id="overtimeDashboardActions">
+          <button type="button" class="record-key-trigger" aria-label="View Info" title="View Info" aria-haspopup="dialog">!</button>
+          <button type="button" class="ot-add-button" id="overtimeAddRequest" onclick="switchView('request')">
+            <i class="fa-solid fa-plus" aria-hidden="true"></i>
+            Add OT
           </button>
-          <h1 id="headerTitle" style="font-size: 20px; font-weight: 800; color: #ffffff; margin: 0; letter-spacing: 0.2px;">Overtime</h1>
         </div>
       </div>
-    </div>
+    </header>
 
     <template id="recordColourKey">
       <h3>Overtime status</h3>
@@ -167,70 +85,77 @@
       </ul>
     </template>
 
-    <div class="main-content" style="padding-top: 20px;">
+    <div class="main-content">
       
       <!-- ================= DASHBOARD VIEW ================= -->
       <div id="view-dashboard" data-record-colour-view style="display: block;">
         
-        <div class="hero-info-banner">
-          <div class="ot-meta-stack" id="overtimeMeta">
-            <div class="hero-stat">
-              <div class="label">Shift Group</div>
-              <div class="value">GROUP A</div>
-            </div>
-            <div class="hero-stat">
-              <div class="label">Supervisor</div>
-              <div class="value">EBB04</div>
-            </div>
+        <dl class="ot-meta" id="overtimeMeta">
+          <div class="hero-stat">
+            <dt>Shift Group</dt>
+            <dd>GROUP A</dd>
           </div>
-          <button type="button" class="ot-add-button" id="overtimeAddRequest" onclick="switchView('request')" aria-label="Request overtime">
-            <i class="fa-solid fa-plus" aria-hidden="true"></i>
-          </button>
+          <div class="hero-stat">
+            <dt>Supervisor</dt>
+            <dd>EBB04</dd>
+          </div>
+        </dl>
+
+        <div class="pill-tabs-container" id="overtimePeriodTabs" role="group" aria-label="Overtime period" data-as-of="2026-09-15">
+          <button type="button" class="pill-tab active" data-period="this-week" aria-pressed="true" onclick="activateFilter(this)">This Week</button>
+          <button type="button" class="pill-tab" data-period="last-week" aria-pressed="false" onclick="activateFilter(this)">Last Week</button>
+          <button type="button" class="pill-tab" data-period="this-month" aria-pressed="false" onclick="activateFilter(this)">This Month</button>
+          <button type="button" class="pill-tab" data-period="last-month" aria-pressed="false" onclick="activateFilter(this)">Last Month</button>
         </div>
 
-        <div class="pill-tabs-container">
-          <button class="pill-tab active" onclick="activateFilter(this)">This Week</button>
-          <button class="pill-tab" onclick="activateFilter(this)">Last Week</button>
-          <button class="pill-tab" onclick="activateFilter(this)">This Month</button>
-          <button class="pill-tab" onclick="activateFilter(this)">Last Month</button>
-        </div>
-
-        <section id="overtimeSummaryCard" class="history-total-records-card overtime-summary-card record-summary-card" aria-label="Overtime summary">
-          <div class="overtime-summary-metric record-summary-metric">
-            <strong id="overtimeTotalRecords" class="history-total-records-value record-summary-value" aria-live="polite" data-record-count>0</strong>
-            <span class="history-total-records-label record-summary-label">Records</span>
+        <section id="overtimeSummaryCard" class="history-total-records-card overtime-summary-card" aria-label="Overtime summary">
+          <div class="overtime-summary-hours">
+            <span>Total Hours</span>
+            <strong id="overtimeTotalHours">0.00</strong>
           </div>
-          <div class="overtime-summary-metric overtime-summary-metric--hours">
-            <span class="history-total-records-label">Total Hours</span>
-            <strong id="overtimeTotalHours" class="history-total-records-value">2.00 <span class="overtime-summary-unit">HRS</span></strong>
-          </div>
+          <span class="overtime-summary-count" aria-live="polite" aria-atomic="true"><span id="overtimeTotalRecords" data-record-count>0</span> <span>records</span></span>
         </section>
+        <p class="attendance-history-empty-state" id="overtimeEmptyState" role="status" hidden>No overtime records for this period.</p>
 
         <a data-history-link href="#history/overtime/2026-09-14" class="history-card-item history-item-card ot-record-card" data-status="unapproved-ot" aria-label="View overtime details for Mon, 14 Sep 2026">
           <div class="ot-record-top history-card-header">
-            <div class="ot-record-heading history-card-heading"><h2 class="history-time-row">08:09 &rarr; 19:40</h2><div class="ot-record-date history-card-ref">Date: Mon, 14 Sep 2026</div></div>
-            <div class="ot-record-controls"><span class="card-status-badge ot-record-status"><i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i>Unapproved OT</span></div>
+            <div class="ot-record-heading history-card-heading">
+              <h2 class="history-time-row ot-record-date"><time datetime="2026-09-14">Mon, 14 Sep 2026</time></h2>
+              <p class="ot-record-code">OT Code <span aria-hidden="true">&middot;</span> <span class="ot-record-code-value">1.5 OT</span></p>
+            </div>
+            <span class="card-status-badge ot-record-status"><i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i>Unapproved OT</span>
           </div>
           <div class="card-details-box ot-record-details">
-            <div class="ot-record-detail"><span>Shift</span><strong>8.30&ndash;17.30 (W01)</strong></div>
-            <div class="ot-record-detail"><span>OT Code</span><strong>1.5 OT</strong></div>
-            <div class="ot-record-detail"><span>Plan Hours</span><strong>2.00</strong></div>
-            <div class="ot-record-detail"><span>Actual Hours</span><strong>2.00</strong></div>
-            <div class="ot-record-detail"><span>Approved Hours</span><strong>0.00</strong></div>
+            <dl class="ot-record-schedule">
+              <div class="ot-record-detail"><dt>Shift</dt><dd class="ot-record-shift">08:30&ndash;17:30 (W01)</dd></div>
+              <div class="ot-record-detail"><dt>Clock times</dt><dd class="ot-record-clock-times" data-icon-system-ignore>08:09 &rarr; 19:40</dd></div>
+            </dl>
+            <dl class="ot-record-hours">
+              <div class="ot-record-detail"><dt>Plan Hours</dt><dd>2.00</dd></div>
+              <div class="ot-record-detail"><dt>Actual Hours</dt><dd data-actual-hours>2.00</dd></div>
+              <div class="ot-record-detail"><dt>Approved Hours</dt><dd>0.00</dd></div>
+            </dl>
           </div>
         </a>
 
         <a data-history-link href="#history/overtime/2026-09-11" class="history-card-item history-item-card ot-record-card" data-status="approved" aria-label="View overtime details for Fri, 11 Sep 2026">
           <div class="ot-record-top history-card-header">
-            <div class="ot-record-heading history-card-heading"><h2 class="history-time-row">08:15 &rarr; 19:30</h2><div class="ot-record-date history-card-ref">Date: Fri, 11 Sep 2026</div></div>
-            <div class="ot-record-controls"><span class="card-status-badge ot-record-status"><i class="fa-solid fa-check" aria-hidden="true"></i>Approved</span></div>
+            <div class="ot-record-heading history-card-heading">
+              <h2 class="history-time-row ot-record-date"><time datetime="2026-09-11">Fri, 11 Sep 2026</time></h2>
+              <p class="ot-record-code">OT Code <span aria-hidden="true">&middot;</span> <span class="ot-record-code-value">1.5 OT</span></p>
+            </div>
+            <span class="card-status-badge ot-record-status"><i class="fa-solid fa-check" aria-hidden="true"></i>Approved</span>
           </div>
           <div class="card-details-box ot-record-details">
-            <div class="ot-record-detail"><span>Shift</span><strong>8.30&ndash;17.30 (W01)</strong></div>
-            <div class="ot-record-detail"><span>OT Code</span><strong>1.5 OT</strong></div>
-            <div class="ot-record-detail"><span>Plan Hours</span><strong>2.00</strong></div>
-            <div class="ot-record-detail"><span>Actual Hours</span><strong>2.00</strong></div>
-            <div class="ot-record-detail"><span>Approved Hours</span><strong>2.00</strong></div>
+            <dl class="ot-record-schedule">
+              <div class="ot-record-detail"><dt>Shift</dt><dd class="ot-record-shift">08:30&ndash;17:30 (W01)</dd></div>
+              <div class="ot-record-detail"><dt>Clock times</dt><dd class="ot-record-clock-times" data-icon-system-ignore>08:15 &rarr; 19:30</dd></div>
+            </dl>
+            <dl class="ot-record-hours">
+              <div class="ot-record-detail"><dt>Plan Hours</dt><dd>2.00</dd></div>
+              <div class="ot-record-detail"><dt>Actual Hours</dt><dd data-actual-hours>2.00</dd></div>
+              <div class="ot-record-detail"><dt>Approved Hours</dt><dd>2.00</dd></div>
+            </dl>
           </div>
         </a>
 
@@ -240,14 +165,18 @@
 
 
       <!-- ================= REQUEST VIEW ================= -->
-      <div id="view-request" style="display: none; padding-bottom: 20px;">
+      <div id="view-request" style="display: none;">
         <form id="otRequestForm" novalidate onsubmit="event.preventDefault(); submitOtRequest();">
           <section class="ot-form-card" aria-labelledby="otRequestDetailsTitle">
             <div class="ot-form-heading"><span aria-hidden="true"></span><h2 id="otRequestDetailsTitle">Overtime Request Details</h2></div>
-            <div class="ot-form-meta">
-              <div><span>Shift</span><strong>8.30AM - 5.30PM (W01)</strong></div>
-              <div><span>Supervisor</span><strong>EBB04</strong></div>
-            </div>
+            <dl class="ot-form-meta">
+              <dt>Shift</dt>
+              <dd>8.30AM - 5.30PM (W01)</dd>
+            </dl>
+            <dl class="ot-form-meta">
+              <dt>Supervisor</dt>
+              <dd>EBB04</dd>
+            </dl>
             <div class="modern-form-group">
               <label class="modern-label" for="otRequestDate">Date <span class="required">*</span></label>
               <input id="otRequestDate" type="date" class="modern-input" value="2026-09-15">
@@ -258,26 +187,27 @@
             </div>
             <div class="time-picker-grid">
               <div class="modern-form-group"><label class="modern-label" for="otBreakHours">Break Hours</label><input id="otBreakHours" type="number" class="modern-input" placeholder="0.0" step="0.5"></div>
-              <div class="modern-form-group"><label class="modern-label" for="otTotalHours">Hours <span class="required">*</span></label><input id="otTotalHours" type="text" class="modern-input ot-total-hours" value="0" readonly></div>
+              <div class="modern-form-group"><label class="modern-label" for="otTotalHours">Hours <span class="required">*</span></label><input id="otTotalHours" type="text" class="modern-input" value="0" readonly></div>
             </div>
             <div class="modern-form-group">
               <label class="modern-label" for="otType">OT Type <span class="required">*</span></label>
-              <div class="ot-select-wrapper"><select id="otType" class="modern-input"><option>- SELECT TYPE -</option><option>1.5 OT</option><option>2.0 OT</option><option>Public Holiday OT</option></select></div>
+              <div class="ot-select-wrapper"><select id="otType" class="modern-input"><option value="- SELECT TYPE -">Select type</option><option>1.5 OT</option><option>2.0 OT</option><option>Public Holiday OT</option></select></div>
             </div>
             <div class="modern-form-group">
               <label class="modern-label" for="otReason">Reason <span class="required">*</span></label>
-              <div class="ot-select-wrapper"><select id="otReason" class="modern-input"><option>- SELECT REASON -</option><option>System OT Reason</option><option>Project Deadline</option><option>Cover Colleague</option></select></div>
+              <div class="ot-select-wrapper"><select id="otReason" class="modern-input"><option value="- SELECT REASON -">Select reason</option><option>System OT Reason</option><option>Project Deadline</option><option>Cover Colleague</option></select></div>
             </div>
-            <div class="modern-form-group ot-credit-row">
-              <div><strong id="otCreditLabel">Convert to Leave Credit</strong></div>
-              <button type="button" class="modern-switch" role="switch" aria-checked="false" aria-labelledby="otCreditLabel" onclick="this.classList.toggle('on'); this.setAttribute('aria-checked', String(this.classList.contains('on')))"><span class="modern-switch-thumb"></span></button>
+            <div class="modern-form-group ot-switch-row">
+              <label id="otCreditLabel" for="otLeaveCredit">Convert to Leave Credit</label>
+              <button id="otLeaveCredit" type="button" class="modern-switch" role="switch" aria-checked="false" aria-labelledby="otCreditLabel" onclick="this.setAttribute('aria-checked', this.getAttribute('aria-checked') !== 'true')">
+                <span class="modern-switch-thumb" aria-hidden="true"></span>
+              </button>
             </div>
-            <div id="otNeedTransportField" class="modern-form-group">
-              <span id="otNeedTransportLabel" class="modern-label">Need Transport</span>
-              <div class="ot-transport-row">
-                <span id="otNeedTransportDescription">Transport required</span>
-                <button id="otNeedTransport" type="button" class="modern-switch ot-transport-switch on" role="switch" aria-checked="true" aria-labelledby="otNeedTransportLabel otNeedTransportDescription" onclick="this.classList.toggle('on'); this.setAttribute('aria-checked', String(this.classList.contains('on')))"><span class="modern-switch-thumb" aria-hidden="true"></span></button>
-              </div>
+            <div id="otNeedTransportField" class="modern-form-group ot-switch-row">
+              <label id="otNeedTransportDescription" for="otNeedTransport">Transport required</label>
+              <button id="otNeedTransport" type="button" class="modern-switch" role="switch" aria-checked="true" aria-labelledby="otNeedTransportDescription" onclick="this.setAttribute('aria-checked', this.getAttribute('aria-checked') !== 'true')">
+                <span class="modern-switch-thumb" aria-hidden="true"></span>
+              </button>
             </div>
             <div class="modern-form-group"><label class="modern-label" for="otRemarks">Remarks</label><textarea id="otRemarks" class="modern-input" rows="3" placeholder="Add additional notes here..."></textarea></div>
             <div class="modern-form-group">
@@ -291,9 +221,9 @@
               <input type="file" id="hiddenOtCameraInput" accept="image/*" capture="environment" hidden onchange="handleOtFileSelected(this)">
             </div>
           </section>
-          <div id="request-actions" class="ot-form-actions form-action-row" style="display: none;">
+          <div id="request-actions" class="ot-form-actions form-action-row">
             <button type="button" class="form-cancel-btn" onclick="switchView('dashboard')"><i class="fa-solid fa-xmark" aria-hidden="true"></i><span>Cancel</span></button>
-            <button type="submit" class="ot-form-action primary"><span>Submit</span><i class="fa-solid fa-paper-plane" aria-hidden="true"></i></button>
+            <button type="submit" class="form-primary-btn"><span>Submit</span><i class="fa-solid fa-paper-plane" aria-hidden="true"></i></button>
           </div>
         </form>
       </div>
@@ -354,7 +284,7 @@
                  <span style="font-size: 13.5px; font-weight: 700; color: var(--text-primary);">2.00</span>
               </div>
               <div style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border-subtle);">
-                 <span style="font-size: 13px; font-weight: 600; color: var(--text-secondary);">Approved Hrs</span>
+                 <span style="font-size: 13px; font-weight: 600; color: var(--text-secondary);">Approved Hours</span>
                  <span style="font-size: 13.5px; font-weight: 800; color: #ef4444;">0.00</span>
               </div>
               <div style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border-subtle);">
@@ -391,7 +321,7 @@
               </div>
            </div>
           </div>
-          <table id="overtimeApprovedDetails" class="record-detail-table" hidden></table>
+          <table id="overtimeApprovedDetails" class="record-detail-table" data-icon-system-ignore hidden></table>
         </div>
       </section>
     </main>
@@ -399,18 +329,16 @@
 
   <script>
     let currentView = "dashboard";
+    const overtimePeriodTabs = document.getElementById("overtimePeriodTabs");
     
     function switchView(view) {
       currentView = view;
       document.getElementById("view-dashboard").style.display = view === "dashboard" ? "block" : "none";
       document.getElementById("view-request").style.display = view === "request" ? "block" : "none";
-      document.getElementById("headerTitle").innerText = view === "dashboard" ? "Overtime" : "Request OT";
+      const title = document.getElementById("headerTitle");
+      title.textContent = view === "dashboard" ? "Overtime" : "Request OT";
+      document.getElementById("overtimeDashboardActions").hidden = view !== "dashboard";
       
-      const reqActions = document.getElementById("request-actions");
-      if (reqActions) {
-        reqActions.style.display = view === "request" ? "flex" : "none";
-      }
-
       const bottomNav = document.querySelector("phone-bottom-nav");
       if (bottomNav) {
         bottomNav.style.display = "contents";
@@ -421,6 +349,8 @@
         mainContent.style.paddingBottom = "90px";
         mainContent.scrollTop = 0;
       }
+      const focusTarget = view === "dashboard" ? document.getElementById("overtimeAddRequest") : title;
+      focusTarget.focus({ preventScroll: true });
     }
 
     function goBack() {
@@ -435,13 +365,25 @@
       const records = Array.from(document.querySelectorAll("#view-dashboard .ot-record-card")).filter(record => (
         !record.hidden && getComputedStyle(record).display !== "none"
       ));
-      const count = document.getElementById("overtimeTotalRecords");
-      if (count) count.textContent = String(records.length);
+      const totalHours = records.reduce((total, record) => (
+        total + (Number.parseFloat(record.querySelector("[data-actual-hours]").textContent) || 0)
+      ), 0);
+      document.getElementById("overtimeTotalHours").textContent = totalHours.toFixed(2);
+      document.getElementById("overtimeTotalRecords").textContent = String(records.length);
+      document.getElementById("overtimeEmptyState").hidden = records.length > 0;
     }
 
     function activateFilter(btn) {
-      document.querySelectorAll(".pill-tab").forEach(el => el.classList.remove("active"));
-      btn.classList.add("active");
+      overtimePeriodTabs.querySelectorAll("[data-period]").forEach(tab => {
+        const selected = tab === btn;
+        tab.classList.toggle("active", selected);
+        tab.setAttribute("aria-pressed", String(selected));
+      });
+      const [start, end] = AttendanceDateDisplay.periodRange(btn.dataset.period, overtimePeriodTabs.dataset.asOf);
+      for (const card of document.querySelectorAll("#view-dashboard .ot-record-card")) {
+        const date = AttendanceDateDisplay.parse(card.querySelector("time[datetime]").dateTime);
+        card.hidden = !(date && date >= start && date <= end);
+      }
       updateOvertimeSummary();
     }
 
@@ -456,10 +398,14 @@
       if (approved) {
         table.replaceChildren();
         const fields = [
-          ['Date', card.querySelector('.ot-record-date').textContent.replace(/^Date:\s*/, '')],
+          ['Date', card.querySelector('.ot-record-date').textContent],
           ['Status', card.querySelector('.ot-record-status').textContent],
-          ['Clock Times', card.querySelector('.history-time-row').textContent],
-          ...[...card.querySelectorAll('.ot-record-detail')].map(row => [row.firstElementChild.textContent, row.lastElementChild.textContent])
+          ['Clock Times', card.querySelector('.ot-record-clock-times').textContent],
+          ['Shift', card.querySelector('.ot-record-shift').textContent],
+          ['OT Code', card.querySelector('.ot-record-code-value').textContent],
+          ...Array.from(card.querySelectorAll('.ot-record-hours .ot-record-detail'), field => [
+            field.querySelector('dt').textContent, field.querySelector('dd').textContent
+          ])
         ];
         for (const [label, value] of fields) {
           const row = table.insertRow();
@@ -509,7 +455,7 @@
       setTimeout(() => { switchView('dashboard'); }, 800);
     }
 
-    document.addEventListener("DOMContentLoaded", updateOvertimeSummary);
+    activateFilter(overtimePeriodTabs.querySelector('[aria-pressed="true"]'));
   </script>
 </body>
 </html>

@@ -4,15 +4,15 @@ const AttendanceAdviceFields = (() => {
     return text && !/^[-–—]$/.test(text) ? text : empty;
   }
 
-  function minutes(value, empty) {
-    const text = display(value, empty);
+  function minutes(value) {
+    const text = display(value, '');
     const duration = /^(\d+):([0-5]\d)$/.exec(text);
     if (duration) return String(Number(duration[1]) * 60 + Number(duration[2]));
     return text.replace(/^(\d+)\s*min(?:ute)?s?$/i, '$1');
   }
 
   function absent(value) {
-    const text = display(value);
+    const text = display(value, '');
     if (/^(yes|true|1)$/i.test(text)) return 'Yes';
     if (/^(no|false|0)$/i.test(text)) return 'No';
     return text;
@@ -22,7 +22,7 @@ const AttendanceAdviceFields = (() => {
     return display(value, Number(duration) === 0 ? 'Not applicable' : undefined);
   }
 
-  function entries(record, attendanceDay) {
+  function formValues(record, attendanceDay) {
     // A submitted value takes precedence over the linked day's original value.
     function field(...names) {
       for (const source of [record, attendanceDay]) {
@@ -33,21 +33,38 @@ const AttendanceAdviceFields = (() => {
       }
       return '';
     }
-    const lateIn = minutes(field('lateInMinutes', 'lateIn'));
-    const missingClockOut = field('missingClockOut') === 'true';
-    const earlyOut = minutes(field('earlyOutMinutes', 'earlyOut'), missingClockOut ? 'Clock-out missing' : undefined);
-    const timeOff = minutes(field('timeOffMinutes', 'timeOff'));
-    const absence = absent(field('absent'));
+    const values = {
+      lateInMinutes: minutes(field('lateInMinutes', 'lateIn')),
+      lateReason: field('lateReason', 'lateInReason'),
+      earlyOutMinutes: minutes(field('earlyOutMinutes', 'earlyOut')),
+      earlyOutReason: field('earlyOutReason'),
+      timeOffMinutes: minutes(field('timeOffMinutes', 'timeOff')),
+      timeOffReason: field('timeOffReason'),
+      absent: absent(field('absent')),
+      absentReason: field('absentReason'),
+      leaveCode: field('leaveCode'),
+      remarks: field('remarks', 'remark'),
+      missingClockOut: field('missingClockOut')
+    };
+    return Object.fromEntries(Object.entries(values).filter(([, value]) => value !== ''));
+  }
+
+  function entries(record, attendanceDay) {
+    const values = formValues(record, attendanceDay);
+    const lateIn = display(values.lateInMinutes);
+    const earlyOut = display(values.earlyOutMinutes, values.missingClockOut === 'true' ? 'Clock-out missing' : undefined);
+    const timeOff = display(values.timeOffMinutes);
+    const absence = display(values.absent);
     return [
       ['Late In Minutes', lateIn],
-      ['Late Reason', reason(field('lateReason', 'lateInReason'), lateIn)],
+      ['Late Reason', reason(values.lateReason, lateIn)],
       ['Early Out Minutes', earlyOut],
-      ['Early Out Reason', reason(field('earlyOutReason'), earlyOut)],
+      ['Early Out Reason', reason(values.earlyOutReason, earlyOut)],
       ['Time Off Minutes', timeOff],
-      ['Time Off Reason', reason(field('timeOffReason'), timeOff)],
+      ['Time Off Reason', reason(values.timeOffReason, timeOff)],
       ['Absent', absence],
-      ['Absent Reason', display(field('absentReason'), absence === 'No' ? 'Not applicable' : undefined)],
-      ['Leave Code', display(field('leaveCode'))]
+      ['Absent Reason', display(values.absentReason, absence === 'No' ? 'Not applicable' : undefined)],
+      ['Leave Code', display(values.leaveCode)]
     ];
   }
 
@@ -66,5 +83,5 @@ const AttendanceAdviceFields = (() => {
     }
   }
 
-  return { entries, render };
+  return { entries, render, formValues };
 })();

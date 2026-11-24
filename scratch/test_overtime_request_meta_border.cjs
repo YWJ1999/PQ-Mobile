@@ -26,68 +26,51 @@ const viewports = [320, 360, 390, 420];
         await page.click('#overtimeAddRequest');
 
         const summary = await page.evaluate(() => {
-          const card = document.querySelector('.ot-form-meta');
-          const input = document.querySelector('.modern-input');
-          const cardStyle = getComputedStyle(card);
-          const inputStyle = getComputedStyle(input);
-          const cardRect = card.getBoundingClientRect();
-          const rows = [...card.children].map(row => row.getBoundingClientRect());
-
+          const form = document.getElementById('otRequestForm');
+          const sides = ['Top', 'Right', 'Bottom', 'Left'];
           return {
-            borderWidths: [
-              cardStyle.borderTopWidth,
-              cardStyle.borderRightWidth,
-              cardStyle.borderBottomWidth,
-              cardStyle.borderLeftWidth
-            ],
-            borderStyles: [
-              cardStyle.borderTopStyle,
-              cardStyle.borderRightStyle,
-              cardStyle.borderBottomStyle,
-              cardStyle.borderLeftStyle
-            ],
-            borderColors: [
-              cardStyle.borderTopColor,
-              cardStyle.borderRightColor,
-              cardStyle.borderBottomColor,
-              cardStyle.borderLeftColor
-            ],
-            inputBorderColor: inputStyle.borderTopColor,
-            borderRadius: parseFloat(cardStyle.borderTopLeftRadius),
-            padding: [
-              parseFloat(cardStyle.paddingTop),
-              parseFloat(cardStyle.paddingRight),
-              parseFloat(cardStyle.paddingBottom),
-              parseFloat(cardStyle.paddingLeft)
-            ],
-            overflow: card.scrollWidth - card.clientWidth,
-            rowsContained: rows.every(row => (
-              row.left >= cardRect.left
-              && row.right <= cardRect.right
-              && row.top >= cardRect.top
-              && row.bottom <= cardRect.bottom
-            )),
-            header: document.getElementById('headerTitle').textContent.trim()
+            header: document.getElementById('headerTitle').textContent.trim(),
+            inputBorderColor: getComputedStyle(form.querySelector('.modern-input')).borderTopColor,
+            cards: Array.from(form.querySelectorAll('.ot-form-meta'), card => {
+              const style = getComputedStyle(card);
+              const rect = card.getBoundingClientRect();
+              return {
+                label: card.querySelector('dt').textContent.trim(),
+                value: card.querySelector('dd').textContent.trim(),
+                top: rect.top,
+                bottom: rect.bottom,
+                borders: sides.map(side => style[`border${side}`]),
+                borderRadius: parseFloat(style.borderTopLeftRadius),
+                padding: sides.map(side => parseFloat(style[`padding${side}`])),
+                overflow: card.scrollWidth - card.clientWidth,
+                contentContained: Array.from(card.children).every(child => {
+                  const box = child.getBoundingClientRect();
+                  return box.left >= rect.left && box.right <= rect.right
+                    && box.top >= rect.top && box.bottom <= rect.bottom;
+                })
+              };
+            })
           };
         });
 
-        assert.deepEqual(summary.borderWidths, ['1px', '1px', '1px', '1px'], `${theme} ${width}px: request summary needs a complete border`);
-        assert.deepEqual(summary.borderStyles, ['solid', 'solid', 'solid', 'solid'], `${theme} ${width}px: request summary border stays solid on every side`);
-        assert.deepEqual(
-          summary.borderColors,
-          Array(4).fill(summary.inputBorderColor),
-          `${theme} ${width}px: request summary and form controls use the same border color`
-        );
-        assert.ok(summary.borderRadius >= 16, `${theme} ${width}px: request summary uses the rounded card treatment`);
-        assert.ok(summary.padding.every(value => value >= 14), `${theme} ${width}px: request summary keeps card-like inner spacing`);
-        assert.ok(summary.overflow <= 1, `${theme} ${width}px: request summary must not overflow horizontally`);
-        assert.equal(summary.rowsContained, true, `${theme} ${width}px: request summary rows stay inside the bordered card`);
         assert.equal(summary.header, 'Request OT');
+        assert.deepEqual(summary.cards.map(card => [card.label, card.value]), [
+          ['Shift', '8.30AM - 5.30PM (W01)'],
+          ['Supervisor', 'EBB04']
+        ]);
+        assert.ok(summary.cards[0].bottom < summary.cards[1].top, `${theme} ${width}px: the two cards have a visible gap`);
+        for (const card of summary.cards) {
+          const context = `${theme} ${width}px ${card.label}`;
+          assert.deepEqual(card.borders, Array(4).fill(`1px solid ${summary.inputBorderColor}`), `${context}: full border matches form controls`);
+          assert.ok(card.borderRadius >= 16, `${context}: rounded corners`);
+          assert.ok(card.padding.every(value => value >= 14), `${context}: card padding`);
+          assert.ok(card.overflow <= 1 && card.contentContained, `${context}: contents fit inside the card`);
+        }
       }
     }
 
     assert.deepEqual(pageErrors, [], 'Request OT summary renders without page errors');
-    console.log('Request OT bordered summary checks passed.');
+    console.log('PASS: Request OT shows separate Shift and Supervisor cards at all four mobile widths in both themes.');
   } finally {
     await browser.close();
   }

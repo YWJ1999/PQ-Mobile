@@ -21,7 +21,7 @@
     />
     <link
       rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+      href="../../../assets/vendor/fontawesome-6.7.2/css/all.min.css"
     />
     <link rel="stylesheet" href="../../../css/theme.css" />
     <link rel="stylesheet" href="../../../css/app.css" />
@@ -348,66 +348,60 @@
         <!-- OT History List View -->
         <div id="viewOtHistory" data-record-colour-view="OT plan status" data-record-legend='{"Pending Approve":"submitted","To Resubmit":"resubmit","Approved":"approved","Rejected":"rejected"}' style="display: none">
           <!-- OT Card 1: AXT000000000101 -->
-<article role="button" tabindex="0" onkeydown="if(event.target === this && (event.key === 'Enter' || event.key === ' ')){event.preventDefault(); this.click();}" class="history-card-item" data-status="resubmit" onclick="HistoryRecordPage.open('ot', 'AXT000000000101', this)">
+          <article role="button" tabindex="0" onkeydown="if(event.target === this && (event.key === 'Enter' || event.key === ' ')){event.preventDefault(); this.click();}" class="history-card-item" data-status="resubmit" onclick="HistoryRecordPage.open('ot', 'AXT000000000101', this)">
             <div class="history-card-header">
               <div class="history-card-heading">
-                <h3 class="history-card-title">OT 1.5 BEFORE WORK</h3>
-                <div class="history-card-ref">Document Reference: AXT000000000101</div>
+                <h3 class="history-card-title"><time datetime="2024-07-12">Fri, 12 Jul 2024</time></h3>
+                <div class="history-card-ref">Ref: AXT000000000101</div>
               </div>
-              <div class="attendance-history-card-end"><span class="card-status-badge"><i class="fa-solid fa-rotate-right" aria-hidden="true"></i>To Resubmit</span><i class="fa-solid fa-chevron-right" aria-hidden="true"></i></div>
+              <span class="card-status-badge"><i class="fa-solid fa-rotate-right" aria-hidden="true"></i>To Resubmit</span>
             </div>
-            <span class="record-submit-date">Submit Date: 12/07/2024</span>
-            <div class="history-card-details">
-              <table class="record-detail-table"><tbody>
-                <tr class="attendance-history-detail"><td class="detail-popout-label">Date</td><td class="detail-popout-value"><strong>12/07/2024</strong></td></tr>
-                <tr class="attendance-history-detail"><td class="detail-popout-label">Plan Hours</td><td class="detail-popout-value"><strong>16.00</strong></td></tr>
-                <tr class="attendance-history-detail"><td class="detail-popout-label">Actual Hours</td><td class="detail-popout-value"><strong>0.00</strong></td></tr>
-              </tbody></table>
-            </div>
+            <dl class="history-card-details ot-plan-history-facts">
+              <div><dt>OT Type</dt><dd>OT 1.5 BEFORE WORK</dd></div>
+              <div><dt>Submit Date</dt><dd><time datetime="2024-07-12">12 Jul 2024</time></dd></div>
+              <div><dt>Plan Hours</dt><dd>16.00 hrs</dd></div>
+              <div><dt>Actual Hours</dt><dd>0.00 hrs</dd></div>
+            </dl>
             <div class="history-card-actions">
               <button type="button" class="history-submit-btn" aria-label="Submit OT Plan AXT000000000101" onclick="event.stopPropagation(); this.closest('.history-card-item').click()">Submit</button>
             </div>
           </article>
 
           <!-- OT Card 2: OTB000000001604 -->
-<article role="button" tabindex="0" onkeydown="if(event.target === this && (event.key === 'Enter' || event.key === ' ')){event.preventDefault(); this.click();}" class="history-card-item" data-status="resubmit" onclick="HistoryRecordPage.open('ot', 'OTB000000001604', this)">
+          <article role="button" tabindex="0" onkeydown="if(event.target === this && (event.key === 'Enter' || event.key === ' ')){event.preventDefault(); this.click();}" class="history-card-item" data-status="resubmit" onclick="HistoryRecordPage.open('ot', 'OTB000000001604', this)">
             <div class="history-card-header">
               <div class="history-card-heading">
-                <h3 class="history-card-title">1.5 OT</h3>
-                <div class="history-card-ref">Document Reference: OTB000000001604</div>
+                <h3 class="history-card-title"><time datetime="2023-10-24">Tue, 24 Oct 2023</time></h3>
+                <div class="history-card-ref">Ref: OTB000000001604</div>
               </div>
-              <div class="attendance-history-card-end"><span class="card-status-badge"><i class="fa-solid fa-rotate-right" aria-hidden="true"></i>To Resubmit</span><i class="fa-solid fa-chevron-right" aria-hidden="true"></i></div>
+              <span class="card-status-badge"><i class="fa-solid fa-rotate-right" aria-hidden="true"></i>To Resubmit</span>
             </div>
-            <span class="record-submit-date">Submit Date: 24/10/2023</span>
-            <div class="history-card-details">
-              <table class="record-detail-table"><tbody>
-                <tr class="attendance-history-detail"><td class="detail-popout-label">Date</td><td class="detail-popout-value"><strong>24/10/2023</strong></td></tr>
-                <tr class="attendance-history-detail"><td class="detail-popout-label">Plan Hours</td><td class="detail-popout-value"><strong>3.00</strong></td></tr>
-                <tr class="attendance-history-detail"><td class="detail-popout-label">Actual Hours</td><td class="detail-popout-value"><strong>0.00</strong></td></tr>
-              </tbody></table>
-            </div>
+            <dl class="history-card-details ot-plan-history-facts">
+              <div><dt>OT Type</dt><dd>1.5 OT</dd></div>
+              <div><dt>Submit Date</dt><dd><time datetime="2023-10-24">24 Oct 2023</time></dd></div>
+              <div><dt>Plan Hours</dt><dd>3.00 hrs</dd></div>
+              <div><dt>Actual Hours</dt><dd>0.00 hrs</dd></div>
+            </dl>
             <div class="history-card-actions">
               <button type="button" class="history-submit-btn" aria-label="Submit OT Plan OTB000000001604" onclick="event.stopPropagation(); this.closest('.history-card-item').click()">Submit</button>
             </div>
           </article>
 
           <!-- OT Card 3: OTB000000001611 -->
-<article role="button" tabindex="0" onkeydown="if(event.target === this && (event.key === 'Enter' || event.key === ' ')){event.preventDefault(); this.click();}" class="history-card-item" data-status="resubmit" onclick="HistoryRecordPage.open('ot', 'OTB000000001611', this)">
+          <article role="button" tabindex="0" onkeydown="if(event.target === this && (event.key === 'Enter' || event.key === ' ')){event.preventDefault(); this.click();}" class="history-card-item" data-status="resubmit" onclick="HistoryRecordPage.open('ot', 'OTB000000001611', this)">
             <div class="history-card-header">
               <div class="history-card-heading">
-                <h3 class="history-card-title">1.5 OT</h3>
-                <div class="history-card-ref">Document Reference: OTB000000001611</div>
+                <h3 class="history-card-title"><time datetime="2024-07-12">Fri, 12 Jul 2024</time></h3>
+                <div class="history-card-ref">Ref: OTB000000001611</div>
               </div>
-              <div class="attendance-history-card-end"><span class="card-status-badge"><i class="fa-solid fa-rotate-right" aria-hidden="true"></i>To Resubmit</span><i class="fa-solid fa-chevron-right" aria-hidden="true"></i></div>
+              <span class="card-status-badge"><i class="fa-solid fa-rotate-right" aria-hidden="true"></i>To Resubmit</span>
             </div>
-            <span class="record-submit-date">Submit Date: 12/07/2024</span>
-            <div class="history-card-details">
-              <table class="record-detail-table"><tbody>
-                <tr class="attendance-history-detail"><td class="detail-popout-label">Date</td><td class="detail-popout-value"><strong>12/07/2024</strong></td></tr>
-                <tr class="attendance-history-detail"><td class="detail-popout-label">Plan Hours</td><td class="detail-popout-value"><strong>2.00</strong></td></tr>
-                <tr class="attendance-history-detail"><td class="detail-popout-label">Actual Hours</td><td class="detail-popout-value"><strong>4.00</strong></td></tr>
-              </tbody></table>
-            </div>
+            <dl class="history-card-details ot-plan-history-facts">
+              <div><dt>OT Type</dt><dd>1.5 OT</dd></div>
+              <div><dt>Submit Date</dt><dd><time datetime="2024-07-12">12 Jul 2024</time></dd></div>
+              <div><dt>Plan Hours</dt><dd>2.00 hrs</dd></div>
+              <div><dt>Actual Hours</dt><dd>4.00 hrs</dd></div>
+            </dl>
             <div class="history-card-actions">
               <button type="button" class="history-submit-btn" aria-label="Submit OT Plan OTB000000001611" onclick="event.stopPropagation(); this.closest('.history-card-item').click()">Submit</button>
             </div>
@@ -941,7 +935,7 @@
       function upgradeAttendanceHistoryCardFacts() {
         document
           .querySelectorAll(
-            "#viewClockingHistory .history-card-details, #viewOtHistory .history-card-details, #viewFeedbackHistory .history-card-details",
+            "#viewClockingHistory .history-card-details, #viewFeedbackHistory .history-card-details",
           )
           .forEach((details) => {
             const table = details.querySelector(".record-detail-table");

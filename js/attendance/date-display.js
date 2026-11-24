@@ -19,20 +19,37 @@
     const date = new Date(Date.UTC(year, month - 1, day));
     return date.getUTCFullYear() === year && date.getUTCMonth() === month - 1 && date.getUTCDate() === day ? date : null;
   }
+  const dayMonth = date => `${date.getUTCDate()} ${months[date.getUTCMonth()]}`;
+  function formatDayMonth(value) {
+    const date = parse(value);
+    return date ? dayMonth(date) : String(value || '—');
+  }
   function format(value) {
     const date = parse(value);
-    return date ? `${weekdays[date.getUTCDay()]} ${date.getUTCDate()} ${months[date.getUTCMonth()]} ${date.getUTCFullYear()}` : String(value || '—');
+    return date ? `${weekdays[date.getUTCDay()]} ${dayMonth(date)} ${date.getUTCFullYear()}` : String(value || '—');
   }
   function formatRange(from, to) {
     const start = parse(from);
     const end = parse(to);
     if (!start || !end) return '';
-    const dayMonth = date => `${date.getUTCDate()} ${months[date.getUTCMonth()]}`;
     const last = `${dayMonth(end)} ${end.getUTCFullYear()}`;
     if (start.getTime() === end.getTime()) return last;
     const first = start.getUTCFullYear() === end.getUTCFullYear()
       ? dayMonth(start) : `${dayMonth(start)} ${start.getUTCFullYear()}`;
     return `${first} – ${last}`;
   }
-  window.AttendanceDateDisplay = { parse, format, formatRange };
+  function periodRange(period, asOfDate) {
+    const today = new Date();
+    const asOf = parse(asOfDate) || new Date(Date.UTC(today.getFullYear(), today.getMonth(), today.getDate()));
+    const year = asOf.getUTCFullYear();
+    const month = asOf.getUTCMonth();
+    if (period === 'this-month' || period === 'last-month') {
+      const selectedMonth = period === 'last-month' ? month - 1 : month;
+      return [new Date(Date.UTC(year, selectedMonth, 1)), new Date(Date.UTC(year, selectedMonth + 1, 0))];
+    }
+    const daysSinceMonday = (asOf.getUTCDay() + 6) % 7;
+    const monday = asOf.getUTCDate() - daysSinceMonday - (period === 'last-week' ? 7 : 0);
+    return [new Date(Date.UTC(year, month, monday)), new Date(Date.UTC(year, month, monday + 6))];
+  }
+  window.AttendanceDateDisplay = { parse, format, formatDayMonth, formatRange, periodRange };
 })();

@@ -3,6 +3,21 @@ const path = require('node:path');
 const { pathToFileURL } = require('node:url');
 const puppeteer = require('puppeteer');
 
+function measureSwitch(control) {
+  const track = control.getBoundingClientRect();
+  const thumb = control.querySelector('.modern-switch-thumb').getBoundingClientRect();
+  const style = getComputedStyle(control);
+  return {
+    state: control.getAttribute('aria-checked'),
+    background: style.backgroundColor,
+    border: style.borderColor,
+    size: [track.width, track.height],
+    rightEdge: track.right,
+    thumbSize: [thumb.width, thumb.height],
+    thumbOnRight: thumb.left + thumb.width / 2 > track.left + track.width / 2
+  };
+}
+
 (async () => {
   const browser = await puppeteer.launch({
     headless: true,
@@ -24,33 +39,25 @@ const puppeteer = require('puppeteer');
 
       const initial = await page.evaluate(() => {
         const field = document.getElementById('otNeedTransportField');
-        const label = document.getElementById('otNeedTransportLabel');
-        const description = document.getElementById('otNeedTransportDescription');
-        const row = field?.querySelector('.ot-transport-row');
         const control = document.getElementById('otNeedTransport');
-        const thumb = control?.querySelector('.modern-switch-thumb');
-        const credit = document.querySelector('.ot-credit-row');
+        const label = document.getElementById(control?.getAttribute('aria-labelledby'));
+        const creditControl = document.getElementById('otLeaveCredit');
+        const credit = creditControl?.closest('.modern-form-group');
         const remarks = document.getElementById('otRemarks')?.closest('.modern-form-group');
         const main = document.querySelector('.main-content');
 
-        if (!field || !label || !description || !row || !control || !thumb || !credit || !remarks || !main) {
+        if (!field || !label || !control || !credit || !remarks || !main) {
           return null;
         }
 
-        const controlRect = control.getBoundingClientRect();
-        const thumbRect = thumb.getBoundingClientRect();
-        const rowStyle = getComputedStyle(row);
-        const controlStyle = getComputedStyle(control);
+        const rowStyle = getComputedStyle(field);
 
         return {
           label: label.textContent.trim(),
-          description: description.textContent.trim(),
+          fieldText: field.innerText.trim(),
           role: control.getAttribute('role'),
-          state: control.getAttribute('aria-checked'),
-          labelledBy: control.getAttribute('aria-labelledby'),
-          green: controlStyle.backgroundColor,
-          controlSize: [controlRect.width, controlRect.height],
-          thumbOnRight: thumbRect.left + (thumbRect.width / 2) > controlRect.left + (controlRect.width / 2),
+          creditLabel: document.getElementById(creditControl.getAttribute('aria-labelledby')).textContent.trim(),
+          creditRole: creditControl.getAttribute('role'),
           rowRadius: Number.parseFloat(rowStyle.borderRadius),
           rowHasBackground: rowStyle.backgroundColor !== 'rgba(0, 0, 0, 0)',
           afterCredit: Boolean(credit.compareDocumentPosition(field) & Node.DOCUMENT_POSITION_FOLLOWING),
@@ -60,34 +67,39 @@ const puppeteer = require('puppeteer');
       });
 
       assert.ok(initial, `${theme}: Need Transport UI is present`);
-      assert.equal(initial.label, 'Need Transport');
-      assert.equal(initial.description, 'Transport required');
+      assert.equal(initial.fieldText, 'Transport required');
+      assert.equal(initial.label, initial.fieldText);
       assert.equal(initial.role, 'switch');
-      assert.equal(initial.state, 'true');
-      assert.equal(initial.labelledBy, 'otNeedTransportLabel otNeedTransportDescription');
-      assert.equal(initial.green, 'rgb(16, 185, 129)');
-      assert.deepEqual(initial.controlSize, [46, 26]);
-      assert.ok(initial.thumbOnRight, `${theme}: enabled switch thumb is on the right`);
+      assert.equal(initial.creditLabel, 'Convert to Leave Credit');
+      assert.equal(initial.creditRole, 'switch');
       assert.ok(initial.rowRadius >= 12, `${theme}: transport row has rounded corners`);
       assert.ok(initial.rowHasBackground, `${theme}: transport row has a visible surface`);
       assert.ok(initial.afterCredit && initial.beforeRemarks, `${theme}: transport UI sits between credit and remarks`);
       assert.equal(initial.overflow, 0, `${theme}: transport UI does not overflow at 360px`);
 
+      const creditOff = await page.$eval('#otLeaveCredit', measureSwitch);
+      const transportOn = await page.$eval('#otNeedTransport', measureSwitch);
+      assert.equal(creditOff.state, 'false');
+      assert.equal(creditOff.background, 'rgba(150, 150, 150, 0.25)');
+      assert.equal(creditOff.thumbOnRight, false);
+      assert.equal(transportOn.state, 'true');
+      assert.equal(transportOn.background, 'rgb(16, 185, 129)');
+      assert.equal(transportOn.thumbOnRight, true);
+      for (const control of [creditOff, transportOn]) {
+        assert.deepEqual(control.size, [46, 26]);
+        assert.deepEqual(control.thumbSize, [18, 18]);
+      }
+
+      await page.focus('#otLeaveCredit');
+      await page.keyboard.press('Space');
+      assert.deepEqual(await page.$eval('#otLeaveCredit', measureSwitch), transportOn);
       await page.click('#otNeedTransport');
-      const toggled = await page.$eval('#otNeedTransport', control => {
-        const controlRect = control.getBoundingClientRect();
-        const thumbRect = control.querySelector('.modern-switch-thumb').getBoundingClientRect();
-        return {
-          state: control.getAttribute('aria-checked'),
-          thumbOnLeft: thumbRect.left + (thumbRect.width / 2) < controlRect.left + (controlRect.width / 2)
-        };
-      });
-      assert.equal(toggled.state, 'false');
-      assert.ok(toggled.thumbOnLeft, `${theme}: disabled switch thumb moves to the left`);
+      assert.deepEqual(await page.$eval('#otNeedTransport', measureSwitch), creditOff);
+      assert.deepEqual(await page.$eval('#otLeaveCredit', measureSwitch), transportOn);
     }
 
     assert.deepEqual(pageErrors, []);
-    console.log('PASS: Request OT Need Transport UI matches the requested switch card.');
+    console.log('PASS: Both Request OT switches match in both states and toggle independently in light and dark themes.');
   } finally {
     await browser.close();
   }

@@ -101,7 +101,7 @@ html body :is(.history-card-item, .history-item-card, .project-history-card, .in
 
 /* References are secondary; employee IDs remain directly below the name. */
 html body :is(.history-card-item, .history-item-card, .project-history-card)
-:is(.history-card-ref, .project-history-card-reference, .summary-history-date, .team-history-record-ref, .team-history-request-ref, .record-card-header h3 + div) {
+:is(.history-card-ref, .project-history-card-reference, .summary-history-date, .summary-history-shift, .team-history-record-ref, .team-history-request-ref, .record-card-header h3 + div) {
   display: block;
   margin-top: 5px;
   color: var(--record-header-muted) !important;
@@ -270,7 +270,8 @@ html .phone-container :is(.record-detail-note, .training-feedback-card-detail:on
   grid-column: 1 / -1;
 }
 
-html body .history-card-item:has(.history-card-header) .history-card-actions {
+html body .history-card-item:has(.history-card-header) .history-card-actions,
+html body .summary-history-card > .summary-history-actions {
   margin-top: 16px;
   padding: 0 !important;
 }

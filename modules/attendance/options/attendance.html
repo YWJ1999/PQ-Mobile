@@ -32,10 +32,11 @@
   <script src="../../../js/components.js"></script>
   <script src="../../../js/app.js" defer></script>
   <script src="../../../js/attendance/date-display.js"></script>
+  <script src="../../../js/attendance/advice-fields.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="../../../assets/vendor/fontawesome-6.7.2/css/all.min.css">
   <link rel="stylesheet" href="../../../css/theme.css">
   <link rel="stylesheet" href="../../../css/app.css">
   <style>
@@ -775,19 +776,28 @@
     }
 
     /* Attendance Feedback Modern Clock Tool Styles */
+    .fb-clock-panel {
+      width: fit-content;
+      max-width: min(100%, 18rem);
+      padding: 16px 8px;
+      border: 1px solid var(--border-subtle);
+      border-radius: 24px;
+      background: var(--bg-card);
+      box-shadow: var(--shadow-sm);
+    }
+
     .fb-clock-track {
       display: flex;
       gap: 10px;
       overflow-x: auto;
-      padding: 6px 2px;
+      padding: 6px;
       scrollbar-width: none;
       scroll-behavior: smooth;
     }
     .fb-clock-track::-webkit-scrollbar { display: none; }
 
     .fb-clock-card {
-      width: 136px;
-      min-width: 136px;
+      width: 120px;
       border-radius: 14px;
       overflow: hidden;
       border: 1.5px solid var(--border-subtle);
@@ -835,13 +845,13 @@
       white-space: nowrap;
     }
     .fb-clock-pill-blue {
-      background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+      background: var(--primary-action-background);
       color: #ffffff;
       font-size: 11.5px;
       font-weight: 800;
       padding: 3px 6px;
       border-radius: 8px;
-      box-shadow: 0 2px 6px rgba(2, 132, 199, 0.3);
+      box-shadow: 0 2px 6px rgba(124, 58, 237, 0.3);
       width: 100%;
       text-align: center;
       box-sizing: border-box;
@@ -850,7 +860,7 @@
       text-overflow: ellipsis;
     }
     .fb-clock-pill-blue.new-badge {
-      background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+      filter: brightness(1.08);
     }
 
     .fb-clock-bottom {
@@ -943,8 +953,8 @@
         margin-left: 2px;
       }
 
-      .feedback-late-in-fields[hidden] {
-        display: none !important;
+      #feedbackDetailsForm .modern-label {
+        margin-bottom: 8px;
       }
       .feedback-context-control {
         width: 100%;
@@ -965,6 +975,10 @@
         appearance: none;
         cursor: pointer;
         padding-right: 42px;
+      }
+      .feedback-context-control:focus-visible {
+        outline: 2px solid var(--purple-primary);
+        outline-offset: 2px;
       }
       
       /* Summary Grid for exception fields */
@@ -1380,7 +1394,7 @@
                <button onclick="event.stopPropagation(); openModal('shiftChangeModalOverlay')" class="card-action-btn btn-shift-change">
                  Change Shift
                </button>
-               <button onclick="event.stopPropagation(); openFeedbackModal('15 Sep 2026', '8.30AM–5.30PM (W01)', '')" class="card-action-btn btn-feedback">
+               <button onclick="event.stopPropagation(); openFeedbackModal('15 Sep 2026', '8.30AM–5.30PM (W01)', this.closest('.attendance-record-card').dataset)" class="card-action-btn btn-feedback">
                  Feedback
                </button>
            </div>
@@ -1425,14 +1439,14 @@
                <button onclick="event.stopPropagation(); openModal('shiftChangeModalOverlay')" class="card-action-btn btn-shift-change">
                  Change Shift
                </button>
-               <button onclick="event.stopPropagation(); openFeedbackModal('14 Sep 2026', '8.30AM–5.30PM (W01)', 'Unapproved OT')" class="card-action-btn btn-feedback">
+               <button onclick="event.stopPropagation(); openFeedbackModal('14 Sep 2026', '8.30AM–5.30PM (W01)', this.closest('.attendance-record-card').dataset)" class="card-action-btn btn-feedback">
                  Feedback
                </button>
            </div>
       </div>
 
       <!-- Attendance Card 3 (Late In Exception) -->
-      <div class="history-card-item attendance-record-card late-in-theme" data-exception="late-in" data-late-in="12 minutes" data-date="2026-09-13">
+      <div class="history-card-item attendance-record-card late-in-theme" data-exception="late-in" data-late-in="12 minutes" data-late-reason="Traffic Congestion" data-date="2026-09-13">
            <div class="attendance-record-top history-card-header">
               <button class="attendance-verify-button" type="button" onclick="toggleSingleVerify(this)" title="Verify this record" aria-label="Verify attendance for 13 September 2026" aria-pressed="false">
                     <span class="verify-checkbox-box" aria-hidden="true"><i class="fa-solid fa-check"></i></span>
@@ -1470,7 +1484,7 @@
                <button onclick="event.stopPropagation(); openModal('shiftChangeModalOverlay')" class="card-action-btn btn-shift-change">
                  Change Shift
                </button>
-               <button onclick="event.stopPropagation(); openFeedbackModal('13 Sep 2026', '8.30AM–5.30PM (W01)', 'Late In', { lateInMinutes: this.closest('.attendance-record-card').dataset.lateIn, lateInReason: 'Traffic Congestion' })" class="card-action-btn btn-feedback">
+               <button onclick="event.stopPropagation(); openFeedbackModal('13 Sep 2026', '8.30AM–5.30PM (W01)', this.closest('.attendance-record-card').dataset)" class="card-action-btn btn-feedback">
                  Feedback
                </button>
            </div>
@@ -1721,7 +1735,7 @@
               </div>
 
               <!-- Clock Cards Track Container -->
-              <div style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 24px; padding: 16px; box-shadow: var(--shadow-sm);">
+              <div class="fb-clock-panel">
                  <div id="fbClockCardsTrack" class="fb-clock-track">
                     <!-- Generated by JS -->
                  </div>
@@ -1729,14 +1743,14 @@
            </div>
 
            <!-- Section: Feedback Details Card (Matching leave.html Image 2 Pattern) -->
-           <div style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 24px; padding: 20px; box-shadow: var(--shadow-card); margin-bottom: 20px;">
-              <h4 class="form-section-heading" style="font-size: 16px; font-weight: 800; color: var(--text-primary); margin-bottom: 18px;">Feedback Details</h4>
+           <form id="feedbackDetailsForm" aria-labelledby="feedbackDetailsTitle" onsubmit="event.preventDefault(); submitFbForm()" style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 24px; padding: 20px; box-shadow: var(--shadow-card); margin-bottom: 20px;">
+              <h4 id="feedbackDetailsTitle" class="form-section-heading" style="font-size: 16px; font-weight: 800; color: var(--text-primary); margin-bottom: 18px;">Feedback Details</h4>
 
               <!-- Amended Shift (Line 1) -->
               <div class="modern-form-group">
-                 <label class="modern-label" style="margin-bottom: 8px;">Amended Shift</label>
+                 <label class="modern-label" for="fbAmendedShiftSelect">Amended Shift</label>
                  <div class="custom-select" style="position: relative;">
-                    <select id="fbAmendedShiftSelect" style="width: 100%; background: var(--bg-input); border: 1px solid var(--border-subtle); border-radius: 14px; padding: 14px 16px; font-size: 13.5px; font-weight: 700; color: var(--text-primary); outline: none; appearance: none; box-sizing: border-box; cursor: pointer;">
+                    <select id="fbAmendedShiftSelect" name="amendedShift" style="width: 100%; background: var(--bg-input); border: 1px solid var(--border-subtle); border-radius: 14px; padding: 14px 16px; font-size: 13.5px; font-weight: 700; color: var(--text-primary); outline: none; appearance: none; box-sizing: border-box; cursor: pointer;">
                        <option value="">-- Select Amended Shift --</option>
                        <option value="W01">8.30AM - 5.30PM (W01) - Default</option>
                        <option value="W02">8.00AM - 5.00PM (W02)</option>
@@ -1752,9 +1766,9 @@
 
               <!-- Time Amend Reason (Line 2) -->
               <div class="modern-form-group">
-                 <label class="modern-label" style="margin-bottom: 8px;">Time Amend Reason</label>
+                 <label class="modern-label" for="fbAmendReasonSelect">Time Amend Reason</label>
                  <div class="custom-select" style="position: relative;">
-                    <select id="fbAmendReasonSelect" style="width: 100%; background: var(--bg-input); border: 1px solid var(--border-subtle); border-radius: 14px; padding: 14px 16px; font-size: 13.5px; font-weight: 700; color: var(--text-primary); outline: none; appearance: none; box-sizing: border-box; cursor: pointer;">
+                    <select id="fbAmendReasonSelect" name="amendReason" style="width: 100%; background: var(--bg-input); border: 1px solid var(--border-subtle); border-radius: 14px; padding: 14px 16px; font-size: 13.5px; font-weight: 700; color: var(--text-primary); outline: none; appearance: none; box-sizing: border-box; cursor: pointer;">
                        <option value="">- Select Amend Reason -</option>
                        <option value="forgot" selected>Forgot to Clock</option>
                        <option value="device">Device Offline / Biometric Reader Issue</option>
@@ -1769,34 +1783,89 @@
                  </div>
               </div>
 
-              <div id="feedbackLateInFields" class="feedback-late-in-fields" hidden>
-                 <div class="modern-form-group">
-                    <label class="modern-label" for="fbLateInMinutes" style="margin-bottom: 8px;">Late In Minutes</label>
-                    <input class="feedback-context-control" id="fbLateInMinutes" type="text" value="" readonly>
-                 </div>
-
-                 <div class="modern-form-group">
-                    <label class="modern-label" for="fbLateInReason" style="margin-bottom: 8px;">Late In Reason</label>
-                    <div class="custom-select" style="position: relative;">
-                       <select class="feedback-context-control" id="fbLateInReason">
-                          <option value="">- Select Late In Reason -</option>
-                          <option value="Traffic Congestion">Traffic Congestion</option>
-                          <option value="Public Transport Delay">Public Transport Delay</option>
-                          <option value="Weather Condition">Weather Condition</option>
-                          <option value="Emergency">Emergency</option>
-                          <option value="Other">Other</option>
-                       </select>
-                       <div class="arrow" style="position: absolute; right: 16px; top: 50%; transform: translateY(-50%); pointer-events: none; color: var(--text-muted);">
-                          <i class="fa-solid fa-chevron-down" style="font-size: 13px;"></i>
-                       </div>
-                    </div>
+              <div class="modern-form-group">
+                 <label class="modern-label" for="fbLateInMinutes">Late In Minutes</label>
+                 <input class="feedback-context-control" id="fbLateInMinutes" name="lateInMinutes" type="number" min="0" step="1" inputmode="numeric">
+              </div>
+              <div class="modern-form-group">
+                 <label class="modern-label" for="fbLateInReason">Late Reason</label>
+                 <div class="attendance-form-select-wrap">
+                    <select class="feedback-context-control" id="fbLateInReason" name="lateReason">
+                       <option value="">- Select Late Reason -</option>
+                       <option>Traffic Congestion</option>
+                       <option>Public Transport Delay</option>
+                       <option>Weather Condition</option>
+                       <option>Emergency</option>
+                       <option>Other</option>
+                    </select>
+                    <i class="fa-solid fa-chevron-down attendance-form-select-chevron" aria-hidden="true"></i>
                  </div>
               </div>
-
-              <!-- Remarks (Line 11) -->
+              <div class="modern-form-group">
+                 <label class="modern-label" for="fbEarlyOutMinutes">Early Out Minutes</label>
+                 <input class="feedback-context-control" id="fbEarlyOutMinutes" name="earlyOutMinutes" type="number" min="0" step="1" inputmode="numeric">
+              </div>
+              <div class="modern-form-group">
+                 <label class="modern-label" for="fbEarlyOutReason">Early Out Reason</label>
+                 <div class="attendance-form-select-wrap">
+                    <select class="feedback-context-control" id="fbEarlyOutReason" name="earlyOutReason">
+                       <option value="">- Select Early Out Reason -</option>
+                       <option>Personal</option>
+                       <option>Medical</option>
+                       <option>Official Out</option>
+                       <option>Other</option>
+                    </select>
+                    <i class="fa-solid fa-chevron-down attendance-form-select-chevron" aria-hidden="true"></i>
+                 </div>
+              </div>
+              <div class="modern-form-group">
+                 <label class="modern-label" for="fbTimeOffMinutes">Time Off Minutes</label>
+                 <input class="feedback-context-control" id="fbTimeOffMinutes" name="timeOffMinutes" type="number" min="0" step="1" inputmode="numeric">
+              </div>
+              <div class="modern-form-group">
+                 <label class="modern-label" for="fbTimeOffReason">Time Off Reason</label>
+                 <div class="attendance-form-select-wrap">
+                    <select class="feedback-context-control" id="fbTimeOffReason" name="timeOffReason">
+                       <option value="">- Select Time Off Reason -</option>
+                       <option>Personal</option>
+                       <option>Medical</option>
+                       <option>Official Duty</option>
+                       <option>Other</option>
+                    </select>
+                    <i class="fa-solid fa-chevron-down attendance-form-select-chevron" aria-hidden="true"></i>
+                 </div>
+              </div>
+              <div class="modern-form-group">
+                 <label class="modern-label" for="fbAbsent">Absent</label>
+                 <div class="attendance-form-select-wrap">
+                    <select class="feedback-context-control" id="fbAbsent" name="absent">
+                       <option value="">- Select -</option>
+                       <option>No</option>
+                       <option>Yes</option>
+                    </select>
+                    <i class="fa-solid fa-chevron-down attendance-form-select-chevron" aria-hidden="true"></i>
+                 </div>
+              </div>
+              <div class="modern-form-group">
+                 <label class="modern-label" for="fbAbsentReason">Absent Reason</label>
+                 <div class="attendance-form-select-wrap">
+                    <select class="feedback-context-control" id="fbAbsentReason" name="absentReason">
+                       <option value="">- Select Absent Reason -</option>
+                       <option>Sick Leave / Unwell</option>
+                       <option>Emergency / Urgent</option>
+                       <option>Unpaid Leave</option>
+                       <option>Other</option>
+                    </select>
+                    <i class="fa-solid fa-chevron-down attendance-form-select-chevron" aria-hidden="true"></i>
+                 </div>
+              </div>
+              <div class="modern-form-group">
+                 <label class="modern-label" for="fbLeaveCode">Leave Code</label>
+                 <input class="feedback-context-control" id="fbLeaveCode" name="leaveCode" type="text">
+              </div>
               <div class="modern-form-group" style="margin-bottom: 24px;">
-                 <label class="modern-label" style="margin-bottom: 6px;">Remarks</label>
-                 <textarea id="fbRemarksInput" placeholder="Enter remarks or justification for supervisor review..." style="width: 100%; background: var(--bg-input); border: 1px solid var(--border-subtle); border-radius: 14px; padding: 12px 14px; font-size: 13.5px; font-weight: 500; color: var(--text-primary); outline: none; box-sizing: border-box; min-height: 100px; resize: vertical; font-family: inherit; line-height: 1.5;"></textarea>
+                 <label class="modern-label" for="fbRemarksInput" style="margin-bottom: 6px;">Remarks</label>
+                 <textarea id="fbRemarksInput" name="remarks" placeholder="Enter remarks or justification for supervisor review..." style="width: 100%; background: var(--bg-input); border: 1px solid var(--border-subtle); border-radius: 14px; padding: 12px 14px; font-size: 13.5px; font-weight: 500; color: var(--text-primary); outline: none; box-sizing: border-box; min-height: 100px; resize: vertical; font-family: inherit; line-height: 1.5;"></textarea>
               </div>
 
               <!-- Section: Upload Attachments (Integrated inside card matching leave.html) -->
@@ -1824,7 +1893,7 @@
                  <!-- Uploaded Chips List -->
                  <div id="fbUploadedChipsList" style="display: flex; flex-wrap: wrap; justify-content: flex-start; gap: 8px; margin-top: 16px;"></div>
               </div>
-           </div>
+           </form>
 
            <!-- Form Actions -->
            <div class="attendance-feedback-actions attendance-form-actions form-action-row" style="margin: 10px 4px 24px;">
@@ -1834,7 +1903,7 @@
               <button type="button" class="attendance-form-draft" onclick="saveFbDraft()">
                  <i class="fa-solid fa-floppy-disk" aria-hidden="true"></i><span>Draft</span>
               </button>
-              <button type="button" class="attendance-form-submit" onclick="submitFbForm()">
+              <button type="submit" form="feedbackDetailsForm" class="attendance-form-submit">
                  <span>Submit</span><i class="fa-solid fa-paper-plane" aria-hidden="true"></i>
               </button>
            </div>
@@ -2075,24 +2144,9 @@
       closeModal('filterModalOverlay', event);
     }
 
-    function attendancePeriodRange(period) {
-      const today = new Date();
-      const asOf = AttendanceDateDisplay.parse(attendancePeriodBar.dataset.asOf)
-        || new Date(Date.UTC(today.getFullYear(), today.getMonth(), today.getDate()));
-      const year = asOf.getUTCFullYear();
-      const month = asOf.getUTCMonth();
-      if (period === 'this-month' || period === 'last-month') {
-        const selectedMonth = period === 'last-month' ? month - 1 : month;
-        return [new Date(Date.UTC(year, selectedMonth, 1)), new Date(Date.UTC(year, selectedMonth + 1, 0))];
-      }
-      const daysSinceMonday = (asOf.getUTCDay() + 6) % 7;
-      const monday = asOf.getUTCDate() - daysSinceMonday - (period === 'last-week' ? 7 : 0);
-      return [new Date(Date.UTC(year, month, monday)), new Date(Date.UTC(year, month, monday + 6))];
-    }
-
     function filterAttendanceRecords() {
       const period = attendancePeriodBar.querySelector('[aria-pressed="true"]').dataset.period;
-      const [start, end] = attendancePeriodRange(period);
+      const [start, end] = AttendanceDateDisplay.periodRange(period, attendancePeriodBar.dataset.asOf);
       let hasMatches = false;
       let normalHours = 0;
       let otHours = 0;
@@ -2261,8 +2315,16 @@
       selectedClockCardIndex = 0;
       document.getElementById('fbMetaEmployeeName').textContent = params.get('feedbackEmployeeName') || 'Farhan binti rahmat';
       document.getElementById('fbMetaEmployeeNo').textContent = `#${(params.get('feedbackEmployeeNo') || 'EBB12').replace(/^#+/, '')}`;
+      // Keep the source fields with this history entry when the form is reloaded.
+      const url = new URL(window.location.href);
+      let record = history.state?.attendanceFeedback || {};
+      if (url.hash) {
+        record = Object.fromEntries(new URLSearchParams(url.hash.slice(1)));
+        url.hash = '';
+        history.replaceState({ ...history.state, attendanceFeedback: record }, '', url);
+      }
+      openFeedbackModal(dateStr, params.get('feedbackShift') || '', record);
       document.getElementById('fbAmendReasonSelect').value = '';
-      openFeedbackModal(dateStr, params.get('feedbackShift') || '', '');
     }
 
     function openLinkedShiftChange() {
@@ -2288,13 +2350,13 @@
         
         cardEl.innerHTML = `
           <div class="fb-clock-top">
-            <span class="fb-clock-date-label">${AttendanceDateDisplay.format(card.inDate)}</span>
+            <span class="fb-clock-date-label">${AttendanceDateDisplay.formatDayMonth(card.inDate)}</span>
             <div class="fb-clock-pill-blue ${card.isNewIn ? 'new-badge' : ''}" onclick="event.stopPropagation(); openClockTimeEditor(${index}, 'inTime')">
               ${card.inTime}
             </div>
           </div>
           <div class="fb-clock-bottom">
-            <span class="fb-clock-bottom-date">${AttendanceDateDisplay.format(card.outDate)}</span>
+            <span class="fb-clock-bottom-date">${AttendanceDateDisplay.formatDayMonth(card.outDate)}</span>
             <div class="fb-clock-pill-white ${card.isDashedOut ? 'dashed' : ''}" onclick="event.stopPropagation(); openClockTimeEditor(${index}, 'outTime')">
               ${card.outTime}
             </div>
@@ -2392,22 +2454,29 @@
       editingCardTarget = null;
     }
 
-    function openFeedbackModal(dateStr, shiftStr, exceptionStr = '', exceptionDetails = {}) {
+    function openFeedbackModal(dateStr, shiftStr, record = {}) {
       const dateEl = document.getElementById('fbMetaDate');
       const shiftEl = document.getElementById('fbMetaShift');
-      const lateInFields = document.getElementById('feedbackLateInFields');
-      const lateInMinutes = document.getElementById('fbLateInMinutes');
-      const lateInReason = document.getElementById('fbLateInReason');
-      const isLateIn = String(exceptionStr).trim().toLowerCase() === 'late in';
       if (dateEl && dateStr) dateEl.textContent = AttendanceDateDisplay.format(dateStr);
       if (shiftEl && shiftStr) shiftEl.textContent = shiftStr;
-      if (lateInMinutes) lateInMinutes.value = '';
-      if (lateInReason) lateInReason.value = '';
-      if (lateInFields) lateInFields.hidden = !isLateIn;
-      if (isLateIn) {
-        if (lateInMinutes) lateInMinutes.value = exceptionDetails.lateInMinutes || '';
-        if (lateInReason) lateInReason.value = exceptionDetails.lateInReason || '';
+
+      const form = document.getElementById('feedbackDetailsForm');
+      form.querySelectorAll('option[data-record-option]').forEach(option => option.remove());
+      form.reset();
+      document.getElementById('fbUploadedChipsList').replaceChildren();
+      const values = AttendanceAdviceFields.formValues(record);
+      for (const [name, value] of Object.entries(values)) {
+        const control = form.elements.namedItem(name);
+        if (!control) continue;
+        if (control instanceof HTMLSelectElement && !Array.from(control.options).some(option => option.value === value)) {
+          const option = new Option(value, value);
+          option.dataset.recordOption = '';
+          control.add(option);
+        }
+        control.value = value;
       }
+      form.elements.lateInMinutes.readOnly = record?.exception === 'late-in' && values.lateInMinutes !== undefined;
+      form.elements.earlyOutMinutes.placeholder = values.missingClockOut === 'true' ? 'Clock-out missing' : '';
       
       renderFeedbackClockCards();
       openModal('feedbackModalOverlay');

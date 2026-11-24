@@ -244,8 +244,8 @@ async function check(name, fn) {
           hasDateBadge: Boolean(card.querySelector('.date-badge, .history-date-badge')),
           role: card.getAttribute('role'),
           tabIndex: card.tabIndex,
-          title: card.querySelector('.history-time-row')?.textContent.replace(/\s+/g, ' ').trim(),
-          date: card.querySelector('.summary-history-date')?.textContent.trim(),
+          date: card.querySelector('.summary-history-card-heading > h3:first-child')?.textContent.trim(),
+          shift: card.querySelector('h3 + .summary-history-shift')?.textContent.trim(),
           background: getComputedStyle(card).backgroundImage,
           borderTopColor: getComputedStyle(card).borderTopColor,
           borderLeftColor: getComputedStyle(card).borderLeftColor,
@@ -283,9 +283,10 @@ async function check(name, fn) {
       assert.equal(scheduled.cards.length, 22);
       assert.ok(scheduled.cards.every(card => card.hasHistoryClass && card.radius === '18px' && !card.hasDateBadge));
       assert.ok(scheduled.cards.every(card => card.role === 'button' && card.tabIndex === 0));
-      assert.equal(scheduled.cards[0].title, 'W01: 8.30AM\u20135.30PM');
-      assert.doesNotMatch(scheduled.cards[0].title, /\uFFFD/, 'Shift time does not contain a broken encoding character');
+      assert.ok(scheduled.cards.every(card => card.date && card.shift));
       assert.equal(scheduled.cards[0].date, 'Mon, 14 Sep 2026');
+      assert.equal(scheduled.cards[0].shift, 'W01: 8.30AM\u20135.30PM');
+      assert.doesNotMatch(scheduled.cards[0].shift, /\uFFFD/, 'Shift time does not contain a broken encoding character');
       assert.match(scheduled.cards[0].background, /16, 185, 129/, 'Normal attendance matches the Approved Leave History surface');
       assert.equal(scheduled.cards[0].borderLeftColor, 'rgb(16, 185, 129)', 'Category color stays on the left accent');
       assert.notEqual(scheduled.cards[0].borderTopColor, scheduled.cards[0].borderLeftColor, 'Category accent does not recolor the full border');

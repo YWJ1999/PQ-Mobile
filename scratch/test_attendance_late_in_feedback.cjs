@@ -20,6 +20,17 @@ async function closeModal(page, id) {
   await waitForModal(page, id, 'none');
 }
 
+async function readLateInFields(page) {
+  return page.$eval('#feedbackDetailsForm', form => {
+    const { lateInMinutes, lateReason } = form.elements;
+    return {
+      visible: [lateInMinutes, lateReason].every(control => control.getClientRects().length > 0),
+      minutes: lateInMinutes.value,
+      reason: lateReason.value
+    };
+  });
+}
+
 (async () => {
   const browser = await puppeteer.launch({
     headless: true,
@@ -101,7 +112,6 @@ async function closeModal(page, id) {
         await waitForModal(page, 'feedbackModalOverlay', 'flex');
 
         const lateInFeedback = await page.$eval('#feedbackModalOverlay', overlay => {
-          const group = overlay.querySelector('#feedbackLateInFields');
           const feedbackHeading = Array.from(overlay.querySelectorAll('h4'))
             .find(heading => heading.textContent.trim() === 'Feedback Details');
           const detailsCard = feedbackHeading?.parentElement;
@@ -109,8 +119,6 @@ async function closeModal(page, id) {
             .filter(label => label.getClientRects().length > 0)
             .map(label => label.textContent.replace(/\s+/g, ' ').trim());
           return {
-            groupVisible: Boolean(group && !group.hidden && group.getClientRects().length),
-            labels: Array.from(group?.querySelectorAll('label') || [], label => label.textContent.trim()),
             minutes: overlay.querySelector('#fbLateInMinutes')?.value,
             reason: overlay.querySelector('#fbLateInReason')?.value,
             minutesReadonly: overlay.querySelector('#fbLateInMinutes')?.readOnly,
@@ -128,15 +136,13 @@ async function closeModal(page, id) {
           };
         });
 
-        assert.equal(lateInFeedback.groupVisible, true, 'Late In Feedback displays its exception fields');
-        assert.deepEqual(lateInFeedback.labels, ['Late In Minutes', 'Late In Reason']);
-        assert.equal(lateInFeedback.minutes, '12 minutes');
+        assert.equal(lateInFeedback.minutes, '12');
         assert.equal(lateInFeedback.reason, 'Traffic Congestion');
         assert.equal(lateInFeedback.minutesReadonly, true, 'Late In Minutes remains informational');
-        assert.equal(lateInFeedback.reasonTag, 'SELECT', 'Late In Reason uses a dropdown');
-        assert.equal(lateInFeedback.reasonDisabled, false, 'Late In Reason can be changed');
+        assert.equal(lateInFeedback.reasonTag, 'SELECT', 'Late Reason uses a dropdown');
+        assert.equal(lateInFeedback.reasonDisabled, false, 'Late Reason can be changed');
         assert.deepEqual(lateInFeedback.reasonOptions, [
-          '- Select Late In Reason -',
+          '- Select Late Reason -',
           'Traffic Congestion',
           'Public Transport Delay',
           'Weather Condition',
@@ -148,8 +154,9 @@ async function closeModal(page, id) {
         assert.equal(lateInFeedback.hasClockTimes, true, 'Existing Clock Times section remains');
         assert.deepEqual(
           lateInFeedback.visibleLabels,
-          ['Amended Shift', 'Time Amend Reason', 'Late In Minutes', 'Late In Reason', 'Remarks', 'Attachments'],
-          'Late In fields sit below Time Amend Reason and above Remarks'
+          ['Amended Shift', 'Time Amend Reason', 'Late In Minutes', 'Late Reason', 'Early Out Minutes', 'Early Out Reason',
+            'Time Off Minutes', 'Time Off Reason', 'Absent', 'Absent Reason', 'Leave Code', 'Remarks', 'Attachments'],
+          'Feedback Details shows each field once in order'
         );
         assert.deepEqual(lateInFeedback.actions, ['Cancel', 'Draft', 'Submit']);
         assert.ok(lateInFeedback.overflow <= 1, `${theme} ${width}px Feedback has no horizontal overflow`);
@@ -162,14 +169,9 @@ async function closeModal(page, id) {
           });
           await waitForModal(page, 'feedbackModalOverlay', 'flex');
           assert.deepEqual(
-            await page.$eval('#feedbackLateInFields', group => ({
-              hidden: group.hidden,
-              rendered: group.getClientRects().length > 0,
-              minutes: document.getElementById('fbLateInMinutes').value,
-              reason: document.getElementById('fbLateInReason').value
-            })),
-            { hidden: true, rendered: false, minutes: '', reason: '' },
-            `${exception} Feedback hides and clears Late In-only data`
+            await readLateInFields(page),
+            { visible: true, minutes: '', reason: '' },
+            `${exception} Feedback displays empty fields for unrecorded values`
           );
           await closeModal(page, 'feedbackModalOverlay');
         }
@@ -180,13 +182,8 @@ async function closeModal(page, id) {
         });
         await waitForModal(page, 'feedbackModalOverlay', 'flex');
         assert.deepEqual(
-          await page.$eval('#feedbackLateInFields', group => ({
-            hidden: group.hidden,
-            rendered: group.getClientRects().length > 0,
-            minutes: document.getElementById('fbLateInMinutes').value,
-            reason: document.getElementById('fbLateInReason').value
-          })),
-          { hidden: false, rendered: true, minutes: '12 minutes', reason: 'Traffic Congestion' },
+          await readLateInFields(page),
+          { visible: true, minutes: '12', reason: 'Traffic Congestion' },
           'Late In context repopulates after another record cleared it'
         );
         await closeModal(page, 'feedbackModalOverlay');
@@ -223,21 +220,16 @@ async function closeModal(page, id) {
         await page.goto(`${pageUrl}?${linkedParams}`, { waitUntil: 'domcontentloaded' });
         await waitForModal(page, 'feedbackModalOverlay', 'flex');
         assert.deepEqual(
-          await page.$eval('#feedbackLateInFields', group => ({
-            hidden: group.hidden,
-            rendered: group.getClientRects().length > 0,
-            minutes: document.getElementById('fbLateInMinutes').value,
-            reason: document.getElementById('fbLateInReason').value
-          })),
-          { hidden: true, rendered: false, minutes: '', reason: '' },
-          'Linked Feedback uses the ordinary form without Late In-only data'
+          await readLateInFields(page),
+          { visible: true, minutes: '', reason: '' },
+          'A direct link without recorded values opens the complete empty fields'
         );
         assert.deepEqual(pageErrors, [], `${theme} ${width}px has no JavaScript errors`);
         await page.close();
       }
     }
 
-    console.log('PASS: Late In Attendance card keeps shared actions and adds only its Feedback context.');
+    console.log('PASS: Attendance Feedback shows all detail fields and fills them from the selected record.');
   } finally {
     await browser.close();
   }

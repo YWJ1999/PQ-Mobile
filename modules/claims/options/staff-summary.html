@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="../../../assets/vendor/fontawesome-6.7.2/css/all.min.css">
   <link rel="stylesheet" href="../../../css/theme.css">
   <link rel="stylesheet" href="../../../css/app.css">
   <link rel="stylesheet" href="../../../css/claim-forms.css">
@@ -44,7 +44,6 @@
     .staff-name { color: #ffffff; font-size: 14.5px; font-weight: 800; line-height: 1.4; overflow-wrap: anywhere; }
     .staff-employee-id { display: block; font-size: 11.5px; font-weight: 700; color: rgba(255,255,255,.72); opacity: .9; font-family: monospace, sans-serif; margin-bottom: 4px; line-height: 1.5; }
     .staff-role { color: rgba(255,255,255,.78); font-size: 11px; font-weight: 600; }
-    .staff-card-chevron { color: rgba(255,255,255,.82); font-size: 11px; padding-top: 12px; }
     .staff-summary-card-body { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 10px 12px; margin: 14px 16px 16px; padding: 10px 12px; border: 1px solid var(--border-subtle); border-radius: 12px; background: var(--bg-input); }
     .staff-current-row { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; min-width: 0; }
     .staff-current-label { color: var(--text-muted); font-size: 10.5px; font-weight: 700; }
@@ -275,7 +274,7 @@
         card.setAttribute('aria-haspopup', 'dialog');
         card.addEventListener('click', () => openStaffModal(entry.category));
         card.innerHTML = '<div class="staff-card-header"><div class="staff-identity"><div class="staff-name">' + escapeHtml(entry.category) +
-          '</div></div><i class="fa-solid fa-chevron-right staff-card-chevron" aria-hidden="true"></i></div>' +
+          '</div></div></div>' +
           '<div class="staff-summary-card-body"><div class="staff-current-row"><span class="staff-current-label">Current Amount</span><span class="staff-current-value">' +
           amountText(entry.current) + '</span></div><div class="staff-stat-grid">' +
           '<div class="staff-stat"><span class="staff-stat-label">Last Amount</span><span class="staff-stat-value">' + amountText(entry.last) + '</span></div>' +

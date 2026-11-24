@@ -38,6 +38,15 @@ const cases = [
         await page.setViewport({ width, height: 844 });
         for (const [index, expected] of cases.entries()) {
           await page.$$eval('.summary-kpi-card', (cards, cardIndex) => cards[cardIndex].click(), index);
+          const dateFirst = await page.$$eval('#details-list-container .summary-history-card-heading', headings =>
+            headings.length === currentDetailItems.length && headings.every((heading, i) => {
+              const [date, shift] = heading.children;
+              const record = currentDetailItems[i];
+              return date.matches('h3') && date.textContent.trim() === `${record.day}, ${record.fullDate}`
+                && shift.matches('.summary-history-shift') && shift.textContent.trim() === record.shift;
+            })
+          );
+          assert.ok(dateFirst, `${expected.title}: each card shows its date heading followed by its shift`);
           await page.$eval('#btn-chart-toggle', button => button.click());
           await page.waitForFunction(() => [...document.querySelectorAll('#view-chart .bar-fill')]
             .every(bar => bar.style.width === bar.dataset.width));

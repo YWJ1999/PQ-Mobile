@@ -6,6 +6,7 @@ const puppeteer = require('puppeteer');
 const pendingUrl = pathToFileURL(path.resolve(__dirname, '../modules/attendance/options/feedback-history.html')).href;
 
 async function clickAndWaitForNavigation(page, selector) {
+  await page.$eval(selector, button => button.scrollIntoView({ block: 'center', behavior: 'instant' }));
   await Promise.all([
     page.waitForNavigation({ waitUntil: 'networkidle0', timeout: 5000 }),
     page.click(selector)
@@ -52,8 +53,37 @@ async function assertFullPageForm(page, overlaySelector) {
       document.getElementById('fbMetaEmployeeName').textContent.trim(),
       document.getElementById('fbMetaEmployeeNo').textContent.trim()
     ]), ['Mon 14 Sep 2026', '8.30AM–5.30PM (W01)', 'Farhan binti rahmat', '#EBB12']);
+    const details = await page.$eval('#feedbackDetailsForm', form =>
+      Array.from(form.querySelectorAll('label[for]'), label =>
+        [label.textContent.trim(), label.control.value, label.control.getClientRects().length > 0]
+      )
+    );
+    assert.deepEqual(details, [
+      ['Amended Shift', ''], ['Time Amend Reason', ''],
+      ['Late In Minutes', '0'], ['Late Reason', ''], ['Early Out Minutes', '0'], ['Early Out Reason', ''],
+      ['Time Off Minutes', ''], ['Time Off Reason', ''], ['Absent', 'No'], ['Absent Reason', ''],
+      ['Leave Code', ''], ['Remarks', '']
+    ].map(([label, value]) => [label, value, true]));
     await clickAndWaitForNavigation(page, '[data-feedback-back]');
     assert.equal(new URL(page.url()).pathname.endsWith('/feedback-history.html'), true);
+
+    const supplied = {
+      lateIn: '00:12', lateReason: 'Traffic Congestion', earlyOut: '00:25', earlyOutReason: 'Medical',
+      timeOff: '45 minutes', timeOffReason: 'Appointment & travel', absent: 'false',
+      absentReason: '', leaveCode: '001', remarks: 'Checked with supervisor.'
+    };
+    const secondRecord = '.pending-feedback-record:nth-of-type(2)';
+    await page.$eval(secondRecord, (card, fields) => Object.assign(card.dataset, fields), supplied);
+    await clickAndWaitForNavigation(page, secondRecord + ' .btn-feedback');
+    await page.reload({ waitUntil: 'domcontentloaded' });
+    await page.waitForSelector('#feedbackDetailsForm', { visible: true });
+    const values = await page.$eval('#feedbackDetailsForm', form => Object.fromEntries(new FormData(form)));
+    assert.deepEqual(values, {
+      amendedShift: '', amendReason: '', lateInMinutes: '12', lateReason: 'Traffic Congestion',
+      earlyOutMinutes: '25', earlyOutReason: 'Medical', timeOffMinutes: '45', timeOffReason: 'Appointment & travel',
+      absent: 'No', absentReason: '', leaveCode: '001', remarks: 'Checked with supervisor.'
+    });
+    await clickAndWaitForNavigation(page, '[data-feedback-back]');
 
     await clickAndWaitForNavigation(page, '.pending-feedback-record:nth-of-type(2) .btn-shift-change');
     assert.equal(new URL(page.url()).pathname.endsWith('/attendance.html'), true);

@@ -7,6 +7,17 @@ const pageUrl = pathToFileURL(path.resolve(__dirname, '..', 'modules/attendance/
 const chrome = process.env.PUPPETEER_EXECUTABLE_PATH || 'C:/Program Files/Google/Chrome/Application/chrome.exe';
 const viewports = [320, 360, 390, 420];
 
+async function periodResults(page) {
+  return page.evaluate(() => ({
+    dates: Array.from(document.querySelectorAll('.ot-record-card'))
+      .filter(card => card.getClientRects().length > 0)
+      .map(card => card.querySelector('time').dateTime),
+    hours: document.getElementById('overtimeTotalHours').textContent,
+    count: document.querySelector('.overtime-summary-count').innerText,
+    empty: Boolean(document.getElementById('overtimeEmptyState')?.getClientRects().length)
+  }));
+}
+
 (async () => {
   const browser = await puppeteer.launch({
     headless: true,
@@ -18,6 +29,8 @@ const viewports = [320, 360, 390, 420];
     const page = await browser.newPage();
     const pageErrors = [];
     page.on('pageerror', error => pageErrors.push(error.message));
+    await page.setRequestInterception(true);
+    page.on('request', request => /^https?:/.test(request.url()) ? request.abort() : request.continue());
 
     for (const theme of ['light', 'dark']) {
       for (const width of viewports) {
@@ -63,7 +76,13 @@ const viewports = [320, 360, 390, 420];
           `${theme} ${width}px: period tabs must share the available width equally`
         );
 
-        await page.click('.pill-tab:last-child');
+        assert.deepEqual(await periodResults(page), { dates: ['2026-09-14'], hours: '2.00', count: '1 record', empty: false });
+        await page.click('[data-period="last-week"]');
+        assert.deepEqual(await periodResults(page), { dates: ['2026-09-11'], hours: '2.00', count: '1 record', empty: false });
+        await page.click('[data-period="this-month"]');
+        assert.deepEqual(await periodResults(page), { dates: ['2026-09-14', '2026-09-11'], hours: '4.00', count: '2 records', empty: false });
+        await page.click('[data-period="last-month"]');
+        assert.deepEqual(await periodResults(page), { dates: [], hours: '0.00', count: '0 records', empty: true });
         assert.deepEqual(
           await page.$$eval('.pill-tab', tabs => tabs.map(tab => tab.classList.contains('active'))),
           [false, false, false, true],
@@ -77,8 +96,28 @@ const viewports = [320, 360, 390, 420];
       }
     }
 
+    await page.click('[data-period="last-week"]');
+    await page.click('.ot-record-card:not([hidden])');
+    await page.waitForSelector('#overtimeApprovedDetails', { visible: true });
+    await page.click('#modal-ot-details [data-history-back]');
+    await page.waitForSelector('#modal-ot-details', { hidden: true });
+    assert.equal(await page.$eval('.pill-tab[aria-pressed="true"]', tab => tab.dataset.period), 'last-week');
+    assert.deepEqual((await periodResults(page)).dates, ['2026-09-11']);
+
+    // December 31 and January 1 share a week, but belong to different months.
+    await page.$eval('.pill-tabs-container', tabs => { tabs.dataset.asOf = '2027-01-01'; });
+    await page.$$eval('.ot-record-card', ([first, second]) => {
+      first.querySelector('time').dateTime = '2027-01-01';
+      second.querySelector('time').dateTime = '2026-12-31';
+      second.querySelector('[data-actual-hours]').textContent = '1.25';
+    });
+    await page.click('[data-period="this-week"]');
+    assert.deepEqual(await periodResults(page), { dates: ['2027-01-01', '2026-12-31'], hours: '3.25', count: '2 records', empty: false });
+    await page.click('[data-period="last-month"]');
+    assert.deepEqual(await periodResults(page), { dates: ['2026-12-31'], hours: '1.25', count: '1 record', empty: false });
+
     assert.deepEqual(pageErrors, [], 'Overtime period tabs render without page errors');
-    console.log('Overtime period tab layout checks passed.');
+    console.log('Overtime period filters, totals and mobile layout passed.');
   } finally {
     await browser.close();
   }

@@ -1,3 +1,7 @@
+.hours-summary-page .summary-history-card-end { max-width: 50%; }
+.hours-summary-page .summary-history-status { max-width: 100%; }
+.hours-summary-page .summary-history-status > span { white-space: normal; overflow-wrap: anywhere; }
+
 .hours-summary-page .hours-summary-header {
   flex: 0 0 auto;
   padding: 0 0 14px;

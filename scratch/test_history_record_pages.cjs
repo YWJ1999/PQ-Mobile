@@ -29,7 +29,7 @@ const cases = [
   ]),
   ['modules/attendance/options/feedback-history.html', '.pending-feedback-details-trigger'],
   ['modules/attendance/options/ot-plan.html', '#staffCardsContainer [data-staff-id="000008"]'],
-  ['modules/attendance/options/overtime.html', '.ot-record-card[data-status="approved"]'],
+  ['modules/attendance/options/overtime.html', '.ot-record-card[data-status="approved"]', '[data-period="last-week"]'],
   ...['Leave', 'Credit', 'OffTime'].map(tab => ['leave.html?view=history', '#myHistoryCardsList .history-item-card', '#histTab' + tab]),
   ['salary-history.html', '.me-options-btn'],
   ['bonus-history.html', '.me-options-btn']
