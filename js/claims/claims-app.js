@@ -16,8 +16,7 @@
     teamQueue = [...pending, ...teamQueue.filter(item => !item.savedClaim)];
   }
   syncSavedClaimQueue();
-  let selectedIndividualCalendarDay = Number(window.INDIVIDUAL_TRAVEL_DATA?.selectedDay) || 28;
-  let selectedTeamCalendarDay = Number(window.TEAM_TRAVEL_DATA?.selectedDay) || 28;
+  const travelCalendars = {};
 
   function showToast(msg) {
     const toast = document.getElementById('toastNotification');
@@ -79,7 +78,7 @@
       if (value) value.textContent = count;
     });
     renderBreakdownDonutChart('individual', activeBreakdownCategory);
-    renderIndividualCalendar();
+    renderTravelCalendar('individual');
     renderOptionSquareGrid();
     renderMySubmissions('all');
   }
@@ -91,7 +90,7 @@
    */
   function renderTeamDashboard() {
     renderBreakdownDonutChart('team', activeBreakdownCategory);
-    renderTeamCalendar();
+    renderTravelCalendar('team');
     renderManagerSquareGrid();
     renderTeamQueue();
   }
@@ -238,59 +237,89 @@
    * INDIVIDUAL TRAVEL CALENDAR (Screenshot 1)
    * ==========================================
    */
-  function formatCalendarDate(day) {
-    return new Intl.DateTimeFormat('en-GB', {
-      weekday: 'long',
-      day: 'numeric',
-      month: 'long',
-      year: 'numeric'
-    }).format(new Date(2026, 8, day));
-  }
-
-  function renderIndividualCalendar() {
-    const gridContainer = document.getElementById('individual-calendar-grid');
-    if (!gridContainer) return;
-
-    const travelDays = window.INDIVIDUAL_TRAVEL_DATA?.travelDays || [28, 29, 30];
-    const today = 24;
-
-    let daysHtml = '';
-    daysHtml += `<div class="cal-day empty" aria-hidden="true"></div>`;
-
-    for (let d = 1; d <= 30; d++) {
-      const isToday = d === today;
-      const isTravel = travelDays.includes(d);
-      const isSelected = d === selectedIndividualCalendarDay;
-      const classes = ['cal-day'];
-
-      if (isToday) classes.push('today');
-      if (isTravel) classes.push('travel-highlight');
-      if (isSelected) classes.push('active-pill');
-
-      daysHtml += `
-        <button type="button" class="${classes.join(' ')}" data-day="${d}" aria-label="${formatCalendarDate(d)}${isTravel ? ', travel date' : ''}${isToday ? ', today' : ''}" aria-pressed="${isSelected}"${isToday ? ' aria-current="date"' : ''} onclick="window.ClaimsEngine.selectIndividualCalendarDay(${d})">
-          <span>${d}</span>
-          ${isTravel ? '<span class="dot-indicator"></span>' : ''}
-        </button>
-      `;
-    }
-
-    gridContainer.innerHTML = daysHtml;
-    updateIndividualTripDetail(selectedIndividualCalendarDay);
-  }
-
-  function selectIndividualCalendarDay(day, focusSelected = false) {
-    selectedIndividualCalendarDay = Number(day);
-    if (window.INDIVIDUAL_TRAVEL_DATA) window.INDIVIDUAL_TRAVEL_DATA.selectedDay = selectedIndividualCalendarDay;
-    let selectedButton = null;
-    document.querySelectorAll('#individual-calendar-grid button.cal-day').forEach(button => {
-      const isSelected = Number(button.dataset.day) === selectedIndividualCalendarDay;
-      button.classList.toggle('active-pill', isSelected);
-      button.setAttribute('aria-pressed', String(isSelected));
-      if (isSelected) selectedButton = button;
+  function formatCalendarDate(scope, day) {
+    return travelCalendars[scope].month.date(day).toLocaleDateString('en-GB', {
+      weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
     });
-    updateIndividualTripDetail(selectedIndividualCalendarDay);
-    if (focusSelected) selectedButton?.focus({ preventScroll: true });
+  }
+
+  function renderTravelCalendar(scope) {
+    const grid = document.getElementById(scope + '-calendar-grid');
+    if (!grid) return;
+    const individual = scope === 'individual';
+    const data = individual ? window.INDIVIDUAL_TRAVEL_DATA : window.TEAM_TRAVEL_DATA;
+    const state = travelCalendars[scope] ??= { month: calendarMonth(2026, 8), day: Number(data.selectedDay) || 28 };
+    const {month} = state;
+    const hasData = month.label === data.month;
+    document.getElementById(scope + 'TravelMonth').textContent = month.label;
+    const count = hasData ? (individual ? data.trips.length : data.tripsCount) : 0;
+    const staff = individual ? '' : (hasData ? data.staffCount : 0) + ' staff • ';
+    document.getElementById(scope + 'TravelSummary').textContent = staff + count + (count === 1 ? ' trip' : ' trips') + ' this month';
+    grid.replaceChildren();
+    for (let i = 0; i < month.mondayOffset; i++) {
+      const blank = document.createElement('div');
+      blank.className = 'cal-day empty';
+      blank.setAttribute('aria-hidden', 'true');
+      grid.append(blank);
+    }
+    for (let day = 1; day <= month.days; day++) {
+      const cell = document.createElement('button');
+      cell.type = 'button';
+      cell.className = 'cal-day';
+      cell.dataset.day = day;
+      const number = document.createElement('span');
+      number.textContent = day;
+      cell.append(number);
+      let label = formatCalendarDate(scope, day);
+      const travel = hasData && (individual ? data.travelDays.includes(day) : data.travelBadges[day]);
+      if (travel) {
+        cell.classList.add(individual ? 'travel-highlight' : 'staff-travel-highlight');
+        const marker = document.createElement('span');
+        marker.className = individual ? 'dot-indicator' : 'staff-count-badge';
+        if (!individual) marker.textContent = travel;
+        cell.append(marker);
+        label += individual ? ', travel date' : ', ' + travel + ' staff travelling';
+      }
+      if (month.key === '2026-09' && day === 24) {
+        cell.classList.add('today');
+        cell.setAttribute('aria-current', 'date');
+        label += ', today';
+      }
+      cell.setAttribute('aria-label', label);
+      cell.addEventListener('click', () => selectTravelDay(scope, day));
+      grid.append(cell);
+    }
+    selectTravelDay(scope, state.day);
+  }
+
+  function selectTravelDay(scope, day, focusSelected = false) {
+    const state = travelCalendars[scope];
+    state.day = Number(day);
+    const data = scope === 'individual' ? window.INDIVIDUAL_TRAVEL_DATA : window.TEAM_TRAVEL_DATA;
+    if (state.month.label === data.month) data.selectedDay = state.day;
+    document.querySelectorAll('#' + scope + '-calendar-grid button.cal-day').forEach(button => {
+      const selected = Number(button.dataset.day) === state.day;
+      button.classList.toggle('active-pill', selected);
+      button.setAttribute('aria-pressed', String(selected));
+      if (selected && focusSelected) button.focus({ preventScroll: true });
+    });
+    if (scope === 'individual') updateIndividualTripDetail(state.day);
+    else updateTeamTripDetail(state.day);
+  }
+
+  function shiftTravelMonth(scope, offset) {
+    const state = travelCalendars[scope];
+    state.month = state.month.move(offset);
+    state.day = Math.min(state.day, state.month.days);
+    renderTravelCalendar(scope);
+  }
+
+  function resetTravelDay(scope) {
+    const state = travelCalendars[scope];
+    state.month = calendarMonth(2026, 8);
+    state.day = 24;
+    renderTravelCalendar(scope);
+    document.querySelector('#' + scope + '-calendar-grid [aria-current="date"]')?.focus({ preventScroll: true });
   }
 
   function updateIndividualTripDetail(day) {
@@ -298,7 +327,8 @@
     if (!detailBox) return;
 
     const travelDays = window.INDIVIDUAL_TRAVEL_DATA?.travelDays || [28, 29, 30];
-    if (travelDays.includes(day)) {
+    const month = travelCalendars.individual.month;
+    if (month.label === window.INDIVIDUAL_TRAVEL_DATA.month && travelDays.includes(day)) {
       const trip = window.INDIVIDUAL_TRAVEL_DATA?.trips?.[0] || {
         route: 'Kuala Lumpur ➔ Penang',
         destination: 'Penang Branch',
@@ -311,7 +341,7 @@
 
       detailBox.innerHTML = `
         <div style="font-size: 13px; font-weight: 800; color: var(--text-primary); margin-bottom: 8px;">
-          ${formatCalendarDate(day)}
+          ${formatCalendarDate('individual', day)}
         </div>
         <div style="background: var(--bg-input); border-radius: 18px; padding: 14px 16px; border: 1px solid var(--border-subtle);">
           <div style="display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 12px;">
@@ -347,10 +377,10 @@
           </div>
         </div>
       `;
-    } else if (day === 24) {
+    } else if (month.key === '2026-09' && day === 24) {
       detailBox.innerHTML = `
         <div style="font-size: 13px; font-weight: 800; color: var(--text-primary); margin-bottom: 8px;">
-          ${formatCalendarDate(day)} (Today)
+          ${formatCalendarDate('individual', day)} (Today)
         </div>
         <div style="background: var(--bg-input); border-radius: 16px; padding: 12px 14px; border: 1px solid var(--border-subtle); font-size: 12px; color: var(--text-muted);">
           No travel schedules for today. Office working day.
@@ -359,7 +389,7 @@
     } else {
       detailBox.innerHTML = `
         <div style="font-size: 13px; font-weight: 800; color: var(--text-primary); margin-bottom: 8px;">
-          ${formatCalendarDate(day)}
+          ${formatCalendarDate('individual', day)}
         </div>
         <div style="background: var(--bg-input); border-radius: 16px; padding: 12px 14px; border: 1px solid var(--border-subtle); font-size: 12px; color: var(--text-muted);">
           No travel records for this date.
@@ -373,52 +403,6 @@
    * TEAM TRAVEL CALENDAR (Screenshot 2)
    * ==========================================
    */
-  function renderTeamCalendar() {
-    const gridContainer = document.getElementById('team-calendar-grid');
-    if (!gridContainer) return;
-
-    const travelBadges = window.TEAM_TRAVEL_DATA?.travelBadges || {};
-    const today = 24;
-
-    let daysHtml = '';
-    daysHtml += `<div class="cal-day empty" aria-hidden="true"></div>`;
-
-    for (let d = 1; d <= 30; d++) {
-      const isToday = d === today;
-      const count = travelBadges[d] || 0;
-      const isSelected = d === selectedTeamCalendarDay;
-      const classes = ['cal-day'];
-
-      if (isToday) classes.push('today');
-      if (count > 0) classes.push('staff-travel-highlight');
-      if (isSelected) classes.push('active-pill');
-
-      daysHtml += `
-        <button type="button" class="${classes.join(' ')}" data-day="${d}" aria-label="${formatCalendarDate(d)}${count ? `, ${count} staff travelling` : ''}${isToday ? ', today' : ''}" aria-pressed="${isSelected}"${isToday ? ' aria-current="date"' : ''} onclick="window.ClaimsEngine.selectTeamCalendarDay(${d})">
-          <span>${d}</span>
-          ${count > 0 ? `<span class="staff-count-badge">${count}</span>` : ''}
-        </button>
-      `;
-    }
-
-    gridContainer.innerHTML = daysHtml;
-    updateTeamTripDetail(selectedTeamCalendarDay);
-  }
-
-  function selectTeamCalendarDay(day, focusSelected = false) {
-    selectedTeamCalendarDay = Number(day);
-    if (window.TEAM_TRAVEL_DATA) window.TEAM_TRAVEL_DATA.selectedDay = selectedTeamCalendarDay;
-    let selectedButton = null;
-    document.querySelectorAll('#team-calendar-grid button.cal-day').forEach(button => {
-      const isSelected = Number(button.dataset.day) === selectedTeamCalendarDay;
-      button.classList.toggle('active-pill', isSelected);
-      button.setAttribute('aria-pressed', String(isSelected));
-      if (isSelected) selectedButton = button;
-    });
-    updateTeamTripDetail(selectedTeamCalendarDay);
-    if (focusSelected) selectedButton?.focus({ preventScroll: true });
-  }
-
   function teamTripIncludesDay(trip, day) {
     const match = String(trip.dates || '').match(/(\d{1,2})\s*[-–—]\s*(\d{1,2})\s+Sep/i);
     if (!match) return false;
@@ -432,11 +416,12 @@
     const data = window.TEAM_TRAVEL_DATA;
     if (!data) return;
 
-    const staffList = data.staffTrips.filter(staff => teamTripIncludesDay(staff, day));
+    const month = travelCalendars.team.month;
+    const staffList = month.label === data.month ? data.staffTrips.filter(staff => teamTripIncludesDay(staff, day)) : [];
     if (staffList.length) {
       detailBox.innerHTML = `
         <div style="font-size: 13.5px; font-weight: 800; color: var(--text-primary); margin-bottom: 10px;">
-          ${formatCalendarDate(day)} · ${staffList.length} staff
+          ${formatCalendarDate('team', day)} · ${staffList.length} staff
         </div>
         <div style="display: flex; flex-direction: column; gap: 8px;">
           ${staffList.map(s => `
@@ -455,7 +440,7 @@
     } else {
       detailBox.innerHTML = `
         <div style="font-size: 13.5px; font-weight: 800; color: var(--text-primary); margin-bottom: 8px;">
-          ${formatCalendarDate(day)}${day === 24 ? ' (Today)' : ''}
+          ${formatCalendarDate('team', day)}${month.key === '2026-09' && day === 24 ? ' (Today)' : ''}
         </div>
         <div style="background: var(--bg-input); border-radius: 16px; padding: 12px 14px; border: 1px solid var(--border-subtle); font-size: 12px; color: var(--text-muted);">
           No staff travel scheduled for this date.
@@ -1184,8 +1169,10 @@
     showToast,
     switchClaimScope,
     toggleBreakdownCategory,
-    selectIndividualCalendarDay,
-    selectTeamCalendarDay,
+    shiftTravelMonth,
+    resetTravelDay,
+    selectIndividualCalendarDay: (day, focus) => selectTravelDay('individual', day, focus),
+    selectTeamCalendarDay: (day, focus) => selectTravelDay('team', day, focus),
     renderMySubmissions,
     filterMySubmissions,
     renderTeamQueue,

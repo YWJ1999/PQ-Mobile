@@ -7,6 +7,8 @@
   <link rel="stylesheet" href="../../../assets/vendor/fontawesome-6.7.2/css/all.min.css">
   <script src="../../../js/components.js"></script>
   <script src="../../../js/app.js" defer></script>
+  <script src="../../../js/calendar-month.js"></script>
+  <script src="../../../js/attendance/roster-calendar.js" defer></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -294,11 +296,11 @@
          
          <!-- Month Navigator Row -->
          <div class="attendance-schedule-header">
-            <h3 class="attendance-schedule-month">September 2026</h3>
+            <h3 class="attendance-schedule-month" data-roster-title aria-live="polite">September 2026</h3>
             <div class="attendance-schedule-controls">
                <button type="button" class="attendance-schedule-info-trigger" data-schedule-info-trigger aria-haspopup="dialog" aria-controls="attendanceScheduleInfo"><i class="fa-solid fa-circle-info" aria-hidden="true"></i><span>Info</span></button>
-               <button type="button" title="Previous Month" aria-label="Previous Month"><i class="fa-solid fa-chevron-left" aria-hidden="true"></i></button>
-               <button type="button" title="Next Month" aria-label="Next Month"><i class="fa-solid fa-chevron-right" aria-hidden="true"></i></button>
+               <button type="button" data-roster-step="-1" title="Previous Month" aria-label="Previous Month"><i class="fa-solid fa-chevron-left" aria-hidden="true"></i></button>
+               <button type="button" data-roster-step="1" title="Next Month" aria-label="Next Month"><i class="fa-solid fa-chevron-right" aria-hidden="true"></i></button>
             </div>
          </div>
 
@@ -307,53 +309,7 @@
             <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
          </div>
 
-         <!-- Calendar 30-Day Grid -->
-         <div class="cal-days-grid attendance-schedule-grid">
-            <!-- Row 1 -->
-            <div class="cal-cell"></div>
-            <div class="cal-cell" id="cal-day-1" onclick="selectDay(1)"><span class="cal-date">1</span><span class="cal-d">D</span></div>
-            <div class="cal-cell" id="cal-day-2" onclick="selectDay(2)"><span class="cal-date">2</span><span class="cal-d">D</span></div>
-            <div class="cal-cell" id="cal-day-3" onclick="selectDay(3)"><span class="cal-date">3</span><span class="cal-d">D</span></div>
-            <div class="cal-cell" id="cal-day-4" onclick="selectDay(4)"><span class="cal-date">4</span><span class="cal-hol">HOL</span></div>
-            <div class="cal-cell" id="cal-day-5" onclick="selectDay(5)"><span class="cal-date">5</span><span class="cal-off">OFF</span></div>
-            <div class="cal-cell" id="cal-day-6" onclick="selectDay(6)"><span class="cal-date">6</span><span class="cal-rest">REST</span></div>
-
-            <!-- Row 2 -->
-            <div class="cal-cell" id="cal-day-7" onclick="selectDay(7)"><span class="cal-date">7</span><span class="cal-d">D</span></div>
-            <div class="cal-cell" id="cal-day-8" onclick="selectDay(8)"><span class="cal-date">8</span><span class="cal-d">D</span></div>
-            <div class="cal-cell" id="cal-day-9" onclick="selectDay(9)"><span class="cal-date">9</span><span class="cal-cs">CS</span></div>
-            <div class="cal-cell" id="cal-day-10" onclick="selectDay(10)"><span class="cal-date">10</span><span class="cal-d">D</span></div>
-            <div class="cal-cell active today" id="cal-day-11" onclick="selectDay(11)"><span class="cal-date">11</span><span class="cal-d">D</span></div>
-            <div class="cal-cell" id="cal-day-12" onclick="selectDay(12)"><span class="cal-date">12</span><span class="cal-off">OFF</span></div>
-            <div class="cal-cell" id="cal-day-13" onclick="selectDay(13)"><span class="cal-date">13</span><span class="cal-rest">REST</span></div>
-
-            <!-- Row 3 -->
-            <div class="cal-cell" id="cal-day-14" onclick="selectDay(14)"><span class="cal-date">14</span><span class="cal-none">NS</span></div>
-            <div class="cal-cell" id="cal-day-15" onclick="selectDay(15)"><span class="cal-date">15</span><span class="cal-d">D</span></div>
-            <div class="cal-cell" id="cal-day-16" onclick="selectDay(16)"><span class="cal-date">16</span><span class="cal-d">D</span></div>
-            <div class="cal-cell" id="cal-day-17" onclick="selectDay(17)"><span class="cal-date">17</span><span class="cal-d">D</span></div>
-            <div class="cal-cell" id="cal-day-18" onclick="selectDay(18)"><span class="cal-date">18</span><span class="cal-d">D</span></div>
-            <div class="cal-cell" id="cal-day-19" onclick="selectDay(19)"><span class="cal-date">19</span><span class="cal-off">OFF</span></div>
-            <div class="cal-cell" id="cal-day-20" onclick="selectDay(20)"><span class="cal-date">20</span><span class="cal-rest">REST</span></div>
-
-            <!-- Row 4 -->
-            <div class="cal-cell" id="cal-day-21" onclick="selectDay(21)"><span class="cal-date">21</span><span class="cal-n">N</span></div>
-            <div class="cal-cell" id="cal-day-22" onclick="selectDay(22)"><span class="cal-date">22</span><span class="cal-n">N</span></div>
-            <div class="cal-cell" id="cal-day-23" onclick="selectDay(23)"><span class="cal-date">23</span><span class="cal-n">N</span></div>
-            <div class="cal-cell" id="cal-day-24" onclick="selectDay(24)"><span class="cal-date">24</span><span class="cal-n">N</span></div>
-            <div class="cal-cell" id="cal-day-25" onclick="selectDay(25)"><span class="cal-date">25</span><span class="cal-n">N</span></div>
-            <div class="cal-cell" id="cal-day-26" onclick="selectDay(26)"><span class="cal-date">26</span><span class="cal-off">OFF</span></div>
-            <div class="cal-cell" id="cal-day-27" onclick="selectDay(27)"><span class="cal-date">27</span><span class="cal-rest">REST</span></div>
-            
-            <!-- Row 5 -->
-            <div class="cal-cell" id="cal-day-28" onclick="selectDay(28)"><span class="cal-date">28</span><span class="cal-d">D</span></div>
-            <div class="cal-cell" id="cal-day-29" onclick="selectDay(29)"><span class="cal-date">29</span><span class="cal-d">D</span></div>
-            <div class="cal-cell" id="cal-day-30" onclick="selectDay(30)"><span class="cal-date">30</span><span class="cal-d">D</span></div>
-            <div class="cal-cell"></div>
-            <div class="cal-cell"></div>
-            <div class="cal-cell"></div>
-            <div class="cal-cell"></div>
-         </div>
+         <div class="cal-days-grid attendance-schedule-grid" data-roster-grid></div>
 
          <dialog id="attendanceScheduleInfo" class="attendance-schedule-info-dialog" aria-labelledby="attendanceScheduleInfoTitle">
             <div class="attendance-schedule-info-panel">
@@ -400,10 +356,9 @@
             </div>
             <div style="flex: 1;">
                <div style="font-size: 15px; font-weight: 800; color: var(--text-primary);">Approved OT plan</div>
-               <div id="otTime" style="font-size: 13px; font-weight: 600; color: var(--text-muted); margin-top: 2px;">17:00 – 19:00</div>
-            </div>
-            <div id="otHours" style="font-size: 13px; font-weight: 600; color: var(--text-muted);">
-               2 hours
+               <div style="font-size: 13px; font-weight: 600; color: var(--text-muted); margin-top: 2px;">
+                  <span id="otTime">17:00 – 19:00</span> &middot; <span id="otHours">2 hours</span>
+               </div>
             </div>
          </div>
       </div>
@@ -411,75 +366,8 @@
     </div>
 
     <!-- Bottom navigation -->
-    <phone-bottom-nav active="attendance"></phone-bottom-nav>
+    <phone-bottom-nav in-flow active="attendance"></phone-bottom-nav>
   </div>
 
-  <script>
-    const scheduleData = {
-      1: { dateStr: 'Tue, 1 Sep 2026', isToday: false, shift: 'Day shift', shiftTime: '08:00 – 17:00', shiftColor: '#7c3aed', ot: null },
-      2: { dateStr: 'Wed, 2 Sep 2026', isToday: false, shift: 'Day shift', shiftTime: '08:00 – 17:00', shiftColor: '#7c3aed', ot: null },
-      3: { dateStr: 'Thu, 3 Sep 2026', isToday: false, shift: 'Day shift', shiftTime: '08:00 – 17:00', shiftColor: '#7c3aed', ot: { hours: '2 hours', time: '17:00 – 19:00' } },
-      4: { dateStr: 'Fri, 4 Sep 2026', isToday: false, shift: 'Day shift', shiftTime: '08:00 – 17:00', shiftColor: '#7c3aed', ot: null },
-      5: { dateStr: 'Sat, 5 Sep 2026', isToday: false, shift: 'Rest day', shiftTime: 'Off duty', shiftColor: '#94a3b8', ot: null },
-      6: { dateStr: 'Sun, 6 Sep 2026', isToday: false, shift: 'Rest day', shiftTime: 'Off duty', shiftColor: '#94a3b8', ot: null },
-      7: { dateStr: 'Mon, 7 Sep 2026', isToday: false, shift: 'Day shift', shiftTime: '08:00 – 17:00', shiftColor: '#7c3aed', ot: null },
-      8: { dateStr: 'Tue, 8 Sep 2026', isToday: false, shift: 'Day shift', shiftTime: '08:00 – 17:00', shiftColor: '#7c3aed', ot: { hours: '1 hour', time: '17:00 – 18:00' } },
-      9: { dateStr: 'Wed, 9 Sep 2026', isToday: false, shift: 'Day shift', shiftTime: '08:00 – 17:00', shiftColor: '#7c3aed', ot: null },
-      10: { dateStr: 'Thu, 10 Sep 2026', isToday: false, shift: 'Day shift', shiftTime: '08:00 – 17:00', shiftColor: '#7c3aed', ot: null },
-      11: { dateStr: 'Fri, 11 Sep 2026', isToday: true, shift: 'Day shift', shiftTime: '08:00 – 17:00', shiftColor: '#7c3aed', ot: { hours: '2 hours', time: '17:00 – 19:00' } },
-      12: { dateStr: 'Sat, 12 Sep 2026', isToday: false, shift: 'Rest day', shiftTime: 'Off duty', shiftColor: '#94a3b8', ot: null },
-      13: { dateStr: 'Sun, 13 Sep 2026', isToday: false, shift: 'Rest day', shiftTime: 'Off duty', shiftColor: '#94a3b8', ot: null },
-      14: { dateStr: 'Mon, 14 Sep 2026', isToday: false, shift: 'Day shift', shiftTime: '08:00 – 17:00', shiftColor: '#7c3aed', ot: null },
-      15: { dateStr: 'Tue, 15 Sep 2026', isToday: false, shift: 'Day shift', shiftTime: '08:00 – 17:00', shiftColor: '#7c3aed', ot: { hours: '2 hours', time: '17:00 – 19:00' } },
-      16: { dateStr: 'Wed, 16 Sep 2026', isToday: false, shift: 'Day shift', shiftTime: '08:00 – 17:00', shiftColor: '#7c3aed', ot: null },
-      17: { dateStr: 'Thu, 17 Sep 2026', isToday: false, shift: 'Day shift', shiftTime: '08:00 – 17:00', shiftColor: '#7c3aed', ot: null },
-      18: { dateStr: 'Fri, 18 Sep 2026', isToday: false, shift: 'Day shift', shiftTime: '08:00 – 17:00', shiftColor: '#7c3aed', ot: null },
-      19: { dateStr: 'Sat, 19 Sep 2026', isToday: false, shift: 'Rest day', shiftTime: 'Off duty', shiftColor: '#94a3b8', ot: null },
-      20: { dateStr: 'Sun, 20 Sep 2026', isToday: false, shift: 'Rest day', shiftTime: 'Off duty', shiftColor: '#94a3b8', ot: null },
-      21: { dateStr: 'Mon, 21 Sep 2026', isToday: false, shift: 'Night shift', shiftTime: '20:00 – 05:00', shiftColor: '#0d9488', ot: null },
-      22: { dateStr: 'Tue, 22 Sep 2026', isToday: false, shift: 'Night shift', shiftTime: '20:00 – 05:00', shiftColor: '#0d9488', ot: { hours: '2 hours', time: '18:00 – 20:00' } },
-      23: { dateStr: 'Wed, 23 Sep 2026', isToday: false, shift: 'Night shift', shiftTime: '20:00 – 05:00', shiftColor: '#0d9488', ot: null },
-      24: { dateStr: 'Thu, 24 Sep 2026', isToday: false, shift: 'Night shift', shiftTime: '20:00 – 05:00', shiftColor: '#0d9488', ot: { hours: '1 hour', time: '19:00 – 20:00' } },
-      25: { dateStr: 'Fri, 25 Sep 2026', isToday: false, shift: 'Night shift', shiftTime: '20:00 – 05:00', shiftColor: '#0d9488', ot: null },
-      26: { dateStr: 'Sat, 26 Sep 2026', isToday: false, shift: 'Rest day', shiftTime: 'Off duty', shiftColor: '#94a3b8', ot: null },
-      27: { dateStr: 'Sun, 27 Sep 2026', isToday: false, shift: 'Rest day', shiftTime: 'Off duty', shiftColor: '#94a3b8', ot: null },
-      28: { dateStr: 'Mon, 28 Sep 2026', isToday: false, shift: 'Day shift', shiftTime: '08:00 – 17:00', shiftColor: '#7c3aed', ot: null },
-      29: { dateStr: 'Tue, 29 Sep 2026', isToday: false, shift: 'Day shift', shiftTime: '08:00 – 17:00', shiftColor: '#7c3aed', ot: { hours: '2 hours', time: '17:00 – 19:00' } },
-      30: { dateStr: 'Wed, 30 Sep 2026', isToday: false, shift: 'Day shift', shiftTime: '08:00 – 17:00', shiftColor: '#7c3aed', ot: null }
-    };
-
-    function selectDay(dayNum) {
-      document.querySelectorAll('.cal-cell').forEach(el => el.classList.remove('active'));
-      const cell = document.getElementById('cal-day-' + dayNum);
-      if (cell) cell.classList.add('active');
-
-      const data = scheduleData[dayNum];
-      if (!data) return;
-
-      document.getElementById('selectedDayTitle').textContent = data.dateStr;
-      const badge = document.getElementById('selectedDayBadge');
-      if (data.isToday) {
-        badge.style.display = 'inline-block';
-        badge.textContent = 'Today';
-      } else {
-        badge.style.display = 'none';
-      }
-
-      document.getElementById('shiftTitle').textContent = data.shift;
-      document.getElementById('shiftTime').textContent = data.shiftTime;
-      const iconBox = document.getElementById('shiftIconCircle');
-      iconBox.style.borderColor = data.shiftColor;
-      iconBox.style.color = data.shiftColor;
-
-      const otRow = document.getElementById('dayOtRow');
-      if (data.ot) {
-        otRow.style.display = 'flex';
-        document.getElementById('otTime').textContent = data.ot.time;
-        document.getElementById('otHours').textContent = data.ot.hours;
-      } else {
-        otRow.style.display = 'none';
-      }
-    }
-  </script>
 </body>
 </html>

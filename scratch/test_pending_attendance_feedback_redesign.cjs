@@ -69,7 +69,7 @@ async function assertOverlayFitsAtWidths(page, selector) {
         assert.notEqual(summarySurface.backgroundColor, 'rgb(255, 255, 255)');
       }
 
-      for (const width of [360, 390, 420]) {
+      for (const width of [320, 360, 390, 420]) {
         await page.setViewport({ width, height: 950 });
         const layout = await page.evaluate(() => ({
           pageFits: document.querySelector('.main-content').scrollWidth <= document.querySelector('.main-content').clientWidth + 1,
@@ -78,24 +78,28 @@ async function assertOverlayFitsAtWidths(page, selector) {
           cards: [...document.querySelectorAll('.pending-feedback-record')].map(card => {
             const cardRect = card.getBoundingClientRect();
             const actions = [...card.querySelectorAll('.history-card-actions button')];
+            const facts = card.querySelector('.attendance-day-facts');
+            const [day, clock, normal, ot] = Array.from(facts.children, field => field.getBoundingClientRect());
             return {
               radius: getComputedStyle(card).borderRadius,
               padding: getComputedStyle(card).padding,
-              date: card.querySelector('.history-card-ref')?.textContent.trim(),
-              title: card.querySelector('.history-card-title')?.textContent.trim(),
+              date: card.querySelector('.history-card-title')?.textContent.trim(),
+              shift: card.querySelector('.attendance-day-shift')?.textContent.trim(),
+              times: card.querySelector('[data-clock-times]').textContent,
               labels: [...card.querySelectorAll('.attendance-history-detail > span')].map(node => node.textContent.trim()),
               status: card.querySelector('.card-status-badge')?.textContent.trim(),
               actions: actions.map(node => node.textContent.trim()),
-              detailGap: getComputedStyle(card.querySelector('.history-card-details')).rowGap,
-              detailRadius: getComputedStyle(card.querySelector('.history-card-details')).borderRadius,
-              detailRowsAreBorderless: [...card.querySelectorAll('.attendance-history-detail')].every(row => getComputedStyle(row).borderBottomStyle === 'none'),
+              detailRadius: getComputedStyle(facts).borderRadius,
+              twoByTwo: day.top === clock.top && normal.top === ot.top && day.bottom === normal.top && day.right === clock.left,
+              columnDivider: getComputedStyle(facts.children[1]).borderInlineStartWidth,
+              rowDivider: getComputedStyle(facts.children[2]).borderBlockStartWidth,
               actionsLayout: getComputedStyle(card.querySelector('.history-card-actions')).display,
               actionsAlignment: getComputedStyle(card.querySelector('.history-card-actions')).justifyContent,
               actionRadii: actions.map(button => getComputedStyle(button).borderRadius),
               compactActions: actions.every(button => button.getBoundingClientRect().width < 140),
               actionsStayOnOneRow: new Set(actions.map(button => Math.round(button.getBoundingClientRect().top))).size === 1,
               titleStaysOnOneLine: card.querySelector('.history-card-title').scrollHeight < parseFloat(getComputedStyle(card.querySelector('.history-card-title')).lineHeight) * 1.5,
-              hasChevron: !!card.querySelector('.attendance-history-card-end > .fa-chevron-right'),
+              hasChevron: !!card.querySelector('.history-card-header .fa-chevron-right'),
               semanticDetailsButton: !card.hasAttribute('role') && card.querySelector('.pending-feedback-details-trigger')?.tagName === 'BUTTON',
               fits: card.scrollWidth <= card.clientWidth + 1 && actions.every(button => {
                 const rect = button.getBoundingClientRect();
@@ -109,17 +113,19 @@ async function assertOverlayFitsAtWidths(page, selector) {
         assert.equal(layout.hasVerifyControls, false, 'Pending Attendance Feedback must not expose Verify controls');
         assert.equal(layout.cards.length, 2);
         assert.equal(layout.hasAttendanceContext, false, 'Pending Attendance Feedback must not show Shift Group or Supervisor');
-        assert.deepEqual(layout.cards.map(card => card.date), ['Mon 14 Sep 2026', 'Tue 15 Sep 2026']);
+        assert.deepEqual(layout.cards.map(card => card.date), ['Mon, 14 Sep 2026', 'Tue, 15 Sep 2026']);
+        assert.deepEqual(layout.cards.map(card => card.times), ['08:09 → 19:40', '07:38 → —']);
         assert.deepEqual(layout.cards.map(card => card.status), ['Unapproved OT', 'Unpaired Clock Entry']);
         layout.cards.forEach((card, cardIndex) => {
           assert.equal(card.radius, '18px');
           assert.equal(card.padding, '18px');
-          assert.ok(card.title);
-          assert.deepEqual(card.labels, ['Day Type', 'Clock Times', 'Normal Hours', 'OT Hours', 'Exception']);
+          assert.equal(card.shift, '8.30AM–5.30PM (W01)');
+          assert.deepEqual(card.labels, ['Day Type', 'Clock Times', 'Normal Hours', 'OT Hours']);
           assert.deepEqual(card.actions, ['Change Shift', 'Feedback']);
-          assert.equal(card.detailGap, '10px');
           assert.equal(card.detailRadius, '12px');
-          assert.equal(card.detailRowsAreBorderless, true);
+          assert.equal(card.twoByTwo, true);
+          assert.equal(card.columnDivider, '1px');
+          assert.equal(card.rowDivider, '1px');
           assert.equal(card.actionsLayout, 'grid');
           assert.equal(card.actionsAlignment, 'end');
           assert.equal(card.actionsStayOnOneRow, true);
@@ -156,7 +162,7 @@ async function assertOverlayFitsAtWidths(page, selector) {
         'Unapproved OT Hours', 'Exception', 'Document #'
       ]);
       assert.deepEqual(details.values, [
-        '#EBB12', 'Farhan binti rahmat', '15 Sep 2026', '8.30AM–5.30PM (W01)', 'Work Day', 'GROUP A',
+        '#EBB12', 'Farhan binti rahmat', '15 Sep 2026', '8.30AM–5.30PM (W01)', 'Workday', 'GROUP A',
         '#EBB04', '07:38', '0.00', '0', 'Not applicable', 'Clock-out missing', '-', '-',
         '-', 'No', 'Not applicable', '-', '0.00', '0.00', 'Missing Clock Out', '–'
       ]);

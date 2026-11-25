@@ -39,10 +39,15 @@ const pageUrl = pathToFileURL(path.resolve(__dirname, '../modules/attendance/opt
     assert.equal(await page.$eval('#modalSupervisorSelect', node => node.value), 'EBB04');
 
     await page.select('#modalSupervisorSelect', '000234');
-    await page.click('#editOtDetailsModal .btn-primary');
-    await new Promise(resolve => setTimeout(resolve, 320));
+    await page.click('#editOtDetailsModal [type="submit"]');
+    await page.waitForSelector('#editOtDetailsModal', { hidden: true });
+    assert.equal(await page.$eval('#otDetailSupervisor', node => node.textContent), '#000234 · Kevin Lim');
     await page.click('.ot-edit-link');
     assert.equal(await page.$eval('#modalSupervisorSelect', node => node.value), '000234');
+    await page.select('#modalSupervisorSelect', '000450');
+    await page.click('#editOtDetailsModal .sheet-footer [type="button"]');
+    await page.waitForSelector('#editOtDetailsModal', { hidden: true });
+    assert.equal(await page.$eval('#otDetailSupervisor', node => node.textContent), '#000234 · Kevin Lim');
 
     await page.goto(pageUrl + '?theme=dark', { waitUntil: 'load' });
     await page.click('.ot-edit-link');

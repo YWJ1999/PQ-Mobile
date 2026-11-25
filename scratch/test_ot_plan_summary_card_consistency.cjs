@@ -40,6 +40,8 @@ async function readCardStyles(page) {
     await page.setViewport({ width: 390, height: 900 });
 
     await page.goto(shiftPlanUrl + '?theme=light', { waitUntil: 'domcontentloaded' });
+    await page.click('#tabCalendarBtn');
+    await page.click('#calSummaryCard [data-kind="ot"]');
     const shiftCardStyles = await readCardStyles(page);
     assert.equal(await page.$$eval('#view-ot-plan-summary .calendar-purple-card', cards => cards.length), 2);
     assert.equal(
@@ -51,6 +53,8 @@ async function readCardStyles(page) {
     );
 
     await page.goto(otPlanUrl + '?theme=light', { waitUntil: 'domcontentloaded' });
+    await page.click('#tabCalendarBtn');
+    await page.click('#calSummaryCard .is-total');
     const cardSelector = [
       '#view-ot-plan-summary .history-card-item',
       '#view-approved-ot-summary .history-card-item',
@@ -61,7 +65,7 @@ async function readCardStyles(page) {
     assert.equal(await page.$$eval(cardSelector, nodes => nodes.every(node => node.classList.contains('calendar-purple-card'))), true);
     assert.equal(await page.$$eval(cardSelector, nodes => nodes.some(node => node.classList.contains('ot-theme'))), false);
     assert.equal(
-      await page.$$eval(cardSelector, nodes => nodes.every(node => !node.querySelector('.calendar-purple-card-header .fa-chevron-right'))),
+      await page.$$eval(cardSelector, nodes => nodes.every(node => node.querySelector('.calendar-purple-card-header .fa-chevron-right'))),
       true
     );
     assert.equal(await page.$$eval(cardSelector, nodes => nodes.every(node => node.querySelectorAll('.calendar-purple-detail').length === 3)), true);
@@ -75,13 +79,12 @@ async function readCardStyles(page) {
     );
     assert.deepEqual(await readCardStyles(page), shiftCardStyles);
 
-    await page.evaluate(() => openSummaryViewFromCal('view-ot-plan-summary'));
     await page.click('#view-ot-plan-summary .calendar-purple-card');
     assert.equal(await page.$eval('#view-ot-plan-detail', view => view.classList.contains('active')), true);
     assert.equal(await page.$eval('#otDetailShift', node => node.textContent.trim()), '8.30:17.30W');
     assert.deepEqual(errors, []);
 
-    console.log('OT Plan summary cards keep the shared styling without chevrons.');
+    console.log('OT Plan summary cards use the Shift Planning layout and open employee details.');
   } finally {
     await browser.close();
   }

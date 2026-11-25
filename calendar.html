@@ -12,6 +12,7 @@
   <link rel="stylesheet" href="css/theme.css">
   <link rel="stylesheet" href="css/app.css">
   <script src="js/components.js"></script>
+  <script src="js/calendar-month.js"></script>
   <script src="js/app.js" defer></script>
 </head>
 
@@ -129,7 +130,7 @@
     </div>
 
     <!-- Bottom Navigation Bar with Calendar Active -->
-    <phone-bottom-nav active="calendar"></phone-bottom-nav>
+    <phone-bottom-nav in-flow active="calendar"></phone-bottom-nav>
 
     <!-- Slide-in Left Profile Drawer -->
     <left-profile-drawer></left-profile-drawer>
@@ -326,6 +327,10 @@
       { day: 30, type: 'work', cat: 'roster', status: 'Approved', label: '', full: 'Working Shift (09:00 - 18:00)' }
     ];
 
+    const calendarEvents = { '2026-08': AUGUST_2026_DAYS, '2026-09': SEPTEMBER_2026_DAYS };
+    const weekDateFormat = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+    const monthNames = Array.from({length: 12}, (_, i) => new Date(2026, i, 1).toLocaleString('en-GB', {month: 'long'}));
+
     // Render Calendar Grid
     function renderCalendar() {
       const grid = document.getElementById('calDaysGrid');
@@ -333,40 +338,42 @@
       const subEl = document.getElementById('calActiveFilterSub');
       grid.innerHTML = '';
       const subNameMap = { all: 'All Summary', leave: 'Leave', roster: 'Roster', booking: 'Book', training: 'Train', meeting: 'Meet', subordinate: 'Staff' };
-      const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-      const monthIndex = monthNames.indexOf(filterState.month);
-      const year = Number(filterState.year);
-      const dayCount = new Date(year, monthIndex + 1, 0).getDate();
-      titleEl.innerText = filterState.month + ' ' + filterState.year;
-      subEl.innerText = subNameMap[activeSubCalendar] + ' ? Status: ' + filterState.status + ' ? ' + filterState.month + ' ' + filterState.year;
-      const source = year === 2026 && filterState.month === 'August' ? AUGUST_2026_DAYS : year === 2026 && filterState.month === 'September' ? SEPTEMBER_2026_DAYS : [];
-      const events = new Map(source.map(item => [item.day, item]));
-      let displayDays = Array.from({ length: dayCount }, (_, index) => index + 1);
-      const leadCount = viewMode === 'month' ? new Date(year, monthIndex, 1).getDay() : 0;
-      if (viewMode === 'week') displayDays = displayDays.slice(15, 22);
+      const month = calendarMonth(Number(filterState.year), monthNames.indexOf(filterState.month));
+      const anchor = new Date(selectedDateStr + 'T12:00:00');
+      const weekly = viewMode === 'week';
+      const firstDay = weekly ? anchor.getDate() - anchor.getDay() : 1;
+      titleEl.textContent = weekly ? weekDateFormat.formatRange(month.date(firstDay), month.date(firstDay + 6)) : month.label;
+      subEl.textContent = subNameMap[activeSubCalendar] + ' • Status: ' + filterState.status + ' • ' + month.label;
+      const leadCount = weekly ? 0 : month.date(1).getDay();
       for (let index = 0; index < leadCount; index++) {
-        const emptyCell = document.createElement('div'); emptyCell.className = 'cal-day-cell other-month'; grid.appendChild(emptyCell);
+        const emptyCell = document.createElement('div');
+        emptyCell.className = 'cal-day-cell other-month';
+        grid.append(emptyCell);
       }
-      displayDays.forEach(day => {
-        const item = events.get(day) || { day, type: 'work', cat: 'roster', full: 'Working Shift (09:00 - 18:00)' };
-        const dateStr = String(year) + '-' + String(monthIndex + 1).padStart(2, '0') + '-' + String(day).padStart(2, '0');
-        const categoryMatches = activeSubCalendar === 'all' || item.cat === activeSubCalendar;
-        const status = recordReviewStatusLabel(item.status);
+      const count = weekly ? 7 : month.days;
+      for (let index = 0; index < count; index++) {
+        const date = month.date(firstDay + index);
+        const day = date.getDate();
+        const dateStr = calendarDateKey(date);
+        const item = calendarEvents[dateStr.slice(0, 7)]?.[day - 1];
+        const categoryMatches = activeSubCalendar === 'all' || item?.cat === activeSubCalendar;
+        const status = recordReviewStatusLabel(item?.status);
         const statusMatches = filterState.status === 'All' || status === filterState.status;
-        const highlighted = categoryMatches && statusMatches;
+        const highlighted = item && categoryMatches && statusMatches;
         const cellEl = document.createElement('div');
         cellEl.className = highlighted ? 'cal-day-cell status-' + item.type : 'cal-day-cell';
+        cellEl.dataset.date = dateStr;
         if (dateStr === selectedDateStr) cellEl.classList.add('selected');
         const statusDot = highlighted && status ? '<span class="cal-status-dot dot-' + status.toLowerCase() + '" title="Status: ' + status + '"></span>' : '';
         cellEl.innerHTML = '<span class="cal-date-num">' + day + '</span>' + (highlighted && item.label ? '<span class="cal-cell-tag">' + item.label + '</span>' : '') + statusDot;
         cellEl.onclick = () => selectDate(dateStr, item);
         grid.appendChild(cellEl);
-      });
+      }
     }
 
     // Select date cell & trigger the Event Detail Bottom Sheet
     function selectDate(dateStr, itemData) {
-      selectedDateStr = dateStr;
+      setCalendarDate(new Date(dateStr + 'T12:00:00'));
       currentSelectedData = itemData;
       renderCalendar();
       openCalEventSheet(dateStr, itemData);
@@ -381,13 +388,21 @@
       const actionIcon = document.getElementById('sheetActionIcon');
       const actionText = document.getElementById('sheetPrimaryActionText');
 
-      const d = new Date(dateStr);
+      const d = new Date(dateStr + 'T12:00:00');
       const options = { weekday: 'long', day: 'numeric', month: 'short', year: 'numeric' };
       const formattedDate = d.toLocaleDateString('en-US', options);
 
       titleEl.innerText = formattedDate;
 
-      const st = itemData ? (itemData.status || 'Approved') : 'Approved';
+      if (!itemData) {
+        subEl.textContent = 'Event & Shift Details';
+        contentEl.textContent = 'No events scheduled for this date.';
+        actionIcon.textContent = '';
+        actionText.textContent = 'Close';
+        overlay.classList.add('open');
+        return;
+      }
+      const st = itemData.status || 'Approved';
       subEl.innerText = `Status: ${recordReviewStatusLabel(st)} • Event & Shift Details`;
 
       const type = itemData ? itemData.type : 'work';
@@ -633,21 +648,26 @@
       renderCalendar();
     }
 
-    // Shift period stepper arrows (< >)
-    function shiftPeriod(delta) {
-      const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-      let index = monthNames.indexOf(filterState.month) + delta;
-      let year = Number(filterState.year);
-      if (index < 0) { index = 11; year -= 1; }
-      if (index > 11) { index = 0; year += 1; }
-      filterState.month = monthNames[index];
-      filterState.year = String(year);
-      const monthSelect = document.getElementById('selectFilterMonth');
-      if (![...monthSelect.options].some(option => option.value === filterState.month)) {
-        const option = document.createElement('option'); option.value = filterState.month; option.textContent = filterState.month; monthSelect.appendChild(option);
+    function setCalendarDate(date) {
+      selectedDateStr = calendarDateKey(date);
+      filterState.month = monthNames[date.getMonth()];
+      filterState.year = String(date.getFullYear());
+      for (const [id, value] of [['selectFilterMonth', filterState.month], ['selectFilterYear', filterState.year]]) {
+        const select = document.getElementById(id);
+        if (![...select.options].some(option => option.value === value)) select.add(new Option(value, value));
+        select.value = value;
       }
-      document.getElementById('selectFilterYear').value = filterState.year;
-      monthSelect.value = filterState.month;
+    }
+
+    function shiftPeriod(delta) {
+      const date = new Date(selectedDateStr + 'T12:00:00');
+      if (viewMode === 'week') {
+        date.setDate(date.getDate() + delta * 7);
+        setCalendarDate(date);
+      } else {
+        const month = calendarMonth(date.getFullYear(), date.getMonth() + delta);
+        setCalendarDate(month.date(Math.min(date.getDate(), month.days)));
+      }
       renderCalendar();
     }
 
@@ -672,8 +692,11 @@
 
     // Update dropdown selections
     function updatePeriodFromSelect() {
-      filterState.year = document.getElementById('selectFilterYear').value;
-      filterState.month = document.getElementById('selectFilterMonth').value;
+      const year = Number(document.getElementById('selectFilterYear').value);
+      const index = monthNames.indexOf(document.getElementById('selectFilterMonth').value);
+      const month = calendarMonth(year, index);
+      const day = Number(selectedDateStr.slice(-2));
+      setCalendarDate(month.date(Math.min(day, month.days)));
     }
 
     // Reset filter to defaults (All Status, 2026 August)

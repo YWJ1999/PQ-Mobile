@@ -1,0 +1,121 @@
+/* Daily records on Attendance and Pending Attendance Feedback. */
+html body .history-card-item.attendance-day-card {
+  display: block;
+  margin-bottom: 14px;
+}
+
+.attendance-day-card[hidden] { display: none !important; }
+
+html body .attendance-day-card > .history-card-header {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 8px;
+  min-height: 0;
+  padding-block: 12px !important;
+}
+
+.attendance-day-card .history-card-heading {
+  display: grid;
+  flex: 1 0 auto;
+  gap: 3px;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+
+.attendance-day-card .history-card-title {
+  margin: 0;
+  font-size: clamp(16px, 4.6vw, 18px);
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: -.02em;
+}
+
+.attendance-day-shift {
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+html body .attendance-day-card .history-card-header .card-status-badge {
+  min-width: 0;
+  flex-shrink: 1;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  text-align: end;
+  line-height: 1.25;
+}
+
+.attendance-day-facts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  width: 100%;
+  margin: 12px 0 0;
+  padding: 0;
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--bg-input) 75%, var(--border-subtle));
+  color: var(--text-primary);
+  text-align: start;
+}
+
+.attendance-day-facts > * {
+  display: grid;
+  align-content: start;
+  gap: 2px;
+  min-width: 0;
+  padding: 8px clamp(10px, 3.8vw, 16px);
+}
+
+.attendance-day-facts > :nth-child(even) { border-inline-start: 1px solid var(--border-subtle); }
+.attendance-day-facts > :nth-child(n+3) { border-block-start: 1px solid var(--border-subtle); }
+
+.attendance-day-facts > * > span {
+  color: var(--text-muted);
+  font-size: 11.5px;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.attendance-day-facts > * > strong {
+  color: var(--text-primary);
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.35;
+  font-variant-numeric: tabular-nums;
+}
+
+.attendance-day-facts [data-clock-times] { white-space: nowrap; }
+
+.attendance-day-card .history-card-actions {
+  font-family: 'Plus Jakarta Sans', 'Segoe UI', sans-serif;
+}
+
+@media (max-width: 360px) {
+  html body .attendance-day-card > .history-card-header {
+    gap: 6px;
+    padding-inline: 14px !important;
+  }
+}
+
+/* The same exception gets the same header and legend swatch on both pages. */
+.pending-feedback-page [data-status="unapproved-ot"],
+:is(.attendance-day-card, .attendance-status-key li)[data-exception="unapproved-ot"] {
+  --exception-colour: #c32929;
+}
+
+.pending-feedback-page :is([data-status="odd-clocking"], [data-status="missing-clock-in"], [data-status="missing-clock-out"]),
+:is(.attendance-day-card, .attendance-status-key li)[data-exception="missing-clock"] {
+  --exception-colour: #ac520d;
+}
+
+html body.pending-feedback-page :is(.pending-feedback-record, .attendance-exception-key li)[data-status],
+html body :is(.history-card-item.attendance-day-card, .attendance-status-key li):is([data-exception="unapproved-ot"], [data-exception="missing-clock"]) {
+  --record-accent: var(--exception-colour, var(--text-muted));
+  --record-header-fill: linear-gradient(105deg, color-mix(in srgb, var(--record-accent) 75%, black), var(--record-accent));
+}

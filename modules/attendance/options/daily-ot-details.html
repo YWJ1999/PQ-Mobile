@@ -35,16 +35,57 @@
     </header>
 
     <main class="daily-ot-detail-content">
-      <div id="dailyOtRecords" class="daily-ot-records"></div>
+      <form id="dailyOtForm">
+        <div class="entries-heading">
+          <h2 id="dailyOtEntriesTitle">OT entries</h2>
+          <span id="dailyOtDuration">Duration (HHMM)</span>
+        </div>
+        <div class="history-card-item daily-ot-table-wrap">
+          <table class="daily-ot-entries-table" aria-labelledby="dailyOtEntriesTitle" aria-describedby="dailyOtDuration">
+            <thead>
+              <tr>
+                <th scope="col">OT type</th>
+                <th scope="col">Actual</th>
+                <th scope="col">Approved</th>
+              </tr>
+            </thead>
+            <tbody id="dailyOtRecords"></tbody>
+          </table>
+        </div>
+      </form>
     </main>
 
-    <div id="dailyOtActions" class="detail-actions">
-      <button id="dailyOtUpdate" class="primary-action" type="button">Void selected (0)</button>
-    </div>
-    <phone-bottom-nav active="apps"></phone-bottom-nav>
-    <div id="dailyOtToast" class="detail-toast" role="status" aria-live="polite">Daily OT updated</div>
+    <footer id="dailyOtActions" class="detail-actions">
+      <div class="approved-total">
+        <label for="dailyOtTotal">Total approved OT (hours)</label>
+        <output id="dailyOtTotal" aria-live="polite">0.00</output>
+      </div>
+      <button id="dailyOtUpdate" class="primary-action" type="submit" form="dailyOtForm">Update</button>
+      <div id="dailyOtToast" class="detail-toast" role="status"></div>
+    </footer>
+    <phone-bottom-nav in-flow active="apps"></phone-bottom-nav>
   </div>
 
+  <template id="dailyOtEntry">
+    <tr class="daily-ot-record">
+      <td>
+        <span class="ot-type-name"></span>
+        <label class="daily-ot-void-control">
+          <input class="daily-ot-void-checkbox" type="checkbox">
+          <span>Void entry</span>
+        </label>
+      </td>
+      <td class="record-readonly"></td>
+      <td>
+        <label class="approved-field">
+          <input class="daily-ot-approval-input" type="text" inputmode="numeric" maxlength="4"
+                 required pattern="[0-9]{2}[0-5][0-9]" autocomplete="off" placeholder="HHMM"
+                 title="Enter four digits in HHMM format, with minutes from 00 to 59.">
+          <i class="fa-solid fa-pen" aria-hidden="true"></i>
+        </label>
+      </td>
+    </tr>
+  </template>
   <script src="daily-ot-data.js"></script>
   <script src="daily-ot-details.js"></script>
 </body>

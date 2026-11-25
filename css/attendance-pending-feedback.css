@@ -60,127 +60,12 @@
 .pending-feedback-page [data-status="holiday-absent"] { --exception-colour: #a03369; }
 .pending-feedback-page [data-status="late-in"] { --exception-colour: #866009; }
 .pending-feedback-page [data-status="on-leave"] { --exception-colour: #24724e; }
-.pending-feedback-page :is([data-status="odd-clocking"], [data-status="missing-clock-in"], [data-status="missing-clock-out"]) { --exception-colour: #ac520d; }
 .pending-feedback-page [data-status="undefined-shift"] { --exception-colour: #73469c; }
 .pending-feedback-page [data-status="no-shift-group"] { --exception-colour: #46539e; }
-.pending-feedback-page [data-status="unapproved-ot"] { --exception-colour: #c32929; }
 .pending-feedback-page [data-status="invalid-clock-sequence"] { --exception-colour: #943f8a; }
 .pending-feedback-page [data-status="time-off"] { --exception-colour: #0e7479; }
 
-html body.pending-feedback-page :is(.pending-feedback-record, .attendance-exception-key li)[data-status] {
-  --record-accent: var(--exception-colour, var(--text-muted));
-  --record-header-fill: linear-gradient(105deg, color-mix(in srgb, var(--record-accent) 75%, black), var(--record-accent));
-}
 .attendance-exception-key li > span { background: var(--record-header-fill); }
-.attendance-history-page.pending-feedback-page .pending-feedback-record {
-  --history-ink: var(--record-accent);
-  margin-bottom: 14px;
-  padding: 16px 18px;
-  border-left-color: var(--record-accent);
-  border-radius: 20px;
-  background: linear-gradient(135deg, var(--bg-card) 0%, color-mix(in srgb, var(--record-accent) 5.5%, transparent) 100%);
-}
-[data-theme="dark"] .attendance-history-page.pending-feedback-page .pending-feedback-record {
-  --history-ink: color-mix(in srgb, var(--record-accent) 45%, white);
-}
-.pending-feedback-page .history-card-header { gap: 8px; }
-.pending-feedback-page .pending-feedback-details-trigger {
-  min-width: 0;
-  flex: 1;
-  padding: 0;
-  border: 0;
-  background: transparent;
-  color: inherit;
-  font: inherit;
-  text-align: left;
-  cursor: pointer;
-}
-.pending-feedback-page .history-card-title {
-  font-size: 13.5px;
-  line-height: 1.35;
-}
-.pending-feedback-page .history-card-ref {
-  margin-top: 4px;
-  color: var(--purple-text);
-  font-size: 10.5px;
-  letter-spacing: .2px;
-}
-.pending-feedback-page .attendance-history-card-end {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.pending-feedback-page .history-card-header .attendance-history-card-end .card-status-badge {
-  max-width: 132px;
-  padding: 4px 8px;
-  border-radius: 10px;
-  color: var(--history-ink);
-  font-size: 10px;
-  line-height: 1.15;
-  white-space: normal;
-}
-.pending-feedback-page .history-card-details {
-  margin-top: 10px;
-  padding: 12px;
-  gap: 7px;
-  border-color: color-mix(in srgb, var(--record-accent) 20%, transparent);
-  border-radius: 14px;
-  background: color-mix(in srgb, var(--record-accent) 5.5%, transparent);
-}
-.pending-feedback-page .attendance-history-detail {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 16px;
-  min-width: 0;
-  padding: 0;
-  border: 0;
-}
-.pending-feedback-page .attendance-history-detail span {
-  flex: 0 0 auto;
-  color: var(--text-muted);
-  font-size: 11px;
-  font-weight: 600;
-}
-.pending-feedback-page .attendance-history-detail strong {
-  min-width: 0;
-  color: var(--text-primary);
-  font-size: 11.5px;
-  font-weight: 800;
-  text-align: right;
-  font-variant-numeric: tabular-nums;
-  overflow-wrap: anywhere;
-}
-.pending-feedback-page .attendance-history-detail:last-child strong { color: var(--history-ink); }
-.pending-feedback-page .history-card-actions {
-  display: flex;
-  justify-content: flex-end;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 12px;
-}
-.pending-feedback-page .card-action-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 5px;
-  min-height: 34px;
-  padding: 8px 10px;
-  border-radius: 20px;
-  font-family: inherit;
-  font-size: 11px;
-  font-weight: 700;
-  white-space: nowrap;
-  cursor: pointer;
-  transition: transform .18s ease, filter .18s ease;
-}
-.pending-feedback-page .card-action-btn:active { transform: scale(.97); }
-.pending-feedback-page :is(.btn-shift-change,.btn-feedback) {
-  border: 1px solid #7c3aed;
-  background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
-  color: #fff;
-  box-shadow: 0 5px 14px rgba(124,58,237,.24);
-}
 .pending-feedback-page :is(button,.history-card-item):focus-visible {
   outline: 3px solid rgba(124,58,237,.3);
   outline-offset: 2px;
@@ -483,11 +368,6 @@ html body.pending-feedback-page :is(.pending-feedback-record, .attendance-except
 
 @media (max-width: 374px) {
   .pending-feedback-header-row h1 { font-size: 15px; }
-  .pending-feedback-page .history-card-header { gap: 5px; }
-  .pending-feedback-page .attendance-history-card-end { gap: 5px; }
-  .pending-feedback-page .history-card-title { font-size: 12px; letter-spacing: -.2px; }
-  .pending-feedback-page .history-card-header .attendance-history-card-end .card-status-badge { max-width: 108px; padding-inline: 6px; font-size: 8.75px; }
-  .pending-feedback-page .card-action-btn { padding-inline: 7px; font-size: 9.5px; }
   .pending-feedback-upload-actions { grid-template-columns: 1fr; }
 }
 @media (prefers-reduced-motion: reduce) {

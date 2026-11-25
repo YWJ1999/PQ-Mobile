@@ -19,6 +19,7 @@
   <link rel="stylesheet" href="../../../css/history-cards.css">
   <link rel="stylesheet" href="../../../css/attendance-history.css">
   <link rel="stylesheet" href="../../../css/attendance-pending-feedback.css">
+  <link rel="stylesheet" href="../../../css/attendance-day-cards.css">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
     body { min-height: 100vh; padding: 20px 0; display: flex; flex-direction: column; align-items: center; justify-content: center; background: var(--bg-page); color: var(--text-primary); }
@@ -68,57 +69,51 @@
         </div>
       </section>
 
-      <article class="history-card-item pending-feedback-record"
+      <article class="history-card-item attendance-day-card pending-feedback-record"
         data-status="unapproved-ot" data-date="14 Sep 2026" data-shift="8.30AM&ndash;5.30PM (W01)"
         data-times="08:09 &middot; 19:40" data-normal-hours="8.00" data-ot-hours="2.00" data-exception="Unapproved OT"
         data-late-in="00:00" data-early-out="00:00" data-absent="No"
         onclick="HistoryRecordPage.open('attendance', this.dataset.date, this.querySelector('.pending-feedback-details-trigger'))">
         <div class="history-card-header">
           <button type="button" class="history-card-heading pending-feedback-details-trigger" aria-label="View attendance details for 14 Sep 2026" onclick="event.stopPropagation(); HistoryRecordPage.open('attendance', this.closest('.pending-feedback-record').dataset.date, this)">
-            <h3 class="history-card-title">8.30AM&ndash;5.30PM (W01)</h3>
-            <div class="history-card-ref">Mon 14 Sep 2026</div>
+            <time class="history-card-title" datetime="2026-09-14">Mon, 14 Sep 2026</time>
+            <span class="attendance-day-shift">8.30AM&ndash;5.30PM (W01)</span>
           </button>
-          <div class="attendance-history-card-end">
-            <span class="card-status-badge"><i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i>Unapproved OT</span>
-          </div>
+          <span class="card-status-badge"><i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i>Unapproved OT</span>
         </div>
-        <div class="history-card-details">
-          <div class="attendance-history-detail"><span>Day Type</span><strong data-day-type>Work Day</strong></div>
-          <div class="attendance-history-detail"><span>Clock Times</span><strong>08:09 &middot; 19:40</strong></div>
+        <div class="attendance-day-facts">
+          <div class="attendance-history-detail"><span>Day Type</span><strong data-day-type>Workday</strong></div>
+          <div class="attendance-history-detail"><span>Clock Times</span><strong data-clock-times data-icon-system-ignore>08:09 &rarr; 19:40</strong></div>
           <div class="attendance-history-detail"><span>Normal Hours</span><strong>8.00</strong></div>
           <div class="attendance-history-detail"><span>OT Hours</span><strong>2.00</strong></div>
-          <div class="attendance-history-detail"><span>Exception</span><strong>Unapproved OT</strong></div>
         </div>
         <div class="history-card-actions">
-          <button type="button" class="card-action-btn btn-shift-change" onclick="event.stopPropagation(); runAttendanceHistoryAction('shift', this.closest('.pending-feedback-record'))"><span>Change Shift</span></button>
-          <button type="button" class="card-action-btn btn-feedback" onclick="event.stopPropagation(); runAttendanceHistoryAction('feedback', this.closest('.pending-feedback-record'))"><span>Feedback</span></button>
+          <button type="button" class="card-action-btn btn-shift-change" onclick="event.stopPropagation(); runAttendanceHistoryAction('shift', this.closest('.pending-feedback-record'))">Change Shift</button>
+          <button type="button" class="card-action-btn btn-feedback" onclick="event.stopPropagation(); runAttendanceHistoryAction('feedback', this.closest('.pending-feedback-record'))">Feedback</button>
         </div>
       </article>
 
-      <article class="history-card-item pending-feedback-record"
+      <article class="history-card-item attendance-day-card pending-feedback-record"
         data-status="odd-clocking" data-date="15 Sep 2026" data-shift="8.30AM&ndash;5.30PM (W01)"
         data-times="07:38" data-normal-hours="0.00" data-ot-hours="0.00" data-exception="Missing Clock Out"
         data-late-in="00:00" data-missing-clock-out="true" data-absent="No"
         onclick="HistoryRecordPage.open('attendance', this.dataset.date, this.querySelector('.pending-feedback-details-trigger'))">
         <div class="history-card-header">
           <button type="button" class="history-card-heading pending-feedback-details-trigger" aria-label="View attendance details for 15 Sep 2026" onclick="event.stopPropagation(); HistoryRecordPage.open('attendance', this.closest('.pending-feedback-record').dataset.date, this)">
-            <h3 class="history-card-title">8.30AM&ndash;5.30PM (W01)</h3>
-            <div class="history-card-ref">Tue 15 Sep 2026</div>
+            <time class="history-card-title" datetime="2026-09-15">Tue, 15 Sep 2026</time>
+            <span class="attendance-day-shift">8.30AM&ndash;5.30PM (W01)</span>
           </button>
-          <div class="attendance-history-card-end">
-            <span class="card-status-badge"><i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i>Unpaired Clock Entry</span>
-          </div>
+          <span class="card-status-badge"><i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i>Unpaired Clock Entry</span>
         </div>
-        <div class="history-card-details">
-          <div class="attendance-history-detail"><span>Day Type</span><strong data-day-type>Work Day</strong></div>
-          <div class="attendance-history-detail"><span>Clock Times</span><strong>07:38</strong></div>
+        <div class="attendance-day-facts">
+          <div class="attendance-history-detail"><span>Day Type</span><strong data-day-type>Workday</strong></div>
+          <div class="attendance-history-detail"><span>Clock Times</span><strong data-clock-times data-icon-system-ignore>07:38 &rarr; &mdash;</strong></div>
           <div class="attendance-history-detail"><span>Normal Hours</span><strong>0.00</strong></div>
           <div class="attendance-history-detail"><span>OT Hours</span><strong>0.00</strong></div>
-          <div class="attendance-history-detail"><span>Exception</span><strong>Missing Clock Out</strong></div>
         </div>
         <div class="history-card-actions">
-          <button type="button" class="card-action-btn btn-shift-change" onclick="event.stopPropagation(); runAttendanceHistoryAction('shift', this.closest('.pending-feedback-record'))"><span>Change Shift</span></button>
-          <button type="button" class="card-action-btn btn-feedback" onclick="event.stopPropagation(); runAttendanceHistoryAction('feedback', this.closest('.pending-feedback-record'))"><span>Feedback</span></button>
+          <button type="button" class="card-action-btn btn-shift-change" onclick="event.stopPropagation(); runAttendanceHistoryAction('shift', this.closest('.pending-feedback-record'))">Change Shift</button>
+          <button type="button" class="card-action-btn btn-feedback" onclick="event.stopPropagation(); runAttendanceHistoryAction('feedback', this.closest('.pending-feedback-record'))">Feedback</button>
         </div>
       </article>
     </main>

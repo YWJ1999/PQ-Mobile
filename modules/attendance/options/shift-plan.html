@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>PeopleHCM - Shift Plan</title>
+  <link rel="stylesheet" href="../../../css/history-record-page.css">
+  <script src="../../../js/history-record-page.js"></script>
   <script src="../../../js/components.js">
     function adjustDate(offset) {
       if (!window.currentSummaryFilterDate) {
@@ -35,6 +37,9 @@
     }
 
   </script>
+  <script src="../../../js/calendar-month.js" defer></script>
+  <script src="../../../js/attendance/planning-calendar.js" defer></script>
+  <script src="../../../js/attendance/planning-headcount-details.js" defer></script>
   <script src="../../../js/app.js" defer></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -42,7 +47,7 @@
   <link rel="stylesheet" href="../../../assets/vendor/fontawesome-6.7.2/css/all.min.css">
   <link rel="stylesheet" href="../../../css/theme.css">
   <link rel="stylesheet" href="../../../css/app.css">
-  <link rel="stylesheet" href="../../../css/detail-popout.css">
+  <link rel="stylesheet" href="../../../css/attendance-planning.css">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: 'Plus Jakarta Sans', sans-serif; }
     body { background-color: var(--bg-page); display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 100vh; color: var(--text-primary); padding: 20px 0; }
@@ -57,144 +62,19 @@
     .icon-btn-ghost { background: rgba(255, 255, 255, 0.18); border: 1px solid rgba(255, 255, 255, 0.25); width: 36px; height: 36px; border-radius: 12px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #ffffff; transition: all 0.2s; }
     .icon-btn-ghost:active { transform: scale(0.92); background: rgba(255, 255, 255, 0.28); }
 
-    /* Executive Date Switcher Card Below Header */
-    .date-switcher-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border-subtle);
-      border-radius: 16px;
-      padding: 6px 8px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 6px;
-      box-shadow: var(--shadow-sm);
-    }
-    .date-nav-btn {
-      background: var(--bg-input);
-      border: 1px solid var(--border-subtle);
-      color: var(--text-primary);
-      font-size: 13px;
-      cursor: pointer;
-      width: 34px;
-      height: 34px;
-      border-radius: 11px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.15s ease;
-      flex-shrink: 0;
-    }
-    .date-nav-btn:active {
-      transform: scale(0.92);
-      background: var(--purple-primary);
-      color: #ffffff;
-    }
-    .date-current-badge {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 7px;
-      font-size: 13.5px;
-      font-weight: 800;
-      color: var(--text-primary);
-    }
-
-    /* Filter Trigger Button Card */
-    .filter-trigger-btn {
-      width: 46px;
-      height: 46px;
-      border-radius: 16px;
-      background: var(--bg-card);
-      border: 1px solid var(--border-subtle);
-      color: var(--purple-primary);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      box-shadow: var(--shadow-sm);
-      font-size: 15px;
-      transition: all 0.15s ease;
-      flex-shrink: 0;
-    }
-    .filter-trigger-btn:active {
-      transform: scale(0.92);
-      background: var(--purple-primary);
-      color: #ffffff;
-    }
-
-    /* 3 Tabs Navigation Card Below Header */
-    .tabs-nav-card {
-      display: flex;
-      background: var(--bg-card);
-      border: 1px solid var(--border-subtle);
-      border-radius: 16px;
-      padding: 4px;
-      gap: 4px;
-      margin-bottom: 14px;
-      box-shadow: var(--shadow-sm);
-    }
-    .tab-card-btn {
-      flex: 1;
-      padding: 9px 0;
-      text-align: center;
-      font-size: 13px;
-      font-weight: 700;
-      color: var(--text-muted);
-      background: transparent;
-      border: none;
-      border-radius: 12px;
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-    .tab-card-btn.active {
-      color: #ffffff;
-      background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
-      font-weight: 800;
-      box-shadow: 0 4px 12px rgba(124, 58, 237, 0.35);
-    }
-
     /* Cards */
     .card { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 20px; padding: 14px; margin-bottom: 12px; box-shadow: var(--shadow-sm); }
-
-    /* Mode Switcher Segment (Change shift vs Copy to dates) */
-    .shift-mode-switcher {
-      display: flex;
-      gap: 6px;
-      background: var(--bg-card);
-      border: 1px solid var(--border-subtle);
-      border-radius: 16px;
-      padding: 4px;
-      margin-bottom: 14px;
-      box-shadow: var(--shadow-sm);
-    }
-    .shift-mode-btn {
-      flex: 1;
-      padding: 10px 14px;
-      border-radius: 12px;
-      font-size: 13px;
-      font-weight: 800;
-      border: none;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      color: var(--text-muted);
-      background: transparent;
-      white-space: nowrap;
-    }
-    .shift-mode-btn.active {
-      background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
-      color: #ffffff;
-      box-shadow: 0 4px 12px rgba(124, 58, 237, 0.35);
-    }
 
     /* Dropdown Picker Trigger */
     .picker-box { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 16px; padding: 12px 14px; margin-bottom: 12px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s; }
     .picker-box:active { border-color: var(--purple-primary); }
     #shiftSelectModal .modal-sheet { background: var(--bg-input); }
-    .shift-picker-trigger { width: 100%; min-height: 54px; font: inherit; text-align: left; color: var(--text-primary); box-shadow: var(--shadow-sm); }
+    #shiftOptionsList .picker-box { margin: 0; font: inherit; text-align: start; }
+    .shift-option-name, .shift-option-description { display: block; }
+    .shift-option-name { color: var(--text-primary); font-size: 14px; font-weight: 700; }
+    .shift-option-description { margin-top: 2px; color: var(--text-muted); font-size: 12px; }
+    #shiftOptionsList .fa-circle-check { color: var(--purple-primary); }
+    .shift-picker-trigger { width: 100%; min-height: 46px; padding-block: 8px; margin-bottom: 10px; font: inherit; text-align: left; color: var(--text-primary); box-shadow: var(--shadow-sm); }
     .shift-picker-trigger:hover { border-color: rgba(124, 58, 237, 0.45); }
     .shift-picker-trigger:active { transform: scale(0.99); }
     .shift-picker-trigger:focus-visible { outline: 3px solid rgba(124, 58, 237, 0.24); outline-offset: 2px; border-color: var(--purple-primary); }
@@ -223,57 +103,8 @@
     .search-input:focus { border-color: var(--purple-primary); }
     .search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 13px; }
 
-    /* Staff List Header */
-    .list-header { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 12px; padding: 14px; border: 1px solid var(--border-subtle); border-radius: 18px; background: var(--bg-card); box-shadow: var(--shadow-sm); }
-    .staff-record-counts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; flex: 1; min-width: 0; }
-    .staff-record-label { display: block; margin-bottom: 4px; color: var(--text-muted); font-size: 10.5px; font-weight: 700; line-height: 1.4; }
-    .list-counter { display: block; font-size: 18px; font-weight: 800; color: var(--purple-primary); line-height: 1.2; font-variant-numeric: tabular-nums; }
-    .select-all-control { display: inline-flex; align-items: center; gap: 7px; flex-shrink: 0; color: var(--purple-primary); font-size: 12.5px; font-weight: 800; cursor: pointer; user-select: none; white-space: nowrap; }
-    .select-all-control input { width: 18px; height: 18px; margin: 0; accent-color: var(--purple-primary); cursor: pointer; }
-    .select-all-control:has(input:focus-visible) { outline: 3px solid rgba(124, 58, 237, 0.22); outline-offset: 3px; border-radius: 8px; }
-    .select-all-control:has(input:disabled) { opacity: 0.5; cursor: default; }
-
-    /* Employee Item Card */
-    .staff-card {
-      background: linear-gradient(135deg, var(--bg-card) 0%, rgba(16, 185, 129, 0.06) 100%);
-      border: 1px solid var(--border-subtle);
-      border-left: 5px solid #10b981;
-      border-radius: 18px;
-      padding: 16px;
-      margin-bottom: 12px;
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-      transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
-      position: relative;
-      box-shadow: var(--shadow-sm);
-      cursor: pointer;
-    }
-    .staff-card:active { transform: scale(0.985); }
-    .staff-card.selected {
-      border-top-color: rgba(124, 58, 237, 0.6);
-      border-right-color: rgba(124, 58, 237, 0.6);
-      border-bottom-color: rgba(124, 58, 237, 0.6);
-      box-shadow: 0 5px 18px rgba(124, 58, 237, 0.12);
-    }
-    .staff-card.disabled { opacity: 0.55; background: var(--bg-input); }
-    .staff-card-top { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; align-items: center; width: 100%; }
-    .staff-identity { min-width: 0; }
-    .staff-name { font-size: 14.5px; font-weight: 800; color: var(--text-primary); line-height: 1.2; }
-    .staff-card-controls { display: flex; flex-direction: column; align-items: center; gap: 8px; }
-    .custom-checkbox { width: 22px; height: 22px; border-radius: 7px; border: 2px solid var(--border-subtle); display: flex; align-items: center; justify-content: center; background: var(--bg-input); cursor: pointer; transition: all 0.2s; flex-shrink: 0; }
-    .staff-card.selected .custom-checkbox { background: #7c3aed; border-color: var(--purple-primary); color: #ffffff; }
-    .custom-checkbox i { font-size: 12px; display: none; }
-    .staff-card.selected .custom-checkbox i { display: block; }
-
-    /* AGENTS.md Required Employee ID Typography */
-    .emp-id-label { font-size: 11.5px; font-weight: 700; color: var(--text-muted); opacity: 0.85; font-family: monospace, sans-serif; margin-bottom: 3px; line-height: 1.2; }
-
-    .staff-card-summary-panel { display: grid; gap: 9px; width: 100%; padding: 12px 14px; border: 1px solid rgba(16, 185, 129, 0.18); border-radius: 15px; background: rgba(16, 185, 129, 0.05); }
-    .staff-card-detail { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-    .staff-card-detail span { color: var(--text-secondary); font-size: 11.5px; font-weight: 600; }
-    .staff-card-detail strong { color: var(--text-primary); font-size: 12px; font-weight: 800; text-align: right; }
-    .ineligible-note { font-size: 10.5px; font-weight: 700; color: #ef4444; margin-top: 4px; text-align: right; }
+    .shift-field-label { display: block; margin: 0 0 5px 2px; color: var(--text-muted); font-size: 11.5px; font-weight: 700; }
+    #selectedShiftLabel { font-size: 14px; font-weight: 700; }
 
     /* Sticky Bottom Action Bar */
     .sticky-bottom-bar { position: absolute; bottom: 78px; left: 0; right: 0; background: color-mix(in srgb, var(--bg-card) 94%, transparent); border-top: 1px solid var(--border-subtle); padding: 11px 18px; box-shadow: 0 -10px 30px rgba(0,0,0,0.15); z-index: 90; display: flex; flex-direction: row; align-items: center; justify-content: flex-end; gap: 14px; backdrop-filter: blur(14px); }
@@ -451,8 +282,9 @@
     }
     .summary-table-row {
       display: grid;
+      position: relative;
       grid-template-columns: 88px 1fr 85px;
-      padding: 13px 16px;
+      padding: 0 16px;
       border-bottom: 1px solid var(--border-subtle);
       font-size: 12.5px;
       font-weight: 700;
@@ -468,20 +300,9 @@
       background: rgba(124, 58, 237, 0.14);
       box-shadow: inset 4px 0 0 #7c3aed;
     }
-    .summary-table-row:focus-visible {
-      outline: 2px solid #7c3aed;
-      outline-offset: -2px;
-    }
-    .headcount-detail-trigger { min-width: 52px; padding: 6px 8px; border: 0; border-radius: 9px; background: var(--purple-subtle); color: var(--purple-primary); font-size: 12.5px; font-weight: 900; cursor: pointer; }
-    .headcount-detail-trigger:active { transform: scale(0.96); }
-    .headcount-detail-trigger:focus-visible { outline: 2px solid var(--purple-primary); outline-offset: 2px; }
-    .headcount-employee-section-title { margin: 14px 0 7px; color: var(--text-muted); font-size: 12px; font-weight: 800; }
-    .headcount-employee-table-wrap { overflow: hidden; border: 1px solid var(--border-subtle); border-radius: 10px; background: var(--bg-card); }
-    .headcount-employee-table { width: 100%; border-collapse: collapse; table-layout: fixed; font-size: 11.5px; }
-    .headcount-employee-table th { padding: 9px 10px; border: 1px solid rgba(255, 255, 255, 0.22); background: #7c3aed; color: #ffffff; font-weight: 800; text-align: left; }
-    .headcount-employee-table td { padding: 8px 10px; border: 1px solid var(--border-subtle); background: var(--bg-card); color: var(--text-primary); font-weight: 600; overflow-wrap: anywhere; }
-    .headcount-employee-table tbody tr:nth-child(even) td { background: var(--bg-input); }
-    .headcount-employee-table th:first-child, .headcount-employee-table td:first-child { width: 38%; font-family: monospace, sans-serif; }
+    .headcount-detail-trigger { position: relative; display: flex; align-self: stretch; align-items: center; justify-content: flex-end; margin-inline-end: -16px; padding: 12px 16px 12px 0; text-decoration: none; }
+    .headcount-detail-trigger span { min-width: 52px; padding: 6px 8px; border-radius: 9px; background: var(--purple-subtle); color: var(--purple-primary); font-size: 12.5px; font-weight: 900; text-align: center; }
+    .headcount-detail-trigger:focus-visible { outline: 2px solid var(--purple-text); outline-offset: -2px; }
 
     #summaryChartOffCircle,
     #summaryChartW02Circle {
@@ -536,57 +357,10 @@
     .table-shift-badge.cyan { background: rgba(6, 182, 212, 0.15); color: #06b6d4; border: 1px solid rgba(6, 182, 212, 0.3); }
     .table-shift-badge.rose { background: rgba(244, 63, 94, 0.15); color: #f43f5e; border: 1px solid rgba(244, 63, 94, 0.3); }
 
-    /* Grid Calendar Styles (Light Theme) */
-    .grid-cal-card { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 20px; padding: 16px; box-shadow: var(--shadow-sm); }
-    .grid-cal-header { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 14px; }
-    .grid-cal-month { margin: 0; color: var(--text-primary); font-size: 15px; font-weight: 800; }
-    .grid-cal-subtitle { margin-top: 2px; color: var(--text-muted); font-size: 10.5px; font-weight: 600; }
-    .grid-cal-controls { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
-    .grid-cal-nav-btn { width: 32px; height: 32px; padding: 0; display: grid; place-items: center; border: 1px solid var(--border-subtle); border-radius: 10px; background: var(--bg-input); color: var(--text-primary); font-size: 12px; cursor: pointer; transition: background .2s ease, transform .2s ease; }
-    .grid-cal-nav-btn:hover { background: var(--bg-card-hover); }
-    .grid-cal-nav-btn:active { transform: scale(.94); }
-    .grid-cal-nav-btn:focus-visible { outline: 2px solid var(--purple-text); outline-offset: 2px; }
-    .grid-cal-info { width: auto; padding: 0 9px; display: inline-flex; gap: 5px; border-color: var(--purple-border); background: var(--purple-subtle); color: var(--purple-text); font-size: 10.5px; font-weight: 800; }
-    .grid-cal-weekdays { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); margin-bottom: 8px; }
-    .grid-cal-weekday { color: var(--text-muted); text-align: center; font-size: 11px; font-weight: 800; }
-    .grid-cal-days { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 5px; background: transparent; }
-    .grid-cal-cell { min-width: 0; min-height: 58px; padding: 5px 1px; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; box-sizing: border-box; border: 1px solid var(--border-subtle); border-radius: 12px; background: var(--bg-card); color: var(--text-primary); cursor: pointer; transition: background .2s ease, box-shadow .2s ease, transform .2s ease; }
-    .grid-cal-cell:not(.empty):hover { background: var(--bg-card-hover); }
-    .grid-cal-cell:not(.empty):active { transform: scale(.94); }
-    .grid-cal-cell.empty { min-height: 42px; border-color: transparent; background: transparent; color: var(--text-muted); opacity: .42; cursor: default; pointer-events: none; }
-    .grid-cal-cell.selected { border: 2px solid var(--purple-primary); background: linear-gradient(135deg, rgba(124,58,237,.16), rgba(109,40,217,.22)); border-radius: 12px; z-index: 5; box-shadow: 0 0 0 2px rgba(124,58,237,.28), 0 5px 12px rgba(124,58,237,.2); transform: scale(1.04); }
-    .grid-cal-cell:focus-visible { outline: 2px solid var(--purple-text); outline-offset: 2px; }
-    .grid-cal-date { color: var(--text-primary); font-size: 13.5px; font-weight: 700; line-height: 1; margin-bottom: 3px; }
-    .grid-cal-cell.selected .grid-cal-date { color: var(--purple-text); font-size: 14.5px; font-weight: 900; }
-    .grid-cal-stat-staff { color: var(--tag-blue-text); font-size: 9.5px; font-weight: 800; line-height: 1.1; margin-bottom: 1px; }
-    .grid-cal-stat-hours { color: var(--tag-teal-text); font-size: 9.5px; font-weight: 800; line-height: 1.1; }
-    .grid-cal-empty-text { font-size: 10px; font-weight: 600; color: var(--text-caption); }
-    .shift-calendar-info-list { display: grid; gap: 0; }
-    .shift-calendar-info-row { display: grid; grid-template-columns: 42px minmax(0, 1fr); align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--border-subtle); }
-    .shift-calendar-info-row:last-child { border-bottom: 0; }
-    .shift-calendar-info-sample { justify-self: center; font-size: 11px; font-weight: 900; }
-    .shift-calendar-info-sample.staff { color: var(--tag-blue-text); }
-    .shift-calendar-info-sample.hours { color: var(--tag-teal-text); }
-    .shift-calendar-info-sample.selected { width: 28px; height: 28px; display: grid; place-items: center; border: 2px solid var(--purple-primary); border-radius: 9px; background: var(--purple-subtle); color: var(--purple-text); }
-    .shift-calendar-info-copy strong { display: block; color: var(--text-primary); font-size: 12.5px; font-weight: 800; }
-    .shift-calendar-info-copy span { display: block; margin-top: 2px; color: var(--text-muted); font-size: 11px; font-weight: 600; line-height: 1.45; }
-    
-    /* Summary Card below Calendar */
-    .cal-summary-card { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 20px; padding: 14px 16px 15px; margin-top: 10px; box-shadow: var(--shadow-sm); }
-    .cal-summary-title { margin-bottom: 14px; color: var(--text-primary); font-size: 12.5px; font-weight: 800; }
-    .cal-summary-stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); text-align: center; }
-    .cal-summary-stat { min-width: 0; padding: 1px 5px; display: flex; flex-direction: column; align-items: center; gap: 4px; position: relative; border: 0; background: transparent; color: inherit; font: inherit; cursor: pointer; transition: transform .15s ease, opacity .15s ease; }
-    .cal-summary-stat:not(:first-child) { border-left: 1px solid var(--border-subtle); }
-    .cal-summary-stat:active { transform: scale(.97); }
-    .cal-summary-stat:focus-visible { outline: 2px solid var(--purple-text); outline-offset: 3px; border-radius: 8px; }
-    .cal-summary-stat-val { max-width: 100%; padding: 0; border: 0; border-radius: 0; background: transparent; color: var(--purple-text); font-size: 16.5px; font-weight: 900; line-height: 1.1; white-space: nowrap; font-variant-numeric: tabular-nums; }
-    .cal-summary-stat-label { color: var(--purple-text); font-size: 9.5px; font-weight: 700; line-height: 1.2; white-space: nowrap; }
-    .cal-summary-stat.is-ot-plan .cal-summary-stat-val { font-size: 13.5px; }
-    .cal-summary-ot { font-size: 11.5px; font-weight: 600; color: var(--text-muted); display: flex; justify-content: space-between; padding-top: 12px; border-top: 1px solid var(--border-subtle); margin-bottom: 16px; }
-    .cal-summary-btn { width: 100%; padding: 10px; border-radius: 12px; border: 1px solid #7c3aed; background: transparent; color: var(--purple-primary); font-size: 12.5px; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; transition: all 0.2s; }
-    .cal-summary-btn:active { transform: scale(0.98); background: var(--purple-subtle); }
+    #calendarFilterEmpty { margin: 8px 0; color: var(--text-muted); font-size: 12px; }
+    #mainContentScroll:has(#tabCalendarBtn.active) { padding-bottom: 0; }
+    #calendarTabView .cal-summary-stats { grid-template-columns: 1fr .9fr minmax(max-content, 1.35fr) .85fr; }
 
-    
     /* Hub and Spoke View Container */
     .view-container { display: none; width: 100%; height: 100%; position: absolute; top: 0; left: 0; background: var(--bg-phone); z-index: 10; overflow: hidden; flex-direction: column; }
     .view-container.active { display: flex; z-index: 20; }
@@ -652,6 +426,7 @@
     }
     .calendar-purple-card-header > i { font-size: 12px; opacity: .8; }
     .calendar-purple-card-title { font-size: 13.5px; font-weight: 800; line-height: 1.25; }
+    .calendar-purple-card .calendar-purple-card-header .history-time-row { margin: 0; color: inherit; }
     .calendar-purple-card-body {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -953,7 +728,7 @@
 <body>
   <preview-top-bar active-page="attendance"></preview-top-bar>
   <div class="phone-container" style="position: relative;">
-    <div id="view-main" class="view-container active" style="display: flex; flex-direction: column; height: 100%; overflow: hidden;">
+    <div data-history-background id="view-main" class="view-container active" style="display: flex; flex-direction: column; height: 100%; overflow: hidden;">
 
     <!-- Toast Component -->
     <div class="toast-box" id="toastNotice">
@@ -976,57 +751,47 @@
     <!-- Main Dynamic Content Scrollable Body -->
     <div class="main-content" id="mainContentScroll">
 
-      <!-- TOP CONTROL ROW BELOW HEADER: Date Switcher & Filter Info -->
-      <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 12px;">
-        
-        <!-- Date Navigator Card -->
+      <div class="planning-controls">
+        <div class="tabs-nav-card" role="group" aria-label="Shift planning view">
+          <button type="button" class="tab-card-btn active" id="tabStaffBtn" aria-pressed="true" aria-controls="staffTabView" onclick="switchMainTab('staff')">Plan</button>
+          <button type="button" class="tab-card-btn" id="tabCalendarBtn" aria-pressed="false" aria-controls="calendarTabView" onclick="switchMainTab('calendar')">Calendar</button>
+          <button type="button" class="tab-card-btn" id="tabSummaryBtn" aria-pressed="false" aria-controls="summaryTabView" onclick="switchMainTab('summary')">Summary</button>
+        </div>
+
+        <div class="shift-mode-switcher" id="planModeSwitcher" role="group" aria-label="Planning action">
+          <button type="button" class="shift-mode-btn active" id="modeChangeShiftBtn" aria-pressed="true" aria-controls="shiftSelectionControls" onclick="setSelectionMode('change_shift')">Change shift</button>
+          <button type="button" class="shift-mode-btn" id="modeCopyDatesBtn" aria-pressed="false" aria-controls="copyDateControls" onclick="setSelectionMode('copy_dates')">Copy to dates</button>
+        </div>
+
         <div class="date-switcher-card">
-          <button class="date-nav-btn" onclick="changeDate(-1)" aria-label="Previous Date">
-            <i class="fa-solid fa-chevron-left"></i>
+          <button type="button" class="date-nav-btn" onclick="changeDate(-1)" aria-label="Previous Date">
+            <i class="fa-solid fa-chevron-left" aria-hidden="true"></i>
           </button>
           <div class="date-current-badge">
-            <i class="fa-solid fa-calendar-days" style="color: var(--purple-primary); font-size: 14px;"></i>
-            <span id="currentDateDisplay">Wed, 23 Sep 2026</span>
+            <i class="fa-solid fa-calendar-days" aria-hidden="true" style="color: var(--purple-primary);"></i>
+            <span id="currentDateDisplay" aria-live="polite">Wed, 23 Sep 2026</span>
           </div>
-          <button class="date-nav-btn" onclick="changeDate(1)" aria-label="Next Date">
-            <i class="fa-solid fa-chevron-right"></i>
+          <button type="button" class="date-nav-btn" onclick="changeDate(1)" aria-label="Next Date">
+            <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
           </button>
         </div>
 
-        <!-- Filter Trigger Card -->
-        <div class="date-switcher-card" style="display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; text-align: left; cursor: pointer;" onclick="openFilterModal()">
-          <div style="display: flex; flex-direction: column; gap: 3px; flex: 1;">
-            <div style="font-size: 10px; font-weight: 800; color: var(--purple-primary); text-transform: uppercase; letter-spacing: 0.5px;">Current Filter</div>
-            <div style="font-size: 13px; font-weight: 800; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 250px;" id="currentFilterTextDisplay">23 Sep 2026 • All Companies</div>
-          </div>
-          <button type="button" class="filter-trigger-btn" aria-label="Filter Roster" title="Filter Roster" style="margin: 0; pointer-events: none;">
-            <i class="fa-solid fa-sliders"></i>
-          </button>
-        </div>
+        <button type="button" class="enterprise-toast-bar planning-filter" id="planningFilterButton" onclick="openFilterModal()" aria-haspopup="dialog" aria-expanded="false" aria-controls="filterModal">
+          <span class="planning-filter-copy">
+            <span class="enterprise-toast-label">Current filter</span>
+            <span class="enterprise-toast-value"><span id="currentFilterTextDisplay">23 Sep 2026 • All Staff</span></span>
+          </span>
+          <span class="enterprise-toast-btn filter-trigger-btn" aria-hidden="true"><i class="fa-solid fa-sliders"></i></span>
+        </button>
       </div>
 
-      <!-- Main 3 Tabs Bar ("三个 card": Staff | Calendar | Summary) -->
-      <div class="tabs-nav-card">
-        <button class="tab-card-btn active" id="tabStaffBtn" onclick="switchMainTab('staff')">Plan</button>
-        <button class="tab-card-btn" id="tabCalendarBtn" onclick="switchMainTab('calendar')">Calendar</button>
-        <button class="tab-card-btn" id="tabSummaryBtn" onclick="switchMainTab('summary')">Summary</button>
-      </div>
-
-      <!-- ================= 1. STAFF TAB CONTENT ================= -->
       <div id="staffTabView">
-
-        <!-- Mode Switcher (Change Shift vs Copy to Dates) -->
-        <div class="shift-mode-switcher">
-          <button class="shift-mode-btn active" id="modeChangeShiftBtn" onclick="setSelectionMode('change_shift')">Change shift</button>
-          <button class="shift-mode-btn" id="modeCopyDatesBtn" onclick="setSelectionMode('copy_dates')">Copy to dates</button>
-        </div>
-
         <!-- Change shift selection -->
         <div id="shiftSelectionControls">
-          <div style="font-size: 11px; font-weight: 800; color: var(--text-muted); margin: 0 0 4px 2px;">New shift</div>
-          <button type="button" class="picker-box shift-picker-trigger" id="shiftPickerTrigger" onclick="openShiftSelectModal()" aria-haspopup="dialog" aria-controls="shiftSelectModal">
+          <span class="shift-field-label" id="newShiftLabel">New shift</span>
+          <button type="button" class="picker-box shift-picker-trigger" id="shiftPickerTrigger" onclick="openShiftSelectModal()" aria-haspopup="dialog" aria-controls="shiftSelectModal" aria-labelledby="newShiftLabel selectedShiftLabel">
             <span class="shift-picker-value">
-              <span style="font-size: 13.5px; font-weight: 800; color: var(--text-primary);" id="selectedShiftLabel">W02 · 9:00 AM – 6:00 PM</span>
+              <span id="selectedShiftLabel">W02 · 9:00 AM – 6:00 PM</span>
             </span>
             <span class="shift-picker-affordance"><span class="shift-picker-chevron" aria-hidden="true"><i class="fa-solid fa-chevron-down"></i></span></span>
           </button>
@@ -1055,13 +820,12 @@
           <p id="copyDateError" class="copy-date-error" role="alert" hidden></p>
         </div>
 
-        <!-- Staff Counter Header -->
         <div class="list-header record-summary-card">
-          <div class="staff-record-counts" aria-live="polite">
-            <div class="record-summary-metric"><strong class="list-counter record-summary-value" id="listCounterText" data-record-count>0</strong> <span class="staff-record-label record-summary-label">Records</span></div>
-            <div><span class="staff-record-label">Selected Records</span><strong class="list-counter" id="selectedRecordsText">0</strong></div>
+          <div class="staff-record-counts" aria-live="polite" aria-atomic="true">
+            <strong class="staff-record-total"><span id="listCounterText" data-record-count>0</span> <span class="staff-record-label">Records</span></strong>
+            <span class="staff-selection-count"><span id="selectedRecordsText">0</span> selected</span>
           </div>
-          <label class="select-all-control" id="selectAllControl" for="selectAllCheckbox"><input type="checkbox" id="selectAllCheckbox" onchange="handleSelectAllCheckbox(this.checked)"><span>Select All</span></label>
+          <label class="select-all-control" id="selectAllControl"><input type="checkbox" id="selectAllCheckbox" onchange="handleSelectAllCheckbox(this.checked)">Select all</label>
         </div>
 
         <!-- Staff List Items Container -->
@@ -1073,55 +837,33 @@
 
       <!-- ================= 2. CALENDAR TAB CONTENT ================= -->
       <div id="calendarTabView" style="display: none; padding-bottom: 24px;">
-        <div class="grid-cal-card">
-          <div class="grid-cal-header">
-            <div>
-              <h3 class="grid-cal-month" id="gridCalTitle">September 2026</h3>
-              <div class="grid-cal-subtitle">Staff &amp; scheduled hours</div>
-            </div>
-            <div class="grid-cal-controls">
-              <button type="button" class="grid-cal-nav-btn grid-cal-info" id="shiftCalendarInfoTrigger" onclick="openShiftCalendarInfo()" aria-haspopup="dialog" aria-controls="shiftCalendarInfoModal"><i class="fa-solid fa-circle-info" aria-hidden="true"></i><span>Info</span></button>
-              <button type="button" class="grid-cal-nav-btn" data-grid-month="previous" onclick="changeGridMonth(-1)" aria-label="Previous month"><i class="fa-solid fa-chevron-left" aria-hidden="true"></i></button>
-              <button type="button" class="grid-cal-nav-btn" data-grid-month="next" onclick="changeGridMonth(1)" aria-label="Next month"><i class="fa-solid fa-chevron-right" aria-hidden="true"></i></button>
-            </div>
-          </div>
+        <attendance-planning-calendar class="grid-cal-card"></attendance-planning-calendar>
 
-          <div class="grid-cal-weekdays">
-            <div class="grid-cal-weekday">M</div>
-            <div class="grid-cal-weekday">T</div>
-            <div class="grid-cal-weekday">W</div>
-            <div class="grid-cal-weekday">T</div>
-            <div class="grid-cal-weekday">F</div>
-            <div class="grid-cal-weekday">S</div>
-            <div class="grid-cal-weekday">S</div>
+        <section class="history-card-item cal-summary-card" id="calSummaryCard" aria-labelledby="calSummaryTitle" style="display: none;">
+          <div class="cal-summary-header">
+            <h3 class="cal-summary-title" id="calSummaryTitle"></h3>
+            <span class="cal-summary-staff" id="calSummaryStaff"></span>
           </div>
-          
-          <div class="grid-cal-days" id="gridCalDays">
-            <!-- Dynamically generated days go here -->
-          </div>
-        </div>
-
-        <div class="cal-summary-card" id="calSummaryCard" style="display: none;">
-          <div class="cal-summary-title" id="calSummaryTitle">Tue, 15 Sep 2026</div>
+          <p id="calendarFilterEmpty" hidden>No staff match these filters on this date.</p>
           <div class="cal-summary-stats">
-            <button type="button" class="cal-summary-stat is-working" onclick="openSummaryViewFromCal('view-work-shift-summary')" aria-label="View working summary, 269.00">
-              <strong class="cal-summary-stat-val">269.00</strong>
-              <span class="cal-summary-stat-label">Working</span>
+            <button type="button" class="cal-summary-stat is-working" data-kind="work" onclick="openSummaryViewFromCal('view-work-shift-summary')">
+              <span class="cal-summary-stat-label">Work Shift</span>
+              <strong class="cal-summary-stat-val"></strong>
             </button>
-            <button type="button" class="cal-summary-stat is-no-work" onclick="openSummaryViewFromCal('view-no-work-summary')" aria-label="View no work summary, 13">
-              <strong class="cal-summary-stat-val">13</strong>
+            <button type="button" class="cal-summary-stat is-no-work" data-kind="off" onclick="openSummaryViewFromCal('view-no-work-summary')">
               <span class="cal-summary-stat-label">No Work</span>
+              <strong class="cal-summary-stat-val"></strong>
             </button>
-            <button type="button" class="cal-summary-stat is-ot-plan" onclick="openSummaryViewFromCal('view-ot-plan-summary')" aria-label="View OT Plan summary, 73 staff and 127 hours">
-              <strong class="cal-summary-stat-val">73 / 127.00</strong>
+            <button type="button" class="cal-summary-stat is-ot-plan" data-kind="ot" onclick="openSummaryViewFromCal('view-ot-plan-summary')">
               <span class="cal-summary-stat-label">OT Plan</span>
+              <strong class="cal-summary-stat-val"></strong>
             </button>
-            <button type="button" class="cal-summary-stat is-leave" onclick="openSummaryViewFromCal('view-leave-summary')" aria-label="View on leave summary, 5.00">
-              <strong class="cal-summary-stat-val">5.00</strong>
+            <button type="button" class="cal-summary-stat is-leave" data-kind="leave" onclick="openSummaryViewFromCal('view-leave-summary')">
               <span class="cal-summary-stat-label">On Leave</span>
+              <strong class="cal-summary-stat-val"></strong>
             </button>
           </div>
-        </div>
+        </section>
       </div>
 
       <!-- ================= 3. SUMMARY TAB CONTENT ================= -->
@@ -1132,29 +874,26 @@
       <div id="summaryTabView" style="display: none; padding-bottom: 24px;">
 
         <!-- 1. INLINE DONUT CHART -->
-        <div class="history-card-item" id="summaryChartCard" style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 20px; padding: 18px; margin-bottom: 14px; box-shadow: var(--shadow-sm); cursor: default; flex-direction: column; align-items: stretch; gap: 16px;">
-          <div style="display: flex; align-items: center; justify-content: space-between;">
-            <div id="summaryChartTitle" style="font-size: 14px; font-weight: 800; color: var(--text-primary);">Headcount by Shift</div>
-            <button type="button" id="summaryChartInfoButton" onclick="openChartModal()" aria-label="View chart information" title="View chart information" style="width: 34px; height: 34px; border-radius: 12px; border: 1px solid rgba(124, 58, 237, 0.28); background: rgba(124, 58, 237, 0.12); color: var(--purple-primary); display: inline-flex; align-items: center; justify-content: center; cursor: pointer;">
+        <a class="history-card-item" id="summaryChartCard" data-history-link aria-label="View headcount details"
+           aria-describedby="summaryChartTitle summaryChartTotal summaryChartCenterLabel summaryChartOffDescription summaryChartW02Description">
+          <span style="display: flex; align-items: center; justify-content: space-between;">
+            <span id="summaryChartTitle" style="font-size: 14px; font-weight: 800; color: var(--text-primary);">Headcount by Shift</span>
+            <span class="planning-chart-info-icon" id="summaryChartInfoButton" title="View headcount details" aria-hidden="true">
               <i class="fa-solid fa-circle-info"></i>
-            </button>
-          </div>
-
-          <div style="display: flex; flex-direction: column; align-items: center; gap: 14px;">
-            <div class="summary-chart-visual" style="position: relative; width: 150px; height: 150px; transform-origin: center;">
-              <svg width="150" height="150" viewBox="0 0 160 160" style="transform: rotate(-90deg);">
-                <circle cx="80" cy="80" r="58" fill="transparent" stroke="var(--border-subtle)" stroke-width="22" opacity="0.3"></circle>
-                <circle id="summaryChartOffCircle" cx="80" cy="80" r="58" fill="transparent" stroke="#06b6d4" stroke-width="22" stroke-dasharray="347.8 364.4" stroke-dashoffset="0"></circle>
-                <circle id="summaryChartW02Circle" cx="80" cy="80" r="58" fill="transparent" stroke="#f43f5e" stroke-width="22" stroke-dasharray="16.5 364.4" stroke-dashoffset="-347.8"></circle>
-              </svg>
-              <div style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;">
-                <div id="summaryChartTotal" style="font-size: 20px; font-weight: 900; color: var(--text-primary);">287</div>
-                <div id="summaryChartCenterLabel" style="font-size: 9.5px; font-weight: 800; color: var(--text-muted); text-transform: uppercase;">Total Staff</div>
-              </div>
-            </div>
-
-          </div>
-        </div>
+            </span>
+          </span>
+          <span class="summary-chart-visual" style="align-self: center; position: relative; width: 150px; height: 150px; transform-origin: center;">
+            <svg width="150" height="150" viewBox="0 0 160 160" style="transform: rotate(-90deg);" role="img" aria-labelledby="summaryChartTitle" aria-describedby="summaryChartOffDescription summaryChartW02Description">
+              <circle cx="80" cy="80" r="58" fill="transparent" stroke="var(--border-subtle)" stroke-width="22" opacity="0.3"></circle>
+              <circle id="summaryChartOffCircle" cx="80" cy="80" r="58" fill="transparent" stroke="#06b6d4" stroke-width="22" stroke-dasharray="347.8 364.4" stroke-dashoffset="0"><title id="summaryChartOffDescription"></title></circle>
+              <circle id="summaryChartW02Circle" cx="80" cy="80" r="58" fill="transparent" stroke="#f43f5e" stroke-width="22" stroke-dasharray="16.5 364.4" stroke-dashoffset="-347.8"><title id="summaryChartW02Description"></title></circle>
+            </svg>
+            <span style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+              <span id="summaryChartTotal" style="font-size: 20px; font-weight: 900; color: var(--text-primary);">287</span>
+              <span id="summaryChartCenterLabel" style="font-size: 9.5px; font-weight: 800; color: var(--text-muted); text-transform: uppercase;">Total Staff</span>
+            </span>
+          </span>
+        </a>
 
         <div class="summary-table-card">
           <div class="summary-table-hdr">
@@ -1163,6 +902,13 @@
             <div style="text-align: right;">Headcount</div>
           </div>
           <div id="summaryTableRowsContainer"></div>
+          <template id="shiftSummaryRowTemplate">
+            <div class="summary-table-row">
+              <div><span class="table-shift-badge"></span></div>
+              <button type="button" class="summary-job-title"></button>
+              <a class="headcount-detail-trigger" data-history-link><span></span></a>
+            </div>
+          </template>
         </div>
 
       </div>
@@ -1177,7 +923,7 @@
 
 
     <!-- ================= VIEW: WORK SHIFT SUMMARY ================= -->
-    <div id="view-work-shift-summary" class="view-container">
+    <div data-history-background id="view-work-shift-summary" class="view-container">
       <div class="shift-top-header">
         <phone-status-bar time="9:41" style="color: #ffffff;"></phone-status-bar>
         <div class="header-nav">
@@ -1189,7 +935,7 @@
           </div>
         </div>
       </div>
-      <div class="shift-detail-info-card summary-detail-info-card">
+      <div class="record-summary-card shift-detail-info-card summary-detail-info-card">
         <div class="shift-detail-info-row shift-detail-info-date">
           <span class="shift-detail-info-label">Date:</span>
           <span class="shift-detail-info-value" id="wsSummaryDateFilter">23 Sep 2026</span>
@@ -1201,139 +947,11 @@
           </div>
         </div>
       </div>
-      <div class="scroll-body">
-        
-        <!-- Card 1 -->
-        <a href="javascript:void(0)" onclick="openWorkShiftDetail('0700:1500', 22, '176.00', '145.60')" class="history-card-item" style="display: block; text-decoration: none; padding: 14px 16px;">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-            <div class="history-time-row" style="font-size: 15px; font-weight: 800; color: var(--text-primary); margin-bottom: 0;">
-              0700:1500
-            </div>
-            <div style="color: var(--text-muted); font-size: 13px; opacity: 0.6;">
-              <i class="fa-solid fa-chevron-right"></i>
-            </div>
-          </div>
-          <div style="font-size: 12.5px; font-weight: 700; color: var(--text-primary); margin-bottom: 2px;">
-            Headcount: <span style="font-weight: 800;">22 Staff</span>
-          </div>
-          <div style="font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 2px;">
-            Scheduled Hours: <span style="color: var(--text-primary); font-weight: 700;">176.00</span>
-          </div>
-          <div style="font-size: 12px; font-weight: 600; color: var(--text-muted);">
-            Work Hours: <span style="color: var(--text-primary); font-weight: 700;">145.60</span>
-          </div>
-        </a>
-
-        <!-- Card 2 -->
-        <a href="javascript:void(0)" onclick="openWorkShiftDetail('0800:1700(B)', 3, '24.00', '24.00')" class="history-card-item" style="display: block; text-decoration: none; padding: 14px 16px;">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-            <div class="history-time-row" style="font-size: 15px; font-weight: 800; color: var(--text-primary); margin-bottom: 0;">
-              0800:1700(B)
-            </div>
-            <div style="color: var(--text-muted); font-size: 13px; opacity: 0.6;">
-              <i class="fa-solid fa-chevron-right"></i>
-            </div>
-          </div>
-          <div style="font-size: 12.5px; font-weight: 700; color: var(--text-primary); margin-bottom: 2px;">
-            Headcount: <span style="font-weight: 800;">3 Staff</span>
-          </div>
-          <div style="font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 2px;">
-            Scheduled Hours: <span style="color: var(--text-primary); font-weight: 700;">24.00</span>
-          </div>
-          <div style="font-size: 12px; font-weight: 600; color: var(--text-muted);">
-            Work Hours: <span style="color: var(--text-primary); font-weight: 700;">24.00</span>
-          </div>
-        </a>
-
-        <!-- Card 3 -->
-        <a href="javascript:void(0)" onclick="openWorkShiftDetail('0815:1715', 1, '8.00', '8.00')" class="history-card-item" style="display: block; text-decoration: none; padding: 14px 16px;">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-            <div class="history-time-row" style="font-size: 15px; font-weight: 800; color: var(--text-primary); margin-bottom: 0;">
-              0815:1715
-            </div>
-            <div style="color: var(--text-muted); font-size: 13px; opacity: 0.6;">
-              <i class="fa-solid fa-chevron-right"></i>
-            </div>
-          </div>
-          <div style="font-size: 12.5px; font-weight: 700; color: var(--text-primary); margin-bottom: 2px;">
-            Headcount: <span style="font-weight: 800;">1 Staff</span>
-          </div>
-          <div style="font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 2px;">
-            Scheduled Hours: <span style="color: var(--text-primary); font-weight: 700;">8.00</span>
-          </div>
-          <div style="font-size: 12px; font-weight: 600; color: var(--text-muted);">
-            Work Hours: <span style="color: var(--text-primary); font-weight: 700;">8.00</span>
-          </div>
-        </a>
-
-        <!-- Card 4 -->
-        <a href="javascript:void(0)" onclick="openWorkShiftDetail('0830:1730', 1, '8.00', '8.00')" class="history-card-item" style="display: block; text-decoration: none; padding: 14px 16px;">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-            <div class="history-time-row" style="font-size: 15px; font-weight: 800; color: var(--text-primary); margin-bottom: 0;">
-              0830:1730
-            </div>
-            <div style="color: var(--text-muted); font-size: 13px; opacity: 0.6;">
-              <i class="fa-solid fa-chevron-right"></i>
-            </div>
-          </div>
-          <div style="font-size: 12.5px; font-weight: 700; color: var(--text-primary); margin-bottom: 2px;">
-            Headcount: <span style="font-weight: 800;">1 Staff</span>
-          </div>
-          <div style="font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 2px;">
-            Scheduled Hours: <span style="color: var(--text-primary); font-weight: 700;">8.00</span>
-          </div>
-          <div style="font-size: 12px; font-weight: 600; color: var(--text-muted);">
-            Work Hours: <span style="color: var(--text-primary); font-weight: 700;">8.00</span>
-          </div>
-        </a>
-
-        <!-- Card 5 -->
-        <a href="javascript:void(0)" onclick="openWorkShiftDetail('1500:2300', 1, '8.00', '0.00')" class="history-card-item" style="display: block; text-decoration: none; padding: 14px 16px;">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-            <div class="history-time-row" style="font-size: 15px; font-weight: 800; color: var(--text-primary); margin-bottom: 0;">
-              1500:2300
-            </div>
-            <div style="color: var(--text-muted); font-size: 13px; opacity: 0.6;">
-              <i class="fa-solid fa-chevron-right"></i>
-            </div>
-          </div>
-          <div style="font-size: 12.5px; font-weight: 700; color: var(--text-primary); margin-bottom: 2px;">
-            Headcount: <span style="font-weight: 800;">1 Staff</span>
-          </div>
-          <div style="font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 2px;">
-            Scheduled Hours: <span style="color: var(--text-primary); font-weight: 700;">8.00</span>
-          </div>
-          <div style="font-size: 12px; font-weight: 600; color: var(--text-muted);">
-            Work Hours: <span style="color: var(--text-primary); font-weight: 700;">0.00</span>
-          </div>
-        </a>
-
-        <!-- Card 6 -->
-        <a href="javascript:void(0)" onclick="openWorkShiftDetail('8.30:17.30W', 242, '1,936.00', '1,316.09')" class="history-card-item" style="display: block; text-decoration: none; padding: 14px 16px;">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-            <div class="history-time-row" style="font-size: 15px; font-weight: 800; color: var(--purple-primary); margin-bottom: 0;">
-              8.30:17.30W
-            </div>
-            <div style="color: var(--text-muted); font-size: 13px; opacity: 0.6;">
-              <i class="fa-solid fa-chevron-right"></i>
-            </div>
-          </div>
-          <div style="font-size: 12.5px; font-weight: 700; color: var(--text-primary); margin-bottom: 2px;">
-            Headcount: <span style="font-weight: 800;">242 Staff</span>
-          </div>
-          <div style="font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 2px;">
-            Scheduled Hours: <span style="color: var(--text-primary); font-weight: 700;">1,936.00</span>
-          </div>
-          <div style="font-size: 12px; font-weight: 600; color: var(--text-muted);">
-            Work Hours: <span style="color: var(--text-primary); font-weight: 700;">1,316.09</span>
-          </div>
-        </a>
-
-      </div>
+      <div class="scroll-body"></div>
     </div>
 
     <!-- ================= VIEW: NO WORK SUMMARY ================= -->
-    <div id="view-no-work-summary" class="view-container">
+    <div data-history-background id="view-no-work-summary" class="view-container">
       <div class="shift-top-header">
         <phone-status-bar time="9:41" style="color: #ffffff;"></phone-status-bar>
         <div class="header-nav">
@@ -1345,7 +963,7 @@
           </div>
         </div>
       </div>
-      <div class="shift-detail-info-card summary-detail-info-card">
+      <div class="record-summary-card shift-detail-info-card summary-detail-info-card">
         <div class="shift-detail-info-row shift-detail-info-date">
           <span class="shift-detail-info-label">Date:</span>
           <span class="shift-detail-info-value" id="nwSummaryDateFilter">23 Sep 2026</span>
@@ -1357,27 +975,11 @@
           </div>
         </div>
       </div>
-      <div class="scroll-body">
-        
-        <a href="javascript:void(0)" onclick="openNoWorkDetail('Rest / Off Day', 13)" class="history-card-item feedback-theme" style="display: block; text-decoration: none; padding: 14px 16px;">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-            <div class="history-time-row feedback-time" style="font-size: 15px; font-weight: 800; margin-bottom: 0;">
-              Rest / Off Day
-            </div>
-            <div style="color: var(--text-muted); font-size: 13px; opacity: 0.6;">
-              <i class="fa-solid fa-chevron-right"></i>
-            </div>
-          </div>
-          <div style="font-size: 12.5px; font-weight: 700; color: var(--text-primary);">
-            Headcount: <span style="font-weight: 800;">13 Staff</span>
-          </div>
-        </a>
-
-      </div>
+      <div class="scroll-body"></div>
     </div>
 
     <!-- ================= VIEW: OT PLAN SUMMARY ================= -->
-    <div id="view-ot-plan-summary" class="view-container">
+    <div data-history-background id="view-ot-plan-summary" class="view-container">
       <div class="shift-top-header">
         <phone-status-bar time="9:41" style="color: #ffffff;"></phone-status-bar>
         <div class="header-nav">
@@ -1389,7 +991,7 @@
           </div>
         </div>
       </div>
-      <div class="shift-detail-info-card summary-detail-info-card">
+      <div class="record-summary-card shift-detail-info-card summary-detail-info-card">
         <div class="shift-detail-info-row shift-detail-info-date">
           <span class="shift-detail-info-label">Date:</span>
           <span class="shift-detail-info-value" id="otSummaryDateFilter">23 Sep 2026</span>
@@ -1401,54 +1003,11 @@
           </div>
         </div>
       </div>
-      <div class="scroll-body">
-        <a href="javascript:void(0)" onclick="openOtPlanDetail('8.30:17.30W', 'OT 1.5 BEFORE WORK', 26, '26.00')" class="history-card-item calendar-purple-card">
-          <div class="calendar-purple-card-header">
-            <div class="calendar-purple-card-title">8.30:17.30W</div>
-            <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
-          </div>
-          <div class="calendar-purple-card-body">
-            <div class="calendar-purple-detail full-width">
-              <span class="calendar-purple-label">OT Type</span>
-              <span class="summary-value">OT 1.5 BEFORE WORK</span>
-            </div>
-            <div class="calendar-purple-detail">
-              <span class="calendar-purple-label">Headcount</span>
-              <span class="summary-value">26</span>
-            </div>
-            <div class="calendar-purple-detail">
-              <span class="calendar-purple-label">Hours</span>
-              <span class="summary-value">26.00</span>
-            </div>
-          </div>
-        </a>
-
-        <a href="javascript:void(0)" onclick="openOtPlanDetail('8.30:17.30W', '1.5 OT', 55, '94.00')" class="history-card-item calendar-purple-card">
-          <div class="calendar-purple-card-header">
-            <div class="calendar-purple-card-title">8.30:17.30W</div>
-            <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
-          </div>
-          <div class="calendar-purple-card-body">
-            <div class="calendar-purple-detail full-width">
-              <span class="calendar-purple-label">OT Type</span>
-              <span class="summary-value">1.5 OT</span>
-            </div>
-            <div class="calendar-purple-detail">
-              <span class="calendar-purple-label">Headcount</span>
-              <span class="summary-value">55</span>
-            </div>
-            <div class="calendar-purple-detail">
-              <span class="calendar-purple-label">Hours</span>
-              <span class="summary-value">94.00</span>
-            </div>
-          </div>
-        </a>
-
-      </div>
+      <div class="scroll-body"></div>
     </div>
 
     <!-- ================= VIEW: LEAVE SUMMARY ================= -->
-    <div id="view-leave-summary" class="view-container">
+    <div data-history-background id="view-leave-summary" class="view-container">
       <div class="shift-top-header">
         <phone-status-bar time="9:41" style="color: #ffffff;"></phone-status-bar>
         <div class="header-nav">
@@ -1460,7 +1019,7 @@
           </div>
         </div>
       </div>
-      <div class="shift-detail-info-card summary-detail-info-card">
+      <div class="record-summary-card shift-detail-info-card summary-detail-info-card">
         <div class="shift-detail-info-row shift-detail-info-date">
           <span class="shift-detail-info-label">Date:</span>
           <span class="shift-detail-info-value" id="lvSummaryDateFilter">23 Sep 2026</span>
@@ -1472,60 +1031,11 @@
           </div>
         </div>
       </div>
-      <div class="scroll-body">
-        <a href="javascript:void(0)" onclick="openLeaveDetail('ANNUAL LEAVE', '8.30:17.30W', 2)" class="history-card-item calendar-purple-card">
-          <div class="calendar-purple-card-header">
-            <div class="calendar-purple-card-title">8.30:17.30W</div>
-          </div>
-          <div class="calendar-purple-card-body">
-            <div class="calendar-purple-detail">
-              <span class="calendar-purple-label">Leave Type</span>
-              <span class="summary-value">ANNUAL LEAVE</span>
-            </div>
-            <div class="calendar-purple-detail">
-              <span class="calendar-purple-label">Headcount</span>
-              <span class="summary-value">2.00</span>
-            </div>
-          </div>
-        </a>
-
-        <a href="javascript:void(0)" onclick="openLeaveDetail('MEDICAL LEAVE', '8.30:17.30W', 3)" class="history-card-item calendar-purple-card">
-          <div class="calendar-purple-card-header">
-            <div class="calendar-purple-card-title">8.30:17.30W</div>
-          </div>
-          <div class="calendar-purple-card-body">
-            <div class="calendar-purple-detail">
-              <span class="calendar-purple-label">Leave Type</span>
-              <span class="summary-value">MEDICAL LEAVE</span>
-            </div>
-            <div class="calendar-purple-detail">
-              <span class="calendar-purple-label">Headcount</span>
-              <span class="summary-value">3.00</span>
-            </div>
-          </div>
-        </a>
-
-        <a href="javascript:void(0)" onclick="openLeaveDetail('UNPAID LEAVE', '8.30:17.30W', 1)" class="history-card-item calendar-purple-card">
-          <div class="calendar-purple-card-header">
-            <div class="calendar-purple-card-title">8.30:17.30W</div>
-          </div>
-          <div class="calendar-purple-card-body">
-            <div class="calendar-purple-detail">
-              <span class="calendar-purple-label">Leave Type</span>
-              <span class="summary-value">UNPAID LEAVE</span>
-            </div>
-            <div class="calendar-purple-detail">
-              <span class="calendar-purple-label">Headcount</span>
-              <span class="summary-value">1.00</span>
-            </div>
-          </div>
-        </a>
-
-      </div>
+      <div class="scroll-body"></div>
     </div>
 
     <!-- ================= VIEW: WORK SHIFT EMPLOYEE DETAIL ================= -->
-    <div id="view-work-shift-detail" class="view-container">
+    <div data-history-background id="view-work-shift-detail" class="view-container">
       <div class="shift-top-header">
         <phone-status-bar time="9:41" style="color: #ffffff;"></phone-status-bar>
         <div class="header-nav">
@@ -1538,7 +1048,7 @@
         </div>
       </div>
       <!-- Info Header Card -->
-      <div class="shift-detail-info-card" style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 16px; margin: 12px 16px 6px; padding: 12px 16px; box-shadow: var(--shadow-sm);">
+      <div class="record-summary-card shift-detail-info-card" style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 16px; margin: 12px 16px 6px; padding: 12px 16px; box-shadow: var(--shadow-sm);">
         <div class="shift-detail-info-row shift-detail-info-date">
           <span class="shift-detail-info-label">Date:</span>
           <span class="shift-detail-info-value" id="wsDetailDate">23 Sep 2026</span>
@@ -1568,7 +1078,7 @@
     </div>
 
     <!-- ================= VIEW: NO WORK EMPLOYEE DETAIL ================= -->
-    <div id="view-no-work-detail" class="view-container">
+    <div data-history-background id="view-no-work-detail" class="view-container">
       <div class="shift-top-header">
         <phone-status-bar time="9:41" style="color: #ffffff;"></phone-status-bar>
         <div class="header-nav">
@@ -1581,7 +1091,7 @@
         </div>
       </div>
       <!-- Info Header Card -->
-      <div class="shift-detail-info-card" style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 16px; margin: 12px 16px 6px; padding: 12px 16px; box-shadow: var(--shadow-sm);">
+      <div class="record-summary-card shift-detail-info-card" style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 16px; margin: 12px 16px 6px; padding: 12px 16px; box-shadow: var(--shadow-sm);">
         <div class="shift-detail-info-row shift-detail-info-date">
           <span class="shift-detail-info-label">Date:</span>
           <span class="shift-detail-info-value" id="nwDetailDate">23 Sep 2026</span>
@@ -1603,7 +1113,7 @@
     </div>
 
     <!-- ================= VIEW: OT PLAN EMPLOYEE DETAIL ================= -->
-    <div id="view-ot-plan-detail" class="view-container">
+    <div data-history-background id="view-ot-plan-detail" class="view-container">
       <div class="shift-top-header">
         <phone-status-bar time="9:41" style="color: #ffffff;"></phone-status-bar>
         <div class="header-nav">
@@ -1616,7 +1126,7 @@
         </div>
       </div>
       <!-- Info Header Card -->
-      <div class="shift-detail-info-card" style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 16px; margin: 12px 16px 6px; padding: 12px 16px; box-shadow: var(--shadow-sm);">
+      <div class="record-summary-card shift-detail-info-card" style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 16px; margin: 12px 16px 6px; padding: 12px 16px; box-shadow: var(--shadow-sm);">
         <div class="shift-detail-info-row shift-detail-info-date">
           <span class="shift-detail-info-label">Date:</span>
           <span class="shift-detail-info-value" id="otDetailDate">23 Sep 2026</span>
@@ -1646,7 +1156,7 @@
     </div>
 
     <!-- ================= VIEW: LEAVE EMPLOYEE DETAIL ================= -->
-    <div id="view-leave-detail" class="view-container">
+    <div data-history-background id="view-leave-detail" class="view-container">
       <div class="shift-top-header">
         <phone-status-bar time="9:41" style="color: #ffffff;"></phone-status-bar>
         <div class="header-nav">
@@ -1659,7 +1169,7 @@
         </div>
       </div>
       <!-- Info Header Card -->
-      <div class="shift-detail-info-card" style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 16px; margin: 12px 16px 6px; padding: 12px 16px; box-shadow: var(--shadow-sm);">
+      <div class="record-summary-card shift-detail-info-card" style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 16px; margin: 12px 16px 6px; padding: 12px 16px; box-shadow: var(--shadow-sm);">
         <div class="shift-detail-info-row shift-detail-info-date">
           <span class="shift-detail-info-label">Date:</span>
           <span class="shift-detail-info-value" id="lvDetailDate">23 Sep 2026</span>
@@ -1759,31 +1269,13 @@
     </div>
   </div>
 
-  <!-- ================= SHIFT CALENDAR INFO SHEET ================= -->
-  <div class="modal-overlay" id="shiftCalendarInfoModal" onclick="closeModalOnBackdrop(event, 'shiftCalendarInfoModal')">
-    <div class="modal-sheet" onclick="event.stopPropagation()">
-      <div class="drag-handle"></div>
-      <div class="sheet-header">
-        <div class="sheet-title form-section-heading">Calendar Information</div>
-        <button type="button" class="sheet-close-btn" onclick="closeModal('shiftCalendarInfoModal')" aria-label="Close calendar information"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
-      </div>
-      <div class="sheet-body">
-        <div class="shift-calendar-info-list">
-          <div class="shift-calendar-info-row"><span class="shift-calendar-info-sample staff" id="shiftCalendarInfoStaff">287</span><div class="shift-calendar-info-copy"><strong>Staff</strong><span>Number of staff scheduled for the date.</span></div></div>
-          <div class="shift-calendar-info-row"><span class="shift-calendar-info-sample hours" id="shiftCalendarInfoHours">2,192h</span><div class="shift-calendar-info-copy"><strong>Scheduled Hours</strong><span>Total scheduled work hours for the date.</span></div></div>
-          <div class="shift-calendar-info-row"><span class="shift-calendar-info-sample selected" id="shiftCalendarInfoDate">15</span><div class="shift-calendar-info-copy"><strong>Selected Date</strong><span>The purple date opens the shift summary below.</span></div></div>
-        </div>
-      </div>
-    </div>
-  </div>
-
   <!-- ================= SHIFT SELECTOR MODAL SHEET ================= -->
   <div class="modal-overlay" id="shiftSelectModal" onclick="closeModalOnBackdrop(event, 'shiftSelectModal')">
-    <div class="modal-sheet" onclick="event.stopPropagation()">
+    <div class="modal-sheet" role="dialog" aria-modal="true" aria-labelledby="shiftOptionsTitle" onclick="event.stopPropagation()">
       <div class="drag-handle"></div>
       <div class="sheet-header">
-        <div class="sheet-title form-section-heading">Select New Shift</div>
-        <button type="button" class="sheet-close-btn" onclick="closeModal('shiftSelectModal')"><i class="fa-solid fa-xmark"></i></button>
+        <div class="sheet-title form-section-heading" id="shiftOptionsTitle">Select New Shift</div>
+        <button type="button" class="sheet-close-btn" onclick="closeModal('shiftSelectModal')" aria-label="Close shift selection"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
       </div>
       <div class="sheet-body" id="shiftOptionsList">
         <!-- Dynamic Shift Options -->
@@ -1793,25 +1285,25 @@
 
   <!-- ================= FILTER MODAL SHEET ================= -->
   <div class="modal-overlay" id="filterModal" onclick="closeModalOnBackdrop(event, 'filterModal')">
-    <div class="modal-sheet" onclick="event.stopPropagation()">
+    <form class="modal-sheet" role="dialog" aria-modal="true" aria-labelledby="planningFilterTitle" novalidate onclick="event.stopPropagation()" onsubmit="event.preventDefault(); applyFilterRoster()">
       <div class="drag-handle"></div>
       <div class="sheet-header" style="display: flex; align-items: center; justify-content: space-between; padding: 16px 20px 12px 20px; border-bottom: 1px solid var(--border-subtle);">
-        <div class="sheet-title" style="font-size: 18px; font-weight: 800; color: var(--text-primary);">Filter</div>
+        <div class="sheet-title" id="planningFilterTitle" tabindex="-1" style="font-size: 18px; font-weight: 800; color: var(--text-primary);">Filter</div>
         <button type="button" id="resetFilterButton" onclick="resetFilterRoster(event)" style="background: rgba(255, 255, 255, 0.07); border: 1px solid var(--border-subtle); border-radius: 20px; padding: 6px 14px; color: var(--text-primary); font-size: 12px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: all 0.2s ease;">
           <i class="fa-solid fa-rotate-left" style="font-size: 11px;"></i> Reset
         </button>
       </div>
-      <div class="sheet-body" id="staffChangeFilterFields" style="padding: 16px 20px; display: flex; flex-direction: column; gap: 14px; max-height: 65vh; overflow-y: auto;">
+      <div class="sheet-body" id="staffChangeFilterFields" data-filter-scope="change_shift" style="padding: 16px 20px; display: flex; flex-direction: column; gap: 14px; max-height: 65vh; overflow-y: auto;">
         <!-- 1. Date -->
         <div class="staff-change-filter-field">
-          <label style="font-size: 11px; font-weight: 800; color: #a78bfa; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 6px;">Date</label>
-          <input type="date" id="changeFilterDate" value="2026-09-23" style="width: 100%; padding: 12px; border-radius: 12px; background: var(--bg-card); border: 1px solid var(--border-subtle); color: var(--text-primary); font-size: 13px; font-weight: 700; outline: none;">
+          <label for="changeFilterDate" style="font-size: 11px; font-weight: 800; color: #a78bfa; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 6px;">Date</label>
+          <input name="date" type="date" required id="changeFilterDate" value="2026-09-23" style="width: 100%; padding: 12px; border-radius: 12px; background: var(--bg-card); border: 1px solid var(--border-subtle); color: var(--text-primary); font-size: 13px; font-weight: 700; outline: none;">
         </div>
 
         <!-- 2. Staff Shift -->
         <div class="staff-change-filter-field">
-          <label style="font-size: 11px; font-weight: 800; color: #a78bfa; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 6px;">Staff's Shift</label>
-          <select id="changeFilterStaffShift" style="width: 100%; padding: 12px; border-radius: 12px; background: var(--bg-card); border: 1px solid var(--border-subtle); color: var(--text-primary); font-size: 13px; font-weight: 700; outline: none;">
+          <label for="changeFilterStaffShift" style="font-size: 11px; font-weight: 800; color: #a78bfa; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 6px;">Staff's Shift</label>
+          <select name="shift" id="changeFilterStaffShift" style="width: 100%; padding: 12px; border-radius: 12px; background: var(--bg-card); border: 1px solid var(--border-subtle); color: var(--text-primary); font-size: 13px; font-weight: 700; outline: none;">
             <option value="all">- All Staff Shifts -</option>
             <option value="W01">W01 · Morning Shift (8:30 AM – 5:30 PM)</option>
             <option value="W02">W02 · Regular Day (9:00 AM – 6:00 PM)</option>
@@ -1822,14 +1314,14 @@
 
         <!-- 3. Search Keyword -->
         <div class="staff-change-filter-field">
-          <label style="font-size: 11px; font-weight: 800; color: #a78bfa; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 6px;">Search Keyword</label>
-          <input type="search" id="changeFilterSearchKeyword" placeholder="Employee ID or name" autocomplete="off" style="width: 100%; padding: 12px; border-radius: 12px; background: var(--bg-card); border: 1px solid var(--border-subtle); color: var(--text-primary); font-size: 13px; font-weight: 700; outline: none;">
+          <label for="changeFilterSearchKeyword" style="font-size: 11px; font-weight: 800; color: #a78bfa; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 6px;">Search Keyword</label>
+          <input name="keyword" type="search" id="changeFilterSearchKeyword" placeholder="Employee ID or name" autocomplete="off" style="width: 100%; padding: 12px; border-radius: 12px; background: var(--bg-card); border: 1px solid var(--border-subtle); color: var(--text-primary); font-size: 13px; font-weight: 700; outline: none;">
         </div>
 
         <!-- 4. Branch -->
         <div class="staff-change-filter-field">
-          <label style="font-size: 11px; font-weight: 800; color: #a78bfa; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 6px;">Branch</label>
-          <select id="changeFilterBranch" style="width: 100%; padding: 12px; border-radius: 12px; background: var(--bg-card); border: 1px solid var(--border-subtle); color: var(--text-primary); font-size: 13px; font-weight: 700; outline: none;">
+          <label for="changeFilterBranch" style="font-size: 11px; font-weight: 800; color: #a78bfa; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 6px;">Branch</label>
+          <select name="branch" id="changeFilterBranch" style="width: 100%; padding: 12px; border-radius: 12px; background: var(--bg-card); border: 1px solid var(--border-subtle); color: var(--text-primary); font-size: 13px; font-weight: 700; outline: none;">
             <option value="all">- All Branches -</option>
             <option value="HQ">Headquarters (HQ)</option>
             <option value="TS">Times Square Branch</option>
@@ -1840,8 +1332,8 @@
 
         <!-- 5. Section -->
         <div class="staff-change-filter-field">
-          <label style="font-size: 11px; font-weight: 800; color: #a78bfa; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 6px;">Section</label>
-          <select id="changeFilterSection" style="width: 100%; padding: 12px; border-radius: 12px; background: var(--bg-card); border: 1px solid var(--border-subtle); color: var(--text-primary); font-size: 13px; font-weight: 700; outline: none;">
+          <label for="changeFilterSection" style="font-size: 11px; font-weight: 800; color: #a78bfa; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 6px;">Section</label>
+          <select name="section" id="changeFilterSection" style="width: 100%; padding: 12px; border-radius: 12px; background: var(--bg-card); border: 1px solid var(--border-subtle); color: var(--text-primary); font-size: 13px; font-weight: 700; outline: none;">
             <option value="all">- All Sections -</option>
             <option value="Admin">Admin Executive</option>
             <option value="Barista">Barista Operations</option>
@@ -1853,8 +1345,8 @@
 
         <!-- 6. Job Title -->
         <div class="staff-change-filter-field">
-          <label style="font-size: 11px; font-weight: 800; color: #a78bfa; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 6px;">Job Title</label>
-          <select id="changeFilterJobTitle" style="width: 100%; padding: 12px; border-radius: 12px; background: var(--bg-card); border: 1px solid var(--border-subtle); color: var(--text-primary); font-size: 13px; font-weight: 700; outline: none;">
+          <label for="changeFilterJobTitle" style="font-size: 11px; font-weight: 800; color: #a78bfa; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 6px;">Job Title</label>
+          <select name="jobTitle" id="changeFilterJobTitle" style="width: 100%; padding: 12px; border-radius: 12px; background: var(--bg-card); border: 1px solid var(--border-subtle); color: var(--text-primary); font-size: 13px; font-weight: 700; outline: none;">
             <option value="all">- All Job Titles -</option>
             <option value="Executive">Executive</option>
             <option value="Senior Barista">Senior Barista</option>
@@ -1864,18 +1356,18 @@
           </select>
         </div>
       </div>
-      <div class="sheet-body" id="staffCopyFilterFields" style="padding: 16px 20px; display: none; flex-direction: column; gap: 14px; max-height: 65vh; overflow-y: auto;">
+      <div class="sheet-body" id="staffCopyFilterFields" data-filter-scope="copy_dates" style="padding: 16px 20px; display: none; flex-direction: column; gap: 14px; max-height: 65vh; overflow-y: auto;">
         <div class="staff-copy-filter-field">
-          <label style="font-size: 11px; font-weight: 800; color: #a78bfa; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 6px;">Date</label>
-          <input type="date" id="copyFilterDate" value="2026-09-23" style="width: 100%; padding: 12px; border-radius: 12px; background: var(--bg-card); border: 1px solid var(--border-subtle); color: var(--text-primary); font-size: 13px; font-weight: 700; outline: none;">
+          <label for="copyFilterDate" style="font-size: 11px; font-weight: 800; color: #a78bfa; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 6px;">Date</label>
+          <input name="date" type="date" required id="copyFilterDate" value="2026-09-23" style="width: 100%; padding: 12px; border-radius: 12px; background: var(--bg-card); border: 1px solid var(--border-subtle); color: var(--text-primary); font-size: 13px; font-weight: 700; outline: none;">
         </div>
         <div class="staff-copy-filter-field">
-          <label style="font-size: 11px; font-weight: 800; color: #a78bfa; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 6px;">Search Keyword</label>
-          <input type="search" id="copyFilterSearchKeyword" placeholder="Employee ID or name" autocomplete="off" style="width: 100%; padding: 12px; border-radius: 12px; background: var(--bg-card); border: 1px solid var(--border-subtle); color: var(--text-primary); font-size: 13px; font-weight: 700; outline: none;">
+          <label for="copyFilterSearchKeyword" style="font-size: 11px; font-weight: 800; color: #a78bfa; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 6px;">Search Keyword</label>
+          <input name="keyword" type="search" id="copyFilterSearchKeyword" placeholder="Employee ID or name" autocomplete="off" style="width: 100%; padding: 12px; border-radius: 12px; background: var(--bg-card); border: 1px solid var(--border-subtle); color: var(--text-primary); font-size: 13px; font-weight: 700; outline: none;">
         </div>
         <div class="staff-copy-filter-field">
-          <label style="font-size: 11px; font-weight: 800; color: #a78bfa; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 6px;">Branch</label>
-          <select id="copyFilterBranch" style="width: 100%; padding: 12px; border-radius: 12px; background: var(--bg-card); border: 1px solid var(--border-subtle); color: var(--text-primary); font-size: 13px; font-weight: 700; outline: none;">
+          <label for="copyFilterBranch" style="font-size: 11px; font-weight: 800; color: #a78bfa; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 6px;">Branch</label>
+          <select name="branch" id="copyFilterBranch" style="width: 100%; padding: 12px; border-radius: 12px; background: var(--bg-card); border: 1px solid var(--border-subtle); color: var(--text-primary); font-size: 13px; font-weight: 700; outline: none;">
             <option value="all">- All Branches -</option>
             <option value="HQ">Headquarters (HQ)</option>
             <option value="TS">Times Square Branch</option>
@@ -1884,8 +1376,8 @@
           </select>
         </div>
         <div class="staff-copy-filter-field">
-          <label style="font-size: 11px; font-weight: 800; color: #a78bfa; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 6px;">Section</label>
-          <select id="copyFilterSection" style="width: 100%; padding: 12px; border-radius: 12px; background: var(--bg-card); border: 1px solid var(--border-subtle); color: var(--text-primary); font-size: 13px; font-weight: 700; outline: none;">
+          <label for="copyFilterSection" style="font-size: 11px; font-weight: 800; color: #a78bfa; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 6px;">Section</label>
+          <select name="section" id="copyFilterSection" style="width: 100%; padding: 12px; border-radius: 12px; background: var(--bg-card); border: 1px solid var(--border-subtle); color: var(--text-primary); font-size: 13px; font-weight: 700; outline: none;">
             <option value="all">- All Sections -</option>
             <option value="Admin">Admin Executive</option>
             <option value="Barista">Barista Operations</option>
@@ -1895,8 +1387,8 @@
           </select>
         </div>
         <div class="staff-copy-filter-field">
-          <label style="font-size: 11px; font-weight: 800; color: #a78bfa; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 6px;">Job Title</label>
-          <select id="copyFilterJobTitle" style="width: 100%; padding: 12px; border-radius: 12px; background: var(--bg-card); border: 1px solid var(--border-subtle); color: var(--text-primary); font-size: 13px; font-weight: 700; outline: none;">
+          <label for="copyFilterJobTitle" style="font-size: 11px; font-weight: 800; color: #a78bfa; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 6px;">Job Title</label>
+          <select name="jobTitle" id="copyFilterJobTitle" style="width: 100%; padding: 12px; border-radius: 12px; background: var(--bg-card); border: 1px solid var(--border-subtle); color: var(--text-primary); font-size: 13px; font-weight: 700; outline: none;">
             <option value="all">- All Job Titles -</option>
             <option value="Executive">Executive</option>
             <option value="Senior Barista">Senior Barista</option>
@@ -1906,8 +1398,8 @@
           </select>
         </div>
         <div class="staff-copy-filter-field">
-          <label style="font-size: 11px; font-weight: 800; color: #a78bfa; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 6px;">Staff's Shift</label>
-          <select id="copyFilterStaffShift" style="width: 100%; padding: 12px; border-radius: 12px; background: var(--bg-card); border: 1px solid var(--border-subtle); color: var(--text-primary); font-size: 13px; font-weight: 700; outline: none;">
+          <label for="copyFilterStaffShift" style="font-size: 11px; font-weight: 800; color: #a78bfa; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 6px;">Staff's Shift</label>
+          <select name="shift" id="copyFilterStaffShift" style="width: 100%; padding: 12px; border-radius: 12px; background: var(--bg-card); border: 1px solid var(--border-subtle); color: var(--text-primary); font-size: 13px; font-weight: 700; outline: none;">
             <option value="all">- All Staff Shifts -</option>
             <option value="W01">W01 &middot; Morning Shift (8:30 AM &ndash; 5:30 PM)</option>
             <option value="W02">W02 &middot; Regular Day (9:00 AM &ndash; 6:00 PM)</option>
@@ -1916,14 +1408,14 @@
           </select>
         </div>
       </div>
-      <div class="sheet-body" id="calendarFilterFields" style="padding: 16px 20px; display: none; flex-direction: column; gap: 14px; max-height: 65vh; overflow-y: auto;">
+      <div class="sheet-body" id="calendarFilterFields" data-filter-scope="calendar" style="padding: 16px 20px; display: none; flex-direction: column; gap: 14px; max-height: 65vh; overflow-y: auto;">
         <div class="calendar-filter-field">
-          <label style="font-size: 11px; font-weight: 800; color: #a78bfa; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 6px;">Search Keyword</label>
-          <input type="search" id="calendarFilterSearchKeyword" placeholder="Employee ID or name" autocomplete="off" style="width: 100%; padding: 12px; border-radius: 12px; background: var(--bg-card); border: 1px solid var(--border-subtle); color: var(--text-primary); font-size: 13px; font-weight: 700; outline: none;">
+          <label for="calendarFilterSearchKeyword" style="font-size: 11px; font-weight: 800; color: #a78bfa; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 6px;">Search Keyword</label>
+          <input name="keyword" type="search" id="calendarFilterSearchKeyword" placeholder="Employee ID or name" autocomplete="off" style="width: 100%; padding: 12px; border-radius: 12px; background: var(--bg-card); border: 1px solid var(--border-subtle); color: var(--text-primary); font-size: 13px; font-weight: 700; outline: none;">
         </div>
         <div class="calendar-filter-field">
-          <label style="font-size: 11px; font-weight: 800; color: #a78bfa; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 6px;">Staff's Shift</label>
-          <select id="calendarFilterStaffShift" style="width: 100%; padding: 12px; border-radius: 12px; background: var(--bg-card); border: 1px solid var(--border-subtle); color: var(--text-primary); font-size: 13px; font-weight: 700; outline: none;">
+          <label for="calendarFilterStaffShift" style="font-size: 11px; font-weight: 800; color: #a78bfa; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 6px;">Staff's Shift</label>
+          <select name="shift" id="calendarFilterStaffShift" style="width: 100%; padding: 12px; border-radius: 12px; background: var(--bg-card); border: 1px solid var(--border-subtle); color: var(--text-primary); font-size: 13px; font-weight: 700; outline: none;">
             <option value="all">- All Staff Shifts -</option>
             <option value="W01">W01 - Morning Shift</option>
             <option value="W02">W02 - Regular Day</option>
@@ -1932,19 +1424,20 @@
           </select>
         </div>
         <div class="calendar-filter-field">
-          <label style="font-size: 11px; font-weight: 800; color: #a78bfa; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 6px;">Staff's Job</label>
-          <select id="calendarFilterStaffJob" style="width: 100%; padding: 12px; border-radius: 12px; background: var(--bg-card); border: 1px solid var(--border-subtle); color: var(--text-primary); font-size: 13px; font-weight: 700; outline: none;">
+          <label for="calendarFilterStaffJob" style="font-size: 11px; font-weight: 800; color: #a78bfa; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 6px;">Staff's Job</label>
+          <select name="job" id="calendarFilterStaffJob" style="width: 100%; padding: 12px; border-radius: 12px; background: var(--bg-card); border: 1px solid var(--border-subtle); color: var(--text-primary); font-size: 13px; font-weight: 700; outline: none;">
             <option value="all">- All Staff Jobs -</option>
             <option value="Admin Executive">Admin Executive</option>
             <option value="Barista Operations">Barista Operations</option>
             <option value="Account Executive">Account Executive</option>
+            <option value="Account Manager">Account Manager</option>
             <option value="IT Support Engineer">IT Support Engineer</option>
             <option value="Human Resource Officer">Human Resource Officer</option>
           </select>
         </div>
         <div class="calendar-filter-field">
-          <label style="font-size: 11px; font-weight: 800; color: #a78bfa; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 6px;">Staff's Skill</label>
-          <select id="calendarFilterStaffSkill" style="width: 100%; padding: 12px; border-radius: 12px; background: var(--bg-card); border: 1px solid var(--border-subtle); color: var(--text-primary); font-size: 13px; font-weight: 700; outline: none;">
+          <label for="calendarFilterStaffSkill" style="font-size: 11px; font-weight: 800; color: #a78bfa; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 6px;">Staff's Skill</label>
+          <select name="skill" id="calendarFilterStaffSkill" style="width: 100%; padding: 12px; border-radius: 12px; background: var(--bg-card); border: 1px solid var(--border-subtle); color: var(--text-primary); font-size: 13px; font-weight: 700; outline: none;">
             <option value="all">- All Staff Skills -</option>
             <option value="Administration">Administration</option>
             <option value="Coffee Preparation">Coffee Preparation</option>
@@ -1954,22 +1447,22 @@
           </select>
         </div>
       </div>
-      <div class="sheet-body" id="summaryFilterFields" style="padding: 16px 20px; display: none; flex-direction: column; gap: 14px; max-height: 65vh; overflow-y: auto;">
+      <div class="sheet-body" id="summaryFilterFields" data-filter-scope="summary" style="padding: 16px 20px; display: none; flex-direction: column; gap: 14px; max-height: 65vh; overflow-y: auto;">
         <div class="summary-filter-field">
-          <label style="font-size: 11px; font-weight: 800; color: #a78bfa; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 6px;">Date</label>
-          <input type="date" id="summaryFilterDate" value="2026-09-23" style="width: 100%; padding: 12px; border-radius: 12px; background: var(--bg-card); border: 1px solid var(--border-subtle); color: var(--text-primary); font-size: 13px; font-weight: 700; outline: none;">
+          <label for="summaryFilterDate" style="font-size: 11px; font-weight: 800; color: #a78bfa; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 6px;">Date</label>
+          <input name="date" type="date" required id="summaryFilterDate" value="2026-09-23" style="width: 100%; padding: 12px; border-radius: 12px; background: var(--bg-card); border: 1px solid var(--border-subtle); color: var(--text-primary); font-size: 13px; font-weight: 700; outline: none;">
         </div>
         <div class="summary-filter-field">
-          <label style="font-size: 11px; font-weight: 800; color: #a78bfa; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 6px;">Shift Type</label>
-          <select id="summaryFilterShiftType" style="width: 100%; padding: 12px; border-radius: 12px; background: var(--bg-card); border: 1px solid var(--border-subtle); color: var(--text-primary); font-size: 13px; font-weight: 700; outline: none;">
+          <label for="summaryFilterShiftType" style="font-size: 11px; font-weight: 800; color: #a78bfa; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 6px;">Shift Type</label>
+          <select name="shiftType" id="summaryFilterShiftType" style="width: 100%; padding: 12px; border-radius: 12px; background: var(--bg-card); border: 1px solid var(--border-subtle); color: var(--text-primary); font-size: 13px; font-weight: 700; outline: none;">
             <option value="all">- All Shift Types -</option>
-            <option value="W02">W02 � Regular Day</option>
+            <option value="W02">W02 · Regular Day</option>
             <option value="OFF">OFF DAY</option>
           </select>
         </div>
         <div class="summary-filter-field">
-          <label style="font-size: 11px; font-weight: 800; color: #a78bfa; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 6px;">Department</label>
-          <select id="summaryFilterDepartment" style="width: 100%; padding: 12px; border-radius: 12px; background: var(--bg-card); border: 1px solid var(--border-subtle); color: var(--text-primary); font-size: 13px; font-weight: 700; outline: none;">
+          <label for="summaryFilterDepartment" style="font-size: 11px; font-weight: 800; color: #a78bfa; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 6px;">Department</label>
+          <select name="department" id="summaryFilterDepartment" style="width: 100%; padding: 12px; border-radius: 12px; background: var(--bg-card); border: 1px solid var(--border-subtle); color: var(--text-primary); font-size: 13px; font-weight: 700; outline: none;">
             <option value="all">- All Departments -</option>
             <option value="Finance">Finance</option>
             <option value="Food & Beverage">Food & Beverage</option>
@@ -1981,8 +1474,8 @@
           </select>
         </div>
         <div class="summary-filter-field">
-          <label style="font-size: 11px; font-weight: 800; color: #a78bfa; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 6px;">Branch</label>
-          <select id="summaryFilterBranch" style="width: 100%; padding: 12px; border-radius: 12px; background: var(--bg-card); border: 1px solid var(--border-subtle); color: var(--text-primary); font-size: 13px; font-weight: 700; outline: none;">
+          <label for="summaryFilterBranch" style="font-size: 11px; font-weight: 800; color: #a78bfa; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 6px;">Branch</label>
+          <select name="branch" id="summaryFilterBranch" style="width: 100%; padding: 12px; border-radius: 12px; background: var(--bg-card); border: 1px solid var(--border-subtle); color: var(--text-primary); font-size: 13px; font-weight: 700; outline: none;">
             <option value="all">- All Branches -</option>
             <option value="HQ">Headquarters (HQ)</option>
             <option value="TS">Times Square Branch</option>
@@ -1991,8 +1484,8 @@
           </select>
         </div>
         <div class="summary-filter-field">
-          <label style="font-size: 11px; font-weight: 800; color: #a78bfa; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 6px;">Section</label>
-          <select id="summaryFilterSection" style="width: 100%; padding: 12px; border-radius: 12px; background: var(--bg-card); border: 1px solid var(--border-subtle); color: var(--text-primary); font-size: 13px; font-weight: 700; outline: none;">
+          <label for="summaryFilterSection" style="font-size: 11px; font-weight: 800; color: #a78bfa; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 6px;">Section</label>
+          <select name="section" id="summaryFilterSection" style="width: 100%; padding: 12px; border-radius: 12px; background: var(--bg-card); border: 1px solid var(--border-subtle); color: var(--text-primary); font-size: 13px; font-weight: 700; outline: none;">
             <option value="all">- All Sections -</option>
             <option value="Accounts">Accounts</option>
             <option value="Frontline">Frontline</option>
@@ -2004,8 +1497,8 @@
           </select>
         </div>
         <div class="summary-filter-field">
-          <label style="font-size: 11px; font-weight: 800; color: #a78bfa; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 6px;">Cost Centre</label>
-          <select id="summaryFilterCostCenter" style="width: 100%; padding: 12px; border-radius: 12px; background: var(--bg-card); border: 1px solid var(--border-subtle); color: var(--text-primary); font-size: 13px; font-weight: 700; outline: none;">
+          <label for="summaryFilterCostCenter" style="font-size: 11px; font-weight: 800; color: #a78bfa; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 6px;">Cost Centre</label>
+          <select name="costCenter" id="summaryFilterCostCenter" style="width: 100%; padding: 12px; border-radius: 12px; background: var(--bg-card); border: 1px solid var(--border-subtle); color: var(--text-primary); font-size: 13px; font-weight: 700; outline: none;">
             <option value="all">- All Cost Centres -</option>
             <option value="Management">Management</option>
             <option value="Operations">Operations</option>
@@ -2014,147 +1507,86 @@
         </div>
       </div>
       <div class="sheet-footer" style="padding: 16px 20px; border-top: 1px solid var(--border-subtle);">
-        <button type="button" class="btn-primary" id="applyFilterButton" onclick="applyFilterRoster()" style="width: 100%; padding: 14px; border-radius: 16px; background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%); border: none; color: #ffffff; font-size: 14px; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 14px rgba(124, 58, 237, 0.35);">
+        <button type="submit" class="btn-primary" id="applyFilterButton" style="width: 100%; padding: 14px; border-radius: 16px; background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%); border: none; color: #ffffff; font-size: 14px; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 14px rgba(124, 58, 237, 0.35);">
           <i class="fa-solid fa-filter"></i> Apply Filter
         </button>
       </div>
-    </div>
+    </form>
   </div>
 
-  <!-- SUMMARY CHART INFORMATION -->
-  <div class="modal-overlay" id="chartModal" onclick="closeModalOnBackdrop(event, 'chartModal')">
-    <div class="modal-sheet" onclick="event.stopPropagation()">
-      <div class="drag-handle"></div>
-      <div class="sheet-header">
-        <div class="sheet-title" style="display: flex; align-items: center; gap: 7px;">
-          <i class="fa-solid fa-circle-info" style="color: var(--purple-primary);"></i>
-          <span>Chart Details</span>
-        </div>
-        <button type="button" class="sheet-close-btn" onclick="closeModal('chartModal')" aria-label="Close chart details">
-          <i class="fa-solid fa-xmark"></i>
-        </button>
-      </div>
-      <div class="sheet-body">
-        <div style="font-size: 12px; line-height: 1.55; color: var(--text-muted);">The colours show how total staff are distributed across the active shift filters.</div>
-        <div style="display: flex; flex-direction: column; gap: 10px;">
-          <div style="background: var(--bg-input); border: 1px solid var(--border-subtle); border-radius: 14px; padding: 12px;">
-            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 5px;">
-              <span style="display: flex; align-items: center; gap: 8px; color: var(--text-primary); font-size: 12.5px; font-weight: 800;"><span style="width: 10px; height: 10px; border-radius: 3px; background: #06b6d4;"></span>OFF DAY</span>
-              <span id="chartInfoOffPercent" style="color: #06b6d4; font-size: 12.5px; font-weight: 800;">95.5%</span>
-            </div>
-            <div id="chartInfoOffCount" style="font-size: 12px; font-weight: 700; color: var(--text-muted);">274 Staff</div>
-          </div>
-          <div style="background: var(--bg-input); border: 1px solid var(--border-subtle); border-radius: 14px; padding: 12px;">
-            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 5px;">
-              <span style="display: flex; align-items: center; gap: 8px; color: var(--text-primary); font-size: 12.5px; font-weight: 800;"><span style="width: 10px; height: 10px; border-radius: 3px; background: #f43f5e;"></span>W02 � REGULAR DAY</span>
-              <span id="chartInfoW02Percent" style="color: #f43f5e; font-size: 12.5px; font-weight: 800;">4.5%</span>
-            </div>
-            <div id="chartInfoW02Count" style="font-size: 12px; font-weight: 700; color: var(--text-muted);">13 Staff</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- SUMMARY ROW HEADCOUNT DETAILS -->
-  <div class="modal-overlay detail-popout-overlay" id="headcountDetailModal" onclick="closeModalOnBackdrop(event, 'headcountDetailModal')">
-    <section class="detail-popout-panel" role="dialog" aria-modal="true" aria-labelledby="headcountDetailTitle" onclick="event.stopPropagation()">
-      <header class="detail-popout-header">
-        <h2 class="detail-popout-title sheet-title" id="headcountDetailTitle">Headcount Details</h2>
-        <button type="button" class="detail-popout-close" onclick="closeModal('headcountDetailModal')" aria-label="Close headcount details">
-          <i class="fa-solid fa-xmark"></i>
-        </button>
-      </header>
-      <div class="detail-popout-body">
-        <table class="detail-popout-table" id="headcountPrimaryDetailsTable">
-          <tbody>
-            <tr><td class="detail-popout-label">Shift</td><td class="detail-popout-value" id="headcountDetailShift">-</td></tr>
-            <tr><td class="detail-popout-label">Job Title</td><td class="detail-popout-value" id="headcountDetailJobTitle">-</td></tr>
-            <tr><td class="detail-popout-label">Headcount</td><td class="detail-popout-value" id="headcountDetailCount">0.00</td></tr>
-          </tbody>
-        </table>
-        <div class="headcount-employee-section-title" id="headcountEmployeeSectionTitle">Employee</div>
-        <div class="headcount-employee-table-wrap">
-          <table class="headcount-employee-table" id="headcountEmployeeTable">
-            <thead><tr><th scope="col">Emp #</th><th scope="col">Name</th></tr></thead>
-            <tbody id="headcountEmployeeRows"></tbody>
-          </table>
-        </div>
-      </div>
-    </section>
-  </div>
+  <planning-headcount-details id="headcountDetailPage" class="approval-record-page" data-history-page role="main" aria-labelledby="headcountDetailTitle" hidden></planning-headcount-details>
 
   <!-- JavaScript Logic -->
   <script>
     // State variables
     let currentDate = new Date(2026, 8, 23); // 23 Sep 2026
-    let currentGridMonth = new Date(2026, 8, 1); // 1 Sep 2026
     let currentMainTab = 'staff';
     let currentSelectionMode = 'change_shift'; // 'change_shift' or 'copy_dates'
     let pendingCopy = null;
+    const appliedFilters = { change_shift: {}, copy_dates: {}, calendar: {}, summary: {} };
+    const shiftAssignments = [];
     
     // Available Shift Master List
     const shiftsMaster = [
-      { id: 'W01', name: 'W01 · 8:30 AM – 5:30 PM', time: '8:30 AM – 5:30 PM', label: 'Morning Shift' },
-      { id: 'W02', name: 'W02 · 9:00 AM – 6:00 PM', time: '9:00 AM – 6:00 PM', label: 'Regular Day' },
-      { id: 'W03', name: 'W03 · 10:00 PM – 7:00 AM', time: '10:00 PM – 7:00 AM', label: 'Night Shift' },
-      { id: 'OFF', name: 'OFF · Rest / Off Day', time: 'Off Day', label: 'Rest Day' }
+      { id: 'W01', name: 'W01 · 8:30 AM – 5:30 PM', time: '8:30 AM – 5:30 PM', label: 'Morning Shift', dayType: 'Workday', scheduledHours: 8 },
+      { id: 'W02', name: 'W02 · 9:00 AM – 6:00 PM', time: '9:00 AM – 6:00 PM', label: 'Regular Day', dayType: 'Workday', scheduledHours: 8 },
+      { id: 'W03', name: 'W03 · 10:00 PM – 7:00 AM', time: '10:00 PM – 7:00 AM', label: 'Night Shift', dayType: 'Workday', scheduledHours: 8 },
+      { id: 'OFF', name: 'OFF · Rest / Off Day', time: 'Off Day', label: 'Rest Day', dayType: 'Rest day', scheduledHours: 0 }
     ];
     let selectedShift = shiftsMaster[1]; // Default W02
 
     // Employee Master Mock Data
     const staffDatabase = [
-      { id: '000008', name: 'Aqilah Antasha', dept: 'Admin Executive', section: 'Admin', jobTitle: 'Executive', branch: 'HQ', group: 'Group G', currentShift: 'W01', currentShiftTime: '8:30 AM – 5:30 PM', eligibleForW02: true, selected: false },
-      { id: '000009', name: 'Chan Mee Ling', dept: 'Barista Operations', section: 'Barista', jobTitle: 'Senior Barista', branch: 'TS', group: 'Core Hours', currentShift: 'W01', currentShiftTime: '8:30 AM – 5:30 PM', eligibleForW02: true, selected: false },
-      { id: '000100', name: 'Loh Siew Hong', dept: 'Account Executive', section: 'Account', jobTitle: 'Executive', branch: 'MV', group: 'Group A', currentShift: 'W01', currentShiftTime: '8:30 AM – 5:30 PM', eligibleForW02: false, selected: false },
-      { id: '000101', name: 'Lee Soon Hock', dept: 'Account Manager', section: 'Account', jobTitle: 'Manager', branch: 'HQ', group: 'Group B', currentShift: 'W01', currentShiftTime: '8:30 AM – 5:30 PM', eligibleForW02: false, selected: false },
-      { id: '000102', name: 'Muhammad Danial', dept: 'IT Support Engineer', section: 'IT', jobTitle: 'QA Engineer', branch: 'SP', group: 'Group IT', currentShift: 'W02', currentShiftTime: '9:00 AM – 6:00 PM', eligibleForW02: true, selected: false },
-      { id: '000103', name: 'Siti Nurhaliza', dept: 'Human Resource Officer', section: 'HR', jobTitle: 'HR Officer', branch: 'HQ', group: 'Group HR', currentShift: 'W03', currentShiftTime: '10:00 PM – 7:00 AM', eligibleForW02: true, selected: false }
+      { id: '000008', name: 'Aqilah Antasha', dept: 'Admin Executive', section: 'Admin', jobTitle: 'Executive', branch: 'HQ', group: 'Group G', currentShift: 'W01', currentShiftTime: '8:30 AM – 5:30 PM', skill: 'Administration', eligibleForW02: true, selected: false },
+      { id: '000009', name: 'Chan Mee Ling', dept: 'Barista Operations', section: 'Barista', jobTitle: 'Senior Barista', branch: 'TS', group: 'Core Hours', currentShift: 'W01', currentShiftTime: '8:30 AM – 5:30 PM', skill: 'Coffee Preparation', eligibleForW02: true, selected: false },
+      { id: '000100', name: 'Loh Siew Hong', dept: 'Account Executive', section: 'Account', jobTitle: 'Executive', branch: 'MV', group: 'Group A', currentShift: 'W01', currentShiftTime: '8:30 AM – 5:30 PM', skill: 'Accounting', eligibleForW02: false, selected: false },
+      { id: '000101', name: 'Lee Soon Hock', dept: 'Account Manager', section: 'Account', jobTitle: 'Manager', branch: 'HQ', group: 'Group B', currentShift: 'W01', currentShiftTime: '8:30 AM – 5:30 PM', skill: 'Accounting', eligibleForW02: false, selected: false },
+      { id: '000102', name: 'Muhammad Danial', dept: 'IT Support Engineer', section: 'IT', jobTitle: 'QA Engineer', branch: 'SP', group: 'Group IT', currentShift: 'W02', currentShiftTime: '9:00 AM – 6:00 PM', skill: 'Technical Support', eligibleForW02: true, selected: false },
+      { id: '000103', name: 'Siti Nurhaliza', dept: 'Human Resource Officer', section: 'HR', jobTitle: 'HR Officer', branch: 'HQ', group: 'Group HR', currentShift: 'W03', currentShiftTime: '10:00 PM – 7:00 AM', skill: 'Recruitment', eligibleForW02: true, selected: false }
     ];
 
-    const summaryShiftData = [
-      { shift: 'N/A', shiftType: 'W02', jobTitle: 'ACCOUNT EXECUTIVE', department: 'Finance', branch: 'HQ', section: 'Accounts', costCenter: 'Management', headcount: 3 },
-      { shift: 'N/A', shiftType: 'W02', jobTitle: 'BARTENDER', department: 'Food & Beverage', branch: 'TS', section: 'Frontline', costCenter: 'Operations', headcount: 1 },
-      { shift: 'N/A', shiftType: 'W02', jobTitle: 'PRODUCTION OPERATOR', department: 'Operations', branch: 'MV', section: 'Production', costCenter: 'Operations', headcount: 4 },
-      { shift: 'N/A', shiftType: 'W02', jobTitle: 'QUALITY CHECKER', department: 'Quality', branch: 'SP', section: 'Quality Assurance', costCenter: 'Operations', headcount: 2 },
-      { shift: 'N/A', shiftType: 'W02', jobTitle: 'OPERATION DIRECTOR', department: 'Operations', branch: 'HQ', section: 'Production', costCenter: 'Management', headcount: 1 },
-      { shift: 'N/A', shiftType: 'W02', jobTitle: 'CLEANING SPECIALIST', department: 'Facilities', branch: 'HQ', section: 'Support', costCenter: 'Corporate Services', headcount: 2 },
-      { shift: 'OFF DAY', shiftType: 'OFF', jobTitle: 'PRODUCTION OPERATOR', department: 'Operations', branch: 'MV', section: 'Production', costCenter: 'Operations', headcount: 180 },
-      { shift: 'OFF DAY', shiftType: 'OFF', jobTitle: 'SENIOR BARISTA', department: 'Food & Beverage', branch: 'TS', section: 'Frontline', costCenter: 'Operations', headcount: 35 },
-      { shift: 'OFF DAY', shiftType: 'OFF', jobTitle: 'HR EXECUTIVE', department: 'Human Resource', branch: 'HQ', section: 'Human Resource', costCenter: 'Corporate Services', headcount: 12 },
-      { shift: 'OFF DAY', shiftType: 'OFF', jobTitle: 'ACCOUNT EXECUTIVE', department: 'Finance', branch: 'MV', section: 'Accounts', costCenter: 'Management', headcount: 15 },
-      { shift: 'OFF DAY', shiftType: 'OFF', jobTitle: 'WAREHOUSE ASSISTANT', department: 'Logistics', branch: 'SP', section: 'Warehouse', costCenter: 'Operations', headcount: 32 }
-    ];
+    const shiftsById = new Map(shiftsMaster.map(shift => [shift.id, shift]));
+    const planningStaffById = new Map(staffDatabase.map(employee => [employee.id, employee]));
+
+    const summaryRowsByMonth = {
+      '2026-09': [
+        { shift: 'N/A', shiftType: 'W02', jobTitle: 'ACCOUNT EXECUTIVE', department: 'Finance', branch: 'HQ', section: 'Accounts', costCenter: 'Management', headcount: 3 },
+        { shift: 'N/A', shiftType: 'W02', jobTitle: 'BARTENDER', department: 'Food & Beverage', branch: 'TS', section: 'Frontline', costCenter: 'Operations', headcount: 1 },
+        { shift: 'N/A', shiftType: 'W02', jobTitle: 'PRODUCTION OPERATOR', department: 'Operations', branch: 'MV', section: 'Production', costCenter: 'Operations', headcount: 4 },
+        { shift: 'N/A', shiftType: 'W02', jobTitle: 'QUALITY CHECKER', department: 'Quality', branch: 'SP', section: 'Quality Assurance', costCenter: 'Operations', headcount: 2 },
+        { shift: 'N/A', shiftType: 'W02', jobTitle: 'OPERATION DIRECTOR', department: 'Operations', branch: 'HQ', section: 'Production', costCenter: 'Management', headcount: 1 },
+        { shift: 'N/A', shiftType: 'W02', jobTitle: 'CLEANING SPECIALIST', department: 'Facilities', branch: 'HQ', section: 'Support', costCenter: 'Corporate Services', headcount: 2 },
+        { shift: 'OFF DAY', shiftType: 'OFF', jobTitle: 'PRODUCTION OPERATOR', department: 'Operations', branch: 'MV', section: 'Production', costCenter: 'Operations', headcount: 180 },
+        { shift: 'OFF DAY', shiftType: 'OFF', jobTitle: 'SENIOR BARISTA', department: 'Food & Beverage', branch: 'TS', section: 'Frontline', costCenter: 'Operations', headcount: 35 },
+        { shift: 'OFF DAY', shiftType: 'OFF', jobTitle: 'HR EXECUTIVE', department: 'Human Resource', branch: 'HQ', section: 'Human Resource', costCenter: 'Corporate Services', headcount: 12 },
+        { shift: 'OFF DAY', shiftType: 'OFF', jobTitle: 'ACCOUNT EXECUTIVE', department: 'Finance', branch: 'MV', section: 'Accounts', costCenter: 'Management', headcount: 15 },
+        { shift: 'OFF DAY', shiftType: 'OFF', jobTitle: 'WAREHOUSE ASSISTANT', department: 'Logistics', branch: 'SP', section: 'Warehouse', costCenter: 'Operations', headcount: 32 }
+      ]
+    };
 
     const summaryEmployeeData = [
-      { id: '000008', name: 'Aqilah Antasha', shiftType: 'W02', department: 'Finance', branch: 'HQ', section: 'Accounts', costCenter: 'Management' },
-      { id: '000009', name: 'Chan Mee Ling', shiftType: 'W02', department: 'Finance', branch: 'HQ', section: 'Accounts', costCenter: 'Management' },
-      { id: '000100', name: 'Loh Siew Hong', shiftType: 'W02', department: 'Finance', branch: 'HQ', section: 'Accounts', costCenter: 'Management' }
+      { id: '000008', name: 'Aqilah Antasha', shiftType: 'W02', jobTitle: 'ACCOUNT EXECUTIVE', department: 'Finance', branch: 'HQ', section: 'Accounts', costCenter: 'Management' },
+      { id: '000009', name: 'Chan Mee Ling', shiftType: 'W02', jobTitle: 'ACCOUNT EXECUTIVE', department: 'Finance', branch: 'HQ', section: 'Accounts', costCenter: 'Management' },
+      { id: '000100', name: 'Loh Siew Hong', shiftType: 'W02', jobTitle: 'ACCOUNT EXECUTIVE', department: 'Finance', branch: 'HQ', section: 'Accounts', costCenter: 'Management' }
     ];
-    let visibleSummaryRows = [];
-    let selectedSummaryJobTitle = 'all';
+    const summaryGroupFields = ['shiftType', 'jobTitle', 'department', 'branch', 'section', 'costCenter'];
+    let selectedSummaryRow = null;
     let summaryChartRefreshTimer;
     let summaryChartTotalAnimationFrame;
 
     function renderShiftSummary({ animateChart = false } = {}) {
-      const shiftType = document.getElementById('summaryFilterShiftType')?.value || 'all';
-      const department = document.getElementById('summaryFilterDepartment')?.value || 'all';
-      const branch = document.getElementById('summaryFilterBranch')?.value || 'all';
-      const section = document.getElementById('summaryFilterSection')?.value || 'all';
-      const costCenter = document.getElementById('summaryFilterCostCenter')?.value || 'all';
-      const filteredRows = summaryShiftData.filter(row =>
-        (shiftType === 'all' || row.shiftType === shiftType) &&
-        (department === 'all' || row.department === department) &&
-        (branch === 'all' || row.branch === branch) &&
-        (section === 'all' || row.section === section) &&
-        (costCenter === 'all' || row.costCenter === costCenter)
+      const dateKey = calendarDateKey(currentDate);
+      const monthKey = dateKey.slice(0, 7);
+      const filteredRows = (summaryRowsByMonth[monthKey] || []).filter(row =>
+        Object.entries(appliedFilters.summary).every(([key, value]) => row[key] === value)
       );
-      if (selectedSummaryJobTitle !== 'all' && !filteredRows.some(row => row.jobTitle === selectedSummaryJobTitle)) {
-        selectedSummaryJobTitle = 'all';
+      if (selectedSummaryRow && !filteredRows.includes(selectedSummaryRow)) {
+        selectedSummaryRow = filteredRows.find(row => row.jobTitle === selectedSummaryRow.jobTitle) ?? null;
       }
-      const chartRows = selectedSummaryJobTitle === 'all'
-        ? filteredRows
-        : filteredRows.filter(row => row.jobTitle === selectedSummaryJobTitle);
+      const selectedSummaryJobTitle = selectedSummaryRow?.jobTitle;
+      const chartRows = selectedSummaryRow
+        ? filteredRows.filter(row => row.jobTitle === selectedSummaryJobTitle)
+        : filteredRows;
       const total = chartRows.reduce((sum, row) => sum + row.headcount, 0);
       const offTotal = chartRows.filter(row => row.shiftType === 'OFF').reduce((sum, row) => sum + row.headcount, 0);
       const w02Total = chartRows.filter(row => row.shiftType === 'W02').reduce((sum, row) => sum + row.headcount, 0);
@@ -2164,41 +1596,36 @@
       const offArc = total ? (offTotal / total) * circumference : 0;
       const w02Arc = total ? (w02Total / total) * circumference : 0;
 
-      visibleSummaryRows = filteredRows;
       const rowsContainer = document.getElementById('summaryTableRowsContainer');
-      if (rowsContainer) {
-        rowsContainer.innerHTML = filteredRows.length ? filteredRows.map((row, rowIndex) => `
-          <div class="summary-table-row${selectedSummaryJobTitle === row.jobTitle ? ' is-chart-selected' : ''}"
-               role="button"
-               tabindex="0"
-               aria-pressed="${selectedSummaryJobTitle === row.jobTitle}"
-               aria-label="Refresh chart for ${row.jobTitle}"
-               onclick="selectSummaryJobTitle('${row.jobTitle}')"
-               onkeydown="if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); selectSummaryJobTitle('${row.jobTitle}'); }">
-            <div><span class="table-shift-badge ${row.shiftType === 'OFF' ? 'cyan' : 'rose'}">${row.shift}</span></div>
-            <div style="font-weight: 800; font-size: 12.5px;">${row.jobTitle}</div>
-            <div style="text-align: right;">
-              <button type="button" class="headcount-detail-trigger" onclick="event.stopPropagation(); openHeadcountDetail(${rowIndex})" aria-label="View ${row.jobTitle} headcount details">${row.headcount.toFixed(2)}</button>
-            </div>
-          </div>
-        `).join('') : `
-          <div style="padding: 24px 14px; text-align: center; color: var(--text-muted); font-size: 12px; font-weight: 700;">
-            No summary records match the selected filters.
-          </div>
-        `;
+      const template = document.getElementById('shiftSummaryRowTemplate');
+      rowsContainer.replaceChildren();
+      for (const row of filteredRows) {
+        const item = template.content.firstElementChild.cloneNode(true);
+        const selected = row.jobTitle === selectedSummaryJobTitle;
+        item.classList.toggle('is-chart-selected', selected);
+        const badge = item.querySelector('.table-shift-badge');
+        badge.classList.add(row.shiftType === 'OFF' ? 'cyan' : 'rose');
+        badge.textContent = row.shift;
+        const job = item.querySelector('button');
+        job.textContent = row.jobTitle;
+        job.setAttribute('aria-label', 'Refresh chart for ' + row.jobTitle);
+        job.setAttribute('aria-pressed', String(selected));
+        job.onclick = () => selectSummaryRow(row);
+        const link = item.querySelector('a');
+        link.href = HistoryRecordPage.href('headcount', shiftHeadcountKey(dateKey, row));
+        link.setAttribute('aria-label', `View headcount details for ${row.jobTitle}, ${row.shift}, ${row.headcount} staff`);
+        link.firstElementChild.textContent = row.headcount.toFixed(2);
+        rowsContainer.appendChild(item);
       }
+      if (!filteredRows.length) rowsContainer.innerHTML = '<p class="planning-detail-empty">No summary records match the selected filters.</p>';
 
       const chartTitle = document.getElementById('summaryChartTitle');
       const chartCenterLabel = document.getElementById('summaryChartCenterLabel');
-      if (chartTitle) chartTitle.textContent = selectedSummaryJobTitle === 'all' ? 'Headcount by Shift' : `${selectedSummaryJobTitle} by Shift`;
-      if (chartCenterLabel) chartCenterLabel.textContent = selectedSummaryJobTitle === 'all' ? 'Total Staff' : 'Selected Staff';
+      if (chartTitle) chartTitle.textContent = selectedSummaryRow ? `${selectedSummaryJobTitle} by Shift` : 'Headcount by Shift';
+      if (chartCenterLabel) chartCenterLabel.textContent = selectedSummaryRow ? 'Selected Staff' : 'Total Staff';
       updateSummaryChartTotal(total, animateChart);
-      if (document.getElementById('summaryLegendOff')) document.getElementById('summaryLegendOff').textContent = `${offPercent.toFixed(1)}% (${offTotal} Staff)`;
-      if (document.getElementById('summaryLegendW02')) document.getElementById('summaryLegendW02').textContent = `${w02Percent.toFixed(1)}% (${w02Total} Staff)`;
-      if (document.getElementById('chartInfoOffCount')) document.getElementById('chartInfoOffCount').textContent = `${offTotal} Staff`;
-      if (document.getElementById('chartInfoOffPercent')) document.getElementById('chartInfoOffPercent').textContent = `${offPercent.toFixed(1)}%`;
-      if (document.getElementById('chartInfoW02Count')) document.getElementById('chartInfoW02Count').textContent = `${w02Total} Staff`;
-      if (document.getElementById('chartInfoW02Percent')) document.getElementById('chartInfoW02Percent').textContent = `${w02Percent.toFixed(1)}%`;
+      document.getElementById('summaryChartOffDescription').textContent = `Off day, ${offTotal} staff (${offPercent.toFixed(1)}%)`;
+      document.getElementById('summaryChartW02Description').textContent = `W02 regular day, ${w02Total} staff (${w02Percent.toFixed(1)}%)`;
       const offCircle = document.getElementById('summaryChartOffCircle');
       const w02Circle = document.getElementById('summaryChartW02Circle');
       const drawChart = () => {
@@ -2214,6 +1641,7 @@
         }
       };
       const chartCard = document.getElementById('summaryChartCard');
+      chartCard.href = HistoryRecordPage.href('headcount', shiftHeadcountKey(dateKey, selectedSummaryRow ?? filteredRows[0]));
       if (animateChart && chartCard) {
         chartCard.classList.remove('is-refreshing');
         chartCard.dataset.refreshCount = `${Number(chartCard.dataset.refreshCount || 0) + 1}`;
@@ -2257,8 +1685,8 @@
       summaryChartTotalAnimationFrame = requestAnimationFrame(updateFrame);
     }
 
-    function selectSummaryJobTitle(jobTitle) {
-      selectedSummaryJobTitle = selectedSummaryJobTitle === jobTitle ? 'all' : jobTitle;
+    function selectSummaryRow(row) {
+      selectedSummaryRow = selectedSummaryRow?.jobTitle === row.jobTitle ? null : row;
       renderShiftSummary({ animateChart: true });
       document.getElementById('summaryChartCard')?.scrollIntoView({
         behavior: 'smooth',
@@ -2268,12 +1696,14 @@
 
     // Initialization on DOM Load
     document.addEventListener('DOMContentLoaded', () => {
-      updateDateDisplay();
-      renderStaffCards();
-      renderShiftOptionsModal();
-      renderGridCalendar();
-      renderShiftSummary();
-      updateStickyBar();
+      refreshPlanningView();
+      HistoryRecordPage.register((kind, id) => kind === 'headcount' && renderShiftHeadcountDetails(id));
+      document.getElementById('filterModal').addEventListener('keydown', event => {
+        if (event.key === 'Escape') {
+          event.preventDefault();
+          closeModal('filterModal');
+        }
+      });
     });
 
     // Date Navigation
@@ -2288,99 +1718,99 @@
       updateFilterTextDisplay();
     }
 
-    function getActiveStaffFilterElements() {
-      const prefix = currentSelectionMode === 'copy_dates' ? 'copy' : 'change';
-      return {
-        date: document.getElementById(`${prefix}FilterDate`),
-        staffShift: document.getElementById(`${prefix}FilterStaffShift`),
-        searchKeyword: document.getElementById(`${prefix}FilterSearchKeyword`),
-        branch: document.getElementById(`${prefix}FilterBranch`),
-        section: document.getElementById(`${prefix}FilterSection`),
-        jobTitle: document.getElementById(`${prefix}FilterJobTitle`)
-      };
+    function activeFilterScope() {
+      return currentMainTab === 'staff' ? currentSelectionMode : currentMainTab;
+    }
+
+    function activeFilterFields() {
+      return document.querySelector(`[data-filter-scope="${activeFilterScope()}"]`);
     }
 
     function updateFilterTextDisplay() {
-      const displayEl = document.getElementById('currentFilterTextDisplay');
-      if (!displayEl) return;
-      const options = { day: '2-digit', month: 'short', year: 'numeric' };
-      const dateStr = currentDate.toLocaleDateString('en-GB', options);
+      const parts = Object.entries(appliedFilters[activeFilterScope()]).map(([name, value]) => {
+        if (currentMainTab !== 'summary') return value;
+        const options = document.querySelector(`#summaryFilterFields [name="${name}"]`).options;
+        return Array.from(options).find(option => option.value === value).textContent;
+      });
+      const date = currentDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+      const fallback = currentMainTab === 'summary' ? 'All Summary' : 'All Staff';
+      document.getElementById('currentFilterTextDisplay').textContent = `${date} • ${parts.join(', ') || fallback}`;
+      document.querySelector('.planning-filter').classList.toggle('has-filters', parts.length > 0);
+    }
 
-      if (currentMainTab === 'calendar') {
-        const calendarKeyword = document.getElementById('calendarFilterSearchKeyword') ? document.getElementById('calendarFilterSearchKeyword').value.trim() : '';
-        const calendarShift = document.getElementById('calendarFilterStaffShift') ? document.getElementById('calendarFilterStaffShift').value : 'all';
-        const calendarJob = document.getElementById('calendarFilterStaffJob') ? document.getElementById('calendarFilterStaffJob').value : 'all';
-        const calendarSkill = document.getElementById('calendarFilterStaffSkill') ? document.getElementById('calendarFilterStaffSkill').value : 'all';
-        const calendarFilterParts = [];
-        if (calendarKeyword) calendarFilterParts.push(calendarKeyword);
-        if (calendarShift !== 'all') calendarFilterParts.push(calendarShift);
-        if (calendarJob !== 'all') calendarFilterParts.push(calendarJob);
-        if (calendarSkill !== 'all') calendarFilterParts.push(calendarSkill);
-        displayEl.textContent = `${dateStr} \u2022 ${calendarFilterParts.length ? calendarFilterParts.join(', ') : 'All Staff'}`;
-        return;
-      }
-
-      if (currentMainTab === 'summary') {
-        const summaryFilterParts = [
-          'summaryFilterShiftType',
-          'summaryFilterDepartment',
-          'summaryFilterBranch',
-          'summaryFilterSection',
-          'summaryFilterCostCenter'
-        ].map(id => document.getElementById(id))
-          .filter(select => select && select.value !== 'all')
-          .map(select => select.selectedOptions[0].textContent.trim());
-        displayEl.textContent = `${dateStr} \u2022 ${summaryFilterParts.length ? summaryFilterParts.join(', ') : 'All Summary'}`;
-        return;
-      }
-
-      const activeStaffFilters = getActiveStaffFilterElements();
-      const filterStaffShift = activeStaffFilters.staffShift?.value || 'all';
-      const filterSearchKeyword = activeStaffFilters.searchKeyword?.value.trim() || '';
-      const filterBranch = activeStaffFilters.branch?.value || 'all';
-      const filterSection = activeStaffFilters.section?.value || 'all';
-      const filterJobTitle = activeStaffFilters.jobTitle?.value || 'all';
-      const staffFilterParts = [];
-      if (filterStaffShift !== 'all') staffFilterParts.push(filterStaffShift);
-      if (filterSearchKeyword) staffFilterParts.push(filterSearchKeyword);
-      if (filterBranch !== 'all') staffFilterParts.push(filterBranch);
-      if (filterSection !== 'all') staffFilterParts.push(filterSection);
-      if (filterJobTitle !== 'all') staffFilterParts.push(filterJobTitle);
-      displayEl.textContent = `${dateStr} • ${staffFilterParts.length ? staffFilterParts.join(', ') : 'All Staff'}`;
+    function refreshPlanningView() {
+      updateDateDisplay();
+      if (currentMainTab === 'staff') renderStaffCards();
+      else if (currentMainTab === 'calendar') renderGridCalendar();
+      else renderShiftSummary();
     }
 
     function changeDate(delta) {
       currentDate.setDate(currentDate.getDate() + delta);
-      updateDateDisplay();
+      refreshPlanningView();
     }
 
     // Tab Switching
     function switchMainTab(tab) {
       currentMainTab = tab;
-      document.getElementById('tabStaffBtn').classList.toggle('active', tab === 'staff');
-      document.getElementById('tabCalendarBtn').classList.toggle('active', tab === 'calendar');
-      document.getElementById('tabSummaryBtn').classList.toggle('active', tab === 'summary');
-
-      document.getElementById('staffTabView').style.display = tab === 'staff' ? 'block' : 'none';
-      document.getElementById('calendarTabView').style.display = tab === 'calendar' ? 'block' : 'none';
-      document.getElementById('summaryTabView').style.display = tab === 'summary' ? 'block' : 'none';
+      document.querySelectorAll('.tab-card-btn').forEach(button => {
+        const panelId = button.getAttribute('aria-controls');
+        const active = panelId === tab + 'TabView';
+        button.classList.toggle('active', active);
+        button.setAttribute('aria-pressed', String(active));
+        document.getElementById(panelId).style.display = active ? 'block' : 'none';
+      });
+      document.getElementById('planModeSwitcher').hidden = tab !== 'staff';
+      document.querySelector('#view-main phone-bottom-nav').toggleAttribute('in-flow', tab === 'calendar');
 
       updateStickyBar();
-      if (tab === 'summary') renderShiftSummary();
-      updateFilterTextDisplay();
+      refreshPlanningView();
     }
 
     // Selection Mode (Change shift vs Copy to dates)
     function setSelectionMode(mode) {
       currentSelectionMode = mode;
-      document.getElementById('modeChangeShiftBtn').classList.toggle('active', mode === 'change_shift');
-      document.getElementById('modeCopyDatesBtn').classList.toggle('active', mode === 'copy_dates');
-      document.getElementById('shiftSelectionControls').hidden = mode === 'copy_dates';
-      document.getElementById('copyDateControls').hidden = mode !== 'copy_dates';
+      const activeId = mode === 'change_shift' ? 'shiftSelectionControls' : 'copyDateControls';
+      document.querySelectorAll('.shift-mode-btn').forEach(button => {
+        const controls = button.getAttribute('aria-controls');
+        const active = controls === activeId;
+        button.classList.toggle('active', active);
+        button.setAttribute('aria-pressed', String(active));
+        document.getElementById(controls).hidden = !active;
+      });
       pendingCopy = null;
+      refreshPlanningView();
+    }
 
-      renderStaffCards();
-      updateStickyBar();
+    function matchesEmployee(employee, keyword = '') {
+      if (!keyword) return true;
+      const search = keyword.toLowerCase();
+      const id = search.replace(/^#\s*/, '');
+      return employee.name.toLowerCase().includes(search) || (id !== '' && employee.id.toLowerCase().includes(id));
+    }
+
+    function assignmentOnDate(employee, dayKey) {
+      return shiftAssignments.findLast(item =>
+        item.employeeId === employee.id && item.start <= dayKey && dayKey <= item.end
+      );
+    }
+
+    function rosterShift(employee, dayKey) {
+      return shiftsById.get(assignmentOnDate(employee, dayKey)?.shift || employee.currentShift);
+    }
+
+    function visiblePlanStaff() {
+      const filters = appliedFilters[currentSelectionMode];
+      const dayKey = calendarDateKey(currentDate);
+      return staffDatabase.filter(employee => matchesEmployee(employee, filters.keyword)
+        && (!filters.shift || rosterShift(employee, dayKey).id === filters.shift)
+        && (!filters.branch || employee.branch === filters.branch)
+        && (!filters.section || employee.section === filters.section)
+        && (!filters.jobTitle || employee.jobTitle === filters.jobTitle));
+    }
+
+    function selectedPlanStaff() {
+      return visiblePlanStaff().filter(employee => employee.selected && (currentSelectionMode === 'copy_dates' || employee.eligibleForW02));
     }
 
     // Render Staff Cards List
@@ -2388,110 +1818,47 @@
       const container = document.getElementById('staffCardsContainer');
       if (!container) return;
 
-      updateFilterTextDisplay();
-
-      // Extract filter input values
-      const activeStaffFilters = getActiveStaffFilterElements();
-      const filterStaffShift = activeStaffFilters.staffShift?.value || 'all';
-      const filterSearchKeyword = activeStaffFilters.searchKeyword?.value.toLowerCase().trim() || '';
-      const filterBranch = activeStaffFilters.branch?.value || 'all';
-      const filterSection = activeStaffFilters.section?.value || 'all';
-      const filterJobTitle = activeStaffFilters.jobTitle?.value || 'all';
-
-      // Determine active filter state
-      const isFilterActive = (filterStaffShift !== 'all') || (filterSearchKeyword !== '') || (filterBranch !== 'all') || (filterSection !== 'all') || (filterJobTitle !== 'all');
-
-      // Update Filter Trigger Button Active Styling
-      const filterBtn = document.querySelector('.filter-trigger-btn');
-      if (filterBtn) {
-        if (isFilterActive) {
-          filterBtn.style.background = 'var(--purple-primary)';
-          filterBtn.style.color = '#ffffff';
-          filterBtn.style.borderColor = 'var(--purple-primary)';
-        } else {
-          filterBtn.style.background = '';
-          filterBtn.style.color = '';
-          filterBtn.style.borderColor = '';
-        }
-      }
-
-      // Old filter summary removed since it's merged into the filter card above
-
-      container.innerHTML = '';
-
-      let eligibleCount = 0;
-      let totalCount = 0;
-      let selectedCount = 0;
-
-      staffDatabase.forEach(emp => {
-        // 1. Keyword search (Name or ID)
-        if (filterSearchKeyword) {
-          const matchName = emp.name.toLowerCase().includes(filterSearchKeyword);
-          const matchId = emp.id.toLowerCase().includes(filterSearchKeyword);
-          if (!matchName && !matchId) return;
-        }
-
-        // 2. Staff Shift filter
-        if (filterStaffShift !== 'all' && emp.currentShift !== filterStaffShift) {
-          return;
-        }
-
-        // 3. Branch filter
-        if (filterBranch !== 'all' && emp.branch && emp.branch !== filterBranch) {
-          return;
-        }
-
-        // 4. Section / Department filter
-        if (filterSection !== 'all' && emp.section && emp.section !== filterSection) {
-          return;
-        }
-
-        // 5. Job Title filter
-        if (filterJobTitle !== 'all' && emp.jobTitle && emp.jobTitle !== filterJobTitle) {
-          return;
-        }
-
-        totalCount++;
+      container.replaceChildren();
+      const dayKey = calendarDateKey(currentDate);
+      const staff = visiblePlanStaff();
+      staff.forEach(emp => {
         const isEligible = currentSelectionMode === 'copy_dates' || emp.eligibleForW02;
-        if (isEligible) eligibleCount++;
-        if (emp.selected && isEligible) selectedCount++;
-
-        const card = document.createElement('div');
-        card.className = `staff-card ${emp.selected && isEligible ? 'selected' : ''} ${!isEligible ? 'disabled' : ''}`;
+        const currentShift = rosterShift(emp, dayKey);
+        const card = document.createElement('label');
+        card.className = `staff-card history-card-item ${isEligible ? 'theme-green' : 'theme-slate disabled'}`;
+        card.classList.toggle('selected', isEligible && emp.selected);
         card.dataset.staffId = emp.id;
-        
-        card.onclick = () => {
-          if (!isEligible) return;
-          emp.selected = !emp.selected;
-          renderStaffCards();
-          updateStickyBar();
-        };
-
-        // Strict AGENTS.md Rule Compliance for Employee ID:
-        // Placed directly BELOW employee's name with leading '#' (e.g. #000008) and monospace muted typography
         card.innerHTML = `
-          <div class="staff-card-top">
-            <div class="staff-identity">
-              <div class="staff-name">${emp.name}</div>
-              <div class="emp-id-label">#${emp.id}</div>
-            </div>
-            <div class="staff-card-controls">
-              <div class="custom-checkbox" aria-hidden="true">
-                <i class="fa-solid fa-check"></i>
-              </div>
-            </div>
-          </div>
-          <div class="staff-card-summary-panel">
-            <div class="staff-card-detail"><span>Job Title</span><strong>${emp.dept}</strong></div>
-            <div class="staff-card-detail"><span>Shift Group</span><strong>${emp.group}</strong></div>
-            <div class="staff-card-detail"><span>Shift</span><strong>${emp.currentShift}</strong></div>
-          </div>
+          <span class="staff-card-top attendance-record-top history-card-header">
+            <span class="staff-select-control">
+              <input type="checkbox" class="staff-verify-checkbox" aria-labelledby="planName-${emp.id} planId-${emp.id}">
+              <span class="staff-verify-box" aria-hidden="true"><i class="fa-solid fa-check"></i></span>
+            </span>
+            <span class="staff-identity">
+              <span class="staff-name" id="planName-${emp.id}">${emp.name}</span>
+              <span class="emp-id-label" id="planId-${emp.id}">#${emp.id}</span>
+            </span>
+          </span>
+          <span class="staff-card-summary-panel history-card-details">
+            <span class="staff-card-detail"><span>Job Title</span><strong>${emp.dept}</strong></span>
+            <span class="staff-card-detail"><span>Shift Group</span><strong>${emp.group}</strong></span>
+            <span class="staff-card-detail"><span>Current Shift</span><strong>${currentShift.id}</strong></span>
+            <span class="staff-card-detail"><span>Day Type</span><strong>${currentShift?.dayType || '—'}</strong></span>
+          </span>
         `;
+        const checkbox = card.querySelector('input');
+        checkbox.checked = isEligible && emp.selected;
+        checkbox.disabled = !isEligible;
+        checkbox.addEventListener('change', () => {
+          emp.selected = checkbox.checked;
+          card.classList.toggle('selected', checkbox.checked);
+          updateStickyBar();
+        });
         container.appendChild(card);
       });
 
       // Handle Empty Filter Results State
-      if (totalCount === 0) {
+      if (!staff.length) {
         container.innerHTML = `
           <div style="text-align: center; padding: 32px 16px; background: var(--bg-card); border: 1px dashed var(--border-subtle); border-radius: 18px; margin: 12px 0;">
             <i class="fa-solid fa-filter-circle-xmark" style="font-size: 28px; color: var(--purple-primary); margin-bottom: 8px; opacity: 0.8;"></i>
@@ -2502,18 +1869,7 @@
         `;
       }
 
-      // Update headers
-      document.getElementById('listCounterText').textContent = String(totalCount);
-      const selectAllCheckbox = document.getElementById('selectAllCheckbox');
-      if (selectAllCheckbox) {
-        selectAllCheckbox.checked = eligibleCount > 0 && selectedCount === eligibleCount;
-        selectAllCheckbox.indeterminate = false;
-        selectAllCheckbox.disabled = eligibleCount === 0;
-      }
-    }
-
-    function filterStaffList() {
-      renderStaffCards();
+      document.getElementById('listCounterText').textContent = String(staff.length);
       updateStickyBar();
     }
 
@@ -2526,12 +1882,17 @@
         if (visibleEligibleIds.has(emp.id)) emp.selected = checked;
       });
       renderStaffCards();
-      updateStickyBar();
     }
 
     function updateStickyBar() {
-      const selectedEn = staffDatabase.filter(e => e.selected && (currentSelectionMode === 'copy_dates' || e.eligibleForW02));
-      const count = selectedEn.length;
+      const visibleCheckboxes = document.querySelectorAll('#staffCardsContainer .staff-verify-checkbox:enabled');
+      const visibleSelected = Array.from(visibleCheckboxes).filter(box => box.checked).length;
+      const selectAll = document.getElementById('selectAllCheckbox');
+      selectAll.disabled = !visibleCheckboxes.length;
+      selectAll.checked = visibleCheckboxes.length > 0 && visibleSelected === visibleCheckboxes.length;
+      selectAll.indeterminate = visibleSelected > 0 && visibleSelected < visibleCheckboxes.length;
+
+      const count = selectedPlanStaff().length;
       document.getElementById('selectedRecordsText').textContent = String(count);
       const bar = document.getElementById('shiftPlanningActionBar');
       bar.hidden = currentMainTab !== 'staff' || count === 0;
@@ -2542,7 +1903,7 @@
     }
 
     function handleBottomMainAction() {
-      const selectedEn = staffDatabase.filter(e => e.selected && (currentSelectionMode === 'copy_dates' || e.eligibleForW02));
+      const selectedEn = selectedPlanStaff();
       if (selectedEn.length === 0) {
         showToast('Please select at least 1 staff member first.');
         return;
@@ -2574,6 +1935,11 @@
       const m = document.getElementById(modalId);
       if (!m) return;
       if (modalId === 'chooseDatesModal') pendingCopy = null;
+      if (modalId === 'filterModal') {
+        const trigger = document.getElementById('planningFilterButton');
+        trigger.setAttribute('aria-expanded', 'false');
+        trigger.focus({ preventScroll: true });
+      }
       m.style.opacity = '0';
       const sheet = m.querySelector('.modal-sheet');
       if (sheet) sheet.style.transform = 'translateY(100%)';
@@ -2599,14 +1965,16 @@
       const container = document.getElementById('reviewStaffListContainer');
       container.innerHTML = '';
       selectedList.forEach(emp => {
+        const shift = rosterShift(emp, calendarDateKey(currentDate));
         const item = document.createElement('div');
         item.style.cssText = 'background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 14px; padding: 10px 12px; margin-bottom: 2px;';
         
         // Strict AGENTS.md Employee ID placement
         item.innerHTML = `
           <div style="font-size: 14px; font-weight: 800; color: var(--text-primary); margin-bottom: 2px;">${emp.name}</div>
-          <div class="emp-id-label">#${emp.id} · ${emp.dept}</div>
-          <div style="font-size: 11.5px; font-weight: 600; color: var(--text-muted); margin-top: 4px;">Current: ${emp.currentShift} · ${emp.currentShiftTime}</div>
+          <div class="emp-id-label">#${emp.id}</div>
+          <div class="copy-review-shift">${emp.dept}</div>
+          <div style="font-size: 11.5px; font-weight: 600; color: var(--text-muted); margin-top: 4px;">Current: ${shift.id} · ${shift.time}</div>
         `;
         container.appendChild(item);
       });
@@ -2616,10 +1984,9 @@
 
     function confirmApplyChanges() {
       closeModal('reviewChangesModal');
-      const selectedEn = staffDatabase.filter(e => e.selected && e.eligibleForW02);
-      selectedEn.forEach(e => {
-        e.currentShift = selectedShift.id;
-        e.currentShiftTime = selectedShift.time;
+      const dayKey = calendarDateKey(currentDate);
+      selectedPlanStaff().forEach(employee => {
+        shiftAssignments.push({ employeeId: employee.id, start: dayKey, end: dayKey, shift: selectedShift.id });
       });
       renderStaffCards();
       showToast('Shift changes applied successfully!');
@@ -2653,7 +2020,10 @@
         sourceDate: new Date(currentDate),
         startDate: startInput.value,
         endDate: endInput.value,
-        staff: selectedList.map(employee => ({ ...employee }))
+        staff: selectedList.map(employee => {
+          const shift = rosterShift(employee, calendarDateKey(currentDate));
+          return { ...employee, currentShift: shift.id, currentShiftTime: shift.time };
+        })
       };
       const formatDate = date => date.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
       document.getElementById('chooseDatesSubtext').textContent = `${selectedList.length} staff selected`;
@@ -2678,273 +2048,151 @@
 
     function confirmReviewCopy() {
       if (!pendingCopy) return;
-      const copiedIds = new Set(pendingCopy.staff.map(employee => employee.id));
+      const { staff, startDate, endDate } = pendingCopy;
+      staff.forEach(employee => {
+        shiftAssignments.push({ employeeId: employee.id, start: startDate, end: endDate, shift: employee.currentShift });
+        planningStaffById.get(employee.id).selected = false;
+      });
       closeModal('chooseDatesModal');
-      staffDatabase.forEach(employee => { if (copiedIds.has(employee.id)) employee.selected = false; });
       renderStaffCards();
-      updateStickyBar();
       showToast('Shifts successfully copied to selected dates!');
     }
 
     // 3. Shift Selection Sheet
     function openShiftSelectModal() {
+      renderShiftOptionsModal();
       openModal('shiftSelectModal');
     }
 
     function renderShiftOptionsModal() {
       const container = document.getElementById('shiftOptionsList');
       container.innerHTML = '';
-      shiftsMaster.forEach(s => {
-        const opt = document.createElement('div');
+      shiftsMaster.forEach(shift => {
+        const opt = document.createElement('button');
+        opt.type = 'button';
         opt.className = 'picker-box';
+        const active = selectedShift.id === shift.id;
+        opt.setAttribute('aria-pressed', String(active));
         opt.onclick = () => {
-          selectedShift = s;
-          document.getElementById('selectedShiftLabel').textContent = s.name;
+          selectedShift = shift;
+          document.getElementById('selectedShiftLabel').textContent = shift.name;
           closeModal('shiftSelectModal');
           renderStaffCards();
         };
         opt.innerHTML = `
-          <div>
-            <div style="font-size: 14px; font-weight: 800; color: var(--text-primary);">${s.name}</div>
-            <div style="font-size: 11.5px; font-weight: 600; color: var(--text-muted); margin-top: 2px;">${s.label}</div>
-          </div>
-          ${selectedShift.id === s.id ? '<i class="fa-solid fa-circle-check" style="color: var(--purple-primary); font-size: 18px;"></i>' : ''}
+          <span>
+            <span class="shift-option-name">${shift.name}</span>
+            <span class="shift-option-description">${shift.label}</span>
+          </span>
+          ${active ? '<i class="fa-solid fa-circle-check" aria-hidden="true"></i>' : ''}
         `;
         container.appendChild(opt);
       });
     }
 
     // 4. Filter Modal
-    function openFilterModal() {
-      const isCalendarFilter = currentMainTab === 'calendar';
-      const isSummaryFilter = currentMainTab === 'summary';
-      const isStaffFilter = !isCalendarFilter && !isSummaryFilter;
-      const staffChangeFields = document.getElementById('staffChangeFilterFields');
-      const staffCopyFields = document.getElementById('staffCopyFilterFields');
-      const calendarFields = document.getElementById('calendarFilterFields');
-      const summaryFields = document.getElementById('summaryFilterFields');
-      if (staffChangeFields) staffChangeFields.style.display = isStaffFilter && currentSelectionMode === 'change_shift' ? 'flex' : 'none';
-      if (staffCopyFields) staffCopyFields.style.display = isStaffFilter && currentSelectionMode === 'copy_dates' ? 'flex' : 'none';
-      if (calendarFields) calendarFields.style.display = isCalendarFilter ? 'flex' : 'none';
-      if (summaryFields) summaryFields.style.display = isSummaryFilter ? 'flex' : 'none';
+    function fillFilterFields() {
+      const values = appliedFilters[activeFilterScope()];
+      activeFilterFields().querySelectorAll('[name]').forEach(field => {
+        if (field.type === 'date') field.value = calendarDateKey(currentDate);
+        else field.value = values[field.name] ?? (field.tagName === 'SELECT' ? 'all' : '');
+      });
+    }
 
-      const yyyy = currentDate.getFullYear();
-      const mm = String(currentDate.getMonth() + 1).padStart(2, '0');
-      const dd = String(currentDate.getDate()).padStart(2, '0');
-      const formattedDate = `${yyyy}-${mm}-${dd}`;
-      if (document.getElementById('summaryFilterDate')) document.getElementById('summaryFilterDate').value = formattedDate;
+    function openFilterModal() {
+      const scope = activeFilterScope();
+      document.querySelectorAll('[data-filter-scope]').forEach(group => {
+        group.style.display = group.dataset.filterScope === scope ? 'flex' : 'none';
+      });
+      fillFilterFields();
       openModal('filterModal');
+      document.getElementById('planningFilterButton').setAttribute('aria-expanded', 'true');
+      document.getElementById('planningFilterTitle').focus({ preventScroll: true });
     }
 
     function resetFilterRoster(event) {
+      // The shared sheet reset clears every field. Only reset this view.
       if (event) event.stopImmediatePropagation();
-      if (currentMainTab === 'summary') {
-        const yyyy = currentDate.getFullYear();
-        const mm = String(currentDate.getMonth() + 1).padStart(2, '0');
-        const dd = String(currentDate.getDate()).padStart(2, '0');
-        if (document.getElementById('summaryFilterDate')) document.getElementById('summaryFilterDate').value = `${yyyy}-${mm}-${dd}`;
-        if (document.getElementById('summaryFilterShiftType')) document.getElementById('summaryFilterShiftType').value = 'all';
-        if (document.getElementById('summaryFilterDepartment')) document.getElementById('summaryFilterDepartment').value = 'all';
-        if (document.getElementById('summaryFilterBranch')) document.getElementById('summaryFilterBranch').value = 'all';
-        if (document.getElementById('summaryFilterSection')) document.getElementById('summaryFilterSection').value = 'all';
-        if (document.getElementById('summaryFilterCostCenter')) document.getElementById('summaryFilterCostCenter').value = 'all';
-        updateFilterTextDisplay();
-        renderShiftSummary();
-        showToast('Summary filters reset!');
-        return;
-      }
-
-      if (currentMainTab === 'calendar') {
-        if (document.getElementById('calendarFilterSearchKeyword')) document.getElementById('calendarFilterSearchKeyword').value = '';
-        if (document.getElementById('calendarFilterStaffShift')) document.getElementById('calendarFilterStaffShift').value = 'all';
-        if (document.getElementById('calendarFilterStaffJob')) document.getElementById('calendarFilterStaffJob').value = 'all';
-        if (document.getElementById('calendarFilterStaffSkill')) document.getElementById('calendarFilterStaffSkill').value = 'all';
-        updateFilterTextDisplay();
-        renderGridCalendar();
-        showToast('Calendar filters reset!');
-        return;
-      }
-
-      const yyyy = currentDate.getFullYear();
-      const mm = String(currentDate.getMonth() + 1).padStart(2, '0');
-      const dd = String(currentDate.getDate()).padStart(2, '0');
-      const activeStaffFilters = getActiveStaffFilterElements();
-      if (activeStaffFilters.date) activeStaffFilters.date.value = `${yyyy}-${mm}-${dd}`;
-      if (activeStaffFilters.staffShift) activeStaffFilters.staffShift.value = 'all';
-      if (activeStaffFilters.searchKeyword) activeStaffFilters.searchKeyword.value = '';
-      if (activeStaffFilters.branch) activeStaffFilters.branch.value = 'all';
-      if (activeStaffFilters.section) activeStaffFilters.section.value = 'all';
-      if (activeStaffFilters.jobTitle) activeStaffFilters.jobTitle.value = 'all';
-      renderStaffCards();
+      appliedFilters[activeFilterScope()] = {};
+      if (currentMainTab === 'summary') selectedSummaryRow = null;
+      fillFilterFields();
+      refreshPlanningView();
       showToast('Filters reset!');
     }
 
     function applyFilterRoster() {
-      if (currentMainTab === 'summary') {
-        const summaryDateValue = document.getElementById('summaryFilterDate')?.value || '';
-        if (summaryDateValue) {
-          const [year, month, day] = summaryDateValue.split('-').map(Number);
-          currentDate = new Date(year, month - 1, day);
-          updateDateDisplay();
-        }
-        closeModal('filterModal');
-        renderShiftSummary();
-        updateFilterTextDisplay();
-        showToast('Summary filter applied!');
-        return;
+      const fields = activeFilterFields();
+      const date = fields.querySelector('input[type="date"]');
+      if (date) {
+        if (!date.reportValidity()) return;
+        if (date.value) currentDate = new Date(date.value + 'T12:00:00');
       }
-
-      if (currentMainTab === 'calendar') {
-        closeModal('filterModal');
-        updateFilterTextDisplay();
-        renderGridCalendar();
-        showToast('Calendar filter applied!');
-        return;
-      }
-
-      const activeStaffFilters = getActiveStaffFilterElements();
-      const filterDateValue = activeStaffFilters.date?.value || '';
-      if (filterDateValue) {
-        const [year, month, day] = filterDateValue.split('-').map(Number);
-        currentDate = new Date(year, month - 1, day);
-        updateDateDisplay();
-      }
+      const values = {};
+      fields.querySelectorAll('select, input[type="search"]').forEach(field => {
+        const value = field.value.trim();
+        if (value && (field.tagName !== 'SELECT' || value !== 'all')) values[field.name] = value;
+      });
+      appliedFilters[activeFilterScope()] = values;
       closeModal('filterModal');
-      renderStaffCards();
+      refreshPlanningView();
       showToast('Filter applied!');
     }
 
-    // 5. Chart Modal
-    function openHeadcountDetail(rowIndex) {
-      const row = visibleSummaryRows[rowIndex];
-      if (!row) return;
-      document.getElementById('headcountDetailShift').textContent = row.shift;
-      document.getElementById('headcountDetailJobTitle').textContent = row.jobTitle;
-      document.getElementById('headcountDetailCount').textContent = row.headcount.toFixed(2);
-      const employeeContainer = document.getElementById('headcountEmployeeRows');
-      if (employeeContainer) {
-        employeeContainer.innerHTML = summaryEmployeeData.map(employee => `
-          <tr>
-            <td>#${employee.id}</td>
-            <td>${employee.name}</td>
-          </tr>
-        `).join('');
+    function shiftHeadcountKey(date, row) {
+      return row ? [date, ...summaryGroupFields.map(field => row[field])].join('|') : date;
+    }
+
+    function renderShiftHeadcountDetails(key) {
+      const day = key.split('|')[0];
+      const date = new Date(day + 'T12:00:00');
+      if (!Number.isFinite(date.getTime()) || calendarDateKey(date) !== day) return null;
+      const rows = summaryRowsByMonth[day.slice(0, 7)] || [];
+      const row = rows.find(item => shiftHeadcountKey(day, item) === key);
+      if (!row && key !== day) return null;
+      if (!document.getElementById('view-main').classList.contains('active')) switchView('view-main');
+      if (currentMainTab !== 'summary' || calendarDateKey(currentDate) !== day) {
+        currentDate = date;
+        switchMainTab('summary');
       }
-      openModal('headcountDetailModal');
-    }
-
-    function openChartModal() {
-      renderShiftSummary();
-      openModal('chartModal');
-    }
-
-    function openShiftCalendarInfo() {
-      const selectedCell = document.querySelector('#gridCalDays .grid-cal-cell.selected');
-      if (selectedCell) {
-        document.getElementById('shiftCalendarInfoStaff').textContent =
-          selectedCell.querySelector('.grid-cal-stat-staff')?.textContent.trim() || '-';
-        document.getElementById('shiftCalendarInfoHours').textContent =
-          selectedCell.querySelector('.grid-cal-stat-hours')?.textContent.trim() || '-';
-        document.getElementById('shiftCalendarInfoDate').textContent =
-          selectedCell.querySelector('.grid-cal-date')?.textContent.trim() || '-';
-      }
-      openModal('shiftCalendarInfoModal');
-    }
-
-    // Calendar Matrix Generator
-    function changeGridMonth(offset) {
-      currentGridMonth.setMonth(currentGridMonth.getMonth() + offset);
-      renderGridCalendar();
+      const employees = row ? summaryEmployeeData.filter(employee =>
+        summaryGroupFields.every(field => employee[field] === row[field])
+      ) : [];
+      return document.getElementById('headcountDetailPage').render({
+        jobTitle: row ? row.jobTitle.replace(/\b[A-Z]{3,}\b/g, word => word[0] + word.slice(1).toLowerCase()) : '—',
+        shift: row?.shift ?? '—',
+        headcount: row?.headcount ?? 0,
+        employees
+      });
     }
 
     function renderGridCalendar() {
-      const year = currentGridMonth.getFullYear();
-      const month = currentGridMonth.getMonth();
-      
-      const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-      document.getElementById('gridCalTitle').textContent = `${monthNames[month]} ${year}`;
-      
-      const daysContainer = document.getElementById('gridCalDays');
-      daysContainer.innerHTML = '';
-      
-      const firstDay = new Date(year, month, 1);
-      const lastDay = new Date(year, month + 1, 0);
-      
-      // Calculate day of week of 1st day (0 = Sun, 1 = Mon, ..., 6 = Sat)
-      let firstDayIndex = firstDay.getDay() - 1;
-      if (firstDayIndex === -1) firstDayIndex = 6; // Make Monday index 0
-      
-      const daysInMonth = lastDay.getDate();
-      
-      // Show the previous month's final dates using the same pattern as Leave Calendar.
-      const previousMonthLastDay = new Date(year, month, 0).getDate();
-      for (let i = 0; i < firstDayIndex; i++) {
-        const emptyCell = document.createElement('div');
-        emptyCell.className = 'grid-cal-cell empty';
-        const previousDate = document.createElement('div');
-        previousDate.className = 'grid-cal-date';
-        previousDate.textContent = previousMonthLastDay - firstDayIndex + i + 1;
-        emptyCell.appendChild(previousDate);
-        daysContainer.appendChild(emptyCell);
-      }
-      
-      // Mock Data: specific days with custom numbers
-      const mockData = {
-        15: { staff: 287, hours: '2,192h' },
-        16: { staff: 287, hours: '2,192h' },
-        17: { staff: 287, hours: '8h' },
-        18: { staff: 287, hours: '8.5h' },
-        24: { staff: 287, hours: '0h' },
-        25: { staff: 287, hours: '0h' }
-      };
+      const filtered = Object.keys(appliedFilters.calendar).length > 0;
+      const calendar = document.querySelector('attendance-planning-calendar');
+      const totals = calendar.render(currentDate, date => calendarTotalsForDate(date, filtered), date => {
+        currentDate = date;
+        refreshPlanningView();
+      });
+      renderCalendarDaySummary(currentDate, totals, filtered);
+    }
 
-      for (let day = 1; day <= daysInMonth; day++) {
-        const cell = document.createElement('div');
-        cell.className = 'grid-cal-cell';
-        if (day === 15) cell.classList.add('selected'); // Hardcoded selected state for demo
-        
-        cell.onclick = () => {
-          document.querySelectorAll('.grid-cal-cell').forEach(c => c.classList.remove('selected'));
-          cell.classList.add('selected');
-          document.getElementById('calSummaryCard').style.display = 'block';
-          selectedCalDateText = new Date(year, month, day).toLocaleDateString('en-GB', {day: '2-digit', month: 'short', year: 'numeric'});
-          document.getElementById('calSummaryTitle').textContent = `${new Date(year, month, day).toLocaleDateString('en-GB', {weekday: 'short', day: '2-digit', month: 'short', year: 'numeric'})}`;
-        };
-        
-        const dateEl = document.createElement('div');
-        dateEl.className = 'grid-cal-date';
-        dateEl.textContent = day;
-        cell.appendChild(dateEl);
-        
-        // Mocking some blank states for realism (e.g. weekends)
-        const isWeekend = ((day + firstDayIndex - 1) % 7) >= 5;
-        if (false) {
-          const blankEl = document.createElement('div');
-          blankEl.className = 'grid-cal-empty-text';
-          blankEl.textContent = '--';
-          cell.appendChild(blankEl);
-        } else {
-          const staffCount = mockData[day] ? mockData[day].staff : (isWeekend ? 78 : 287);
-          const hoursCount = mockData[day] ? mockData[day].hours : (isWeekend ? '132h' : '2,192h');
-          
-          const staffEl = document.createElement('div');
-          staffEl.className = 'grid-cal-stat-staff';
-          staffEl.textContent = staffCount;
-          
-          const hoursEl = document.createElement('div');
-          hoursEl.className = 'grid-cal-stat-hours';
-          hoursEl.textContent = hoursCount;
-          
-          cell.appendChild(staffEl);
-          cell.appendChild(hoursEl);
-        }
-        
-        daysContainer.appendChild(cell);
-      }
-      const defaultSelectedDate = new Date(year, month, 15);
-      selectedCalDateText = defaultSelectedDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
-      document.getElementById('calSummaryTitle').textContent = defaultSelectedDate.toLocaleDateString('en-GB', { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric' });
+    function renderCalendarDaySummary(date, totals, filtered) {
+      document.getElementById('calSummaryTitle').textContent = date.toLocaleDateString('en-GB', {
+        weekday: 'short', day: '2-digit', month: 'short', year: 'numeric'
+      });
+      document.getElementById('calSummaryStaff').textContent = `${totals.staff} staff`;
+      const values = {
+        work: totals.working.toFixed(2), off: String(totals.off),
+        ot: `${totals.otStaff} / ${totals.otHours.toFixed(2)}`, leave: totals.leave.toFixed(2)
+      };
+      document.querySelectorAll('.cal-summary-stat').forEach(button => {
+        const value = values[button.dataset.kind];
+        button.querySelector('.cal-summary-stat-val').textContent = value;
+        const label = button.querySelector('.cal-summary-stat-label').textContent;
+        button.setAttribute('aria-label', `View ${label} summary, ${value}`);
+        button.disabled = filtered && !parseFloat(value);
+      });
       document.getElementById('calSummaryCard').style.display = 'block';
+      document.getElementById('calendarFilterEmpty').hidden = !filtered || totals.staff > 0;
     }
 
     // Helper Toast
@@ -3013,60 +2261,173 @@
       { name: "Test", id: "TEST6", jobTitle: "FRONT DESK AGENT", leaveDay: "1.00" }
     ];
 
-    function renderCalendarDrilldownSummary(viewId) {
-      const summaryContainer = document.querySelector(`#${viewId} .scroll-body`);
-      if (!summaryContainer) return;
+    const calendarSummaryViews = {
+      'view-work-shift-summary': { kind: 'work', counter: 'wsSummaryRecordCount' },
+      'view-no-work-summary': { kind: 'off', counter: 'nwSummaryRecordCount' },
+      'view-ot-plan-summary': { kind: 'ot', counter: 'otSummaryRecordCount' },
+      'view-leave-summary': { kind: 'leave', counter: 'lvSummaryRecordCount' }
+    };
 
-      if (viewId === 'view-work-shift-summary') {
-        summaryContainer.innerHTML = `
-          <a href="javascript:void(0)" onclick="openWorkShiftDetail('8.30:17.30W', 268, '2,144.00', '0.00')" class="history-card-item calendar-purple-card">
-            <div class="calendar-purple-card-header">
-              <div class="calendar-purple-card-title">8.30:17.30W</div>
-            </div>
-            <div class="calendar-purple-card-body">
-              <div class="calendar-purple-detail">
-                <span class="calendar-purple-label">Headcount</span>
-                <span class="summary-value">268</span>
-              </div>
-              <div class="calendar-purple-detail">
-                <span class="calendar-purple-label">Scheduled Hours</span>
-                <span class="summary-value">2,144.00</span>
-              </div>
-              <div class="calendar-purple-detail full-width">
-                <span class="calendar-purple-label">Work Hours</span>
-                <span class="summary-value">0.00</span>
-              </div>
-            </div>
-          </a>
-        `;
-        return;
+    // The workforce totals include people for whom the demo has no individual record.
+    const calendarGroups = [
+      { kind: 'work', shift: 'W01', count: 268, scheduled: 2144, worked: 0, employees: workShiftEmployeeDataset },
+      { kind: 'off', shift: 'OFF', count: 13, employees: noWorkEmployeeDataset },
+      { kind: 'ot', shift: 'W01', type: 'OT 1.5 BEFORE WORK', count: 26, hours: 26, employees: otPlanEmployeeDataset.slice(0, 26) },
+      { kind: 'ot', shift: 'W01', type: '1.5 OT', count: 55, hours: 94, employees: otPlanEmployeeDataset },
+      { kind: 'leave', shift: 'W01', type: 'ANNUAL LEAVE', count: 2, employees: leaveEmployeeDataset.slice(0, 2) },
+      { kind: 'leave', shift: 'W01', type: 'MEDICAL LEAVE', count: 3, employees: leaveEmployeeDataset },
+      { kind: 'leave', shift: 'W01', type: 'UNPAID LEAVE', count: 1, employees: leaveEmployeeDataset.slice(0, 1) }
+    ];
+
+    const calendarRoster = new Map();
+    for (const group of calendarGroups.filter(group => ['work', 'off'].includes(group.kind))) {
+      for (const employee of group.employees) {
+        calendarRoster.set(employee.id, { ...employee, currentShift: group.shift });
       }
+    }
+    for (const employee of staffDatabase) {
+      calendarRoster.set(employee.id, { ...calendarRoster.get(employee.id), ...employee, jobTitle: employee.dept });
+    }
 
-      if (viewId === 'view-no-work-summary') {
-        summaryContainer.innerHTML = `
-          <a href="javascript:void(0)" onclick="openNoWorkDetail('Rest / Off Day', 13)" class="history-card-item calendar-purple-card">
-            <div class="calendar-purple-card-header">
-              <div class="calendar-purple-card-title">Rest / Off Day</div>
-            </div>
-            <div class="calendar-purple-card-body single-column">
-              <div class="calendar-purple-detail">
-                <span class="calendar-purple-label">Headcount</span>
-                <span class="summary-value">13</span>
-              </div>
-            </div>
-          </a>
-        `;
+    function matchesCalendarFilters(employee, shiftId) {
+      const filters = appliedFilters.calendar;
+      const staff = planningStaffById.get(employee.id);
+      const job = staff?.dept || employee.jobTitle;
+      return matchesEmployee(employee, filters.keyword)
+        && (!filters.shift || shiftId === filters.shift)
+        && (!filters.job || job.toLowerCase() === filters.job.toLowerCase())
+        && (!filters.skill || staff?.skill === filters.skill);
+    }
+
+    // These exceptional days have workforce totals but no individual allocation.
+    const dailyWorkforceHours = { '2026-09-17': 8, '2026-09-18': 8.5, '2026-09-24': 0, '2026-09-25': 0 };
+
+    function baseScheduledHours(shift, dayKey) {
+      if (!shift.scheduledHours || dailyWorkforceHours[dayKey] === 0) return 0;
+      return dayKey in dailyWorkforceHours ? null : shift.scheduledHours;
+    }
+
+    function filteredCalendarGroups(date) {
+      const dayKey = calendarDateKey(date);
+      const byShift = new Map();
+      for (const employee of calendarRoster.values()) {
+        const shift = rosterShift(employee, dayKey);
+        if (!matchesCalendarFilters(employee, shift.id)) continue;
+        if (!byShift.has(shift.id)) {
+          byShift.set(shift.id, {
+            kind: shift.id === 'OFF' ? 'off' : 'work', shift: shift.id,
+            count: 0, scheduled: 0, worked: 0, employees: []
+          });
+        }
+        const group = byShift.get(shift.id);
+        const scheduled = assignmentOnDate(employee, dayKey) ? shift.scheduledHours : baseScheduledHours(shift, dayKey);
+        const worked = Number(employee.workHours || 0);
+        group.employees.push({ ...employee, scheduledHours: scheduled === null ? '—' : scheduled.toFixed(2), workHours: worked.toFixed(2) });
+        group.count++;
+        group.scheduled = group.scheduled === null || scheduled === null ? null : group.scheduled + scheduled;
+        group.worked += worked;
+      }
+      const groups = Array.from(byShift.values());
+      for (const group of calendarGroups.filter(group => ['ot', 'leave'].includes(group.kind))) {
+        const employees = group.employees.filter(employee => {
+          const staff = planningStaffById.get(employee.id);
+          return matchesCalendarFilters(employee, staff ? rosterShift(staff, dayKey).id : group.shift);
+        });
+        if (employees.length) groups.push({
+          ...group, employees, count: employees.length,
+          hours: employees.reduce((sum, employee) => sum + Number(employee.hours || 0), 0)
+        });
+      }
+      return groups;
+    }
+
+    function calendarTotalsForDate(date, filtered) {
+      if (!filtered) {
+        const weekend = date.getDay() === 0 || date.getDay() === 6;
+        const dayKey = calendarDateKey(date);
+        const recordedHours = dailyWorkforceHours[dayKey];
+        const totals = {
+          staff: weekend ? 78 : 287,
+          hours: recordedHours ?? (weekend ? 132 : 2192),
+          working: 269, off: 13, otStaff: 73, otHours: 127, leave: 5
+        };
+        for (const employee of staffDatabase) {
+          const assignment = assignmentOnDate(employee, dayKey);
+          if (!assignment) continue;
+          const shift = shiftsById.get(assignment.shift);
+          const base = shiftsById.get(employee.currentShift);
+          const oldHours = baseScheduledHours(base, dayKey);
+          totals.hours = totals.hours === null || oldHours === null ? null : totals.hours + shift.scheduledHours - oldHours;
+          const change = Number(shift.id !== 'OFF') - Number(base.id !== 'OFF');
+          totals.working += change;
+          totals.off -= change;
+        }
+        return totals;
+      }
+      const groups = filteredCalendarGroups(date);
+      const uniqueStaff = list => new Set(list.flatMap(group => group.employees.map(employee => employee.id))).size;
+      const sum = (list, field) => list.reduce((total, group) => total + group[field], 0);
+      const work = groups.filter(group => group.kind === 'work');
+      const overtime = groups.filter(group => group.kind === 'ot');
+      return {
+        staff: uniqueStaff(groups), hours: work.some(group => group.scheduled === null) ? null : sum(work, 'scheduled'), working: sum(work, 'count'),
+        off: uniqueStaff(groups.filter(group => group.kind === 'off')),
+        otStaff: uniqueStaff(overtime), otHours: sum(overtime, 'hours'),
+        leave: uniqueStaff(groups.filter(group => group.kind === 'leave'))
+      };
+    }
+
+    function renderCalendarDrilldownSummary(viewId) {
+      const { kind, counter } = calendarSummaryViews[viewId];
+      const filtered = Object.keys(appliedFilters.calendar).length > 0;
+      const groups = (filtered ? filteredCalendarGroups(currentDate) : calendarGroups).filter(group => group.kind === kind);
+      const container = document.querySelector(`#${viewId} .scroll-body`);
+      container.replaceChildren();
+      document.getElementById(counter).textContent = String(groups.length);
+      const hours = value => value === null ? '—' : value.toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      for (const group of groups) {
+        const { shift, count } = group;
+        let title = shiftsById.get(shift).name;
+        if (shift === 'W01') title = '8.30:17.30W';
+        if (shift === 'OFF') title = 'Rest / Off Day';
+        const staff = filtered ? group.employees : undefined;
+        const card = document.createElement('button');
+        card.type = 'button';
+        card.className = 'history-card-item calendar-purple-card';
+        let fields;
+        if (kind === 'work') {
+          fields = [['Headcount', count], ['Scheduled Hours', hours(group.scheduled)], ['Work Hours', hours(group.worked), true]];
+          card.onclick = () => openWorkShiftDetail(title, count, hours(group.scheduled), hours(group.worked), staff);
+        } else if (kind === 'off') {
+          fields = [['Headcount', count]];
+          card.onclick = () => openNoWorkDetail(title, count, staff);
+        } else if (kind === 'ot') {
+          fields = [['OT Type', group.type, true], ['Headcount', count], ['Hours', hours(group.hours)]];
+          card.onclick = () => openOtPlanDetail(title, group.type, count, hours(group.hours), staff);
+        } else {
+          fields = [['Leave Type', group.type], ['Headcount', count.toFixed(2)]];
+          card.onclick = () => openLeaveDetail(group.type, title, count, staff);
+        }
+        card.innerHTML = `<span class="calendar-purple-card-header">
+          <span class="history-time-row calendar-purple-card-title">${title}</span>
+          <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
+        </span><span class="calendar-purple-card-body${kind === 'off' ? ' single-column' : ''}">
+          ${fields.map(([label, value, fullWidth]) => `<span class="calendar-purple-detail${fullWidth ? ' full-width' : ''}">
+            <span class="calendar-purple-label">${label}</span><span class="summary-value">${value}</span>
+          </span>`).join('')}
+        </span>`;
+        container.appendChild(card);
       }
     }
 
-    function openWorkShiftDetail(shiftTitle, count, schedHrs, workHrs) {
+    function openWorkShiftDetail(shiftTitle, count, schedHrs, workHrs, employees) {
       document.getElementById('wsDetailShift').textContent = shiftTitle;
       document.getElementById('wsDetailHeadcount').textContent = count;
       document.getElementById('wsDetailScheduledHours').textContent = schedHrs;
       document.getElementById('wsDetailWorkHours').textContent = workHrs;
       
       const container = document.getElementById('wsEmployeeCardsContainer');
-      const list = count <= 3 ? workShiftEmployeeDataset.slice(0, count) : workShiftEmployeeDataset;
+      const list = employees || (count <= 3 ? workShiftEmployeeDataset.slice(0, count) : workShiftEmployeeDataset);
       
       container.innerHTML = list.map(emp => `
         <div class="history-card-item employee-purple-card" style="width: 100%; box-sizing: border-box; margin-bottom: 0;">
@@ -3094,12 +2455,12 @@
       switchView('view-work-shift-detail');
     }
 
-    function openNoWorkDetail(shiftTitle, count) {
+    function openNoWorkDetail(shiftTitle, count, employees = noWorkEmployeeDataset) {
       document.getElementById('nwDetailShift').textContent = shiftTitle;
       document.getElementById('nwDetailHeadcount').textContent = count;
       
       const container = document.getElementById('nwEmployeeCardsContainer');
-      container.innerHTML = noWorkEmployeeDataset.map(emp => `
+      container.innerHTML = employees.map(emp => `
         <div class="history-card-item employee-purple-card" style="width: 100%; box-sizing: border-box; margin-bottom: 0;">
           <div class="employee-purple-header">
             <div class="employee-card-name">${emp.name}</div>
@@ -3117,14 +2478,14 @@
       switchView('view-no-work-detail');
     }
 
-    function openOtPlanDetail(shiftTitle, otType, count, totalHrs) {
+    function openOtPlanDetail(shiftTitle, otType, count, totalHrs, employees) {
       document.getElementById('otDetailShift').textContent = shiftTitle;
       document.getElementById('otDetailOtType').textContent = otType;
       document.getElementById('otDetailHeadcount').textContent = count;
       document.getElementById('otDetailTotalHours').textContent = totalHrs;
       
       const container = document.getElementById('otEmployeeCardsContainer');
-      const list = Array.from({ length: count }, (_, index) => otPlanEmployeeDataset[index] || {
+      const list = employees || Array.from({ length: count }, (_, index) => otPlanEmployeeDataset[index] || {
         name: `OT Plan Staff ${index + 1}`,
         id: String(index + 1).padStart(6, '0'),
         jobTitle: 'ACCOUNT EXECUTIVE',
@@ -3153,12 +2514,12 @@
       switchView('view-ot-plan-detail');
     }
 
-    function openLeaveDetail(leaveType, shiftTitle, count) {
+    function openLeaveDetail(leaveType, shiftTitle, count, employees = leaveEmployeeDataset.slice(0, count)) {
       document.getElementById('lvDetailShift').textContent = shiftTitle;
       document.getElementById('lvDetailHeadcount').textContent = count;
       
       const container = document.getElementById('lvEmployeeCardsContainer');
-      const list = leaveEmployeeDataset.slice(0, count).map(emp => ({ ...emp, leaveType: leaveType }));
+      const list = employees.map(emp => ({ ...emp, leaveType: leaveType }));
       
       container.innerHTML = list.map(emp => `
         <div class="history-card-item employee-purple-card" style="width: 100%; box-sizing: border-box; margin-bottom: 0;">
@@ -3186,10 +2547,10 @@
       switchView('view-leave-detail');
     }
 
-    let selectedCalDateText = "15 Sep 2026";
+
 
     function openSummaryViewFromCal(viewId) {
-      renderCalendarDrilldownSummary(viewId);
+      const selectedCalDateText = currentDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
       if (document.getElementById('wsSummaryDateFilter')) document.getElementById('wsSummaryDateFilter').textContent = selectedCalDateText;
       if (document.getElementById('nwSummaryDateFilter')) document.getElementById('nwSummaryDateFilter').textContent = selectedCalDateText;
       if (document.getElementById('otSummaryDateFilter')) document.getElementById('otSummaryDateFilter').textContent = selectedCalDateText;
@@ -3209,6 +2570,7 @@
     }
 
     function switchView(viewId) {
+      if (calendarSummaryViews[viewId]) renderCalendarDrilldownSummary(viewId);
       document.querySelectorAll('.view-container').forEach(el => {
         el.classList.remove('active');
         // also ensure inline display is updated for safety

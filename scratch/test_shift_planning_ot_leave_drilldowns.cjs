@@ -57,7 +57,7 @@ async function readDetailInfoCard(page, viewSelector) {
         { title: '8.30:17.30W', values: ['1.5 OT', '55', '94.00'] }
       ]
     );
-    assert.equal(await page.$('#view-ot-plan-summary .calendar-purple-card .fa-chevron-right'), null);
+    assert.equal(await page.$$eval('#view-ot-plan-summary .calendar-purple-card-header .fa-chevron-right', icons => icons.length), 2);
 
     await page.click('#view-ot-plan-summary .calendar-purple-card');
     assert.equal(await page.$eval('#otDetailOtType', node => node.textContent.trim()), 'OT 1.5 BEFORE WORK');
@@ -95,7 +95,7 @@ async function readDetailInfoCard(page, viewSelector) {
         { title: '8.30:17.30W', values: ['UNPAID LEAVE', '1.00'] }
       ]
     );
-    assert.equal(await page.$('#view-leave-summary .calendar-purple-card .fa-chevron-right'), null);
+    assert.equal(await page.$$eval('#view-leave-summary .calendar-purple-card-header .fa-chevron-right', icons => icons.length), 3);
 
     await page.click('#view-leave-summary .calendar-purple-card:nth-child(2)');
     assert.equal(await page.$eval('#lvDetailHeadcount', node => node.textContent.trim()), '3');

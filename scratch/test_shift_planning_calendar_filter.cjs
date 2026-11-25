@@ -18,7 +18,8 @@ const pageUrl = pathToFileURL(path.resolve(__dirname, '../modules/attendance/opt
     await page.setViewport({ width: 390, height: 950 });
     await page.goto(pageUrl + '?theme=light', { waitUntil: 'load' });
 
-    await page.evaluate(() => openFilterModal());
+    await page.click('[aria-label="Previous Date"]');
+    await page.click('.planning-filter');
     await page.type('#changeFilterSearchKeyword', 'Siti');
     await page.click('#applyFilterButton');
     await new Promise(resolve => setTimeout(resolve, 320));
@@ -45,6 +46,17 @@ const pageUrl = pathToFileURL(path.resolve(__dirname, '../modules/attendance/opt
     assert.match(calendarSummary, /W01/);
     assert.match(calendarSummary, /Admin Executive/);
     assert.match(calendarSummary, /Administration/);
+    assert.match(calendarSummary, /22 Sept 2026/);
+    assert.deepEqual(await page.$$eval('.grid-cal-cell.selected > span', items => items.map(node => node.textContent)), ['22', '1', '8h']);
+    assert.deepEqual(await page.$$eval('.cal-summary-stat-val', items => items.map(node => node.textContent)), ['1.00', '0', '0 / 0.00', '0.00']);
+    await page.$eval('.cal-summary-stat.is-working', button => button.scrollIntoView({ block: 'center', behavior: 'instant' }));
+    await page.click('.cal-summary-stat.is-working');
+    await page.waitForSelector('#view-work-shift-summary.active');
+    await page.click('#view-work-shift-summary .calendar-purple-card');
+    await page.waitForSelector('#view-work-shift-detail.active');
+    assert.deepEqual(await page.$$eval('#wsEmployeeCardsContainer .employee-card-id', items => items.map(node => node.textContent)), ['#000008']);
+    await page.click('#view-work-shift-detail [aria-label="Back"]');
+    await page.click('#view-work-shift-summary [aria-label="Back"]');
 
     await page.click('#tabStaffBtn');
     await page.evaluate(() => openFilterModal());
@@ -59,11 +71,18 @@ const pageUrl = pathToFileURL(path.resolve(__dirname, '../modules/attendance/opt
     assert.equal(await page.evaluate(() => currentMainTab), 'calendar');
     assert.equal(await page.$eval('#changeFilterSearchKeyword', node => node.value), 'Siti');
     assert.notEqual(await page.$eval('#resetFilterButton', node => getComputedStyle(node).display), 'none');
+    await page.$eval('#calendarFilterSearchKeyword', node => { node.value = 'no-such-person'; });
+    await page.click('#applyFilterButton');
+    await page.waitForSelector('#filterModal', { hidden: true });
+    assert.equal(await page.$eval('.grid-cal-cell.selected .grid-cal-stat-staff', node => node.textContent), '0');
+    assert.ok(await page.$eval('#calendarFilterEmpty', node => !node.hidden));
+    await page.click('.planning-filter');
     await page.click('#resetFilterButton');
     assert.equal(await page.$eval('#calendarFilterSearchKeyword', node => node.value), '');
     assert.equal(await page.$eval('#calendarFilterStaffShift', node => node.value), 'all');
     assert.equal(await page.$eval('#calendarFilterStaffJob', node => node.value), 'all');
     assert.equal(await page.$eval('#calendarFilterStaffSkill', node => node.value), 'all');
+    assert.equal(await page.$eval('.grid-cal-cell.selected .grid-cal-stat-staff', node => node.textContent), '287');
     assert.equal(await page.$eval('#changeFilterSearchKeyword', node => node.value), 'Siti');
     assert.deepEqual(errors, []);
     console.log('PASS: Calendar tab uses four dedicated filters with state isolated from Staff.');

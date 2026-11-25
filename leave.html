@@ -2139,6 +2139,7 @@
 </style>
   <link rel="stylesheet" href="css/approval-actions.css">
   <link rel="stylesheet" href="css/attendance-schedule-calendar.css">
+  <script src="js/calendar-month.js"></script>
   <script src="js/attendance-schedule-calendar.js" defer></script>
   <script src="js/pending-approval-filter.js"></script>
   <link rel="stylesheet" href="css/form-section-headings.css">
@@ -2295,9 +2296,9 @@
                 </div>
                 <div style="display: flex; align-items: center; gap: 6px;">
                   <button type="button" id="leaveIndividualCalendarInfo" class="attendance-schedule-info-trigger" data-schedule-info-trigger data-calendar-info-scope="individual" aria-haspopup="dialog" aria-controls="leaveCalendarInfo"><i class="fa-solid fa-circle-info" aria-hidden="true"></i><span>Info</span></button>
-                  <button type="button" onclick="shiftIndivCalMonth(-1)" title="Previous Month"
+                  <button type="button" onclick="shiftIndivCalMonth(-1)" title="Previous Month" aria-label="Previous month"
                     style="width: 32px; height: 32px; border-radius: 10px; background: var(--bg-input); border: 1px solid var(--border-subtle); color: var(--text-primary); font-size: 14px; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center;">‹</button>
-                  <button type="button" onclick="shiftIndivCalMonth(1)" title="Next Month"
+                  <button type="button" onclick="shiftIndivCalMonth(1)" title="Next Month" aria-label="Next month"
                     style="width: 32px; height: 32px; border-radius: 10px; background: var(--bg-input); border: 1px solid var(--border-subtle); color: var(--text-primary); font-size: 14px; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center;">›</button>
                 </div>
               </div>
@@ -4522,9 +4523,9 @@
             </div>
             <div style="display: flex; align-items: center; gap: 6px;">
               <button type="button" id="leavePersonalCalendarInfo" class="attendance-schedule-info-trigger" data-schedule-info-trigger data-calendar-info-scope="individual" aria-haspopup="dialog" aria-controls="leaveCalendarInfo"><i class="fa-solid fa-circle-info" aria-hidden="true"></i><span>Info</span></button>
-              <button type="button" onclick="shiftMyPersonalPeriod(-1)" title="Previous Month"
+              <button type="button" onclick="shiftMyPersonalPeriod(-1)" title="Previous Month" aria-label="Previous month"
                 style="width: 34px; height: 34px; border-radius: 10px; background: var(--bg-input); border: 1px solid var(--border-subtle); color: var(--text-primary); font-size: 15px; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center;">‹</button>
-              <button type="button" onclick="shiftMyPersonalPeriod(1)" title="Next Month"
+              <button type="button" onclick="shiftMyPersonalPeriod(1)" title="Next Month" aria-label="Next month"
                 style="width: 34px; height: 34px; border-radius: 10px; background: var(--bg-input); border: 1px solid var(--border-subtle); color: var(--text-primary); font-size: 15px; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center;">›</button>
             </div>
           </div>
@@ -4617,16 +4618,16 @@
             style="display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; margin-bottom: 14px; background: var(--bg-input); border-radius: 16px; border: 1px solid var(--border-subtle);">
             <button type="button"
               style="background: none; border: none; font-size: 20px; cursor: pointer; color: var(--text-primary); font-weight: 800; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 8px;"
-              onclick="shiftTeamCalMonth(-1)">‹</button>
+              aria-label="Previous month" onclick="shiftTeamCalMonth(-1)">‹</button>
             <div style="text-align: center;">
               <div id="viewTeamCalMonthText" style="font-size: 15px; font-weight: 800; color: var(--text-primary);">
                 September 2026</div>
-              <div style="font-size: 11px; font-weight: 600; color: var(--purple-text); margin-top: 1px;">14 Total Staff
+              <div id="teamCalendarLeaveDays" style="font-size: 11px; font-weight: 600; color: var(--purple-text); margin-top: 1px;">14 Total Staff
                 Leave Days Scheduled</div>
             </div>
             <button type="button"
               style="background: none; border: none; font-size: 20px; cursor: pointer; color: var(--text-primary); font-weight: 800; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 8px;"
-              onclick="shiftTeamCalMonth(1)">›</button>
+              aria-label="Next month" onclick="shiftTeamCalMonth(1)">›</button>
           </div>
 
           <!-- Weekday Labels Header -->
@@ -5950,7 +5951,7 @@
       <strong aria-live="polite"><span id="floatingSelectedCountBadge">0</span> Selected</strong>
       <bulk-approval-actions></bulk-approval-actions>
     </aside>
-    <phone-bottom-nav active="apps"></phone-bottom-nav>
+    <phone-bottom-nav in-flow active="apps"></phone-bottom-nav>
 
     <!-- INTERACTIVE APPLY LEAVE BOTTOM SHEET MODAL (MATCHING USER SPECIFIED LAYOUT) -->
     <div class="indicators-overlay" id="leaveApplyDrawerOverlay" onclick="closeLeaveApplyModal(event)"
@@ -8270,8 +8271,7 @@
 
     // --- MY PERSONAL LEAVE CALENDAR & EVENT SHEET ---
     let myCalState = {
-      month: 'September',
-      year: '2026',
+      month: calendarMonth(2026, 8),
       subCalendar: 'all',
       viewMode: 'month',
       selectedDateStr: '2026-09-11'
@@ -8340,10 +8340,8 @@
     }
 
     function shiftMyPersonalPeriod(dir) {
-      if (typeof showToast === 'function') {
-        if (dir === 0) showToast('📅 Reset to Sep 2026 Today');
-        else showToast(dir > 0 ? '📅 Shifted to Oct 2026' : '📅 Shifted to Aug 2026');
-      }
+      myCalState.month = dir === 0 ? calendarMonth(2026, 8) : myCalState.month.move(dir);
+      renderMyPersonalCalendar();
     }
 
     function applyLeaveForDate(dateStr) {
@@ -8365,99 +8363,66 @@
       if (typeof showToast === 'function') showToast(`📅 Date selected: ${dateStr}`);
     }
 
-    let indivCalMonthIdx = 8; // September 2026
-    const indivMonthsList = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    let individualMonth = calendarMonth(2026, 8);
+    let individualSelectedDate = '2026-09-10';
+    let teamMonth = calendarMonth(2026, 8);
 
     function shiftIndivCalMonth(dir) {
-      indivCalMonthIdx = (indivCalMonthIdx + dir + 12) % 12;
-      const mName = indivMonthsList[indivCalMonthIdx];
-      const monthStr = `${mName} 2026`;
-      const t = document.getElementById('indivCalMonthTitle');
-      if (t) t.innerText = monthStr;
+      individualMonth = individualMonth.move(dir);
       renderIndivCalendar();
-      if (typeof showToast === 'function') showToast(`📅 ${monthStr}`);
     }
 
     function renderIndivCalendar() {
-      const grid = document.getElementById('indivCalDaysGrid');
-      if (!grid) return;
-      grid.innerHTML = '';
-
-      const leadCount = 2; // Sep 2026 starts on Tuesday
-
-      for (let i = 0; i < leadCount; i++) {
-        const emptyCell = document.createElement('div');
-        emptyCell.className = 'cal-day-cell other-month';
-        emptyCell.innerText = i === 0 ? '30' : '31';
-        grid.appendChild(emptyCell);
-      }
-
-      if (typeof MY_SEPTEMBER_2026_DAYS !== 'undefined') {
-        MY_SEPTEMBER_2026_DAYS.forEach(item => {
-          const cellEl = document.createElement('div');
-          const isLeaveEvent = (item.type === 'al' || item.type === 'ph' || item.type === 'mc');
-
-          cellEl.className = isLeaveEvent ? `cal-day-cell status-${item.type}` : 'cal-day-cell status-work';
-          if (item.day === 10) cellEl.classList.add('selected');
-
-          let displayTag = isLeaveEvent ? item.label : '';
-
-          cellEl.innerHTML = `
-            <span class="cal-date-num">${item.day}</span>
-            ${displayTag ? `<span class="cal-cell-tag">${displayTag}</span>` : ''}
-          `;
-
-          cellEl.onclick = () => {
-            document.querySelectorAll('#indivCalDaysGrid .cal-day-cell').forEach(c => c.classList.remove('selected'));
-            cellEl.classList.add('selected');
-
-            if (isLeaveEvent) {
-              const dateStr = `2026-09-${String(item.day).padStart(2, '0')}`;
-              openCalEventSheet(dateStr, item);
-            }
-          };
-          grid.appendChild(cellEl);
-        });
-      }
+      renderLeaveDays('indivCalDaysGrid', 'indivCalMonthTitle', individualMonth, individualSelectedDate);
     }
 
     function renderMyPersonalCalendar() {
-      const grid = document.getElementById('myPersonalCalDaysGrid');
-      if (!grid) return;
-      grid.innerHTML = '';
-
-      const leadCount = 2; // Sep 2026 starts on Tuesday (Sun, Mon lead cells)
-
-      for (let i = 0; i < leadCount; i++) {
-        const emptyCell = document.createElement('div');
-        emptyCell.className = 'cal-day-cell other-month';
-        emptyCell.innerText = i === 0 ? '30' : '31';
-        grid.appendChild(emptyCell);
-      }
-
-      MY_SEPTEMBER_2026_DAYS.forEach(item => {
-        const cellEl = document.createElement('div');
-        const dateStr = `2026-09-${String(item.day).padStart(2, '0')}`;
-
-        const isLeaveEvent = (item.type === 'al' || item.type === 'ph' || item.type === 'mc');
-
-        cellEl.className = isLeaveEvent ? `cal-day-cell status-${item.type}` : 'cal-day-cell status-work';
-        if (dateStr === myCalState.selectedDateStr) cellEl.classList.add('selected');
-
-        let displayTag = isLeaveEvent ? item.label : '';
-
-        cellEl.innerHTML = `
-          <span class="cal-date-num">${item.day}</span>
-          ${displayTag ? `<span class="cal-cell-tag">${displayTag}</span>` : ''}
-        `;
-
-        cellEl.onclick = () => selectMyPersonalDate(dateStr, item, isLeaveEvent);
-        grid.appendChild(cellEl);
-      });
+      renderLeaveDays('myPersonalCalDaysGrid', 'myPersonalMonthTitle', myCalState.month, myCalState.selectedDateStr);
     }
 
-    let currentTeamMonthIdx = 8; // September 2026
-    const teamMonthsList = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    function renderLeaveDays(gridId, titleId, month, selectedDate) {
+      const grid = document.getElementById(gridId);
+      document.getElementById(titleId).textContent = month.label;
+      grid.replaceChildren();
+      for (let i = 0; i < month.mondayOffset; i++) {
+        const blank = document.createElement('div');
+        blank.className = 'cal-day-cell other-month';
+        blank.textContent = month.previousDays - month.mondayOffset + i + 1;
+        grid.append(blank);
+      }
+      for (let day = 1; day <= month.days; day++) {
+        const date = calendarDateKey(month.date(day));
+        const item = month.key === '2026-09' ? MY_SEPTEMBER_2026_DAYS[day - 1] : null;
+        const isEvent = item && ['al', 'mc', 'ph'].includes(item.type);
+        const cell = document.createElement('button');
+        cell.type = 'button';
+        cell.className = 'cal-day-cell status-' + (isEvent ? item.type : 'work');
+        cell.dataset.date = date;
+        cell.classList.toggle('selected', date === selectedDate);
+        cell.setAttribute('aria-pressed', String(date === selectedDate));
+        const number = document.createElement('span');
+        number.className = 'cal-date-num';
+        number.textContent = day;
+        cell.append(number);
+        if (isEvent) {
+          const tag = document.createElement('span');
+          tag.className = 'cal-cell-tag';
+          tag.textContent = item.label;
+          cell.append(tag);
+        }
+        cell.addEventListener('click', () => {
+          const previous = grid.querySelector('.selected');
+          previous?.classList.remove('selected');
+          previous?.setAttribute('aria-pressed', 'false');
+          cell.classList.add('selected');
+          cell.setAttribute('aria-pressed', 'true');
+          if (gridId === 'indivCalDaysGrid') individualSelectedDate = date;
+          else myCalState.selectedDateStr = date;
+          if (isEvent) openCalEventSheet(date, item);
+        });
+        grid.append(cell);
+      }
+    }
 
     const monthTeamStatData = {
       0: { pending: 3, onLeave: 2, upcoming: 5, title: 'On Leave (Jan)', sub: 'Team members on leave in Jan' },
@@ -8475,18 +8440,17 @@
     };
 
     function shiftTeamCalMonth(dir) {
-      currentTeamMonthIdx = (currentTeamMonthIdx + dir + 12) % 12;
+      teamMonth = teamMonth.move(dir);
       updateTeamMonthUI();
     }
 
     function resetTeamMonthToCurrent() {
-      currentTeamMonthIdx = 8; // September 2026
+      teamMonth = calendarMonth(2026, 8);
       updateTeamMonthUI();
     }
 
     function updateTeamMonthUI() {
-      const mName = teamMonthsList[currentTeamMonthIdx];
-      const monthStr = `${mName} 2026`;
+      const monthStr = teamMonth.label;
 
       // 1. Update Month Header Labels
       const filterLbl = document.getElementById('teamFilterMonthLabel');
@@ -8498,7 +8462,9 @@
       if (t2) t2.innerText = monthStr;
 
       // 2. Update 3 Bento Stat Cards
-      const stats = monthTeamStatData[currentTeamMonthIdx] || monthTeamStatData[8];
+      const stats = teamMonth.year === 2026 ? monthTeamStatData[teamMonth.index] : {
+        title: 'On Leave', sub: 'Team members on leave this month', onLeave: 0, upcoming: 0
+      };
       const pCnt = document.getElementById('teamPendingCount');
       const actionCnt = document.getElementById('leaveTeamActionRequiredCount');
       const olTitle = document.getElementById('teamOnLeaveTitle');
@@ -8531,52 +8497,48 @@
       if (typeof showToast === 'function') showToast(`📅 Switched to ${monthStr}`);
     }
 
+    const teamLeaveBadges = [
+      { 5: 2, 12: 1, 20: 3 }, { 4: 1, 14: 2, 22: 1 }, { 8: 3, 17: 2, 25: 4 },
+      { 6: 1, 15: 2, 23: 1 }, { 2: 2, 11: 3, 19: 1 }, { 9: 1, 18: 2, 26: 3 },
+      { 7: 4, 16: 2, 24: 1 }, { 3: 1, 13: 3, 21: 2 }, { 11: 4, 15: 2, 18: 3, 22: 1, 29: 2 },
+      { 6: 2, 12: 3, 20: 1, 27: 4 }, { 5: 1, 14: 2, 22: 3 }, { 10: 2, 18: 4, 25: 5 }
+    ];
+
+    function teamLeaveCount(day) {
+      if (teamMonth.year !== 2026) return 0;
+      const datedStaff = teamMonth.index === 8 ? dateLeaveData[day]?.staff : null;
+      return datedStaff?.length ?? teamLeaveBadges[teamMonth.index][day] ?? 0;
+    }
+
     function renderHubTeamCalendar() {
       const grid = document.getElementById('hubTeamCalDaysGridContainer');
       if (!grid) return;
 
       let html = '';
 
-      const monthConfigs = {
-        0: { lead: 3, days: 31, badges: { 5: 2, 12: 1, 20: 3 } },
-        1: { lead: 6, days: 28, badges: { 4: 1, 14: 2, 22: 1 } },
-        2: { lead: 6, days: 31, badges: { 8: 3, 17: 2, 25: 4 } },
-        3: { lead: 2, days: 30, badges: { 6: 1, 15: 2, 23: 1 } },
-        4: { lead: 4, days: 31, badges: { 2: 2, 11: 3, 19: 1 } },
-        5: { lead: 0, days: 30, badges: { 9: 1, 18: 2, 26: 3 } },
-        6: { lead: 2, days: 31, badges: { 7: 4, 16: 2, 24: 1 } },
-        7: { lead: 5, days: 31, badges: { 3: 1, 13: 3, 21: 2 } },
-        8: { lead: 1, days: 30, badges: { 15: 2, 18: 3, 22: 1, 29: 2 }, today: 11, todayCount: 4 }, // September (Current)
-        9: { lead: 3, days: 31, badges: { 6: 2, 12: 3, 20: 1, 27: 4 } },
-        10: { lead: 6, days: 30, badges: { 5: 1, 14: 2, 22: 3 } },
-        11: { lead: 1, days: 31, badges: { 10: 2, 18: 4, 25: 5 } }
-      };
-
-      const cfg = monthConfigs[currentTeamMonthIdx] || monthConfigs[8];
-
-      for (let i = 0; i < cfg.lead; i++) {
-        const prevNum = 31 - cfg.lead + 1 + i;
+      for (let i = 0; i < teamMonth.mondayOffset; i++) {
+        const prevNum = teamMonth.previousDays - teamMonth.mondayOffset + 1 + i;
         html += `<div class="team-leave-calendar-day other-month" data-day="${prevNum}"><span class="team-leave-calendar-date">${prevNum}</span><span class="team-leave-calendar-count-placeholder" aria-hidden="true"></span></div>`;
       }
 
-      for (let d = 1; d <= cfg.days; d++) {
+      for (let d = 1; d <= teamMonth.days; d++) {
         const dStr = String(d);
-        const isToday = cfg.today === d && currentTeamMonthIdx === 8;
-        const badgeVal = isToday ? cfg.todayCount : (cfg.badges[d] || 0);
+        const isToday = teamMonth.key === '2026-09' && d === 11;
+        const badgeVal = teamLeaveCount(d);
         const classes = ['team-leave-calendar-day'];
         if (badgeVal) classes.push('has-leave');
         if (isToday) classes.push('is-today');
         html += `
-          <div class="${classes.join(' ')}" data-day="${dStr}">
+          <button type="button" class="${classes.join(' ')}" data-day="${dStr}" onclick="openCalDateDetailsModal(${d}, ${badgeVal})">
             <span class="team-leave-calendar-date">${d}</span>
             ${badgeVal
               ? `<span class="team-leave-calendar-count">${badgeVal}</span>`
               : '<span class="team-leave-calendar-count-placeholder" aria-hidden="true"></span>'}
-          </div>
+          </button>
         `;
       }
 
-      const totalCells = cfg.lead + cfg.days;
+      const totalCells = teamMonth.mondayOffset + teamMonth.days;
       const trailing = (7 - (totalCells % 7)) % 7;
       for (let t = 1; t <= trailing; t++) {
         html += `<div class="team-leave-calendar-day other-month" data-day="${t}"><span class="team-leave-calendar-date">${t}</span><span class="team-leave-calendar-count-placeholder" aria-hidden="true"></span></div>`;
@@ -8601,22 +8563,24 @@
       grid.innerHTML = '';
 
       const deptVal = document.getElementById('teamCalDeptSelect')?.value || 'all';
-      const leadCount = 2; // Sep 2026 starts on Tuesday (Sun, Mon lead cells)
+      const leadCount = teamMonth.mondayOffset;
+      let staffLeaveDays = 0;
 
       for (let i = 0; i < leadCount; i++) {
         const emptyCell = document.createElement('div');
         emptyCell.className = 'cal-date-cell other-month';
-        emptyCell.innerHTML = `<span>${i === 0 ? '31' : '31'}</span>`;
+        emptyCell.textContent = teamMonth.previousDays - leadCount + i + 1;
         grid.appendChild(emptyCell);
       }
 
-      for (let day = 1; day <= 30; day++) {
+      for (let day = 1; day <= teamMonth.days; day++) {
         const dayStr = String(day);
-        const cellData = dateLeaveData[dayStr];
-        const cellEl = document.createElement('div');
+        const cellData = teamMonth.key === '2026-09' ? dateLeaveData[dayStr] : null;
+        const cellEl = document.createElement('button');
+        cellEl.type = 'button';
         cellEl.className = 'cal-date-cell';
         cellEl.dataset.day = dayStr;
-        cellEl.style.cursor = 'default';
+        cellEl.style.border = '0';
 
         let staffList = cellData ? cellData.staff : [];
         if (deptVal !== 'all' && staffList.length > 0) {
@@ -8625,7 +8589,9 @@
           else if (deptVal === 'hr') staffList = staffList.filter(s => s.dept && s.dept.includes('HUMAN'));
         }
 
-        const count = staffList.length;
+        const count = deptVal === 'all' ? teamLeaveCount(day) : staffList.length;
+        cellEl.addEventListener('click', () => openCalDateDetailsModal(day, count, staffList));
+        staffLeaveDays += count;
 
         let badgeHTML = '';
         if (count > 0) {
@@ -8642,14 +8608,7 @@
 
         grid.appendChild(cellEl);
       }
-    }
-
-    function selectMyPersonalDate(dateStr, itemData, isEventDay) {
-      myCalState.selectedDateStr = dateStr;
-      renderMyPersonalCalendar();
-      if (isEventDay) {
-        openCalEventSheet(dateStr, itemData);
-      }
+      document.getElementById('teamCalendarLeaveDays').textContent = staffLeaveDays + ' Total Staff Leave Days Scheduled';
     }
 
     // Open Event Detail Bottom Sheet (Sliding up from bottom of phone)
@@ -9921,35 +9880,35 @@
       }
     };
 
-    function openCalDateDetailsModal(dayNum) {
+    function openCalDateDetailsModal(dayNum, count = 0, filteredStaff) {
       const overlay = document.getElementById('calDateDetailsDrawerOverlay');
       const title = document.getElementById('calModalDateTitle');
       const container = document.getElementById('calModalStaffListContainer');
       if (!overlay) return;
 
-      const data = dateLeaveData[dayNum] || {
-        dateStr: `${dayNum} September 2026`,
-        staff: []
-      };
-
-      if (title) title.innerText = `🗓️ ${data.dateStr}`;
+      const date = teamMonth.date(Number(dayNum));
+      const dateKey = calendarDateKey(date);
+      const shortDate = date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }).replace('Sept', 'Sep');
+      const records = teamMonth.key === '2026-09' ? dateLeaveData[dayNum]?.staff : null;
+      const staff = filteredStaff ?? records ?? [];
+      if (title) title.textContent = date.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
 
       if (container) {
-        if (!data.staff || data.staff.length === 0) {
+        if (!staff.length) {
           container.innerHTML = `
             <div style="text-align: center; padding: 24px 12px; color: var(--text-muted);">
               <div style="font-size: 32px; margin-bottom: 8px;">✨</div>
-              <div style="font-size: 14px; font-weight: 800; color: var(--text-primary);">All Staff Available</div>
-              <div style="font-size: 12px; margin-top: 4px; margin-bottom: 14px;">No leave applications scheduled for this date.</div>
-              <button type="button" onclick="closeCalDateDetailsModal(); applyLeaveForDate('2026-09-${String(dayNum).padStart(2, '0')}');"
+              <div style="font-size: 14px; font-weight: 800; color: var(--text-primary);">${count ? count + ' staff on leave' : 'All Staff Available'}</div>
+              <div style="font-size: 12px; margin-top: 4px; margin-bottom: 14px;">${count ? 'Individual leave details are unavailable for this date.' : 'No leave applications scheduled for this date.'}</div>
+              <button type="button" onclick="closeCalDateDetailsModal(); applyLeaveForDate('${dateKey}');"
                 style="padding: 11px 20px; border-radius: 12px; background: linear-gradient(135deg, #7c3aed, #6d28d9); color: #ffffff; font-size: 13px; font-weight: 800; border: none; cursor: pointer; box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);">
-                + Apply Leave for ${dayNum} Sep
+                + Apply Leave for ${shortDate}
               </button>
             </div>
           `;
         } else {
-          container.innerHTML = data.staff.map((s, idx) => `
-            <div onclick="openTeamMemberLeaveDetails('${s.name}', dateLeaveData['${dayNum}'].staff[${idx}])" style="background: var(--bg-card); border-radius: 18px; padding: 14px; border: 1px solid var(--border-subtle); box-shadow: var(--shadow-card); margin-bottom: 10px; cursor: pointer;">
+          container.innerHTML = staff.map(s => `
+            <div onclick="openTeamMemberLeaveDetails('${s.name}', dateLeaveData['${dayNum}'].staff[${records.indexOf(s)}])" style="background: var(--bg-card); border-radius: 18px; padding: 14px; border: 1px solid var(--border-subtle); box-shadow: var(--shadow-card); margin-bottom: 10px; cursor: pointer;">
               <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
                 <div style="display: flex; align-items: center; gap: 10px;">
                   <div style="width: 40px; height: 40px; border-radius: 14px; background: ${s.bg}; color: ${s.text}; font-size: 13px; font-weight: 800; display: flex; align-items: center; justify-content: center;">${s.avatar}</div>
@@ -9972,9 +9931,9 @@
             </div>
           `).join('') + `
             <div style="margin-top: 8px; text-align: center;">
-              <button type="button" onclick="closeCalDateDetailsModal(); applyLeaveForDate('2026-09-${String(dayNum).padStart(2, '0')}');"
+              <button type="button" onclick="closeCalDateDetailsModal(); applyLeaveForDate('${dateKey}');"
                 style="width: 100%; padding: 12px; border-radius: 14px; background: rgba(124, 58, 237, 0.12); border: 1px solid rgba(124, 58, 237, 0.25); color: var(--purple-primary); font-size: 13px; font-weight: 800; cursor: pointer;">
-                + Apply Leave for ${dayNum} Sep
+                + Apply Leave for ${shortDate}
               </button>
             </div>
           `;

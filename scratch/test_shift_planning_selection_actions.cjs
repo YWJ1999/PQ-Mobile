@@ -19,7 +19,12 @@ const pageUrl = pathToFileURL(path.resolve(__dirname, '../modules/attendance/opt
     for (const theme of ['light', 'dark']) {
     await page.goto(pageUrl + '?theme=' + theme, { waitUntil: 'load' });
 
-    assert.equal(await page.$eval('#selectAllControl', node => node.textContent.trim()), 'Select All');
+    const controls = ['.tabs-nav-card', '#planModeSwitcher', '.date-switcher-card', '.planning-filter', '#shiftSelectionControls', '.list-header', '.staff-card'];
+    assert.ok(await page.evaluate(selectors => {
+      const rows = selectors.map(selector => document.querySelector(selector).getBoundingClientRect());
+      return rows.every((row, index) => row.height > 0 && (index === 0 || row.top >= rows[index - 1].bottom - 1));
+    }, controls), 'Plan controls and roster appear in order');
+    assert.equal(await page.$eval('#selectAllControl', node => node.textContent.trim()), 'Select all');
     assert.equal(await page.$eval('#selectAllCheckbox', node => node.type), 'checkbox');
     assert.equal(await page.$eval('#shiftPickerTrigger', node => node.tagName), 'BUTTON');
     assert.equal(await page.$('#shiftPickerTrigger .shift-picker-action'), null);
@@ -33,7 +38,8 @@ const pageUrl = pathToFileURL(path.resolve(__dirname, '../modules/attendance/opt
     assert.equal(initiallySelected, 0, 'No staff is preselected');
     assert.equal(await page.$eval('#shiftPlanningActionBar', node => getComputedStyle(node).display), 'none');
     assert.equal(await page.$eval('#selectedRecordsText', node => node.textContent), '0');
-    assert.deepEqual(await page.$$eval('.list-header .staff-record-label', nodes => nodes.map(node => node.textContent)), ['Records', 'Selected Records']);
+    assert.equal(await page.$eval('.staff-record-total', node => node.innerText), '6 records');
+    assert.equal(await page.$eval('.staff-selection-count', node => node.innerText), '0 selected');
     assert.equal(await page.$('#selectedCountText'), null);
     assert.equal(await page.$eval('#shiftPlanningActionBar', node => getComputedStyle(node).position), 'absolute');
 
@@ -48,6 +54,7 @@ const pageUrl = pathToFileURL(path.resolve(__dirname, '../modules/attendance/opt
     const eligibleCount = await page.$$eval('.staff-card:not(.disabled)', cards => cards.length);
     await page.click('.staff-card:not(.disabled)');
     assert.equal(await page.$eval('#selectedRecordsText', node => node.textContent), '1');
+    assert.equal(await page.$eval('#selectAllCheckbox', node => node.indeterminate), true);
     assert.equal(await page.$eval('#shiftPlanningActionBar', node => getComputedStyle(node).display), 'flex');
     await page.click('.staff-card.selected');
     assert.equal(await page.$eval('#selectedRecordsText', node => node.textContent), '0');
@@ -65,6 +72,7 @@ const pageUrl = pathToFileURL(path.resolve(__dirname, '../modules/attendance/opt
     assert.equal(await page.$eval('#selectAllCheckbox', node => node.checked), false);
     assert.equal(await page.$eval('#shiftPlanningActionBar', node => getComputedStyle(node).display), 'none');
     await page.evaluate(() => switchMainTab('calendar'));
+    assert.equal(await page.$eval('#planModeSwitcher', node => node.hidden), true);
     await page.evaluate(() => switchMainTab('staff'));
     assert.equal(await page.$eval('#shiftPlanningActionBar', node => getComputedStyle(node).display), 'none', 'Returning to Staff does not show an empty action bar');
     await page.click('#selectAllCheckbox');
@@ -77,6 +85,7 @@ const pageUrl = pathToFileURL(path.resolve(__dirname, '../modules/attendance/opt
     await page.evaluate(() => closeModal('reviewChangesModal'));
     await page.waitForFunction(() => getComputedStyle(document.getElementById('reviewChangesModal')).display === 'none');
     await page.evaluate(() => switchMainTab('summary'));
+    assert.equal(await page.$eval('#planModeSwitcher', node => node.hidden), true);
     assert.equal(await page.$eval('#shiftPlanningActionBar', node => getComputedStyle(node).display), 'none');
     await page.evaluate(() => switchMainTab('staff'));
     assert.equal(await page.$eval('#shiftPlanningActionBar', node => getComputedStyle(node).display), 'flex');

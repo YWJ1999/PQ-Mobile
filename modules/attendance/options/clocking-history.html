@@ -106,6 +106,54 @@
     .clocking-history-facts > div > span { color: var(--text-muted); font-weight: 600; }
     .clocking-history-facts strong { color: var(--text-primary); min-width: 0; text-align: right; overflow-wrap: anywhere; }
 
+    #viewFeedbackHistory .history-card-item { padding: 0 !important; }
+    #viewFeedbackHistory .history-card-header {
+      min-height: 0;
+      flex-wrap: nowrap;
+      gap: 7px;
+      margin: 0 !important;
+      padding: 12px 16px !important;
+    }
+    #viewFeedbackHistory .history-card-title { font-size: clamp(15px, 4.5vw, 18px); font-weight: 700; line-height: 1.3; }
+    #viewFeedbackHistory .history-card-ref { margin-top: 2px; font-size: 11.5px !important; }
+    #viewFeedbackHistory .card-status-badge { font-size: 11.5px; }
+    #viewFeedbackHistory .feedback-chevron { width: 12px; flex: none; font-size: 12px; }
+    #viewFeedbackHistory .feedback-history-facts { margin: 10px 12px 12px !important; }
+    .feedback-history-facts dl { min-width: 0; }
+    .feedback-history-facts dt {
+      color: var(--text-muted);
+      font-size: 11.5px;
+      font-weight: 600;
+      line-height: 1.4;
+    }
+    .feedback-history-facts dd {
+      margin-top: 3px;
+      color: var(--text-primary);
+      font-size: 14.5px;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+      line-height: 1.35;
+      overflow-wrap: anywhere;
+    }
+    .feedback-history-dates {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: baseline;
+      gap: 5px 12px;
+      padding-top: 8px;
+      border-top: 1px solid var(--border-subtle);
+    }
+    .feedback-history-dates dt, .feedback-history-dates dd { font-size: 12.5px; }
+    .feedback-history-dates dd { margin: 0; text-align: end; }
+    @media (max-width: 359px) {
+      #viewFeedbackHistory .history-card-header { padding-inline: 12px !important; }
+      #viewFeedbackHistory .card-status-badge { max-width: 78px; white-space: normal; }
+      #viewFeedbackHistory .feedback-history-facts { margin-inline: 8px !important; column-gap: 8px !important; }
+      .feedback-history-facts dt { font-size: 11px; }
+      .feedback-history-facts dd, .feedback-history-dates dt { font-size: 12.5px; }
+    }
+
     /* Purple Modal Header Styling */
     .modal-header-purple {
       background: linear-gradient(135deg, #3b0764 0%, #4c1d95 50%, #6d28d9 100%);
@@ -425,70 +473,24 @@
       </div>
 
       <!-- Feedback History List View -->
-      <div id="viewFeedbackHistory" data-record-colour-view="Attendance feedback status" data-record-legend='{"Pending Approve":"submitted","Pending Review":"submitted","Pending Resubmit":"resubmit","Approved":"approved","Rejected":"rejected","Cancelled":"cancelled"}' style="display: none;">
-         
-        <!-- Feedback Card 1: Pending (ATT000000000432) -->
-        <a data-status="pending" class="history-card-item" data-history-link href="#history/feedback/ATT000000000432">
-          <div class="history-card-header">
-            <div class="history-card-heading">
-              <h3 class="history-card-title">Attendance Feedback</h3>
-              <div class="history-card-ref">Ref: ATT000000000432</div>
+      <div id="viewFeedbackHistory" data-record-colour-view="Attendance feedback status" data-record-legend='{"Pending Approval":"submitted","Pending Review":"submitted","Pending Resubmit":"resubmit","Approved":"approved","Rejected":"rejected","Cancelled":"cancelled"}' style="display: none;">
+        <template id="feedbackHistoryCard">
+          <a class="history-card-item" data-history-link>
+            <div class="history-card-header">
+              <div class="history-card-heading">
+                <h3 class="history-time-row history-card-title"></h3>
+                <div class="history-card-ref"></div>
+              </div>
+              <span class="card-status-badge"><i class="fa-solid" aria-hidden="true"></i></span>
+              <i class="fa-solid fa-chevron-right feedback-chevron" aria-hidden="true"></i>
             </div>
-            <span class="card-status-badge"><i class="fa-solid fa-hourglass-half" aria-hidden="true"></i>Pending Approve</span>
-          </div>
-          <span class="record-submit-date">Submit Date: 26/02/2026</span>
-          <div class="history-card-details clocking-history-facts">
-            <div><span>Attendance Date</span><strong>31 Dec 2025</strong></div>
-          </div>
-        </a>
-
-        <!-- Feedback Card 2: Pending (ATT000000000435) -->
-        <a data-status="pending" class="history-card-item" data-history-link href="#history/feedback/ATT000000000435">
-          <div class="history-card-header">
-            <div class="history-card-heading">
-              <h3 class="history-card-title">Attendance Feedback</h3>
-              <div class="history-card-ref">Ref: ATT000000000435</div>
+            <div class="history-card-details feedback-history-facts">
+              <dl><dt>Shift</dt><dd data-feedback-shift></dd></dl>
+              <dl><dt>Amended clock times</dt><dd data-feedback-times data-icon-system-ignore></dd></dl>
+              <dl class="feedback-history-dates"></dl>
             </div>
-            <span class="card-status-badge"><i class="fa-solid fa-hourglass-half" aria-hidden="true"></i>Pending Review</span>
-          </div>
-          <span class="record-submit-date">Submit Date: 14/09/2026</span>
-          <div class="history-card-details clocking-history-facts">
-            <div><span>Attendance Date</span><strong>14 Sep 2026</strong></div>
-          </div>
-        </a>
-
-        <!-- Feedback Card 3: Approved (ATT000000000440) -->
-        <a data-status="approved" class="history-card-item" data-history-link href="#history/feedback/ATT000000000440">
-          <div class="history-card-header">
-            <div class="history-card-heading">
-              <h3 class="history-card-title">Attendance Feedback</h3>
-              <div class="history-card-ref">Ref: ATT000000000440</div>
-            </div>
-            <span class="card-status-badge"><i class="fa-solid fa-check" aria-hidden="true"></i>Approved</span>
-          </div>
-          <span class="record-submit-date">Submit Date: 02/09/2026</span>
-          <div class="history-card-details clocking-history-facts">
-            <div><span>Attendance Date</span><strong>02 Sep 2026</strong></div>
-            <div><span>Approved Date</span><strong>02/09/2026</strong></div>
-          </div>
-        </a>
-
-        <!-- Feedback Card 4: Rejected (ATT000000000445) -->
-        <a data-status="rejected" class="history-card-item" data-history-link href="#history/feedback/ATT000000000445">
-          <div class="history-card-header">
-            <div class="history-card-heading">
-              <h3 class="history-card-title">Attendance Feedback</h3>
-              <div class="history-card-ref">Ref: ATT000000000445</div>
-            </div>
-            <span class="card-status-badge"><i class="fa-solid fa-circle-xmark" aria-hidden="true"></i>Rejected</span>
-          </div>
-          <span class="record-submit-date">Submit Date: 18/07/2026</span>
-          <div class="history-card-details clocking-history-facts">
-            <div><span>Attendance Date</span><strong>18 Jul 2026</strong></div>
-            <div><span>Declined Date</span><strong>18/07/2026</strong></div>
-          </div>
-        </a>
-
+          </a>
+        </template>
       </div>
 
     </div>
@@ -724,7 +726,11 @@
               </tr>
               <tr>
                 <td class="detail-label">Amended Shift</td>
-                <td class="detail-value" id="modalFbkAmendedShift">W01 (8.00AM-5.30PM)</td>
+                <td class="detail-value" id="modalFbkAmendedShift"></td>
+              </tr>
+              <tr>
+                <td class="detail-label">Amended clock times</td>
+                <td class="detail-value" id="modalFbkAmendedClockTimes" data-icon-system-ignore></td>
               </tr>
               <tr>
                 <td class="detail-label">Amended Shift Reason</td>
@@ -873,20 +879,65 @@
         closeOtDetailsDirect();
       }
 
-      function renderFeedbackHistoryDetail(docRef, docStatus, emp, branch, dept, date, shift, submitter, submitDate, comments, amendments = {}) {
+      function feedbackHistoryTime(date, includeWeekday = false) {
+        const time = document.createElement('time');
+        time.dateTime = date;
+        time.textContent = new Date(date + 'T00:00:00Z').toLocaleDateString('en-GB', {
+          weekday: includeWeekday ? 'short' : undefined, day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC'
+        });
+        return time;
+      }
+
+      function renderFeedbackHistoryCards(records) {
+        const list = document.getElementById('viewFeedbackHistory');
+        const template = document.getElementById('feedbackHistoryCard');
+        const icons = { pending: 'fa-hourglass-half', approved: 'fa-check', rejected: 'fa-circle-xmark' };
+
+        for (const [ref, [record]] of Object.entries(records)) {
+          const card = template.content.firstElementChild.cloneNode(true);
+          card.href = HistoryRecordPage.href('feedback', ref);
+          card.dataset.status = record.status;
+          card.querySelector('.history-card-title').append(feedbackHistoryTime(record.date, true));
+          card.querySelector('.history-card-ref').textContent = 'Ref: ' + ref;
+          const badge = card.querySelector('.card-status-badge');
+          badge.querySelector('i').classList.add(icons[record.status] || 'fa-circle-info');
+          badge.append(record.statusLabel);
+          card.querySelector('[data-feedback-shift]').textContent = record.amendedShift || record.shift;
+          card.querySelector('[data-feedback-times]').textContent = record.amendedClockTimes || '—';
+
+          const dates = card.querySelector('.feedback-history-dates');
+          for (const [label, date] of [
+            ['Submitted Date', record.submittedDate],
+            ['Approved Date', record.approvedDate],
+            ['Declined Date', record.declinedDate]
+          ]) {
+            if (!date) continue;
+            const term = document.createElement('dt');
+            term.textContent = label;
+            const value = document.createElement('dd');
+            value.append(feedbackHistoryTime(date));
+            dates.append(term, value);
+          }
+          list.append(card);
+        }
+      }
+
+      function renderFeedbackHistoryDetail(docRef, record, emp, branch, dept, submitter, comments) {
         if (document.getElementById('modalFbkDocRef')) document.getElementById('modalFbkDocRef').innerText = docRef || 'ATT000000000432';
         const empParts = (emp || 'EBB12 - Farhan binti rahmat').split(' - ');
         if (document.getElementById('modalFbkEmpNo')) document.getElementById('modalFbkEmpNo').innerText = empParts[0] || 'EBB12';
         if (document.getElementById('modalFbkEmpName')) document.getElementById('modalFbkEmpName').innerText = empParts[1] || 'Farhan binti rahmat';
         if (document.getElementById('modalFbkBranch')) document.getElementById('modalFbkBranch').innerText = branch || 'TIMES SQUARE BRANCH';
         if (document.getElementById('modalFbkDepartment')) document.getElementById('modalFbkDepartment').innerText = dept || 'HUMAN RESOURCE';
-        if (document.getElementById('modalFbkDate')) document.getElementById('modalFbkDate').innerText = date || '31 Dec 2025';
-        if (document.getElementById('modalFbkShift')) document.getElementById('modalFbkShift').innerText = shift || '8.00AM-5.30PM';
+        document.getElementById('modalFbkDate').replaceChildren(feedbackHistoryTime(record.date));
+        document.getElementById('modalFbkShift').textContent = record.shift;
+        document.getElementById('modalFbkAmendedShift').textContent = record.amendedShift || '—';
+        document.getElementById('modalFbkAmendedClockTimes').textContent = record.amendedClockTimes || '—';
         document.getElementById('modalFbkSubmitter').textContent = submitter || '—';
-        recordSubmitDate.set(document.getElementById('modalFbkSubmitDate'), submitDate);
-        AttendanceAdviceFields.render(document.getElementById('modalFbkAdviceFields'), amendments, attendanceDaysByAdviceRef[docRef]);
+        recordSubmitDate.set(document.getElementById('modalFbkSubmitDate'), record.submittedDate);
+        AttendanceAdviceFields.render(document.getElementById('modalFbkAdviceFields'), record, attendanceDaysByAdviceRef[docRef]);
         if (document.getElementById('modalFbkApproverComments')) document.getElementById('modalFbkApproverComments').innerText = comments || '[Comment by FARHAN BIN RAHMAT (EBB12)] okay';
-        document.getElementById('modalFbkDocStatus').replaceChildren(recordDetailStatus.create(docStatus || 'To Resubmit'));
+        document.getElementById('modalFbkDocStatus').replaceChildren(recordDetailStatus.create(record.statusLabel));
       }
 
       function closeFeedbackDetailsDirect() {
@@ -1111,12 +1162,26 @@
         'OTB000000001630': ['Rejected', 'SP013 - Angeline loren alan', 'EBB04', '10 Aug 2026', '10/08/2026', '8.00AM-5.30PM', '0800', '18:00', '20:00', '0', '2.00', '1.5 OT', 'OTHER', 'Documentation', 'No', 'No', 'General documentation', 'Overtime budget exceeded', { actualHours: '0.00' }]
       },
       feedback: {
-        'ATT000000000432': ['Pending Approve', 'EBB12 - Farhan binti rahmat', 'TIMES SQUARE BRANCH', 'HUMAN RESOURCE', '31 Dec 2025', '8.00AM-5.30PM', 'EBB12 - Farhan binti rahmat', '26/02/2026', '[Comment by FARHAN BIN RAHMAT (EBB12)]\nokay'],
-        'ATT000000000435': ['Pending Review', 'SP013 - Angeline loren alan', 'HQ MAIN BRANCH', 'TECH DEPT', '14 Sep 2026', '8.30AM-5.30PM', 'SP013 - Angeline', '14/09/2026', 'Pending supervisor review'],
-        'ATT000000000440': ['Approved', 'SP013 - Angeline loren alan', 'HQ MAIN BRANCH', 'TECH DEPT', '02 Sep 2026', '8.30AM-5.30PM', 'SP013 - Angeline', '02/09/2026', 'Approved by HR'],
-        'ATT000000000445': ['Rejected', 'SP013 - Angeline loren alan', 'HQ MAIN BRANCH', 'TECH DEPT', '18 Jul 2026', '8.30AM-5.30PM', 'SP013 - Angeline', '18/07/2026', 'Invalid reason provided']
+        'ATT000000000432': [
+          { status: 'pending', statusLabel: 'Pending Approval', date: '2025-12-31', submittedDate: '2026-02-26',
+            shift: '08:00–17:30', amendedShift: '08:30–17:30 (W01)', amendedClockTimes: '08:32 → 17:45' },
+          'EBB12 - Farhan binti rahmat', 'TIMES SQUARE BRANCH', 'HUMAN RESOURCE', 'EBB12 - Farhan binti rahmat', '[Comment by FARHAN BIN RAHMAT (EBB12)]\nokay'
+        ],
+        'ATT000000000435': [
+          { status: 'pending', statusLabel: 'Pending Review', date: '2026-09-14', submittedDate: '2026-09-14', shift: '08:30–17:30' },
+          'SP013 - Angeline loren alan', 'HQ MAIN BRANCH', 'TECH DEPT', 'SP013 - Angeline', 'Pending supervisor review'
+        ],
+        'ATT000000000440': [
+          { status: 'approved', statusLabel: 'Approved', date: '2026-09-02', submittedDate: '2026-09-02', approvedDate: '2026-09-02', shift: '08:30–17:30' },
+          'SP013 - Angeline loren alan', 'HQ MAIN BRANCH', 'TECH DEPT', 'SP013 - Angeline', 'Approved by HR'
+        ],
+        'ATT000000000445': [
+          { status: 'rejected', statusLabel: 'Rejected', date: '2026-07-18', submittedDate: '2026-07-18', declinedDate: '2026-07-18', shift: '08:30–17:30' },
+          'SP013 - Angeline loren alan', 'HQ MAIN BRANCH', 'TECH DEPT', 'SP013 - Angeline', 'Invalid reason provided'
+        ]
       }
     };
+    renderFeedbackHistoryCards(attendanceHistoryFields.feedback);
   </script>
   <script src="../../../js/attendance/history-record-route.js"></script>
   </body>

@@ -32,9 +32,9 @@ const pageUrl = pathToFileURL(path.resolve(__dirname, '../modules/attendance/opt
     assert.equal(await page.$eval('#summaryChartTotal', node => node.textContent.trim()), '287');
 
     await page.$$eval('#summaryTableRowsContainer .summary-table-row', rows => {
-      const row = rows.find(item => item.textContent.includes('ACCOUNT EXECUTIVE'));
+      const row = rows.find(item => item.textContent.includes('ACCOUNT EXECUTIVE') && item.textContent.includes('OFF DAY'));
       if (!row) throw new Error('ACCOUNT EXECUTIVE row not found');
-      row.click();
+      row.querySelector('.summary-job-title').click();
     });
 
     assert.equal(await page.$eval('#summaryChartCard', node => node.classList.contains('is-refreshing')), true);
@@ -50,10 +50,11 @@ const pageUrl = pathToFileURL(path.resolve(__dirname, '../modules/attendance/opt
     });
     assert.notEqual(selectedRowStyle.background, 'rgba(0, 0, 0, 0)');
     assert.match(selectedRowStyle.boxShadow, /124, 58, 237/);
-    await new Promise(resolve => setTimeout(resolve, 700));
+    await page.waitForFunction(() => !document.getElementById('summaryChartCard').classList.contains('is-refreshing')
+      && document.getElementById('summaryChartTotal').textContent === '18');
     assert.equal(await page.$eval('#summaryChartTotal', node => node.textContent.trim()), '18');
-    assert.equal(await page.$eval('#chartInfoOffCount', node => node.textContent.trim()), '15 Staff');
-    assert.equal(await page.$eval('#chartInfoW02Count', node => node.textContent.trim()), '3 Staff');
+    assert.equal(await page.$eval('#summaryChartOffDescription', node => node.textContent), 'Off day, 15 staff (83.3%)');
+    assert.equal(await page.$eval('#summaryChartW02Description', node => node.textContent), 'W02 regular day, 3 staff (16.7%)');
     assert.equal(await page.$eval('#summaryChartCard', node => node.classList.contains('is-refreshing')), false);
     assert.equal(
       await page.$eval('#summaryChartCard', node => {
@@ -63,26 +64,34 @@ const pageUrl = pathToFileURL(path.resolve(__dirname, '../modules/attendance/opt
       true
     );
 
+    await page.click('#summaryChartInfoButton');
+    await page.waitForSelector('#headcountDetailPage:not([hidden])');
+    assert.deepEqual(await page.$$eval('#headcountDetailPage dd', nodes => nodes.map(node => node.textContent)), ['Account Executive', 'OFF DAY', '15']);
+    assert.equal(await page.$$eval('#headcountEmployeeRows tr', rows => rows.length), 0);
+    assert.equal(await page.$eval('#headcountEmpty', node => node.innerText), 'Employee details are unavailable for this group.');
+    await page.click('#headcountDetailPage [data-history-back]');
+    await page.waitForSelector('#headcountDetailPage', { hidden: true });
+
     await page.$$eval('#summaryTableRowsContainer .summary-table-row', rows => {
       const row = rows.find(item => item.textContent.includes('BARTENDER'));
       if (!row) throw new Error('BARTENDER row not found');
-      row.click();
+      row.querySelector('.summary-job-title').click();
     });
 
     assert.equal(await page.$eval('#summaryChartCard', node => node.dataset.refreshCount), '2');
     assert.equal(await page.$eval('#summaryChartTitle', node => node.textContent.trim()), 'BARTENDER by Shift');
-    await new Promise(resolve => setTimeout(resolve, 700));
+    await page.waitForFunction(() => document.getElementById('summaryChartTotal').textContent === '1');
     assert.equal(await page.$eval('#summaryChartTotal', node => node.textContent.trim()), '1');
-    assert.equal(await page.$eval('#chartInfoOffCount', node => node.textContent.trim()), '0 Staff');
-    assert.equal(await page.$eval('#chartInfoW02Count', node => node.textContent.trim()), '1 Staff');
+    assert.equal(await page.$eval('#summaryChartOffDescription', node => node.textContent), 'Off day, 0 staff (0.0%)');
+    assert.equal(await page.$eval('#summaryChartW02Description', node => node.textContent), 'W02 regular day, 1 staff (100.0%)');
     assert.equal(
       await page.$$eval('#summaryTableRowsContainer .summary-table-row.is-chart-selected', rows => rows.length),
       1
     );
 
     await page.click('#summaryTableRowsContainer .summary-table-row.is-chart-selected .headcount-detail-trigger');
-    await new Promise(resolve => setTimeout(resolve, 320));
-    assert.equal(await page.$eval('#headcountDetailModal', node => getComputedStyle(node).display), 'flex');
+    await page.waitForSelector('#headcountDetailPage:not([hidden])');
+    assert.deepEqual(await page.$$eval('#headcountDetailPage dd', nodes => nodes.map(node => node.textContent)), ['Bartender', 'N/A', '1']);
     assert.equal(await page.$eval('#summaryChartTitle', node => node.textContent.trim()), 'BARTENDER by Shift');
     assert.deepEqual(errors, []);
 

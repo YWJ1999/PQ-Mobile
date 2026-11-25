@@ -1167,6 +1167,16 @@ html.is-mouse-swiping * {
 /* ========================================================
    BOTTOM NAVIGATION BAR
    ======================================================== */
+/* Keep the calendar's scrollable and tappable area above the bottom bar. */
+phone-bottom-nav[in-flow] {
+  flex: none;
+}
+phone-bottom-nav[in-flow] .bottom-nav {
+  position: relative;
+}
+.phone-container:has(> phone-bottom-nav[in-flow]) > .main-content {
+  padding-bottom: 16px;
+}
 .bottom-nav {
   position: absolute;
   bottom: 0;

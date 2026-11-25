@@ -416,87 +416,6 @@
     .attendance-update-btn:focus-visible { outline: 3px solid var(--purple-primary); outline-offset: 3px; }
     .attendance-update-btn[hidden] { display: none; }
 
-    .history-card-item.attendance-record-card {
-      background: linear-gradient(135deg, var(--bg-card) 0%, rgba(16, 185, 129, 0.06) 100%);
-      border: 1px solid var(--border-subtle);
-      border-left: 5px solid #10b981;
-      border-radius: 18px;
-      padding: 16px;
-      margin-bottom: 12px;
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-      box-shadow: var(--shadow-sm);
-      transition: transform 0.2s;
-    }
-    html[data-theme="dark"] .history-card-item.attendance-record-card {
-      background: linear-gradient(135deg, var(--bg-card) 0%, rgba(16, 185, 129, 0.06) 100%);
-      border-color: var(--border-subtle);
-      border-left-color: #10b981;
-    }
-    .history-card-item.attendance-record-card.exception-theme {
-      background: linear-gradient(135deg, var(--bg-card) 0%, rgba(245, 158, 11, 0.06) 100%);
-      border-color: var(--border-subtle);
-      border-left-color: #f59e0b;
-      box-shadow: var(--shadow-sm);
-    }
-    html[data-theme="dark"] .history-card-item.attendance-record-card.exception-theme {
-      background: linear-gradient(135deg, var(--bg-card) 0%, rgba(245, 158, 11, 0.06) 100%);
-      border-color: var(--border-subtle);
-      border-left-color: #f59e0b;
-    }
-    .history-card-item.attendance-record-card.late-in-theme {
-      background: linear-gradient(135deg, var(--bg-card) 0%, rgba(124, 58, 237, 0.08) 100%);
-      border-color: var(--border-subtle);
-      border-left-color: #7c3aed;
-      box-shadow: var(--shadow-sm);
-    }
-    html[data-theme="dark"] .history-card-item.attendance-record-card.late-in-theme {
-      background: linear-gradient(135deg, var(--bg-card) 0%, rgba(124, 58, 237, 0.1) 100%);
-      border-color: var(--border-subtle);
-      border-left-color: #7c3aed;
-    }
-    .history-card-item.attendance-record-card[hidden] { display: none !important; }
-    .attendance-record-card:active { transform: scale(0.985); }
-    .attendance-record-top {
-      display: grid;
-      grid-template-columns: auto minmax(0, 1fr) auto;
-      gap: 10px;
-      align-items: center;
-    }
-    .attendance-card-details-trigger {
-      min-width: 0;
-      padding: 0;
-      border: 0;
-      background: transparent;
-      color: inherit;
-      font: inherit;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      text-align: left;
-      cursor: pointer;
-    }
-    .attendance-card-details-trigger > span {
-      min-width: 0;
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-    .attendance-record-card .history-time-row {
-      color: var(--text-primary);
-      font-size: 14.5px;
-      font-weight: 800;
-      line-height: 1.3;
-    }
-    html[data-theme="dark"] .attendance-record-card .history-time-row,
-    .attendance-record-card.exception-theme .history-time-row { color: var(--text-primary); }
-    .attendance-record-reference {
-      color: var(--purple-primary);
-      font-size: 11.5px;
-      font-weight: 800;
-    }
     .attendance-verify-button,
     .verify-btn-all {
       padding: 0;
@@ -509,6 +428,8 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      min-width: 24px;
+      min-height: 40px;
       cursor: pointer;
       user-select: none;
     }
@@ -519,48 +440,6 @@
       outline-offset: 4px;
       border-radius: 10px;
     }
-    .attendance-record-summary-panel {
-      display: grid;
-      gap: 9px;
-      padding: 12px 14px;
-      border: 1px solid rgba(16, 185, 129, 0.18);
-      border-radius: 15px;
-      background: rgba(16, 185, 129, 0.05);
-    }
-    .exception-theme .attendance-record-summary-panel {
-      border-color: rgba(245, 158, 11, 0.18);
-      background: rgba(245, 158, 11, 0.05);
-    }
-    .late-in-theme .attendance-record-summary-panel {
-      border-color: rgba(124, 58, 237, 0.24);
-      background: rgba(124, 58, 237, 0.06);
-    }
-    .attendance-record-detail {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-    }
-    .attendance-record-detail span {
-      color: var(--text-secondary);
-      font-size: 11.5px;
-      font-weight: 600;
-    }
-    .attendance-record-detail strong {
-      color: var(--text-primary);
-      font-size: 12px;
-      font-weight: 800;
-      text-align: right;
-    }
-    .attendance-card-actions {
-      display: flex;
-      justify-content: flex-end;
-      gap: 10px;
-      padding-top: 0;
-      border-top: 0;
-    }
-    .attendance-card-actions .card-action-btn { flex: 0 0 auto !important; min-width: 96px; border-radius: 999px; }
-
     .attendance-filter-field { margin-bottom: 16px; }
     .attendance-filter-field label {
       display: block;
@@ -727,38 +606,6 @@
     }
     .action-btn:hover { background: var(--purple-hover); }
 
-    /* Attendance Card Action Buttons */
-    .card-action-btn {
-      padding: 11px 16px;
-      font-size: 13px;
-      font-weight: 700;
-      border-radius: 12px;
-      cursor: pointer;
-      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 7px;
-      text-decoration: none;
-      box-sizing: border-box;
-    }
-    .card-action-btn:active {
-      transform: scale(0.97);
-    }
-    
-    .btn-shift-change,
-    .btn-feedback {
-      background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
-      border: 0;
-      color: #ffffff;
-      box-shadow: 0 4px 12px rgba(124, 58, 237, 0.28);
-    }
-    .btn-shift-change:hover,
-    .btn-feedback:hover {
-      background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
-      color: #ffffff;
-      box-shadow: 0 6px 16px rgba(124, 58, 237, 0.34);
-    }
     [data-theme="light"] .info-block-label { color: #64748b; }
     
     [data-theme="light"] .enterprise-toast-bar {
@@ -1280,6 +1127,7 @@
       }
   </style>
   <link rel="stylesheet" href="../../../css/form-section-headings.css">
+  <link rel="stylesheet" href="../../../css/attendance-day-cards.css">
 </head>
 <body>
   <preview-top-bar active-page="attendance"></preview-top-bar>
@@ -1356,29 +1204,27 @@
       <p class="attendance-history-empty-state" id="attendanceEmptyState" role="status" hidden>No attendance records match these filters.</p>
 
       <!-- Attendance Card 1 (Normal) -->
-      <div class="history-card-item attendance-record-card" data-exception="none" data-date="2026-09-15">
+      <div class="history-card-item attendance-day-card attendance-record-card" data-exception="none" data-date="2026-09-15">
            <div class="attendance-record-top history-card-header">
               <button class="attendance-verify-button" type="button" onclick="toggleSingleVerify(this)" title="Verify this record" aria-label="Verify attendance for 15 September 2026" aria-pressed="false">
                     <span class="verify-checkbox-box" aria-hidden="true"><i class="fa-solid fa-check"></i></span>
                 </button>
-              <button id="attendance-header-2026-09-15" class="attendance-card-details-trigger" type="button" onclick="openAttendanceDetails(this)" aria-haspopup="dialog" aria-controls="attendanceDetailsModalOverlay" aria-label="View attendance details for 15 September 2026">
-                 <span>
-                    <span class="history-time-row">W01: 8.30AM – 5.30PM</span>
-                    <span class="attendance-record-reference history-card-ref">Date: Tue, 15 Sep 2026</span>
-                 </span>
+              <button id="attendance-header-2026-09-15" class="history-card-heading attendance-card-details-trigger" type="button" onclick="openAttendanceDetails(this)" aria-haspopup="dialog" aria-controls="attendanceDetailsModalOverlay" aria-label="View attendance details for 15 September 2026">
+                 <time class="history-card-title" datetime="2026-09-15">Tue, 15 Sep 2026</time>
+                 <span class="attendance-day-shift">8.30AM–5.30PM (W01)</span>
               </button>
               <span class="card-status-badge attendance-exception-status"><i class="fa-solid fa-circle-check" aria-hidden="true"></i>No Exception</span>
            </div>
 
-           <button type="button" class="attendance-record-summary-panel history-card-details" onclick="openAttendanceDetails(this)"
+           <button type="button" class="attendance-record-summary-panel attendance-day-facts" onclick="openAttendanceDetails(this)"
              id="attendance-summary-2026-09-15" aria-labelledby="attendance-header-2026-09-15 attendance-summary-2026-09-15" aria-haspopup="dialog" aria-controls="attendanceDetailsModalOverlay">
                <span class="attendance-record-detail">
                    <span>Day Type</span>
-                   <strong data-day-type>Work Day</strong>
+                   <strong data-day-type>Workday</strong>
                </span>
                <span class="attendance-record-detail">
                    <span>Clock Times</span>
-                   <strong data-clock-times>07:38</strong>
+                   <strong data-clock-times data-icon-system-ignore>07:38 &rarr; &mdash;</strong>
                </span>
                <span class="attendance-record-detail">
                    <span>Normal Hours</span>
@@ -1391,39 +1237,37 @@
            </button>
 
            <div class="attendance-card-actions history-card-actions">
-               <button onclick="event.stopPropagation(); openModal('shiftChangeModalOverlay')" class="card-action-btn btn-shift-change">
+               <button type="button" onclick="openAttendanceCardAction('shift', this)" class="card-action-btn btn-shift-change">
                  Change Shift
                </button>
-               <button onclick="event.stopPropagation(); openFeedbackModal('15 Sep 2026', '8.30AM–5.30PM (W01)', this.closest('.attendance-record-card').dataset)" class="card-action-btn btn-feedback">
+               <button type="button" onclick="openAttendanceCardAction('feedback', this)" class="card-action-btn btn-feedback">
                  Feedback
                </button>
            </div>
       </div>
 
       <!-- Attendance Card 2 (Exception) -->
-      <div class="history-card-item attendance-record-card exception-theme" data-exception="unapproved-ot" data-date="2026-09-14">
+      <div class="history-card-item attendance-day-card attendance-record-card exception-theme" data-exception="unapproved-ot" data-date="2026-09-14">
            <div class="attendance-record-top history-card-header">
               <button class="attendance-verify-button" type="button" onclick="toggleSingleVerify(this)" title="Verify this record" aria-label="Verify attendance for 14 September 2026" aria-pressed="false">
                     <span class="verify-checkbox-box" aria-hidden="true"><i class="fa-solid fa-check"></i></span>
                 </button>
-              <button id="attendance-header-2026-09-14" class="attendance-card-details-trigger" type="button" onclick="openAttendanceDetails(this)" aria-haspopup="dialog" aria-controls="attendanceDetailsModalOverlay" aria-label="View attendance details for 14 September 2026">
-                 <span>
-                    <span class="history-time-row">W01: 8.30AM – 5.30PM</span>
-                    <span class="attendance-record-reference history-card-ref">Date: Mon, 14 Sep 2026</span>
-                 </span>
+              <button id="attendance-header-2026-09-14" class="history-card-heading attendance-card-details-trigger" type="button" onclick="openAttendanceDetails(this)" aria-haspopup="dialog" aria-controls="attendanceDetailsModalOverlay" aria-label="View attendance details for 14 September 2026">
+                 <time class="history-card-title" datetime="2026-09-14">Mon, 14 Sep 2026</time>
+                 <span class="attendance-day-shift">8.30AM–5.30PM (W01)</span>
               </button>
-              <span class="card-status-badge attendance-exception-status is-exception"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>Unapproved OT</span>
+              <span class="card-status-badge attendance-exception-status is-exception"><i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i>Unapproved OT</span>
            </div>
 
-           <button type="button" class="attendance-record-summary-panel history-card-details" onclick="openAttendanceDetails(this)"
+           <button type="button" class="attendance-record-summary-panel attendance-day-facts" onclick="openAttendanceDetails(this)"
              id="attendance-summary-2026-09-14" aria-labelledby="attendance-header-2026-09-14 attendance-summary-2026-09-14" aria-haspopup="dialog" aria-controls="attendanceDetailsModalOverlay">
                <span class="attendance-record-detail">
                    <span>Day Type</span>
-                   <strong data-day-type>Work Day</strong>
+                   <strong data-day-type>Workday</strong>
                </span>
                <span class="attendance-record-detail">
                    <span>Clock Times</span>
-                   <strong data-clock-times>08:09, 19:40</strong>
+                   <strong data-clock-times data-icon-system-ignore>08:09 &rarr; 19:40</strong>
                </span>
                <span class="attendance-record-detail">
                    <span>Normal Hours</span>
@@ -1431,44 +1275,42 @@
                </span>
                <span class="attendance-record-detail">
                    <span>OT Hours</span>
-                   <strong data-ot-hours style="color: #ef4444;">2.00</strong>
+                   <strong data-ot-hours>2.00</strong>
                </span>
            </button>
            
            <div class="attendance-card-actions history-card-actions">
-               <button onclick="event.stopPropagation(); openModal('shiftChangeModalOverlay')" class="card-action-btn btn-shift-change">
+               <button type="button" onclick="openAttendanceCardAction('shift', this)" class="card-action-btn btn-shift-change">
                  Change Shift
                </button>
-               <button onclick="event.stopPropagation(); openFeedbackModal('14 Sep 2026', '8.30AM–5.30PM (W01)', this.closest('.attendance-record-card').dataset)" class="card-action-btn btn-feedback">
+               <button type="button" onclick="openAttendanceCardAction('feedback', this)" class="card-action-btn btn-feedback">
                  Feedback
                </button>
            </div>
       </div>
 
       <!-- Attendance Card 3 (Late In Exception) -->
-      <div class="history-card-item attendance-record-card late-in-theme" data-exception="late-in" data-late-in="12 minutes" data-late-reason="Traffic Congestion" data-date="2026-09-13">
+      <div class="history-card-item attendance-day-card attendance-record-card late-in-theme" data-exception="late-in" data-late-in="12 minutes" data-late-reason="Traffic Congestion" data-date="2026-09-13">
            <div class="attendance-record-top history-card-header">
               <button class="attendance-verify-button" type="button" onclick="toggleSingleVerify(this)" title="Verify this record" aria-label="Verify attendance for 13 September 2026" aria-pressed="false">
                     <span class="verify-checkbox-box" aria-hidden="true"><i class="fa-solid fa-check"></i></span>
                 </button>
-              <button id="attendance-header-2026-09-13" class="attendance-card-details-trigger" type="button" onclick="openAttendanceDetails(this)" aria-haspopup="dialog" aria-controls="attendanceDetailsModalOverlay" aria-label="View attendance details for 13 September 2026">
-                 <span>
-                    <span class="history-time-row">W01: 8.30AM – 5.30PM</span>
-                    <span class="attendance-record-reference history-card-ref">Date: Sun, 13 Sep 2026</span>
-                 </span>
+              <button id="attendance-header-2026-09-13" class="history-card-heading attendance-card-details-trigger" type="button" onclick="openAttendanceDetails(this)" aria-haspopup="dialog" aria-controls="attendanceDetailsModalOverlay" aria-label="View attendance details for 13 September 2026">
+                 <time class="history-card-title" datetime="2026-09-13">Sun, 13 Sep 2026</time>
+                 <span class="attendance-day-shift">8.30AM–5.30PM (W01)</span>
               </button>
               <span class="card-status-badge attendance-exception-status is-exception"><i class="fa-solid fa-clock" aria-hidden="true"></i>Late In</span>
            </div>
 
-           <button type="button" class="attendance-record-summary-panel history-card-details" onclick="openAttendanceDetails(this)"
+           <button type="button" class="attendance-record-summary-panel attendance-day-facts" onclick="openAttendanceDetails(this)"
              id="attendance-summary-2026-09-13" aria-labelledby="attendance-header-2026-09-13 attendance-summary-2026-09-13" aria-haspopup="dialog" aria-controls="attendanceDetailsModalOverlay">
                <span class="attendance-record-detail">
                    <span>Day Type</span>
-                   <strong data-day-type>Work Day</strong>
+                   <strong data-day-type>Workday</strong>
                </span>
                <span class="attendance-record-detail">
                    <span>Clock Times</span>
-                   <strong data-clock-times>08:42, 17:30</strong>
+                   <strong data-clock-times data-icon-system-ignore>08:42 &rarr; 17:30</strong>
                </span>
                <span class="attendance-record-detail">
                    <span>Normal Hours</span>
@@ -1481,10 +1323,10 @@
            </button>
 
            <div class="attendance-card-actions history-card-actions">
-               <button onclick="event.stopPropagation(); openModal('shiftChangeModalOverlay')" class="card-action-btn btn-shift-change">
+               <button type="button" onclick="openAttendanceCardAction('shift', this)" class="card-action-btn btn-shift-change">
                  Change Shift
                </button>
-               <button onclick="event.stopPropagation(); openFeedbackModal('13 Sep 2026', '8.30AM–5.30PM (W01)', this.closest('.attendance-record-card').dataset)" class="card-action-btn btn-feedback">
+               <button type="button" onclick="openAttendanceCardAction('feedback', this)" class="card-action-btn btn-feedback">
                  Feedback
                </button>
            </div>
@@ -1545,7 +1387,7 @@
               </div>
               <div style="display: flex; justify-content: space-between; padding: 13px 0; border-bottom: 1px solid var(--border-subtle);">
                  <span style="font-size: 13px; font-weight: 600; color: var(--text-secondary);">Clock Times</span>
-                 <span id="attendanceDetailClockTimes" style="font-size: 13.5px; font-weight: 700; color: var(--text-primary);"></span>
+                 <span id="attendanceDetailClockTimes" data-icon-system-ignore style="font-size: 13.5px; font-weight: 700; color: var(--text-primary);"></span>
               </div>
               <div style="display: flex; justify-content: space-between; padding: 13px 0; border-bottom: 1px solid var(--border-subtle);">
                  <span style="font-size: 13px; font-weight: 600; color: var(--text-secondary);">Normal Hours</span>
@@ -2030,11 +1872,21 @@
     }
 
     let attendanceDetailsTrigger;
+    function openAttendanceCardAction(action, trigger) {
+      const card = trigger.closest('.attendance-record-card');
+      const shift = card.querySelector('.attendance-day-shift').textContent;
+      if (action === 'shift') {
+        openShiftChangeForm(card.querySelector('time').textContent, shift);
+      } else {
+        openFeedbackModal(card.dataset.date, shift, card.dataset);
+      }
+    }
+
     function openAttendanceDetails(trigger) {
       const card = trigger.closest('.attendance-record-card');
       const value = selector => card.querySelector(selector).textContent.trim();
       document.getElementById('attendanceDetailDate').textContent = AttendanceDateDisplay.format(card.dataset.date);
-      document.getElementById('attendanceDetailShift').textContent = value('.history-time-row');
+      document.getElementById('attendanceDetailShift').textContent = value('.attendance-day-shift');
       document.getElementById('attendanceDetailDayType').textContent = value('[data-day-type]');
       document.getElementById('attendanceDetailClockTimes').textContent = value('[data-clock-times]');
       document.getElementById('attendanceDetailNormalHours').textContent = value('[data-normal-hours]');
@@ -2330,9 +2182,13 @@
     function openLinkedShiftChange() {
       const params = new URLSearchParams(window.location.search);
       if (params.get('shiftFrom') !== 'pending-feedback') return;
+      openShiftChangeForm(params.get('shiftDate') || '15 Sep 2026', params.get('shiftOriginal') || '8.30AM–5.30PM (W01)');
+    }
+
+    function openShiftChangeForm(date, shift) {
       document.getElementById('shiftChangeRequestForm').reset();
-      document.getElementById('shiftMetaDate').textContent = params.get('shiftDate') || '15 Sep 2026';
-      document.getElementById('shiftMetaOriginal').textContent = params.get('shiftOriginal') || '8.30AM–5.30PM (W01)';
+      document.getElementById('shiftMetaDate').textContent = date;
+      document.getElementById('shiftMetaOriginal').textContent = shift;
       updateShiftChangeSummary('');
       openModal('shiftChangeModalOverlay');
     }

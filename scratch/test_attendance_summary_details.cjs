@@ -103,10 +103,18 @@ async function checkAttendance(browser, desktopUrl) {
     await page.tap('.attendance-verify-button');
     assert.notEqual(await page.$eval('.attendance-verify-button', node => node.getAttribute('aria-pressed')), wasVerified);
     await page.waitForSelector(individualDialog, { hidden: true });
-    for (const [action, dialog] of [['.btn-shift-change', '#shiftChangeModalOverlay'], ['.btn-feedback', '#feedbackModalOverlay']]) {
-      await page.tap(action);
+    const actionCard = '.attendance-record-card[data-exception="unapproved-ot"]';
+    const date = await page.$eval(actionCard + ' time', node => node.textContent.replace(',', ''));
+    const shift = await page.$eval(actionCard + ' .attendance-day-shift', node => node.textContent);
+    for (const [action, dialog, dateField, shiftField] of [
+      ['.btn-shift-change', '#shiftChangeModalOverlay', '#shiftMetaDate', '#shiftMetaOriginal'],
+      ['.btn-feedback', '#feedbackModalOverlay', '#fbMetaDate', '#fbMetaShift']
+    ]) {
+      await page.tap(actionCard + ' ' + action);
       await page.waitForSelector(dialog, { visible: true });
       await page.waitForSelector(individualDialog, { hidden: true });
+      assert.equal(await page.$eval(dateField, node => node.textContent.replace(',', '')), date);
+      assert.equal(await page.$eval(shiftField, node => node.textContent), shift);
       await page.click(dialog + ' button[onclick*="closeModal"]');
       await page.waitForSelector(dialog, { hidden: true });
     }

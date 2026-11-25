@@ -13,89 +13,81 @@
     backLink.href = `daily-ot.html?theme=${encodeURIComponent(currentTheme)}`;
   });
 
-  if (!employee) return;
-
+  const form = document.getElementById('dailyOtForm');
   const recordsContainer = document.getElementById('dailyOtRecords');
-  employee.items.forEach((item, index) => {
-    const record = document.createElement('article');
-    record.className = 'daily-ot-record';
+  const template = document.getElementById('dailyOtEntry');
+  const total = document.getElementById('dailyOtTotal');
+  const toast = document.getElementById('dailyOtToast');
+  let toastTimer;
 
-    record.innerHTML = `
-      <h3>${item.description}</h3>
-      <div class="record-fields">
-        <div class="record-field">
-          <span>Actual (HHMM)</span>
-          <span class="record-readonly">${item.actual}</span>
-        </div>
-        <div class="record-field">
-          <label for="dailyOtApproved${index}">Approved (HHMM)</label>
-          <input id="dailyOtApproved${index}" class="daily-ot-approval-input" type="text" inputmode="numeric" maxlength="4" value="${item.approve}" data-record-index="${index}" aria-label="Approved time for ${item.description}" ${item.voided ? 'disabled' : ''}>
-        </div>
-        <label class="daily-ot-void-control" for="dailyOtVoid${index}">
-          <span>Void</span>
-          <input id="dailyOtVoid${index}" class="daily-ot-void-checkbox" type="checkbox" data-record-index="${index}" aria-label="Void ${item.description}" ${item.voided ? 'checked' : ''}>
-        </label>
-      </div>
-    `;
-    recordsContainer.appendChild(record);
-  });
-
-  function parseHhmm(value) {
-    if (!/^\d{4}$/.test(value) || Number(value.slice(2)) > 59) return null;
-    return { normalized: value, minutes: Number(value.slice(0, 2)) * 60 + Number(value.slice(2)) };
+  if (!employee?.items.length) {
+    document.getElementById('dailyOtUpdate').disabled = true;
+    return;
   }
 
-  document.querySelectorAll('.daily-ot-approval-input').forEach(input => {
-    input.addEventListener('input', () => {
-      input.value = input.value.replace(/\D/g, '').slice(0, 4);
-      input.setCustomValidity('');
+  const entries = employee.items.map((item, index) => {
+    const row = template.content.firstElementChild.cloneNode(true);
+    const approved = row.querySelector('.daily-ot-approval-input');
+    const voidBox = row.querySelector('.daily-ot-void-checkbox');
+    const description = item.description.replace(/\b[A-Z]{3,}\b/g, word => word[0] + word.slice(1).toLowerCase());
+    row.querySelector('.ot-type-name').textContent = description;
+    row.querySelector('.record-readonly').textContent = item.actual;
+    approved.id = `dailyOtApproved${index}`;
+    approved.setAttribute('aria-label', `Approved time for ${description} (HHMM)`);
+    approved.value = item.approve;
+    voidBox.id = `dailyOtVoid${index}`;
+    voidBox.setAttribute('aria-label', `Void entry for ${description}`);
+    voidBox.checked = Boolean(item.voided);
+    approved.disabled = voidBox.checked;
+
+    approved.addEventListener('input', () => {
+      approved.value = approved.value.replace(/\D/g, '');
+      updateTotal();
     });
+    voidBox.addEventListener('change', () => {
+      if (voidBox.checked && !approved.validity.valid) approved.value = item.approve;
+      approved.disabled = voidBox.checked;
+      updateTotal();
+    });
+    recordsContainer.appendChild(row);
+    return { item, approved, voidBox };
   });
 
-  const actions = document.getElementById('dailyOtActions');
-  function syncUpdateVisibility() {
-    const count = recordsContainer.querySelectorAll('.daily-ot-void-checkbox:checked').length;
-    document.getElementById('dailyOtUpdate').textContent = formatSelectedAction('Void', count);
-    actions.hidden = count === 0;
-  }
-
-  document.querySelectorAll('.daily-ot-void-checkbox').forEach(checkbox => {
-    checkbox.addEventListener('change', () => {
-      const approved = document.getElementById(`dailyOtApproved${checkbox.dataset.recordIndex}`);
-      approved.disabled = checkbox.checked;
-      approved.setCustomValidity('');
-      syncUpdateVisibility();
-    });
-  });
-  syncUpdateVisibility();
-
-  document.getElementById('dailyOtUpdate').addEventListener('click', () => {
-    let approvedMinutes = 0;
-    const pendingItems = [];
-    for (const input of document.querySelectorAll('.daily-ot-approval-input')) {
-      const index = Number(input.dataset.recordIndex);
-      const voided = document.getElementById(`dailyOtVoid${index}`).checked;
-      const parsed = parseHhmm(input.value);
-      if (!voided && !parsed) {
-        input.setCustomValidity('Enter four digits in HHMM format, with minutes from 00 to 59.');
-        input.reportValidity();
-        return;
+  function updateTotal() {
+    let minutes = 0;
+    for (const { approved } of entries) {
+      if (approved.disabled) continue;
+      if (!approved.validity.valid) {
+        total.value = '—';
+        return null;
       }
-      pendingItems.push({ index, approve: parsed ? parsed.normalized : employee.items[index].approve, voided });
-      if (!voided) approvedMinutes += parsed.minutes;
+      minutes += Number(approved.value.slice(0, 2)) * 60 + Number(approved.value.slice(2));
     }
-    pendingItems.forEach(item => {
-      employee.items[item.index].approve = item.approve;
-      employee.items[item.index].voided = item.voided;
+    total.value = (minutes / 60).toFixed(2);
+    return minutes;
+  }
+  updateTotal();
+
+  form.addEventListener('submit', event => {
+    event.preventDefault();
+    const approvedMinutes = updateTotal();
+    if (approvedMinutes === null) return;
+    entries.forEach(({ item, approved, voidBox }) => {
+      item.approve = approved.value;
+      item.voided = voidBox.checked;
     });
 
     const actualMinutes = Math.round(Number.parseFloat(employee.actualHours) * 60);
-    employee.approvedHours = (approvedMinutes / 60).toFixed(2);
+    employee.approvedHours = total.value;
     employee.unapprovedHours = (Math.max(0, actualMinutes - approvedMinutes) / 60).toFixed(2);
     window.saveDailyOtRecord(employee);
 
-    const toast = document.getElementById('dailyOtToast');
+    window.clearTimeout(toastTimer);
+    toast.textContent = 'Daily OT updated';
     toast.classList.add('show');
-    window.setTimeout(() => toast.classList.remove('show'), 1800);
+    toastTimer = window.setTimeout(() => {
+      toast.classList.remove('show');
+      toast.textContent = '';
+    }, 1800);
   });
 })();

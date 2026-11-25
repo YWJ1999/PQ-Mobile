@@ -7,6 +7,8 @@
   <title>PeopleHCM - Shift Roster</title>
   <script src="../../../js/components.js"></script>
   <script src="../../../js/app.js" defer></script>
+  <script src="../../../js/calendar-month.js"></script>
+  <script src="../../../js/attendance/roster-calendar.js" defer></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -32,6 +34,8 @@
     .header-actions { display: flex; align-items: center; margin-top: 8px; }
     .header-btn { background: rgba(255,255,255,0.15); border: none; width: 36px; height: 36px; border-radius: 12px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #ffffff; backdrop-filter: blur(8px); }
     
+    .roster-nav { padding: 6px; border: 0; background: transparent; color: var(--purple-primary); font: inherit; cursor: pointer; }
+
     /* Calendar from attendance/index.html */
     .cal-cell { background: var(--bg-card); display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding: 8px 0; min-height: 60px; border-bottom: 1px solid var(--border-subtle); border-right: 1px solid var(--border-subtle); position: relative; }
     .cal-cell:nth-child(7n) { border-right: none; }
@@ -109,11 +113,11 @@
     <div class="main-content">
       
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding: 0 4px; margin-top: 24px;">
-         <i class="fa-solid fa-chevron-left" style="font-size: 16px; color: var(--purple-primary); cursor: pointer;"></i>
-         <span style="font-size: 15.5px; font-weight: 800; color: var(--text-primary);">September 2026</span>
+         <button type="button" class="roster-nav" data-roster-step="-1" aria-label="Previous month"><i class="fa-solid fa-chevron-left" aria-hidden="true"></i></button>
+         <span style="font-size: 15.5px; font-weight: 800; color: var(--text-primary);" data-roster-title aria-live="polite">September 2026</span>
          <div style="display: flex; align-items: center; gap: 16px;">
-           <i class="fa-solid fa-chevron-right" style="font-size: 16px; color: var(--purple-primary); cursor: pointer;"></i>
-           <span style="font-size: 13.5px; font-weight: 700; color: var(--purple-primary);">Today</span>
+           <button type="button" class="roster-nav" data-roster-step="1" aria-label="Next month"><i class="fa-solid fa-chevron-right" aria-hidden="true"></i></button>
+           <button type="button" class="roster-nav" data-roster-today style="font-size: 13.5px; font-weight: 700;">Today</button>
          </div>
       </div>
 
@@ -129,7 +133,7 @@
       </div>
 
       <!-- Grid Dates -->
-      <div style="display: grid; grid-template-columns: repeat(7, 1fr); border: 1px solid var(--border-subtle); border-radius: 12px; overflow: hidden; margin-bottom: 20px;">
+      <div data-roster-grid data-shift-roster style="display: grid; grid-template-columns: repeat(7, 1fr); border: 1px solid var(--border-subtle); border-radius: 12px; overflow: hidden; margin-bottom: 20px;">
         <div class="cal-cell"></div>
         <div class="cal-cell" onclick="openShiftModal('1 Sep 2026', '8.30AM-5.30PM', 'W01', 'Work Day')"><span class="cal-date">1</span><span class="cal-d">D</span></div>
         <div class="cal-cell" onclick="openShiftModal('2 Sep 2026', '8.30AM-5.30PM', 'W01', 'Work Day')"><span class="cal-date">2</span><span class="cal-d">D</span></div>
@@ -227,7 +231,7 @@
       </div>
     </div>
     
-    <phone-bottom-nav active="apps"></phone-bottom-nav>
+    <phone-bottom-nav in-flow active="apps"></phone-bottom-nav>
   </div>
 
   <script>

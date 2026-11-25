@@ -2,6 +2,7 @@ const assert = require('node:assert/strict');
 const path = require('node:path');
 const { pathToFileURL } = require('node:url');
 const puppeteer = require('puppeteer');
+const screenshotDir = process.env.PQ_SCREENSHOT_DIR || __dirname;
 
 const listUrl = pathToFileURL(path.resolve(__dirname, '../modules/attendance/options/daily-ot.html')).href;
 const detailUrl = pathToFileURL(path.resolve(__dirname, '../modules/attendance/options/daily-ot-details.html')).href;
@@ -77,7 +78,7 @@ const detailUrl = pathToFileURL(path.resolve(__dirname, '../modules/attendance/o
             statusText: card.querySelector('.card-status-badge')?.textContent.trim(),
             statusIcon: card.querySelector('.card-status-badge i')?.className,
             statusColor: getComputedStyle(card.querySelector('.card-status-badge')).color,
-            accentColor: getComputedStyle(card).borderLeftColor,
+            headerBackground: getComputedStyle(card.querySelector('.daily-ot-card-header')).backgroundImage,
             hints: /Click to (view|edit) details/i.test(card.textContent),
             name: card.querySelector('.daily-ot-card-name')?.textContent.trim(),
             employeeId: card.querySelector('.daily-ot-card-id')?.textContent.trim(),
@@ -86,13 +87,6 @@ const detailUrl = pathToFileURL(path.resolve(__dirname, '../modules/attendance/o
           };
         }));
         assert.equal(cards.length, 6);
-        const expectedStatusColors = theme === 'dark'
-          ? { approved: 'rgb(52, 211, 153)', unapproved: 'rgb(251, 191, 36)' }
-          : { approved: 'rgb(5, 150, 105)', unapproved: 'rgb(217, 119, 6)' };
-        const expectedAccentColors = {
-          approved: 'rgb(16, 185, 129)',
-          unapproved: 'rgb(245, 158, 11)'
-        };
         const records = await page.evaluate(() => window.createDailyOtRecords());
         cards.forEach((card, index) => {
           const record = records[index];
@@ -112,8 +106,8 @@ const detailUrl = pathToFileURL(path.resolve(__dirname, '../modules/attendance/o
           assert.equal(card.icons, 1, 'Daily OT cards must only contain the semantic status icon');
           assert.equal(card.statusText, index < 3 ? 'Approved' : 'Unapproved');
           assert.match(card.statusIcon, index < 3 ? /fa-circle-check/ : /fa-clock-rotate-left/);
-          assert.equal(card.statusColor, index < 3 ? expectedStatusColors.approved : expectedStatusColors.unapproved);
-          assert.equal(card.accentColor, index < 3 ? expectedAccentColors.approved : expectedAccentColors.unapproved);
+          assert.equal(card.statusColor, 'rgb(255, 255, 255)');
+          assert.ok(card.headerBackground.includes(index < 3 ? 'rgb(34, 129, 86)' : 'rgb(184, 94, 14)'), 'History card headers indicate approval status');
           assert.equal(card.hints, false);
           assert.ok(card.name);
           assert.match(card.employeeId, /^#/);
@@ -236,7 +230,7 @@ const detailUrl = pathToFileURL(path.resolve(__dirname, '../modules/attendance/o
           columnLabels: ['MONTH', 'HOURS'],
           columnHead: {
             marginBottom: '12px',
-            padding: '0px 4px 12px',
+            padding: '10px 8px',
             borderBottomWidth: '1px'
           },
           barsGap: '10px',
@@ -250,7 +244,7 @@ const detailUrl = pathToFileURL(path.resolve(__dirname, '../modules/attendance/o
           value: { width: '60px', fontSize: '13.5px' }
         }, 'Daily OT trend must use the Leave Highlight trend layout with OT-specific content');
         if (width === 390) {
-          await page.screenshot({ path: path.resolve(__dirname, `daily-ot-trend-${theme}.png`) });
+          await page.screenshot({ path: path.resolve(screenshotDir, `daily-ot-trend-${theme}.png`) });
         }
         assert.equal(await page.$$eval('#dailyOtTrendView > .daily-ot-view-nav', nodes => nodes.length), 0);
         assert.equal(await page.$$eval('#dailyOtTrendBars .daily-ot-trend-row', rows => rows.length), 12);
@@ -288,7 +282,7 @@ const detailUrl = pathToFileURL(path.resolve(__dirname, '../modules/attendance/o
         });
         assert.deepEqual(legendVisual, {
           headers: ['STATUS', 'HOURS', '% OF TOTAL'],
-          headerPadding: '0px 0px 12px',
+          headerPadding: '10px 8px',
           headerBorder: '1px',
           listGap: '16px',
           listPaddingTop: '16px',
@@ -314,7 +308,7 @@ const detailUrl = pathToFileURL(path.resolve(__dirname, '../modules/attendance/o
           ['Unapproved OT', '43.50', '77.68%']
         ]);
         if (width === 390) {
-          await page.screenshot({ path: path.resolve(__dirname, `daily-ot-month-analysis-${theme}.png`) });
+          await page.screenshot({ path: path.resolve(screenshotDir, `daily-ot-month-analysis-${theme}.png`) });
         }
         assert.equal(await page.$eval('#dailyOtTrendDetailView', node => node.scrollWidth <= node.clientWidth + 1), true);
         await page.click('#dailyOtBackButton');
@@ -327,26 +321,24 @@ const detailUrl = pathToFileURL(path.resolve(__dirname, '../modules/attendance/o
         const firstCard = await page.$('#employeeCardList .daily-ot-card');
         if (width === 390) {
           await firstCard.evaluate(node => node.scrollIntoView({ block: 'start' }));
-          await page.screenshot({ path: path.resolve(__dirname, `daily-ot-history-${theme}.png`) });
+          await page.screenshot({ path: path.resolve(screenshotDir, `daily-ot-history-${theme}.png`) });
         }
         const listPageUrl = page.url();
         await firstCard.click();
         await page.waitForSelector('#approvedOtDetailsModal', { visible: true });
         assert.equal(page.url(), listPageUrl, 'Approved card must keep the list page open');
         assert.deepEqual(await page.$$eval('#approvedOtDetailsModal thead th', nodes => nodes.map(node => node.textContent.trim())), ['Description', 'Actual', 'Approve']);
-        const expectedHeaderStyle = theme === 'dark'
-          ? { backgroundColor: 'rgba(168, 85, 247, 0.18)', color: 'rgb(192, 132, 252)' }
-          : { backgroundColor: 'rgb(243, 232, 255)', color: 'rgb(124, 58, 237)' };
         assert.deepEqual(await page.$$eval('#approvedOtDetailsModal thead th', nodes => nodes.map(node => ({
           backgroundColor: getComputedStyle(node).backgroundColor,
           backgroundImage: getComputedStyle(node).backgroundImage,
           color: getComputedStyle(node).color,
           textAlign: getComputedStyle(node).textAlign
         }))), Array.from({ length: 3 }, () => ({
-          ...expectedHeaderStyle,
+          backgroundColor: 'rgb(124, 58, 237)',
+          color: 'rgb(255, 255, 255)',
           backgroundImage: 'none',
           textAlign: 'left'
-        })), 'Approved OT table headers must match the light-purple reference design');
+        })), 'The read-only details use the shared table header colors');
         assert.deepEqual(await page.$$eval('#approvedOtDetailsModal tbody tr', rows => rows.map(row => [...row.cells].map(cell => cell.textContent.trim()))), [['OT 1.5 BEFORE WORK', '0030', '0030']]);
         assert.deepEqual(await page.$eval('#approvedOtDetailsModal .approved-ot-table', table => {
           const header = table.querySelector('th');
@@ -374,7 +366,7 @@ const detailUrl = pathToFileURL(path.resolve(__dirname, '../modules/attendance/o
         assert.equal(await page.$eval('#approvedOtDetailsModal', node => node.scrollWidth <= node.clientWidth + 1), true);
         if (width === 390) {
           await new Promise(resolve => setTimeout(resolve, 350));
-          await page.screenshot({ path: path.resolve(__dirname, `daily-ot-approved-popup-${theme}.png`) });
+          await page.screenshot({ path: path.resolve(screenshotDir, `daily-ot-approved-popup-${theme}.png`) });
         }
         await page.click('#approvedOtDetailsClose');
         await page.waitForSelector('#approvedOtDetailsModal', { hidden: true });
@@ -388,7 +380,7 @@ const detailUrl = pathToFileURL(path.resolve(__dirname, '../modules/attendance/o
         assert.equal(new URL(page.url()).searchParams.get('employee'), '000022');
         assert.equal(new URL(page.url()).searchParams.get('theme'), theme);
         assert.equal(await page.$eval('#dailyOtDetailTitle', node => node.textContent.trim()), 'Daily OT Approval');
-        assert.equal(await page.$$eval('.daily-ot-detail-content i', nodes => nodes.length), 0, 'Daily OT detail content must not use decorative icons');
+        assert.equal(await page.$$eval('.approved-field .fa-pen', nodes => nodes.length), 8, 'Each approved time has an edit affordance');
         assert.equal(await page.$$eval('.daily-ot-approval-input', nodes => nodes.length), 8, 'Unapproved card opens its approval form');
         assert.equal(await page.$$eval('.daily-ot-void-checkbox', nodes => nodes.length), 8, 'Every Unapproved record card must use a Void checkbox');
         assert.equal(await page.$$eval('.daily-ot-void-button', nodes => nodes.length), 0, 'The old Void button must not remain');
@@ -398,30 +390,24 @@ const detailUrl = pathToFileURL(path.resolve(__dirname, '../modules/attendance/o
       }
 
       const editPage = await browser.newPage();
-      await editPage.setViewport({ width: 390, height: 900, deviceScaleFactor: 1 });
+      await editPage.setViewport({ width: 390, height: 740, deviceScaleFactor: 1 });
       await editPage.goto(`${detailUrl}?employee=000022&theme=${theme}`, { waitUntil: 'networkidle0' });
       assert.equal(await editPage.$$eval('.daily-ot-approval-input', nodes => nodes.length), 8);
       assert.equal(await editPage.$$eval('.daily-ot-void-checkbox', nodes => nodes.length), 8);
-      assert.deepEqual(await editPage.$$eval('.daily-ot-void-checkbox', nodes => nodes.map(node => ({ type: node.type, label: node.closest('label')?.textContent.trim() }))), Array.from({ length: 8 }, () => ({ type: 'checkbox', label: 'Void' })));
-      const voidControlLayout = await editPage.$eval('.daily-ot-void-control', node => {
-        const controlBox = node.getBoundingClientRect();
-        const fieldBox = node.parentElement.querySelector('.record-field').getBoundingClientRect();
-        return {
-          direction: getComputedStyle(node).flexDirection,
-          spansFullRow: controlBox.width > fieldBox.width * 1.8
-        };
+      assert.deepEqual(await editPage.$$eval('.daily-ot-void-checkbox', nodes => nodes.map(node => node.closest('label').textContent.trim())), Array(8).fill('Void entry'));
+      const voidBelowType = await editPage.$eval('.daily-ot-void-control', node => {
+        const title = node.closest('td').querySelector('.ot-type-name');
+        return node.getBoundingClientRect().top >= title.getBoundingClientRect().bottom;
       });
-      assert.deepEqual(voidControlLayout, { direction: 'row', spansFullRow: true }, 'Void must be a full-width horizontal checkbox row beneath the two OT fields');
+      assert.ok(voidBelowType, 'The Void entry checkbox sits beneath the OT type');
       assert.equal(await editPage.$eval('#dailyOtApproved0', node => node.disabled), false);
       await editPage.click('#dailyOtVoid0');
       assert.equal(await editPage.$eval('#dailyOtVoid0', node => node.checked), true);
       assert.equal(await editPage.$eval('#dailyOtApproved0', node => node.disabled), true);
       await editPage.click('#dailyOtVoid0');
       assert.equal(await editPage.$eval('#dailyOtApproved0', node => node.disabled), false);
-      assert.equal(await editPage.$eval('#dailyOtUpdate', node => node.textContent.trim()), 'Void selected (0)');
-      assert.equal(await editPage.$eval('#dailyOtUpdate', node => node.querySelectorAll('i').length), 0);
+      assert.equal(await editPage.$eval('#dailyOtUpdate', node => node.textContent.trim()), 'Update');
       await editPage.click('#dailyOtVoid0');
-      assert.equal(await editPage.$eval('#dailyOtUpdate', node => node.textContent.trim()), 'Void selected (1)');
       const getUpdateGeometry = () => editPage.$eval('#dailyOtActions', actions => {
         const button = actions.querySelector('#dailyOtUpdate');
         const phone = actions.closest('.phone-container');
@@ -430,26 +416,15 @@ const detailUrl = pathToFileURL(path.resolve(__dirname, '../modules/attendance/o
         const phoneBox = phone.getBoundingClientRect();
         const navBox = nav.getBoundingClientRect();
         return {
-          position: getComputedStyle(actions).position,
-          directPhoneChild: actions.parentElement === phone,
-          rightGap: Math.round(phoneBox.right - buttonBox.right),
-          navGap: Math.round(navBox.top - buttonBox.bottom),
+          fullWidth: buttonBox.width >= phoneBox.width - 36,
+          aboveNavigation: Math.abs(actions.getBoundingClientRect().bottom - navBox.top) < 1,
+          belowEntries: phone.querySelector('main').getBoundingClientRect().bottom <= actions.getBoundingClientRect().top + 1,
           left: Math.round(buttonBox.left),
           top: Math.round(buttonBox.top)
         };
       });
       const updateAtTop = await getUpdateGeometry();
-      assert.deepEqual({
-        position: updateAtTop.position,
-        directPhoneChild: updateAtTop.directPhoneChild,
-        rightGap: updateAtTop.rightGap,
-        navGap: updateAtTop.navGap
-      }, {
-        position: 'absolute',
-        directPhoneChild: true,
-        rightGap: 16,
-        navGap: 16
-      }, 'Update must stay fixed to the phone bottom-right above the bottom navigation');
+      assert.ok(updateAtTop.fullWidth && updateAtTop.aboveNavigation && updateAtTop.belowEntries, 'The full-width Update footer sits between the entries and the navigation');
       const detailScrollTop = await editPage.$eval('.daily-ot-detail-content', node => {
         node.scrollTo({ top: node.scrollHeight, behavior: 'instant' });
         return node.scrollTop;

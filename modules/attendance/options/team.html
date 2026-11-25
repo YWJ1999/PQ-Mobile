@@ -730,6 +730,132 @@
           </a>
         </div>
 
+        <!-- Action Required Section (Unified with Leave Module) -->
+        <section class="team-action-required-card" aria-labelledby="attendanceTeamActionRequiredTitle">
+          <!-- Section Header -->
+          <div class="team-action-required-header">
+            <div class="team-action-required-heading">
+              <span class="team-action-required-icon" aria-hidden="true"><i class="fa-solid fa-bolt"></i></span>
+              <span class="team-action-required-copy">
+                <strong class="team-action-required-title" id="attendanceTeamActionRequiredTitle">Action Required</strong>
+                <span class="team-action-required-description">Items that require your action</span>
+              </span>
+            </div>
+            <span class="team-action-required-badge" id="attendanceTeamActionRequiredCount">21 Tasks</span>
+          </div>
+
+          <!-- Action Items List -->
+          <div class="team-action-required-items">
+            <!-- 1. Pending Approval -->
+            <div class="team-pending-approval-action"
+              onclick="showPendingApprovalPage()"
+              role="button"
+              tabindex="0"
+              onkeydown="if(event.key === 'Enter' || event.key === ' '){ event.preventDefault(); showPendingApprovalPage(); }"
+              onmousedown="this.style.transform = 'scale(0.98)'"
+              onmouseup="this.style.transform = 'scale(1)'"
+            >
+              <span class="team-pending-approval-icon" aria-hidden="true">
+                <i class="fa-solid fa-clock-rotate-left"></i>
+              </span>
+              <span class="team-pending-approval-copy">
+                <span class="team-pending-approval-title">Pending Approval</span>
+                <span class="team-pending-approval-description">OT plans &amp; leave requests awaiting review</span>
+              </span>
+              <span class="team-pending-approval-end">
+                <span class="team-pending-approval-count" id="attendancePendingApprovalDashboardCount">13</span>
+                <i class="fa-solid fa-chevron-right team-pending-approval-chevron"></i>
+              </span>
+            </div>
+
+            <!-- 2. Attendance Verification -->
+            <div
+              onclick="
+                openStaffListModal(
+                  'Attendance Verification',
+                  'attendance_verification',
+                )
+              "
+              style="
+                background: var(--bg-input);
+                border: 1px solid var(--border-subtle);
+                border-radius: 16px;
+                padding: 14px 16px;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                cursor: pointer;
+                transition:
+                  transform 0.15s,
+                  border-color 0.15s;
+              "
+              onmousedown="this.style.transform = 'scale(0.98)'"
+              onmouseup="this.style.transform = 'scale(1)'"
+            >
+              <div style="display: flex; align-items: center; gap: 12px">
+                <div
+                  style="
+                    width: 38px;
+                    height: 38px;
+                    border-radius: 12px;
+                    background: rgba(124, 58, 237, 0.15);
+                    color: var(--purple-primary);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    flex-shrink: 0;
+                  "
+                >
+                  <i
+                    class="fa-solid fa-clipboard-check"
+                    style="font-size: 17px"
+                  ></i>
+                </div>
+                <div>
+                  <div
+                    style="
+                      font-size: 14px;
+                      font-weight: 800;
+                      color: var(--text-primary);
+                      line-height: 1.2;
+                    "
+                  >
+                    Attendance Verification
+                  </div>
+                  <div
+                    style="
+                      font-size: 11.5px;
+                      font-weight: 600;
+                      color: var(--text-muted);
+                      margin-top: 3px;
+                    "
+                  >
+                    Clocking exceptions & feedback audits
+                  </div>
+                </div>
+              </div>
+              <div style="display: flex; align-items: center; gap: 8px">
+                <span
+                  style="
+                    font-size: 12px;
+                    font-weight: 800;
+                    color: var(--purple-primary);
+                    background: rgba(124, 58, 237, 0.15);
+                    padding: 3px 10px;
+                    border-radius: 10px;
+                  "
+                >
+                  8
+                </span>
+                <i
+                  class="fa-solid fa-chevron-right"
+                  style="font-size: 13px; color: var(--text-caption)"
+                ></i>
+              </div>
+            </div>
+          </div>
+        </section><!-- End Action Required Card -->
+
         <!-- Team Management Options Grid (13 Options) -->
         <div style="margin-bottom: 24px">
           <div
@@ -1478,131 +1604,6 @@
             </div>
           </div>
         </div>
-        <!-- Action Required Section (Unified with Leave Module) -->
-        <section class="team-action-required-card" aria-labelledby="attendanceTeamActionRequiredTitle">
-          <!-- Section Header -->
-          <div class="team-action-required-header">
-            <div class="team-action-required-heading">
-              <span class="team-action-required-icon" aria-hidden="true"><i class="fa-solid fa-bolt"></i></span>
-              <span class="team-action-required-copy">
-                <strong class="team-action-required-title" id="attendanceTeamActionRequiredTitle">Action Required</strong>
-                <span class="team-action-required-description">Items that require your action</span>
-              </span>
-            </div>
-            <span class="team-action-required-badge" id="attendanceTeamActionRequiredCount">21 Tasks</span>
-          </div>
-
-          <!-- Action Items List -->
-          <div class="team-action-required-items">
-            <!-- 1. Pending Approval -->
-            <div class="team-pending-approval-action"
-              onclick="showPendingApprovalPage()"
-              role="button"
-              tabindex="0"
-              onkeydown="if(event.key === 'Enter' || event.key === ' '){ event.preventDefault(); showPendingApprovalPage(); }"
-              onmousedown="this.style.transform = 'scale(0.98)'"
-              onmouseup="this.style.transform = 'scale(1)'"
-            >
-              <span class="team-pending-approval-icon" aria-hidden="true">
-                <i class="fa-solid fa-clock-rotate-left"></i>
-              </span>
-              <span class="team-pending-approval-copy">
-                <span class="team-pending-approval-title">Pending Approval</span>
-                <span class="team-pending-approval-description">OT plans &amp; leave requests awaiting review</span>
-              </span>
-              <span class="team-pending-approval-end">
-                <span class="team-pending-approval-count" id="attendancePendingApprovalDashboardCount">13</span>
-                <i class="fa-solid fa-chevron-right team-pending-approval-chevron"></i>
-              </span>
-            </div>
-
-            <!-- 2. Attendance Verification -->
-            <div
-              onclick="
-                openStaffListModal(
-                  'Attendance Verification',
-                  'attendance_verification',
-                )
-              "
-              style="
-                background: var(--bg-input);
-                border: 1px solid var(--border-subtle);
-                border-radius: 16px;
-                padding: 14px 16px;
-                display: flex;
-                align-items: center;
-                justify-content: space-between;
-                cursor: pointer;
-                transition:
-                  transform 0.15s,
-                  border-color 0.15s;
-              "
-              onmousedown="this.style.transform = 'scale(0.98)'"
-              onmouseup="this.style.transform = 'scale(1)'"
-            >
-              <div style="display: flex; align-items: center; gap: 12px">
-                <div
-                  style="
-                    width: 38px;
-                    height: 38px;
-                    border-radius: 12px;
-                    background: rgba(124, 58, 237, 0.15);
-                    color: var(--purple-primary);
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    flex-shrink: 0;
-                  "
-                >
-                  <i
-                    class="fa-solid fa-clipboard-check"
-                    style="font-size: 17px"
-                  ></i>
-                </div>
-                <div>
-                  <div
-                    style="
-                      font-size: 14px;
-                      font-weight: 800;
-                      color: var(--text-primary);
-                      line-height: 1.2;
-                    "
-                  >
-                    Attendance Verification
-                  </div>
-                  <div
-                    style="
-                      font-size: 11.5px;
-                      font-weight: 600;
-                      color: var(--text-muted);
-                      margin-top: 3px;
-                    "
-                  >
-                    Clocking exceptions & feedback audits
-                  </div>
-                </div>
-              </div>
-              <div style="display: flex; align-items: center; gap: 8px">
-                <span
-                  style="
-                    font-size: 12px;
-                    font-weight: 800;
-                    color: var(--purple-primary);
-                    background: rgba(124, 58, 237, 0.15);
-                    padding: 3px 10px;
-                    border-radius: 10px;
-                  "
-                >
-                  8
-                </span>
-                <i
-                  class="fa-solid fa-chevron-right"
-                  style="font-size: 13px; color: var(--text-caption)"
-                ></i>
-              </div>
-            </div>
-          </div>
-        </section><!-- End Action Required Card -->
       </div><!-- End viewMainDashboard -->
 
       <!-- Dedicated Page View Section: Pending Approval -->

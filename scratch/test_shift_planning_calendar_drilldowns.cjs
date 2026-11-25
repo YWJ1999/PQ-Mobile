@@ -52,7 +52,7 @@ async function readDetailInfoCard(page, viewSelector) {
     assert.equal(await page.$$eval('#view-work-shift-summary .calendar-purple-card', cards => cards.length), 1);
     assert.equal(await page.$eval('#view-work-shift-summary .calendar-purple-card-title', node => node.textContent.trim()), '8.30:17.30W');
     assert.deepEqual(await page.$$eval('#view-work-shift-summary .calendar-purple-card .summary-value', nodes => nodes.map(node => node.textContent.trim())), ['268', '2,144.00', '0.00']);
-    assert.equal(await page.$('#view-work-shift-summary .calendar-purple-card .fa-chevron-right'), null);
+    assert.ok(await page.$('#view-work-shift-summary .calendar-purple-card-header .fa-chevron-right'));
 
     await page.click('#view-work-shift-summary .calendar-purple-card');
     assert.equal(await page.$eval('#wsDetailHeadcount', node => node.textContent.trim()), '268');
@@ -102,7 +102,7 @@ async function readDetailInfoCard(page, viewSelector) {
     assert.equal(await page.$eval('#nwSummaryRecordCount', node => node.textContent.trim()), '1');
     assert.equal(await page.$eval('#view-no-work-summary .calendar-purple-card-title', node => node.textContent.trim()), 'Rest / Off Day');
     assert.equal(await page.$eval('#view-no-work-summary .summary-value', node => node.textContent.trim()), '13');
-    assert.equal(await page.$('#view-no-work-summary .calendar-purple-card .fa-chevron-right'), null);
+    assert.ok(await page.$('#view-no-work-summary .calendar-purple-card-header .fa-chevron-right'));
     await page.click('#view-no-work-summary .calendar-purple-card');
     assert.equal(await page.$$eval('#nwEmployeeCardsContainer .employee-purple-card', cards => cards.length), 13);
     assert.equal(await page.$eval('#nwEmployeeCardsContainer .employee-purple-card:first-child .employee-card-name', node => node.textContent.trim()), 'TEST');
