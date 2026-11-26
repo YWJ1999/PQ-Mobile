@@ -27,7 +27,7 @@ const puppeteer = require('puppeteer');
       for (const field of fields) assert.ok(text.includes(field.toLowerCase()), `${id} must retain the reference field/value: ${field}`);
     }
     assert.equal(await page.$eval('.me-profile-header .me-emp-fullname', node => node.textContent), 'Sarah Jenkins');
-    assert.equal(await page.$eval('.me-profile-header .me-emp-code', node => node.textContent), '#EBB01');
+    assert.equal(await page.$eval('.me-profile-header .me-emp-code', node => node.textContent), 'EBB01');
     assert.equal(await page.$$eval('#bento-career .profile-history-record', nodes => nodes.length), 5);
     assert.equal(await page.$$eval('#bento-performance .profile-history-record', nodes => nodes.length), 6);
     const performance = await page.$$eval('#bento-performance .profile-history-record', nodes => nodes.map(node => node.innerText));

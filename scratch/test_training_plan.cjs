@@ -25,7 +25,7 @@ const url = (file, theme) => pathToFileURL(path.join(root, 'modules/training-com
       assert.equal(await page.$eval('#trainingPlanPosition', node => node.textContent), 'Group HR Manager');
       assert.deepEqual(await page.$$eval('.training-plan-summary-field > span', nodes => nodes.map(node => node.textContent)), ['Position', 'Supervisor', 'Reporting To']);
       assert.deepEqual(await page.$$eval('.training-plan-person', nodes => nodes.map(node => [...node.children].map(child => child.textContent))), [
-        ['Angeline Loren Alan', '#EBB04'], ['Muhammad Ali Bin Man', '#EBB01']
+        ['Angeline Loren Alan', 'EBB04'], ['Muhammad Ali Bin Man', 'EBB01']
       ], 'Employee IDs are directly below reporting names');
       assert.ok(await page.$('.record-summary-card .record-summary-metric .record-summary-value'), 'Total Records uses the shared design');
       assert.equal(await page.$eval('#trainingPlanTotalRecords', node => node.textContent), '2');

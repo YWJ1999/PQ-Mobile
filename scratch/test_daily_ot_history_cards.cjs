@@ -80,8 +80,7 @@ const detailUrl = pathToFileURL(path.resolve(__dirname, '../modules/attendance/o
             statusColor: getComputedStyle(card.querySelector('.card-status-badge')).color,
             headerBackground: getComputedStyle(card.querySelector('.daily-ot-card-header')).backgroundImage,
             hints: /Click to (view|edit) details/i.test(card.textContent),
-            name: card.querySelector('.daily-ot-card-name')?.textContent.trim(),
-            employeeId: card.querySelector('.daily-ot-card-id')?.textContent.trim(),
+            heading: card.querySelector('.daily-ot-card-name')?.textContent.trim(),
             values: [...card.querySelectorAll('.daily-ot-detail-value')].map(node => node.textContent.trim()),
             fits: box.left >= -1 && box.right <= window.innerWidth + 1
           };
@@ -90,8 +89,7 @@ const detailUrl = pathToFileURL(path.resolve(__dirname, '../modules/attendance/o
         const records = await page.evaluate(() => window.createDailyOtRecords());
         cards.forEach((card, index) => {
           const record = records[index];
-          assert.equal(card.name, record.name);
-          assert.equal(card.employeeId, '#' + record.id);
+          assert.equal(card.heading, `${record.id} - ${record.name}`);
           assert.deepEqual(card.values, [record.shift, record.clockTime, record.actualHours, record.approvedHours, record.unapprovedHours], 'Every original OT field must stay unchanged');
         });
         assert.equal(await page.$$eval('#employeeCardList .modern-emp-card', nodes => nodes.length), 0);
@@ -109,8 +107,6 @@ const detailUrl = pathToFileURL(path.resolve(__dirname, '../modules/attendance/o
           assert.equal(card.statusColor, 'rgb(255, 255, 255)');
           assert.ok(card.headerBackground.includes(index < 3 ? 'rgb(34, 129, 86)' : 'rgb(184, 94, 14)'), 'History card headers indicate approval status');
           assert.equal(card.hints, false);
-          assert.ok(card.name);
-          assert.match(card.employeeId, /^#/);
           assert.equal(card.fits, true);
         });
 

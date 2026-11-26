@@ -66,9 +66,9 @@ async function totals(page, count, points) {
         await page.keyboard.press('Enter');
         assert.equal(await page.$eval('#workIncidentDetailsOverlay', el => el.hidden), false);
         const labels = await page.$$eval('#workIncidentDetailsRows th', els => els.map(el => el.textContent));
-        for (const label of ['Reference #', 'Name', 'Emp #', 'Incident Date', 'Created Date', 'Incident Type', 'Incident Action', 'Measure Value', 'Merit', 'Value', 'Remarks', 'Is Closed?', 'Attachment']) assert.ok(labels.includes(label), label + ' appears in details');
-        assert.equal(labels.indexOf('Emp #'), labels.indexOf('Name') + 1, 'Employee ID follows the name');
-        assert.equal(await page.$eval('[data-detail="empNo"]', el => el.textContent), '#EBB01');
+        for (const label of ['Reference #', 'Name', 'Emp No.', 'Incident Date', 'Created Date', 'Incident Type', 'Incident Action', 'Measure Value', 'Merit', 'Value', 'Remarks', 'Is Closed?', 'Attachment']) assert.ok(labels.includes(label), label + ' appears in details');
+        assert.equal(labels.indexOf('Emp No.'), labels.indexOf('Name') + 1, 'Employee ID follows the name');
+        assert.equal(await page.$eval('[data-detail="empNo"]', el => el.textContent), 'EBB01');
         const attachment = await page.$eval('#workIncidentDetailsRows a[download]', el => el.href);
         assert.ok(require('node:fs').existsSync(require('node:url').fileURLToPath(attachment)), 'Attachment points to an actual file');
         await page.screenshot({ path: path.join(__dirname, `work-incident-details-${theme}-${width}.png`) });

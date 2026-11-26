@@ -15,7 +15,7 @@ async function cardState(page) {
       exposesInternalId: cards.some(card => card.textContent.includes(card.dataset.itemId)),
       firstId: cards[0]?.dataset.itemId || '',
       firstEmployeeMeta: cards[0]?.querySelector('.payroll-employee-dept')?.textContent.trim() || '',
-      firstEmployeeMetaFollowsId: cards[0]?.querySelector('.employee-id')?.nextElementSibling?.classList.contains('payroll-employee-dept') || false
+      firstEmployeeMetaFollowsHeading: cards[0]?.querySelector('.employee-name')?.nextElementSibling?.classList.contains('payroll-employee-dept') || false
     };
   });
 }
@@ -47,7 +47,7 @@ async function run() {
       assert.equal(tax.hasReferenceLabel, false);
       assert.equal(tax.exposesInternalId, false);
       assert.equal(tax.firstEmployeeMeta, 'HUMAN RESOURCE');
-      assert.equal(tax.firstEmployeeMetaFollowsId, true);
+      assert.equal(tax.firstEmployeeMetaFollowsHeading, true);
       const taxDetails = await openFirstDetails(page);
       assert.equal(taxDetails, '#approval/details/' + tax.firstId);
       await page.click('#payrollPendingDetails .action-btn-cancel');

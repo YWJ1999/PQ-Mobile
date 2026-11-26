@@ -16,7 +16,7 @@
   function setEmployee(prefix, employee) {
     const [id, ...parts] = String(employee || '').split(' - ');
     text(prefix + 'EmpName', parts.join(' - ') || '-');
-    text(prefix + 'EmpNo', id ? '#' + id.replace(/^#/, '') : '-');
+    text(prefix + 'EmpNo', formatEmployeeNumber(id) || '-');
   }
 
   function setStatus(id, status) {
@@ -82,7 +82,7 @@
     text('modalOtDocRef', docRef);
     setStatus('modalOtPlanStatus', planStatus);
     setEmployee('modalOt', emp);
-    text('modalOtSupervisor', supervisor);
+    text('modalOtSupervisor', formatEmployeeNumber(supervisor));
     recordSubmitDate.set(document.getElementById('modalOtSubmitDate'), submitDate);
     text('modalOtShift', shift);
     text('modalOtClockingTimes', clkTimes);
@@ -115,7 +115,7 @@
     AttendanceAdviceFields.render(document.getElementById('modalFbkAdviceFields'), amendments, attendanceDaysByAdviceRef[docRef]);
     const [submitterId, ...submitterName] = String(submitter || '').split(' - ');
     text('modalFbkSubmitterName', submitterName.join(' - ') || '-');
-    text('modalFbkSubmitterId', submitterId ? '#' + submitterId.replace(/^#/, '') : '-');
+    text('modalFbkSubmitterId', formatEmployeeNumber(submitterId) || '-');
     document.getElementById('modalFbkApproverComments').value = comments || '-';
     // The first document's two time amendments are shown in the supplied reference.
     const referencePunches = docRef === 'ATT000000000432' ? [

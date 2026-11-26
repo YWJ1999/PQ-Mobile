@@ -234,7 +234,7 @@
     const select = document.getElementById('nominationEmployee');
     const id = document.getElementById('nominationEmployeeId');
     select.addEventListener('change', () => {
-      id.textContent = employees[select.value] ? '#' + select.value : '';
+      id.textContent = employees[select.value] ? formatEmployeeNumber(select.value) : '';
       id.hidden = !id.textContent;
     });
   }
@@ -251,12 +251,12 @@
       EBB49: { name: 'Anitha Siva', position: 'Accounts Executive' }
     };
     for (const [empNo, person] of Object.entries(interviewees)) {
-      interviewee.add(new Option(`${person.name} (#${empNo})`, empNo));
+      interviewee.add(new Option(`${person.name} (${formatEmployeeNumber(empNo)})`, empNo));
     }
     bindEmployee('engagementInterviewee', { engagementIntervieweePosition: 'position' }, interviewees);
     const id = document.getElementById('engagementEmployeeId');
     select.addEventListener('change', () => {
-      id.textContent = employees[select.value] ? '#' + select.value : '';
+      id.textContent = employees[select.value] ? formatEmployeeNumber(select.value) : '';
       id.hidden = !id.textContent;
     });
     const today = new Date();

@@ -121,7 +121,7 @@ const tabs = [
               if (tab.key === 'ot') {
                 const summaryLabels = await page.$$eval('#otDetailsModal .attendance-history-form-summary-list dt', nodes => nodes.map(node => node.textContent.trim()));
                 const fieldLabels = await page.$$eval('#otDetailsModal .attendance-history-form-field > label:first-child, #otDetailsModal .attendance-history-credit-field > label:first-child', nodes => nodes.map(node => node.textContent.trim()));
-                assert.deepEqual(summaryLabels, ['Document Reference', 'Plan Status', 'Employee', 'Supervisor', 'Shift', 'Clocking Times']);
+                assert.deepEqual(summaryLabels, ['Submit Date', 'Document Reference', 'Plan Status', 'Employee', 'Supervisor', 'Shift', 'Clocking Times']);
                 assert.deepEqual(fieldLabels, ['OT Date', 'Start Time', 'End Time', 'Break Hours', 'Plan Hours', 'Actual Hours', 'Approved Hours', 'Approval Method', 'OT Type', 'OT Reason', 'Task', 'Convert to Leave Credit', 'Need Transport', 'Remarks', 'Approver Comments']);
                 assert.equal(await page.$eval('#otPlanFormTitle', node => node.textContent.trim()), 'OT Plan Details');
                 assert.equal(await page.$eval('#otDetailsModal [data-ot-form-cancel]', node => node.textContent.trim()), 'Cancel');
@@ -137,10 +137,10 @@ const tabs = [
               if (tab.key === 'feedback') {
                 const summaryLabels = await page.$$eval('#feedbackDetailsModal .attendance-history-form-summary-list dt', nodes => nodes.map(node => node.textContent.trim()));
                 const fieldLabels = await page.$$eval('#feedbackDetailsModal .attendance-history-form-field > label:first-child', nodes => nodes.map(node => node.textContent.trim()));
-                assert.deepEqual(summaryLabels, ['Document Reference', 'Document Status', 'Employee', 'Employee Branch', 'Employee Department', 'Date', 'Shift', 'Submitter']);
+                assert.deepEqual(summaryLabels, ['Submit Date', 'Document Reference', 'Document Status', 'Employee', 'Employee Branch', 'Employee Department', 'Date', 'Shift', 'Submitter']);
                 assert.deepEqual(fieldLabels, ['Amended Shift', 'Amended Shift Reason', 'Time Amend Reason', 'Remarks', 'Approver Comments']);
                 assert.equal(await page.$eval('#feedbackPlanFormTitle', node => node.textContent.trim()), 'Attendance Feedback');
-                assert.equal(await page.$eval('#modalFbkSubmitDate', node => node.textContent.trim()), 'Submit Date: ' + ['26/02/2026', '14/09/2026'][index]);
+                assert.equal(await page.$eval('#modalFbkSubmitDate dd', node => node.textContent.trim()), ['26/02/2026', '14/09/2026'][index]);
                 assert.equal(await page.$eval('#modalFbkAmendedShift', node => node.value), '');
                 assert.equal(await page.$eval('#modalFbkCamera', node => node.getAttribute('capture')), 'environment');
                 assert.deepEqual(await page.$$eval('#feedbackDetailsModal .attendance-history-form-actions button', nodes => nodes.map(node => node.textContent.trim())), ['Cancel', 'Submit']);

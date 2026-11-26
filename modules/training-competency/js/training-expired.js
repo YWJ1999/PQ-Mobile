@@ -37,7 +37,7 @@
     const card = node('article', 'history-card-item claim-summary-card tec-employee-card');
     card.dataset.expiredEmployee = record.empNo;
     const heading = node('header', 'claim-summary-card-head tec-employee-header'), identity = node('div');
-    identity.append(node('h3', 'claim-summary-card-title tec-employee-name', record.name || 'Employee name unavailable'), node('span', 'tec-employee-id', `#${String(record.empNo).replace(/^#+/, '')}`));
+    identity.append(node('h3', 'claim-summary-card-title tec-employee-name', employeeCardHeading.text(record.empNo, record.name || 'Employee name unavailable')));
     heading.append(identity);
     const body = node('div', 'claim-summary-card-body');
     const fields = node('dl', 'claim-summary-stat-grid tec-employee-fields');

@@ -60,10 +60,7 @@
     return node;
   };
   const formatDate = value => value ? new Date(value + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : '—';
-  const employeeNumber = row => {
-    const number = String(row.empNo ?? '').trim().replace(/^#+/, '');
-    return number ? '#' + number : '—';
-  };
+  const employeeNumber = row => formatEmployeeNumber(row.empNo) || '—';
   const feedback = window.EmployeeCareerFeedbackStore;
   const recordKey = row => String(row.id || [row.empNo, row.date, row.title].join('|'));
   const savedReviews = stored(reviewStorageKey, []);
@@ -103,7 +100,7 @@
       detailsTrigger.setAttribute('aria-label', `View feedback details for ${row.name}: ${row.title}`);
       const header = element('header', 'history-card-header staff-feedback-card-header');
       const identity = element('div', 'history-card-heading');
-      identity.append(element('h3', 'history-card-title history-time-row staff-feedback-name', row.name), element('span', 'staff-feedback-emp-no', employeeNumber(row)));
+      identity.append(element('h3', 'history-card-title history-time-row staff-feedback-name', employeeCardHeading.text(row.empNo, row.name)));
       const end = element('div', 'staff-feedback-card-end');
       end.append(statusBadge(label));
       header.append(identity, end);
@@ -113,6 +110,7 @@
         field.append(element('dt', '', label), element('dd', '', value || '-'));
         body.append(field);
       });
+      recordSubmitDate.append(body, row.submitDate);
       const actions = element('footer', 'staff-feedback-card-actions');
       const reviewButton = element('button', 'staff-feedback-review-button');
       reviewButton.type = 'button';
@@ -123,7 +121,7 @@
         window.location.href = recordPageUrl('review', key);
       });
       actions.append(reviewButton);
-      detailsTrigger.append(header, recordSubmitDate.create(row.submitDate), body);
+      detailsTrigger.append(header, body);
       card.append(detailsTrigger, actions);
       detailsTrigger.addEventListener('click', () => rememberRecord(row, 'details'));
       detailsTrigger.addEventListener('keydown', event => {
@@ -157,7 +155,7 @@
 
   function renderDetails(record) {
     const fields = [
-      ['Name', record.name], ['Status', feedback.statusLabel(record)], ['Emp #', employeeNumber(record)], ['Type', record.type], ['Category', record.category],
+      ['Name', record.name], ['Status', feedback.statusLabel(record)], ['Emp No.', employeeNumber(record)], ['Type', record.type], ['Category', record.category],
       ['Title', record.title], ['Feedback Date 1', formatDate(record.feedbackDate1 ?? record.date)],
       ['Feedback Date 2', formatDate(record.feedbackDate2)], ['Feedback Note', record.feedbackNote ?? record.feedback],
       ['Feedback Remarks', record.feedbackRemarks],
@@ -243,8 +241,7 @@
     activeReviewRecord = record;
     const name = String(record.name || '').trim();
     const parts = name.split(/\s+/);
-    $('staffFeedbackReviewName').textContent = name || 'Employee';
-    $('staffFeedbackReviewEmployeeId').textContent = employeeNumber(record);
+    $('staffFeedbackReviewName').textContent = employeeCardHeading.text(record.empNo, name || 'Employee');
     $('staffFeedbackReviewInitials').textContent = ((parts[0][0] || '') + (parts.length > 1 ? parts.at(-1)[0] : '')).toUpperCase() || '—';
     recordSubmitDate.set($('staffFeedbackReviewSubmitDate'), record.submitDate);
     $('staffFeedbackReviewAttachments').replaceChildren(attachmentList(record.attachments));

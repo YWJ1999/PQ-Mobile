@@ -6,6 +6,16 @@
   const tableBody = document.getElementById(kind + 'HighlightTableBody');
   const defaults = { keyword: '', department: 'all', costCenter: 'all', from: source.from, to: source.to, type: source.metric, min: 0, max: 99999999 };
   let applied = { ...defaults };
+  const params = new URLSearchParams(location.search);
+  for (const [key, fallback] of Object.entries(defaults)) {
+    const value = params.get(key);
+    if (!value) continue;
+    if ((key === 'from' || key === 'to') && !/^\d{4}-\d{2}-\d{2}$/.test(value)) continue;
+    if (typeof fallback === 'number') {
+      const hours = Number(value);
+      if (Number.isFinite(hours) && hours >= 0) applied[key] = hours;
+    } else applied[key] = value;
+  }
   let currentSection = 'report';
   let selectedAnalysis = { rows: [], period: '' };
   let expandedChart = false;
@@ -21,13 +31,15 @@
   const selectedRange = () => dateText(applied.from) + ' – ' + dateText(applied.to);
   const includesCompletePeriod = () => applied.from <= source.from && applied.to >= source.to;
 
+  function employeeForPeriod(employee) {
+    const details = employee.details.filter(detail => detail.date >= applied.from && detail.date <= applied.to);
+    return { ...employee, details, hours: includesCompletePeriod() ? employee.hours : sumHours(details) };
+  }
+
   function filteredEmployees() {
     const keyword = applied.keyword.toLowerCase();
     const completePeriod = includesCompletePeriod();
-    return source.employees.map(employee => {
-      const details = employee.details.filter(detail => detail.date >= applied.from && detail.date <= applied.to);
-      return { ...employee, details, hours: completePeriod ? employee.hours : sumHours(details) };
-    }).filter(employee => (!keyword || (employee.name + ' #' + employee.empNo).toLowerCase().includes(keyword))
+    return source.employees.map(employeeForPeriod).filter(employee => (!keyword || (employee.name + ' #' + employee.empNo).toLowerCase().includes(keyword))
       && (applied.department === 'all' || (employee.department || 'unspecified') === applied.department)
       && (applied.costCenter === 'all' || (employee.costCenter || 'unspecified') === applied.costCenter)
       && (completePeriod || employee.details.length > 0)
@@ -45,25 +57,43 @@
     return element;
   }
 
+  function setHighlightLink(link, page, empNo) {
+    const url = new URL(page, location.href);
+    url.search = location.search;
+    if (empNo) url.searchParams.set('employee', empNo);
+    else url.searchParams.delete('employee');
+    const syncTheme = () => {
+      url.searchParams.set('theme', document.documentElement.dataset.theme);
+      link.href = url.href;
+    };
+    syncTheme();
+    link.addEventListener('click', syncTheme);
+  }
+
   function renderReport() {
+    const url = new URL(location.href);
+    for (const [key, value] of Object.entries(applied)) {
+      if (value === defaults[key]) url.searchParams.delete(key);
+      else url.searchParams.set(key, value);
+    }
+    if (url.href !== location.href) history.replaceState(history.state, '', url);
     const employees = filteredEmployees();
     tableBody.replaceChildren();
     employees.forEach(employee => {
       const row = tableBody.insertRow();
       const idCell = row.insertCell();
       idCell.className = 'employee-id-cell';
-      idCell.textContent = '#' + employee.empNo;
+      idCell.textContent = formatEmployeeNumber(employee.empNo);
       const nameCell = row.insertCell();
       nameCell.className = 'attendance-report-name';
       nameCell.textContent = employee.name;
       const hoursCell = row.insertCell();
       hoursCell.className = 'hours-number';
-      const button = textElement('button', 'hours-pill', hoursText(employee.hours));
-      button.type = 'button';
-      button.dataset.highlightHours = employee.empNo;
-      button.setAttribute('aria-label', 'View ' + employee.name + ' hours details');
-      button.addEventListener('click', () => openDetails(employee));
-      hoursCell.append(button);
+      const hoursControl = textElement('a', 'hours-pill', hoursText(employee.hours));
+      hoursControl.dataset.highlightHours = employee.empNo;
+      hoursControl.setAttribute('aria-label', hoursControl.textContent + ' hours, view details for ' + employee.name);
+      setHighlightLink(hoursControl, kind + '-highlight-details.html', employee.empNo);
+      hoursCell.append(hoursControl);
       const branchCell = row.insertCell();
       branchCell.textContent = employee.branch || '—';
       row.insertCell().textContent = employee.department || '—';
@@ -93,45 +123,54 @@
     for (const child of document.querySelector('.phone-container').children) {
       if (!child.classList.contains('modal-overlay')) child.inert = open;
     }
-    if (open) modal.querySelector(id === 'highlightFilterModal' ? 'input' : 'button').focus();
+    if (open) modal.querySelector('input').focus();
     else if (returnFocus?.isConnected) returnFocus.focus();
   }
 
-  function openDetails(employee) {
-    document.getElementById('highlightDetailName').textContent = employee.name;
-    const list = document.getElementById('highlightDetailsList');
-    list.replaceChildren();
-    if (kind === 'overtime' && employee.details.length) {
-      const meta = textElement('div', 'hours-highlight-detail-meta record-summary-card');
-      const count = document.createElement('span');
-      window.PeopleHcmRecordSummary.renderCount(count, employee.details.length);
-      meta.append(count);
-      const total = textElement('span', '', 'Total Hours: ');
-      const value = textElement('strong', '', hoursText(sumHours(employee.details)));
-      value.id = 'highlightDetailsTotal';
-      total.append(value);
-      meta.append(total);
-      list.append(meta);
+  function renderOvertimeDetail(employee) {
+    const rows = document.getElementById('overtimeDetailRows');
+    for (const detail of employee?.details || []) {
+      const row = rows.insertRow();
+      row.insertCell().textContent = dateText(detail.date);
+      row.insertCell().textContent = detail.description || '—';
+      const hours = row.insertCell();
+      hours.className = 'hours-number';
+      hours.append(textElement('span', 'hours-pill', hoursText(detail.hours)));
     }
+    if (!rows.rows.length) {
+      const empty = rows.insertRow().insertCell();
+      empty.colSpan = 3;
+      empty.className = 'attendance-report-empty';
+      empty.textContent = employee ? 'No dated overtime records are available for this period.' : 'Employee not found.';
+    }
+  }
+
+  function renderAttendanceDetail(employee) {
+    if (!employee?.details.length) {
+      const empty = document.getElementById('attendanceDetailEmpty');
+      if (!employee) empty.textContent = 'Employee not found.';
+      empty.hidden = false;
+      return;
+    }
+
+    const template = document.getElementById('attendanceDetailRecord');
+    const list = document.getElementById('highlightDetailsList');
+    const weekday = new Intl.DateTimeFormat('en-GB', { weekday: 'short', timeZone: 'UTC' });
     for (const detail of employee.details) {
-      const card = textElement('article', 'leave-highlight-detail-record history-card-item');
-      card.append(textElement('div', 'leave-highlight-detail-date', dateText(detail.date)));
-      const body = textElement('div', 'leave-highlight-detail-body');
-      const detailFields = kind === 'overtime'
-        ? [['Description', detail.description, 'description'], ['Hours', hoursText(detail.hours), 'hours']]
-        : [['Shift', detail.shift, 'shift'], ['Clock Times', detail.clockTimes.join(', '), 'clockTimes'], ['Hours', hoursText(detail.hours), 'hours'], ...(detail.exception ? [['Exception', detail.exception, 'exception']] : [])];
-      detailFields.forEach(([label, value, key]) => {
-        const field = textElement('div', 'leave-highlight-detail-field' + (key === 'shift' || key === 'exception' ? ' wide' : ''));
-        const content = textElement('div', 'leave-highlight-detail-value', value);
-        content.dataset.field = key;
-        field.append(textElement('div', 'leave-highlight-detail-label', label), content);
-        body.append(field);
-      });
-      card.append(body);
+      const card = template.content.cloneNode(true);
+      const date = card.querySelector('time');
+      date.dateTime = detail.date;
+      date.textContent = weekday.format(new Date(detail.date)) + ', ' + dateText(detail.date);
+      if (detail.exception) {
+        card.querySelector('.attendance-detail-exception').hidden = false;
+        card.querySelector('[data-field="exception"]').textContent = detail.exception;
+      }
+      card.querySelector('[data-field="dayType"]').textContent = detail.dayType || '—';
+      card.querySelector('[data-field="shift"]').textContent = detail.shift || '—';
+      card.querySelector('[data-field="clockTimes"]').textContent = detail.clockTimes?.join(' ') || '—';
+      card.querySelector('[data-field="hours"]').textContent = hoursText(detail.hours);
       list.append(card);
     }
-    if (!employee.details.length) list.append(textElement('p', 'attendance-report-empty', 'No detailed records are available for this employee in the selected period.'));
-    showModal('highlightDetailsModal', true);
   }
 
   function chartItems(rows) {
@@ -258,6 +297,26 @@
   }
 
   function closeModal(id, event) { if (!event || event.target === event.currentTarget) showModal(id, false); }
+  const detailHeading = document.getElementById('highlightDetailName');
+  if (detailHeading) {
+    setHighlightLink(document.getElementById(kind + 'DetailBack'), kind + '-highlight.html');
+    const match = source.employees.find(item => item.empNo === params.get('employee'));
+    const employee = match && employeeForPeriod(match);
+    if (employee) {
+      document.title = employee.name + ' - ' + (source.detailTitle || detailHeading.textContent) + ' | PeopleHCM';
+      detailHeading.textContent = employee.name;
+      const employeeId = document.getElementById('highlightDetailEmpNo');
+      if (employeeId) employeeId.textContent = formatEmployeeNumber(employee.empNo);
+      document.getElementById(kind + 'DetailSubtitle').hidden = false;
+      window.PeopleHcmRecordSummary.renderCount(document.getElementById(kind + 'DetailCount'), employee.details.length);
+      const total = kind === 'attendance' ? sumHours(employee.details) : employee.hours;
+      document.getElementById('highlightDetailsTotal').textContent = hoursText(total);
+      document.getElementById(kind + 'DetailSummary').hidden = false;
+    }
+    if (kind === 'attendance') renderAttendanceDetail(employee);
+    else renderOvertimeDetail(employee);
+    return;
+  }
   window.showHoursHighlightSection = showSection;
   window.showOvertimeSection = showSection;
   window.showAttendanceSection = showSection;
@@ -270,12 +329,11 @@
   window.openHighlightPeriodAnalysis = () => openAnalysis(datedRecords(), selectedRange());
   window.openHighlightFilterModal = openFilter;
   window.closeHighlightFilterModal = event => closeModal('highlightFilterModal', event);
-  window.closeHighlightDetailsModal = event => closeModal('highlightDetailsModal', event);
   window.submitHighlightFilterModal = submitFilter;
   window.resetHighlightFilterModal = () => { applied = { ...defaults }; expandedChart = false; renderReport(); showModal('highlightFilterModal', false); };
   window.handleExportAction = type => {
     if (type === 'PDF') { window.print(); return; }
-    const rows = [['Emp #', 'Name', 'Hours', 'Branch', 'Department', 'Position'], ...filteredEmployees().map(employee => ['#' + employee.empNo, employee.name, hoursText(employee.hours), employee.branch || '', employee.department || '', employee.position || ''])];
+    const rows = [['Emp No.', 'Name', 'Hours', 'Branch', 'Department', 'Position'], ...filteredEmployees().map(employee => [formatEmployeeNumber(employee.empNo), employee.name, hoursText(employee.hours), employee.branch || '', employee.department || '', employee.position || ''])];
     const csv = '\uFEFF' + rows.map(row => row.map(value => {
       const text = /^[=+@-]/.test(String(value)) ? "'" + value : String(value);
       return '"' + text.replace(/"/g, '""') + '"';

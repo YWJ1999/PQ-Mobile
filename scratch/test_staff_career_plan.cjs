@@ -33,13 +33,10 @@ const pageUrl = theme => pathToFileURL(path.join(root, 'modules/employee-career/
 
       const firstCard = await page.$eval('#staffCareerPlanCards .staff-career-plan-card', card => {
         const name = card.querySelector('.staff-career-plan-name');
-        const employeeId = card.querySelector('.staff-career-plan-employee-id');
         const identity = card.querySelector('.staff-career-plan-card-header');
         return {
           name: name.textContent.trim(),
-          employeeId: employeeId.textContent.trim(),
           subtitle: card.querySelector('.staff-career-plan-subtitle').textContent,
-          idBelowName: employeeId.getBoundingClientRect().top >= name.getBoundingClientRect().bottom,
           headerSpansCard: identity?.getBoundingClientRect().width >= card.getBoundingClientRect().width - 2,
           hasChevron: Boolean(card.querySelector('.fa-chevron-right')),
           uniformValueColor: new Set([...card.querySelectorAll('dd')].map(value => getComputedStyle(value).color)).size === 1,
@@ -49,10 +46,8 @@ const pageUrl = theme => pathToFileURL(path.join(root, 'modules/employee-career/
         };
       });
       assert.deepEqual(firstCard, {
-        name: 'Farhan Binti Rahmat',
-        employeeId: '#EBB12',
-        subtitle: 'HR Executive · #EBB12',
-        idBelowName: true,
+        name: 'EBB12 - Farhan Binti Rahmat',
+        subtitle: 'HR Executive',
         headerSpansCard: true,
         hasChevron: false,
         uniformValueColor: true,
@@ -88,10 +83,9 @@ const pageUrl = theme => pathToFileURL(path.join(root, 'modules/employee-career/
         assert.equal(new URL(page.url()).pathname.split('/').pop(), 'staff-career-plan-details.html');
         const details = await page.$eval('main', main => ({
           headings: [...main.querySelectorAll('h2')].map(heading => heading.textContent),
-          employeeId: main.querySelector('.new-user-profile-id').textContent,
           facts: [...main.querySelectorAll('dt')].map(term => [term.textContent, term.nextElementSibling.textContent])
         }));
-        assert.deepEqual(details, { headings: [row.name], employeeId: '#' + row.empNo, facts: [
+        assert.deepEqual(details, { headings: [`${row.empNo} - ${row.name}`], facts: [
           ['Position', row.position], ['Department', row.department], ['Next Job', row.nextPosition],
           ['Target Year', row.targetDate.slice(0, 4)], ['Career Goal', row.careerGoal || 'Not provided'],
           ['Development Needs / Notes', row.developmentNotes || row.developmentNeeds || 'Not provided']
@@ -132,7 +126,7 @@ const pageUrl = theme => pathToFileURL(path.join(root, 'modules/employee-career/
       );
       await page.select('#staffCareerPlanFilterCostCenter', 'CC-IT');
       await page.click('#staffCareerPlanApplyFilter');
-      assert.deepEqual(await page.$$eval('.staff-career-plan-name', nodes => nodes.map(node => node.textContent)), ['Lee Wei Ming', 'Muhammad Hafiz']);
+      assert.deepEqual(await page.$$eval('.staff-career-plan-name', nodes => nodes.map(node => node.textContent)), ['005712 - Lee Wei Ming', '009034 - Muhammad Hafiz']);
       await page.click('#staffCareerPlanViewChart');
       assert.equal(await page.$eval('#staffCareerPlanChartTotal', node => node.textContent), '2');
       assert.equal(await page.$eval('#staffCareerPlanChartFilterSummary', node => node.textContent), 'CC-IT');

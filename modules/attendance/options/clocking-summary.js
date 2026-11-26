@@ -1,35 +1,36 @@
 /* One transaction source feeds the report, count details and chart. */
 const clockingGroups = [
-  { id: 1, branch: 'TIMES SQUARE BRANCH', dept: 'HUMAN RESOURCE', section: 'BENEFITS', costCenter: 'MANAGEMENT', date: '2026-10-05', zone: 'TIMES SQUARE OFFICE', details: [
+  { id: 1, branch: 'TIMES SQUARE BRANCH', dept: 'HUMAN RESOURCE', section: 'BENEFITS', costCenter: 'MANAGEMENT', date: '2026-10-05', zone: 'TIMES SQUARE OFFICE', location: 'Times Square Office, Kuala Lumpur', details: [
     { empNo: 'EBB15', name: 'Asmawi idris', time: '08:18', type: 'Clock In', mode: 'Manual Input (People HR)' },
     { empNo: 'EBB15', name: 'Asmawi idris', time: '19:53', type: 'Clock Out', mode: 'Manual Input (People HR)' },
-    { empNo: 'A0001', name: 'Natasha thean mei hoi', time: '07:58', type: 'Clock In', mode: 'Manual Input (People HR)', location: 'Times Square Office, Kuala Lumpur' },
+    { empNo: 'A0001', name: 'Natasha thean mei hoi', time: '07:58', type: 'Clock In', mode: 'Manual Input (People HR)' },
     { empNo: 'A0001', name: 'Natasha thean mei hoi', time: '18:47', type: 'Clock Out', mode: 'Manual Input (People HR)' }
   ] },
-  { id: 2, branch: 'TIMES SQUARE BRANCH', dept: 'HUMAN RESOURCE', section: 'BENEFITS', costCenter: 'MID VALLEY', date: '2026-10-05', zone: 'MID VALLEY OFFICE', details: [
+  { id: 2, branch: 'TIMES SQUARE BRANCH', dept: 'HUMAN RESOURCE', section: 'BENEFITS', costCenter: 'MID VALLEY', date: '2026-10-05', zone: 'MID VALLEY OFFICE', location: 'Mid Valley Office', details: [
     { empNo: 'EBB12', name: 'Farhan binti rahmat', time: '08:05', type: 'Clock In', mode: 'Mobile Geofence', distance: 18 },
     { empNo: 'EBB12', name: 'Farhan binti rahmat', time: '17:42', type: 'Clock Out', mode: 'Mobile Geofence', distance: 32 }
   ] },
   // Keep the existing September sample records available through the date filter.
-  { id: 3, branch: 'HQ - KL Main', dept: 'HUMAN RESOURCE', section: 'BENEFITS', costCenter: 'MANAGEMENT', date: '2026-09-20', details: [
+  { id: 3, branch: 'HQ - KL Main', dept: 'HUMAN RESOURCE', section: 'BENEFITS', costCenter: 'MANAGEMENT', date: '2026-09-20', location: 'HQ - KL Main', details: [
     { empNo: 'EBB15', name: 'Asmawi idris', time: '08:04', type: 'Clock In', mode: 'Manual Input (People HR)' },
     { empNo: 'A0001', name: 'Natasha thean mei hoi', time: '08:00', type: 'Clock In', mode: 'Manual Input (People HR)' },
     { empNo: 'EBB12', name: 'Farhan binti rahmat', time: '07:34', type: 'Clock In', mode: 'Manual Input (People HR)' }
   ] },
-  { id: 4, branch: 'HQ - KL Main', dept: 'HUMAN RESOURCE', section: 'CORPORATE', costCenter: 'CC-101 MANAGEMENT', date: '2026-09-20', details: [
+  { id: 4, branch: 'HQ - KL Main', dept: 'HUMAN RESOURCE', section: 'CORPORATE', costCenter: 'CC-101 MANAGEMENT', date: '2026-09-20', location: 'HQ - KL Main', details: [
     { empNo: 'EBB01', name: 'Lee Soon Hock', time: '08:00', type: 'Clock In', mode: 'Face Kiosk' },
     { empNo: '004177', name: 'Siti Nurhaliza', time: '08:15', type: 'Clock In', mode: 'Mobile Geofence' },
     { empNo: '0000101', name: 'Tan Wei Ming', time: '17:30', type: 'Clock Out', mode: 'Face Kiosk' }
   ] },
-  { id: 5, branch: 'Penang Branch', dept: 'HUMAN RESOURCE', section: 'GENERAL HR', costCenter: 'CC-501 HR & OPS', date: '2026-09-20', details: [
+  { id: 5, branch: 'Penang Branch', dept: 'HUMAN RESOURCE', section: 'GENERAL HR', costCenter: 'CC-501 HR & OPS', date: '2026-09-20', location: 'Penang Branch', details: [
     { empNo: 'EBB02', name: 'Wong Kah Fai', time: '08:30', type: 'Clock In', mode: 'Mobile Geofence' }
   ] },
-  { id: 6, branch: 'Johor Bahru Branch', dept: 'PLANT OPERATIONS', section: 'ASSEMBLY', costCenter: 'CC-301 PRODUCTION', date: '2026-09-20', details: [
+  { id: 6, branch: 'Johor Bahru Branch', dept: 'PLANT OPERATIONS', section: 'ASSEMBLY', costCenter: 'CC-301 PRODUCTION', date: '2026-09-20', location: 'Johor Bahru Branch', details: [
     { empNo: 'EBB03', name: 'Chok Ching Hou', time: '07:45', type: 'Clock In', mode: 'Biometric Scanner' },
     { empNo: '004199', name: 'Kavitha Raj', time: '07:50', type: 'Clock In', mode: 'Biometric Scanner' }
   ] }
 ];
 const clockingTransactions = clockingGroups.flatMap(({ details, ...group }) => details.map(record => ({ ...group, ...record })));
+const missingClockingLocation = 'Not recorded';
 const defaultClockingFilters = { date: '2026-10-05', start: '00:00', end: '23:59', branch: 'all', dept: 'all', section: 'all', costCenter: 'all', type: 'all', zone: 'all', radius: 0 };
 const clockingFilterFields = { date: 'filterDateInput', start: 'filterStartTimeInput', end: 'filterEndTimeInput', branch: 'filterBranchSelect', dept: 'filterDeptSelect', section: 'filterSectionSelect', costCenter: 'filterCostCenterSelect', type: 'filterClockTypeSelect', zone: 'filterZoneSelect', radius: 'filterRadiusInput' };
 let appliedClockingFilters = { ...defaultClockingFilters };
@@ -168,17 +169,18 @@ function showClockingDetails(context, returnSection = currentActiveSection === '
   document.getElementById('detailsRecordCount').textContent = String(context.records.length);
   document.getElementById('detailsListContainer').innerHTML = context.records.map(record => {
     const isIn = record.type === 'Clock In' || record.type === 'Break In';
+    const location = record.location?.trim();
     return `<article class="staff-clock-card history-card-item ${isIn ? 'clocking-in-card' : 'clocking-out-card'}">
       <div class="clocking-record-header history-card-header">
-        <div class="clocking-record-heading history-card-heading"><h3 class="staff-name-text">${escapeClockingText(record.name)}</h3><div class="staff-emp-badge">#${escapeClockingText(record.empNo.replace(/^#+/, ''))}</div></div>
+        <div class="clocking-record-heading history-card-heading"><h3 class="staff-name-text">${employeeCardHeading.html(record.empNo, record.name)}</h3></div>
         <span class="clocking-status-badge clocking-record-type ${isIn ? 'is-in' : 'is-out'}"><i class="fa-solid ${isIn ? 'fa-right-to-bracket' : 'fa-right-from-bracket'}" aria-hidden="true"></i>${escapeClockingText(record.type)}</span>
       </div>
       <div class="clocking-record-body history-card-details">
         <div class="clocking-record-field"><div class="clocking-record-label">Clock Time</div><strong class="clocking-record-time">${escapeClockingText(record.time)}</strong></div>
         <div class="clocking-record-field clocking-record-mode-field"><div class="clocking-record-label">Clock Mode</div><strong class="clocking-record-mode">${escapeClockingText(record.mode)}</strong></div>
-        ${record.location ? `<div class="clocking-record-field clocking-record-location-field"><div class="clocking-record-label">Location</div><strong class="clocking-record-mode clocking-record-location">${escapeClockingText(record.location)}</strong></div>` : ''}
+        <div class="clocking-record-field clocking-record-location-field"><div class="clocking-record-label">Location</div><strong class="clocking-record-mode clocking-record-location">${escapeClockingText(location || missingClockingLocation)}</strong></div>
       </div>
-      ${record.location ? `<div class="clocking-card-actions"><button type="button" class="clocking-map-btn" aria-label="View ${escapeClockingText(record.location)} map full screen"><span>View Map</span></button></div>` : ''}
+      ${location ? `<div class="clocking-card-actions"><button type="button" class="clocking-map-btn" aria-label="View ${escapeClockingText(location)} map full screen"><span>View Map</span></button></div>` : ''}
     </article>`;
   }).join('') || '<div class="attendance-report-empty">No clocking records match the current filter.</div>';
   document.querySelectorAll('#detailsListContainer .clocking-map-btn').forEach(button => {
@@ -207,8 +209,8 @@ function openClockingMap(button) {
 
 function clockingExportRows() {
   return [
-    ['Employee Name', 'Employee ID', 'Date', 'Clock Time', 'Clock Type', 'Clock Mode', 'Branch', 'Department', 'Section', 'Cost Centre'],
-    ...(detailsContext?.records || []).map(record => [record.name, `#${record.empNo.replace(/^#+/, '')}`, record.date, record.time, record.type, record.mode, record.branch, record.dept, record.section, record.costCenter])
+    ['Employee Name', 'Employee ID', 'Date', 'Clock Time', 'Clock Type', 'Clock Mode', 'Branch', 'Department', 'Section', 'Cost Centre', 'Location'],
+    ...(detailsContext?.records || []).map(record => [record.name, formatEmployeeNumber(record.empNo), record.date, record.time, record.type, record.mode, record.branch, record.dept, record.section, record.costCenter, record.location?.trim() || missingClockingLocation])
   ];
 }
 

@@ -34,20 +34,20 @@ const pageUrl = pathToFileURL(path.resolve(__dirname, '../modules/attendance/opt
     );
     assert.deepEqual(
       await page.$$eval('#modalSupervisorSelect option', options => options.map(option => option.textContent.trim())),
-      ['#EBB04 · Tech Lead', '#000234 · Kevin Lim', '#000450 · Jenny Koh']
+      ['EBB04 · Tech Lead', '000234 · Kevin Lim', '000450 · Jenny Koh']
     );
     assert.equal(await page.$eval('#modalSupervisorSelect', node => node.value), 'EBB04');
 
     await page.select('#modalSupervisorSelect', '000234');
     await page.click('#editOtDetailsModal [type="submit"]');
     await page.waitForSelector('#editOtDetailsModal', { hidden: true });
-    assert.equal(await page.$eval('#otDetailSupervisor', node => node.textContent), '#000234 · Kevin Lim');
+    assert.equal(await page.$eval('#otDetailSupervisor', node => node.textContent), '000234 · Kevin Lim');
     await page.click('.ot-edit-link');
     assert.equal(await page.$eval('#modalSupervisorSelect', node => node.value), '000234');
     await page.select('#modalSupervisorSelect', '000450');
     await page.click('#editOtDetailsModal .sheet-footer [type="button"]');
     await page.waitForSelector('#editOtDetailsModal', { hidden: true });
-    assert.equal(await page.$eval('#otDetailSupervisor', node => node.textContent), '#000234 · Kevin Lim');
+    assert.equal(await page.$eval('#otDetailSupervisor', node => node.textContent), '000234 · Kevin Lim');
 
     await page.goto(pageUrl + '?theme=dark', { waitUntil: 'load' });
     await page.click('.ot-edit-link');

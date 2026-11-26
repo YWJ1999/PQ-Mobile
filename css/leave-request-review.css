@@ -1,4 +1,24 @@
-#leaveApprovalForm > [data-leave-form] { margin-bottom: 0 !important; }
+:is(#leaveApprovalForm, #teamCalendarLeaveForm) > [data-leave-form] { margin-bottom: 0 !important; }
+[data-leave-form] .record-submit-date { margin-bottom: 14px; }
+.team-leave-record-header {
+  margin: 0 2px 14px;
+  color: var(--text-primary);
+}
+.team-leave-record-header h2 {
+  margin: 0 0 6px;
+  font-size: 16px;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+.team-leave-record-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 600;
+}
 .leave-review-value {
   padding: 12px 14px;
   background: var(--bg-input);

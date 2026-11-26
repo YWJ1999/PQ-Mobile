@@ -51,7 +51,7 @@ const storageKey = 'peoplehcm.staffLearningDevelopment.records.v1';
         fontSize: style.fontSize,
         fontWeight: style.fontWeight
       };
-    }), { name: 'Mei Ling', employeeId: '#EBB06', directlyBelow: true, display: 'block', fontSize: '11.5px', fontWeight: '700' });
+    }), { name: 'Mei Ling', employeeId: 'EBB06', directlyBelow: true, display: 'block', fontSize: '11.5px', fontWeight: '700' });
     assert.equal(await summaryValue('position'), 'Accounts Assistant');
     assert.equal(await summaryValue('period'), '2026');
     assert.equal(await summaryValue('description'), 'Annual Learning & Development Plan');

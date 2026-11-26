@@ -17,6 +17,10 @@ const screenshot = async (page, name) => {
       const page = await browser.newPage();
       const errors = [];
       page.on('pageerror', e => errors.push(e.message));
+      const backToHistory = async () => {
+        await page.click('#closeHistoryDetails');
+        await page.waitForSelector('#historyDetailsModal', { hidden: true });
+      };
       await page.setViewport({ width, height: 950 });
       await page.goto(url(theme), { waitUntil: 'domcontentloaded' });
       await page.evaluate((key, marker, migration) => { localStorage.removeItem(key); localStorage.removeItem(marker); localStorage.removeItem(migration); }, historyKey, sampleKey, migrationKey);
@@ -38,29 +42,35 @@ const screenshot = async (page, name) => {
       assert.match(await page.$eval(first, n => n.textContent), /FGV0000000000001.*17 Jan 2024.*1111-2222.*3/s);
       await screenshot(page, `workplace-history-reference-guest-${theme}-${width}.png`);
       await page.click(first + ' .history-card-main');
-      assert.match(await page.$eval('#historyDetailBody', n => n.textContent), /444.*Guest Information.*55.*Customer.*66.*77.*Internal Attendee.*HUMAN RESOURCE.*GROUP HR MANAGER/s);
-      assert.match(await page.$eval('#historyDetailBody [data-detail-field="Emp #"]', n => n.textContent), /^#EBB12$/);
-      assert.deepEqual(await page.evaluate(() => {
-        const countReferences = root => [...root.querySelectorAll('th')].filter(cell => cell.textContent.trim() === 'Reference #').length;
-        const sections = [...document.querySelectorAll('#historyDetailBody .history-detail-section')];
-        const section = title => sections.find(item => item.querySelector('.history-detail-section-title')?.textContent.trim() === title);
-        return {
-          main: countReferences(document.querySelector('#historyDetailBody .history-detail-main-table')),
-          guestInformation: countReferences(section('Guest Information')),
-          internalAttendee: countReferences(section('Internal Attendee'))
-        };
-      }), {
-        main: 1,
-        guestInformation: 0,
-        internalAttendee: 0
-      }, 'Only the main Guest Visit details table keeps Reference #');
-      assert.equal(await page.$eval('#historyDetailsModal', n => n.getAttribute('aria-hidden')), 'false');
+      const form = '#historyDetailBody guest-visit-fields[readonly]';
+      assert.deepEqual(await page.$$eval(form + ' .visit-step-label', nodes => nodes.map(n => n.textContent)), ['General', 'Guest', 'Attendee', 'Other']);
+      assert.ok(await page.$eval(form, n => [...n.querySelectorAll('input, select, textarea')].every(field => field.readOnly || field.disabled)));
+      assert.equal(await page.$(form + ' :is(.visit-add-record, .visit-record-action, input[type=file], [type=submit])'), null);
+      assert.deepEqual(await page.$$eval('#visitDate, #visitStartTime, #visitEndTime, #visitTotalGuest, #visitLocation', nodes => nodes.map(n => n.value)),
+        ['17 Jan 2024', '11:11', '22:22', '3', '444']);
+      assert.deepEqual(await page.$$eval(form + ' .visit-submission-meta > div', rows => rows.map(row => row.querySelector('dd').textContent)),
+        ['FGV0000000000001', 'Pending', 'EBB12 - Farhan binti rahmat', '17/01/2024']);
+      assert.equal(await page.$eval('#visitAttachments', n => n.textContent), 'No attachments');
+      assert.ok(await page.$eval(form, n => n.scrollWidth <= n.clientWidth));
+      assert.equal(await page.$eval('#visitPanel-general .claim-form-card', card => getComputedStyle(card).borderRadius), '22px');
+      assert.equal(await page.$eval('#visitLocation', field => getComputedStyle(field).borderRadius), '13px');
       await screenshot(page, `workplace-history-reference-guest-detail-${theme}-${width}.png`);
-      await page.keyboard.press('Escape');
+      await page.click('#visitSummaryDetails');
+      await page.click('[data-visit-category="guest"]');
+      await page.click('#visitGuestList [data-toggle-record]');
+      assert.deepEqual(await page.$$eval('#visitGuestList .visit-record-name, #visitGuestList dd', nodes => nodes.map(n => n.innerText)), ['66', '55', 'Customer', '77']);
+      await page.focus('#visitTab-guest');
+      await page.keyboard.press('ArrowRight');
+      await page.click('#visitAttendeeList [data-toggle-record]');
+      assert.deepEqual(await page.$$eval('#visitAttendeeList .visit-record-name, #visitAttendeeList dd', nodes => nodes.map(n => n.innerText)),
+        ['EBB12 - Farhan binti rahmat', 'HUMAN RESOURCE', 'GROUP HR MANAGER']);
+      await page.click('#visitTab-other');
+      assert.ok(await page.$eval('#visitRequestNone', n => n.checked && n.disabled));
+      await backToHistory();
       assert.equal(await page.evaluate(() => document.activeElement.closest('[data-record-id]')?.dataset.recordId), 'sample-guest-0001');
       await page.click('[data-history-action="apply"]');
       assert.equal(await page.$eval('[data-record-id="sample-guest-0006"]', n => n.dataset.status), 'submitted');
-      assert.equal(await page.$eval('#historyDetailsModal', n => n.getAttribute('aria-hidden')), 'true', 'Apply must not open record details');
+      assert.equal(await page.$eval('#historyDetailsModal', n => n.hidden), true, 'Apply must not open record details');
       await page.click('[data-record-id="sample-guest-0006"] [data-history-action="cancel"]');
       assert.equal(await page.$eval('[data-record-id="sample-guest-0006"]', n => n.dataset.status), 'cancelled');
       await page.reload({ waitUntil: 'domcontentloaded' });
@@ -81,7 +91,7 @@ const screenshot = async (page, name) => {
       await page.click('[data-record-id="sample-letter-0091"] .history-card-main');
       assert.match(await page.$eval('#historyDetailBody', n => n.textContent), /DRQ0000000000091.*gnfnngn.*fhcgh.*gfhnmghm.*fj ch.*gfnf.*SuratKebenaranvWJv1Jun2021.pdf.*22 Mar 2022/s);
       await screenshot(page, `workplace-history-reference-letter-detail-${theme}-${width}.png`);
-      await page.keyboard.press('Escape');
+      await backToHistory();
       await page.click('#historyFilterTrigger');
       assert.ok(await page.$eval('#historyStatus', n => n.getClientRects().length), 'Letter status remains visible');
       assert.equal(await page.$eval('#historyTypeLabel', n => n.textContent), 'Letter Type');
@@ -92,9 +102,9 @@ const screenshot = async (page, name) => {
       assert.equal(await page.$$eval('#workplaceHistoryList [data-record-id]', n => n.length), 2);
       await screenshot(page, `workplace-history-reference-inventory-${theme}-${width}.png`);
       await page.click('[data-record-id="sample-inventory-0064"] .history-card-main');
-      assert.match(await page.$eval('#historyDetailBody', n => n.textContent), /IRQ0000000000064.*Pending.*8 Sep 2026.*LOCKER 1000.*Quantity.*1.*UOM.*Piece.*Inventory Request Reason 1.*#EBB12.*Is Assigned\?.*No/s);
+      assert.match(await page.$eval('#historyDetailBody', n => n.textContent), /IRQ0000000000064.*Pending.*8 Sep 2026.*LOCKER 1000.*Quantity.*1.*UOM.*Piece.*Inventory Request Reason 1.*EBB12.*Is Assigned\?.*No/s);
       await screenshot(page, `workplace-history-reference-inventory-detail-${theme}-${width}.png`);
-      await page.keyboard.press('Escape');
+      await backToHistory();
       await page.click('#historyFilterTrigger');
       assert.equal(await page.$eval('#historyTypeLabel', n => n.textContent), 'Request Item');
       await page.select('#historyType', 'Laptop');

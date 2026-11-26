@@ -94,7 +94,7 @@ async function checkHistoryFields(page, theme) {
       assert.deepEqual(details.rows.map(row => row.label), labels);
       assert.equal(details.title, 'Attendance Advice Approval');
       assert.equal(details.legacyVisible, false);
-      assert.deepEqual(details.employee, { name: 'Afifah Nasir', id: '#004177' });
+      assert.deepEqual(details.employee, { name: 'Afifah Nasir', id: '004177' });
       const value = label => details.rows.find(row => row.label === label).value;
       assert.equal(value('Employee Branch'), '—');
       assert.equal(value('Employee Department'), 'QA Manager');
@@ -139,7 +139,7 @@ async function checkHistoryFields(page, theme) {
       assert.deepEqual(adviceLabels.map(value), ['0', 'Recorded adjustment', '90', 'Appointment', '45', 'Family matter', 'Yes', 'Leave recorded', 'AL']);
       assert.equal(value('Remarks'), 'Changed work schedule.\nConfirmed with supervisor.');
       assert.equal(value('Approver Comments'), '[Comment by AHMAD BIN MUSA (EBB02)]\n123');
-      assert.ok(value('Submitter').includes('Farhan binti rahmat') && value('Submitter').includes('#EBB12'));
+      assert.ok(value('Submitter').includes('Farhan binti rahmat') && value('Submitter').includes('EBB12'));
       await page.type('#attFeedbackActionComments', 'Checked shift change');
       await page.click('#attendanceDetailsModalOverlay [data-approval-back]');
       await page.waitForSelector('#attendanceDetailsModalOverlay', { hidden: true });

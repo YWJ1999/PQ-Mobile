@@ -110,7 +110,7 @@ async function readSummary(page) {
       assert.equal(await page.evaluate(() => document.activeElement.id), 'headcountDetailTitle');
       assert.deepEqual(await page.$$eval('#headcountDetailPage dd', nodes => nodes.map(node => node.textContent)), ['All job titles', 'W01', '2']);
       assert.deepEqual(await page.$$eval('#headcountEmployeeRows tr', rows => rows.map(row => [...row.cells].map(cell => cell.textContent))), [
-        ['#000008', 'Aqilah Antasha'], ['#000009', 'Chan Mee Ling']
+        ['000008', 'Aqilah Antasha'], ['000009', 'Chan Mee Ling']
       ]);
       await page.click('#headcountDetailPage [data-history-back]');
       await page.waitForSelector('#headcountDetailPage', { hidden: true });
@@ -122,7 +122,7 @@ async function readSummary(page) {
     await page.keyboard.press('Enter');
     await page.waitForSelector('#headcountFilterDialog', { hidden: true });
     assert.equal(await page.$eval('#headcountDetailCount', node => node.textContent), '1');
-    assert.equal(await page.$eval('#headcountEmployeeRows td', node => node.textContent), '#000009');
+    assert.equal(await page.$eval('#headcountEmployeeRows td', node => node.textContent), '000009');
     await page.goBack();
     await page.waitForSelector('#headcountDetailPage', { hidden: true });
 
@@ -145,11 +145,11 @@ async function readSummary(page) {
     );
     assert.deepEqual(
       await page.$$eval('#otHoursScheduleTable thead th', cells => cells.map(cell => cell.textContent.trim())),
-      ['Emp #', 'Name', 'Planned', 'Approved']
+      ['Emp No.', 'Name', 'Planned', 'Approved']
     );
     assert.deepEqual(
       await page.$$eval('#otHoursScheduleRows tr:first-child td', cells => cells.map(cell => cell.textContent.trim())),
-      ['#000008', 'Aqilah Antasha', '2.50', '2.00']
+      ['000008', 'Aqilah Antasha', '2.50', '2.00']
     );
     await page.click('#otHoursFilterButton');
     await page.type('#otHoursFilterKeyword', 'Chan');
@@ -174,7 +174,7 @@ async function readSummary(page) {
     await page.keyboard.press('Enter');
     await page.waitForSelector('#otHoursDetailPage:not([hidden])');
     assert.equal(await page.$eval('#otHoursDetailJobTitle', node => node.textContent), 'Barista Operations');
-    assert.deepEqual(await page.$$eval('#otHoursScheduleRows td', nodes => nodes.map(node => node.textContent)), ['#000009', 'Chan Mee Ling', '2.50', '2.00']);
+    assert.deepEqual(await page.$$eval('#otHoursScheduleRows td', nodes => nodes.map(node => node.textContent)), ['000009', 'Chan Mee Ling', '2.50', '2.00']);
     assert.equal(await page.$eval('#otHoursFilterText', node => node.textContent), '');
     await page.goBack();
     await page.waitForSelector('#otHoursDetailPage', { hidden: true });
@@ -191,7 +191,7 @@ async function readSummary(page) {
     await page.click('#summaryChartInfoButton');
     await page.waitForSelector('#headcountDetailPage:not([hidden])');
     assert.deepEqual(await page.$$eval('#headcountDetailPage dd', nodes => nodes.map(node => node.textContent)), ['Admin Executive', 'W01', '1']);
-    assert.deepEqual(await page.$$eval('#headcountEmployeeRows td', nodes => nodes.map(node => node.textContent)), ['#000008', 'Aqilah Antasha']);
+    assert.deepEqual(await page.$$eval('#headcountEmployeeRows td', nodes => nodes.map(node => node.textContent)), ['000008', 'Aqilah Antasha']);
     assert.equal(await page.$eval('#headcountFilterText', node => node.textContent), '');
     assert.deepEqual(selected.chartDescriptions, ['OT 1.5 · Before work, 2.5 h (100.0%)', 'OT 1.5 · After work, 0.0 h (0.0%)', 'OT 2.0 · Rest day, 0.0 h (0.0%)']);
     await page.click('#headcountDetailPage [data-history-back]');

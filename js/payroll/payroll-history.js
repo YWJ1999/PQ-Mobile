@@ -187,7 +187,7 @@
       const referenceLine = kind === 'tax'
         ? `<div class="history-card-ref">${record.localDraft ? 'Saved draft' : `Ref: ${escape(reference(record))}`}</div>`
         : '';
-      card.innerHTML = `<a class="history-card-main" data-history-link href="${escape(HistoryRecordPage.href(kind, record.id))}" aria-label="View ${escape(typeLabel(record))} details"><div class="history-card-header"><div class="history-card-heading"><div class="history-card-title-row"><h3 class="history-card-title">${escape(typeLabel(record))}</h3></div>${referenceLine}</div><span class="status-pill ${escape(record.status)}"><i class="fa-solid ${statusIcons[record.status] || 'fa-circle'}" aria-hidden="true"></i>${escape(statuses[record.status] || record.status)}</span></div>${recordSubmitDate.html(record.submitDate)}<div class="history-card-details">${fields.map(([label, value]) => `<div class="history-card-row"><span>${escape(label)}</span><strong class="${label === 'Amount' ? 'history-card-amount' : ''}">${escape(value || '—')}</strong></div>`).join('')}</div>${record.localDraft ? `<p class="history-draft-note">Saved on this device · ${escape(date(record.savedDate))}</p>` : ''}</a>${renderCardActions(record)}`;
+      card.innerHTML = `<a class="history-card-main" data-history-link href="${escape(HistoryRecordPage.href(kind, record.id))}" aria-label="View ${escape(typeLabel(record))} details"><div class="history-card-header"><div class="history-card-heading"><div class="history-card-title-row"><h3 class="history-card-title">${escape(typeLabel(record))}</h3></div>${referenceLine}</div><span class="status-pill ${escape(record.status)}"><i class="fa-solid ${statusIcons[record.status] || 'fa-circle'}" aria-hidden="true"></i>${escape(statuses[record.status] || record.status)}</span></div><div class="history-card-details">${fields.map(([label, value]) => `<div class="history-card-row"><span>${escape(label)}</span><strong class="${label === 'Amount' ? 'history-card-amount' : ''}">${escape(value || '—')}</strong></div>`).join('')}${recordSubmitDate.html(record.submitDate)}</div>${record.localDraft ? `<p class="history-draft-note">Saved on this device · ${escape(date(record.savedDate))}</p>` : ''}</a>${renderCardActions(record)}`;
       card.querySelectorAll('[data-history-action]').forEach(button => button.addEventListener('click', selectCardAction));
       $('payrollHistoryList').append(card);
     });
@@ -227,7 +227,7 @@
   function renderDetail(record, recordKind) {
     releaseAttachmentUrls();
     const employeeName = `<span class="history-employee-name">${escape(record.employeeName || '—')}</span>`;
-    const employeeId = `<span class="history-employee-id">${record.empNo ? `#${escape(String(record.empNo).replace(/^#/, ''))}` : '—'}</span>`;
+    const employeeId = `<span class="history-employee-id">${escape(formatEmployeeNumber(record.empNo) || '—')}</span>`;
     const attachments = (record.attachments || []).map(attachment => {
       const icon = /\.docx?$/i.test(attachment.name) ? 'fa-file-word' : 'fa-file-lines';
       if (attachment.file instanceof Blob) {
@@ -240,7 +240,7 @@
     const body = [
       row('Reference #', reference(record)),
       row('Status', recordDetailStatus.html(statuses[record.status]), true),
-      row('Emp #', employeeId, true),
+      row('Emp No.', employeeId, true),
       row('Name', employeeName, true)
     ];
     if (recordKind === 'tax') {
@@ -272,7 +272,7 @@
     $('historyDetailTitle').textContent = categories[recordKind].detail;
     if (record.category && record.remarks) body.push(row('Remarks', record.remarks));
     if (record.approverActionComments) body.push(row('Approver Action Comments', record.approverActionComments));
-    $('historyDetailBody').innerHTML = `${recordSubmitDate.html(record.submitDate)}<table class="history-detail-table"><tbody>${body.join('')}</tbody></table>`;
+    $('historyDetailBody').innerHTML = `<table class="history-detail-table"><tbody>${recordSubmitDate.html(record.submitDate, 'tr')}${body.join('')}</tbody></table>`;
     $('historyDetailBody').scrollTop = 0;
     renderDetailActions(record, recordKind);
   }
@@ -313,9 +313,9 @@
       const submitted = saved.filter(record => record.category === category);
       const submittedIds = new Set(submitted.map(record => record.id));
       const referenceRows = window.PAYROLL_HISTORY_DATA[category].filter(record => !submittedIds.has(record.id));
-      const drafts = saved.filter(record => record.kind === category && !record.submittedId && record.employeeId === employee.empNo);
+      const drafts = saved.filter(record => record.kind === category && !record.submittedId && formatEmployeeNumber(record.employeeId) === employee.empNo);
       records[category] = PayrollPendingStore.applyDecisions([
-        ...referenceRows, ...submitted.filter(record => record.empNo === employee.empNo || window.PAYROLL_HISTORY_DATA[category].some(row => row.id === record.id)),
+        ...referenceRows, ...submitted.filter(record => formatEmployeeNumber(record.empNo) === employee.empNo || window.PAYROLL_HISTORY_DATA[category].some(row => row.id === record.id)),
         ...drafts.map(record => ({
           ...record.values, id: record.id, localDraft: true, status: 'draft',
           employeeName: employee.name, empNo: employee.empNo, savedDate: record.savedAt, attachments: record.attachments || []

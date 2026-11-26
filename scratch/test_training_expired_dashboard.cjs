@@ -23,8 +23,7 @@ const index = pathToFileURL(path.join(__dirname, '../modules/training-competency
     assert.deepEqual(await page.$$eval('[data-expired-level]', nodes => nodes.map(node => [node.dataset.expiredLevel, node.textContent.trim()])), [['all', 'All4'], ['1', 'Level 12'], ['2', 'Level 22']]);
     assert.equal(await page.$$eval('.tec-employee-card', nodes => nodes.length), 4);
     assert.deepEqual(await page.$$eval('.tec-employee-card time', nodes => nodes.map(node => node.dateTime)), ['2026-08-31', '2026-09-15', '2026-09-23', '2026-09-30']);
-    assert.equal(await page.$eval('.tec-employee-id', node => node.textContent), '#E001234');
-    assert.equal(await page.$eval('.tec-employee-id', node => node.previousElementSibling.textContent), 'Ahmad Faizal');
+    assert.equal(await page.$eval('.tec-employee-name', node => node.textContent), 'E001234 - Ahmad Faizal');
     assert.ok(await page.$eval('.tec-overdue', node => /^\d+ days? overdue$/.test(node.textContent)));
     await click('[data-expired-level="2"]');
     assert.equal(await page.$$eval('.tec-employee-card', nodes => nodes.length), 2);

@@ -100,7 +100,7 @@
       tbody.replaceChildren();
       state.employees.forEach(employee => {
         const tr = element('tr');
-        tr.append(element('td', '', '#' + employee.empNo), element('td', '', employee.name));
+        tr.append(element('td', '', formatEmployeeNumber(employee.empNo)), element('td', '', employee.name));
         const cell = element('td');
         const value = element('span', 'timesheet-hour-value', hours(employee.hours));
         value.dataset.employeeHours = employee.hours;
@@ -194,8 +194,8 @@
         if (/^[=+@\-]/.test(text)) text = "'" + text;
         return '"' + text.replace(/"/g, '""') + '"';
       };
-      const lines = ['Employee #,Name,Hours'];
-      state.employees.forEach(row => lines.push([escape('#' + row.empNo), escape(row.name), row.hours.toFixed(2)].join(',')));
+      const lines = ['Employee No.,Name,Hours'];
+      state.employees.forEach(row => lines.push([escape(formatEmployeeNumber(row.empNo)), escape(row.name), row.hours.toFixed(2)].join(',')));
       lines.push('TOTAL,,' + sum(state.records).toFixed(2));
       const blob = new Blob(['\uFEFF' + lines.join('\r\n')], { type: 'text/csv;charset=utf-8;' });
       const href = URL.createObjectURL(blob);

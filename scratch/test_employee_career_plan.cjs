@@ -46,7 +46,7 @@ const fileUrl = (relative, query = '') => pathToFileURL(path.join(root, relative
 
       assert.deepEqual(
         await page.$$eval('#careerPlanForm label', nodes => nodes.map(node => node.textContent.trim())),
-        ['Employee #', 'Name', 'Position', 'Department', 'Next Job', 'Target Year', 'Career Goal', 'Development Needs / Notes'],
+        ['Employee No.', 'Name', 'Position', 'Department', 'Next Job', 'Target Year', 'Career Goal', 'Development Needs / Notes'],
         'Career Plan presents only the requested fields in order'
       );
 
@@ -57,7 +57,7 @@ const fileUrl = (relative, query = '') => pathToFileURL(path.join(root, relative
         department: document.getElementById('careerPlanDepartment').value,
         readonly: ['careerPlanEmployeeNo', 'careerPlanName', 'careerPlanPosition', 'careerPlanDepartment'].every(id => document.getElementById(id).readOnly)
       })), {
-        employeeNo: '#EBB01',
+        employeeNo: 'EBB01',
         name: 'Aina Rahman',
         position: 'People Operations Executive',
         department: 'People & Culture',

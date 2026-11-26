@@ -35,7 +35,7 @@ const url = query => pathToFileURL(path.join(__dirname, '../modules/training-com
     await staffFilter('EBB12');
     await page.goBack({ waitUntil: 'domcontentloaded' });
     await page.goBack({ waitUntil: 'domcontentloaded' });
-    assert.equal(await page.$eval('#staffCompetencyTable tbody tr:first-child td:first-child', node => node.textContent), '#EBB03', 'Browser back restores Staff filters as well as hub filters');
+    assert.equal(await page.$eval('#staffCompetencyTable tbody tr:first-child td:first-child', node => node.textContent), 'EBB03', 'Browser back restores Staff filters as well as hub filters');
     await staffFilter('');
     await tab('assessment');
     assert.equal(await page.$eval('#competencyHubCount', node => node.textContent), '6');
@@ -51,7 +51,7 @@ const url = query => pathToFileURL(path.join(__dirname, '../modules/training-com
     assert.equal(await page.$eval('#competencyHubCount', node => node.textContent), '12');
     await filter({ competency: 'effective-communication', levelMin: '3', levelMax: '3' });
     assert.equal(await page.$eval('#competencyHubCount', node => node.textContent), '2');
-    assert.equal(await page.$eval('.sch-employee-id', node => node.previousElementSibling.textContent), 'Nur Izzati');
+    assert.equal(await page.$eval('.sch-card-heading strong', node => node.textContent), 'EBB03 - Nur Izzati');
     await navigate('#competencyHubResults [data-employee]');
     await navigate('#csBack');
     assert.equal(await page.$eval('#competencyHubCount', node => node.textContent), '2', 'Employee return preserves search filters');

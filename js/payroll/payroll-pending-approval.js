@@ -100,7 +100,7 @@
       updateSelection();
     });
     const employee = node('div', 'payroll-employee-copy');
-    employee.append(node('h3', 'employee-name', item.employeeName), node('div', 'employee-id', '#' + item.empNo));
+    employee.append(node('h3', 'employee-name', employeeCardHeading.text(item.empNo, item.employeeName)));
     const employeeMeta = item.position || item.department;
     if (employeeMeta) employee.append(node('div', 'payroll-employee-dept', employeeMeta));
     const menu = node('button', 'three-dots-btn');
@@ -207,7 +207,9 @@
   function renderDetails(item) {
     byId('payrollPendingDetailsTitle').textContent = tabNames[item.category] + ' Approval';
     releaseFiles();
-    byId('payrollPendingForm').replaceChildren(recordSubmitDate.create(item.submitDate || item.requestDate), PayrollRequestFields.create(item.category, item, fileUrls));
+    const card = PayrollRequestFields.create(item.category, item, fileUrls);
+    recordSubmitDate.prepend(card.querySelector('.claim-form-stack'), item.submitDate || item.requestDate);
+    byId('payrollPendingForm').replaceChildren(card);
     byId('payrollPendingApproverComments').value = item.approverActionComments || '';
     const footer = document.querySelector('.payroll-approval-details-footer');
     const detailActions = detailActionButtons(item.category);
@@ -219,7 +221,7 @@
     byId('payrollPendingWorkflowTitle').textContent = tabNames[item.category] + ' Workflow';
     const submittedDate = date(item.submitDate || item.requestDate);
     const employee = node('div', 'payroll-approval-workflow-person');
-    employee.append(node('small', '', 'Employee'), node('h3', 'employee-name', item.employeeName), node('div', 'employee-id', '#' + item.empNo));
+    employee.append(node('small', '', 'Employee'), node('h3', 'employee-name', employeeCardHeading.text(item.empNo, item.employeeName)));
     byId('payrollPendingWorkflowRequest').replaceChildren(
       field('Document Reference', item.id), employee,
       recordSubmitDate.create(item.submitDate || item.requestDate),

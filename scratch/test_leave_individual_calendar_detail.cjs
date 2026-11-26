@@ -30,7 +30,7 @@ const puppeteer = require('puppeteer');
           headerReference: purpleHeader?.querySelector('.cal-leave-detail-reference')?.textContent.trim() || '',
           headerHeight: purpleHeader ? Math.round(purpleHeader.getBoundingClientRect().height) : 0,
           contentTypeCount: card?.querySelectorAll('.cal-leave-detail-title').length || 0,
-          submitDate: card?.querySelector('.record-submit-date')?.textContent,
+          submitDate: card?.querySelector('.record-submit-date > strong')?.textContent,
           bodyReferenceCount: card?.querySelectorAll('.cal-calendar-highlight-content .cal-leave-detail-reference').length || 0,
           labels: [...(card?.querySelectorAll('.leave-highlight-detail-label') || [])]
             .map(node => node.textContent.trim())
@@ -58,7 +58,7 @@ const puppeteer = require('puppeteer');
     assert.equal(annual.contentTypeCount, 0, 'Leave type must not repeat in the card body');
     assert.equal(annual.bodyReferenceCount, 0, 'Reference must not repeat in the card body');
     assert.deepEqual(annual.labels, ['Duration']);
-    assert.equal(annual.submitDate, 'Submit Date: 05/09/2026');
+    assert.equal(annual.submitDate, '05/09/2026');
     assert.equal(holiday.submitDate, undefined);
     assert.equal(medical.headerTitle, 'Medical Leave');
     assert.equal(medical.headerReference, 'Ref: LV-2026-0044');

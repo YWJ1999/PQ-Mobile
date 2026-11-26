@@ -79,7 +79,7 @@
     const card = node(assessment ? 'article' : 'a', 'sch-card');
     if (!assessment) { card.href = childUrl('staff-competency-employee.html', row); card.dataset.employee = row.empNo; }
     const header = node('div', 'sch-card-heading'), identity = node('div');
-    identity.append(node('strong', '', row.name), node('span', 'sch-employee-id', `#${String(row.empNo).replace(/^#+/, '')}`));
+    identity.append(node('strong', '', employeeCardHeading.text(row.empNo, row.name)));
     header.append(identity);
     if (!assessment) header.append(icon('chevron-right'));
     card.append(header);

@@ -358,7 +358,7 @@
             </div>
             <dl class="history-card-details ot-plan-history-facts">
               <div><dt>OT Type</dt><dd>OT 1.5 BEFORE WORK</dd></div>
-              <div><dt>Submit Date</dt><dd><time datetime="2024-07-12">12 Jul 2024</time></dd></div>
+              <div class="record-date-field"><dt>Submit Date</dt><dd><time datetime="2024-07-12">12 Jul 2024</time></dd></div>
               <div><dt>Plan Hours</dt><dd>16.00 hrs</dd></div>
               <div><dt>Actual Hours</dt><dd>0.00 hrs</dd></div>
             </dl>
@@ -378,7 +378,7 @@
             </div>
             <dl class="history-card-details ot-plan-history-facts">
               <div><dt>OT Type</dt><dd>1.5 OT</dd></div>
-              <div><dt>Submit Date</dt><dd><time datetime="2023-10-24">24 Oct 2023</time></dd></div>
+              <div class="record-date-field"><dt>Submit Date</dt><dd><time datetime="2023-10-24">24 Oct 2023</time></dd></div>
               <div><dt>Plan Hours</dt><dd>3.00 hrs</dd></div>
               <div><dt>Actual Hours</dt><dd>0.00 hrs</dd></div>
             </dl>
@@ -398,7 +398,7 @@
             </div>
             <dl class="history-card-details ot-plan-history-facts">
               <div><dt>OT Type</dt><dd>1.5 OT</dd></div>
-              <div><dt>Submit Date</dt><dd><time datetime="2024-07-12">12 Jul 2024</time></dd></div>
+              <div class="record-date-field"><dt>Submit Date</dt><dd><time datetime="2024-07-12">12 Jul 2024</time></dd></div>
               <div><dt>Plan Hours</dt><dd>2.00 hrs</dd></div>
               <div><dt>Actual Hours</dt><dd>4.00 hrs</dd></div>
             </dl>
@@ -419,11 +419,11 @@
               </div>
               <div class="attendance-history-card-end"><span class="card-status-badge"><i class="fa-solid fa-rotate-right" aria-hidden="true"></i>To Resubmit</span><i class="fa-solid fa-chevron-right" aria-hidden="true"></i></div>
             </div>
-            <span class="record-submit-date">Submit Date: 26/02/2026</span>
             <div class="history-card-details">
               <table class="record-detail-table"><tbody>
                 <tr class="attendance-history-detail"><td class="detail-popout-label">Date</td><td class="detail-popout-value"><strong>31 Dec 2025</strong></td></tr>
               </tbody></table>
+              <span class="record-submit-date"><span>Submit Date</span> <strong>26/02/2026</strong></span>
             </div>
             <div class="history-card-actions">
               <button type="button" class="history-submit-btn" aria-label="Submit Attendance Feedback ATT000000000432" onclick="event.stopPropagation(); this.closest('.history-card-item').click()">Submit</button>
@@ -439,11 +439,11 @@
               </div>
               <div class="attendance-history-card-end"><span class="card-status-badge"><i class="fa-solid fa-rotate-right" aria-hidden="true"></i>To Resubmit</span><i class="fa-solid fa-chevron-right" aria-hidden="true"></i></div>
             </div>
-            <span class="record-submit-date">Submit Date: 14/09/2026</span>
             <div class="history-card-details">
               <table class="record-detail-table"><tbody>
                 <tr class="attendance-history-detail"><td class="detail-popout-label">Date</td><td class="detail-popout-value"><strong>14 Sep 2026</strong></td></tr>
               </tbody></table>
+              <span class="record-submit-date"><span>Submit Date</span> <strong>14/09/2026</strong></span>
             </div>
             <div class="history-card-actions">
               <button type="button" class="history-submit-btn" aria-label="Submit Attendance Feedback ATT000000000435" onclick="event.stopPropagation(); this.closest('.history-card-item').click()">Submit</button>
@@ -500,10 +500,10 @@
         </header>
         <div class="history-record-content attendance-history-modal-body attendance-history-form-body">
             <form id="historyOtForm" class="attendance-history-form" onsubmit="event.preventDefault(); submitOtDetailsForm()">
-              <span id="modalOtSubmitDate" class="record-submit-date" hidden></span>
               <section class="attendance-history-form-card attendance-history-form-summary" aria-label="OT plan document details">
                 <h2 class="attendance-history-form-section-title">Document Details</h2>
                 <dl class="attendance-history-form-summary-list">
+                  <div id="modalOtSubmitDate" class="record-submit-date" hidden></div>
                   <div><dt>Document Reference</dt><dd id="modalOtDocRef">-</dd></div>
                   <div><dt>Plan Status</dt><dd id="modalOtPlanStatus">-</dd></div>
                   <div><dt>Employee</dt><dd><span class="attendance-history-detail-employee"><span id="modalOtEmpName">-</span><span id="modalOtEmpNo" class="attendance-history-detail-employee-id">-</span></span></dd></div>
@@ -586,10 +586,10 @@
         </header>
         <div class="history-record-content attendance-history-modal-body attendance-history-form-body">
             <form id="historyFeedbackForm" class="attendance-history-form" onsubmit="event.preventDefault(); submitFeedbackDetailsForm()">
-              <span id="modalFbkSubmitDate" class="record-submit-date" hidden></span>
               <section class="attendance-history-form-card attendance-history-form-summary" aria-label="Attendance feedback summary">
                 <h2 class="attendance-history-form-section-title">Request Summary</h2>
                 <dl class="attendance-history-form-summary-list">
+                  <div id="modalFbkSubmitDate" class="record-submit-date" hidden></div>
                   <div><dt>Document Reference</dt><dd id="modalFbkDocRef">-</dd></div>
                   <div><dt>Document Status</dt><dd id="modalFbkDocStatus">-</dd></div>
                   <div><dt>Employee</dt><dd><span class="attendance-history-detail-employee"><span id="modalFbkEmpName">-</span><span id="modalFbkEmpNo" class="attendance-history-detail-employee-id">-</span></span></dd></div>
@@ -956,7 +956,7 @@
               fact.append(label, value);
               facts.append(fact);
             });
-            details.replaceChildren(facts);
+            table.replaceWith(facts);
           });
       }
 

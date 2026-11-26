@@ -30,7 +30,7 @@
           <div class="attendance-report-summary-row"><record-chart-count><strong class="attendance-report-summary-value record-summary-value" id="highlightTotalRecords">0</strong> <span class="attendance-report-summary-label record-summary-label">Records</span></record-chart-count><button type="button" class="view-chart-btn record-chart-button" onclick="showHoursHighlightSection('chart')"><i class="fa-solid fa-chart-simple" aria-hidden="true"></i><span>Chart</span></button></div>
           <div class="attendance-report-summary-row"><div><span class="attendance-report-summary-label" id="highlightMetricLabel">Approved OT Hours</span><strong class="highlight-summary-total" id="highlightMetricValue">0.00</strong></div><div class="hours-highlight-exports"><button type="button" class="action-icon-btn pdf" onclick="handleExportAction('PDF')" aria-label="Export PDF"><i class="fa-solid fa-file-pdf" aria-hidden="true"></i></button><button type="button" class="action-icon-btn excel" onclick="handleExportAction('Excel')" aria-label="Export Excel"><i class="fa-solid fa-file-excel" aria-hidden="true"></i></button></div></div>
         </div>
-        <div class="attendance-report-table-card highlight-table-card"><div class="attendance-report-table-scroll"><table class="attendance-report-table"><thead><tr><th scope="col">Emp #</th><th scope="col">Name</th><th scope="col" class="hours-number">Hours</th><th scope="col">Branch</th><th scope="col">Department</th><th scope="col">Position</th></tr></thead><tbody id="overtimeHighlightTableBody"></tbody></table></div></div>
+        <div class="attendance-report-table-card highlight-table-card"><div class="attendance-report-table-scroll"><table class="attendance-report-table"><thead><tr><th scope="col">Emp No.</th><th scope="col">Name</th><th scope="col" class="hours-number">Hours</th><th scope="col">Branch</th><th scope="col">Department</th><th scope="col">Position</th></tr></thead><tbody id="overtimeHighlightTableBody"></tbody></table></div></div>
       </div>
       <div id="highlightChartView" class="highlight-chart-view" hidden>
         <section class="highlight-analysis-card highlight-breakdown-card"><label for="highlightMetricSelect">BREAKDOWN BY</label><select class="highlight-breakdown-select" id="highlightMetricSelect"><option value="branch">Branch</option></select></section>
@@ -74,12 +74,6 @@
           <div><label for="filterRangeMin">Hours Range</label><div class="highlight-hours-range"><input type="number" id="filterRangeMin" min="0" step="0.01" value="0" required aria-label="Minimum hours"><span>–</span><input type="number" id="filterRangeMax" min="0" step="0.01" value="99999999" required aria-label="Maximum hours"></div></div>
           <button type="submit" id="highlightApplyFilter" class="standard-filter-apply">Apply Filter</button>
         </form>
-      </section>
-    </div>
-    <div id="highlightDetailsModal" class="modal-overlay highlight-details-overlay" hidden onclick="closeHighlightDetailsModal(event)">
-      <section class="highlight-details-dialog" role="dialog" aria-modal="true" aria-labelledby="highlightDetailName" onclick="event.stopPropagation()">
-        <div class="highlight-details-header"><div><h2 id="highlightDetailName"></h2><small>Overtime Highlight Details</small></div><button type="button" class="hours-highlight-close" onclick="closeHighlightDetailsModal()" aria-label="Close details"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button></div>
-        <div class="leave-highlight-details-list" id="highlightDetailsList"></div>
       </section>
     </div>
     <phone-bottom-nav active="apps"></phone-bottom-nav>

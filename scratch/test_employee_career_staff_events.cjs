@@ -40,7 +40,7 @@ const url = pathToFileURL(path.resolve(__dirname, '../modules/employee-career/op
           assert.ok(await page.$$eval('.staff-event-person', nodes => nodes.every(n => {
             const name = n.querySelector('.staff-event-person-name');
             const id = n.querySelector('.staff-event-person-id');
-            return /^#\w+$/.test(id.textContent) && id.getBoundingClientRect().top >= name.getBoundingClientRect().bottom - 1;
+            return /^\w+$/.test(id.textContent) && id.getBoundingClientRect().top >= name.getBoundingClientRect().bottom - 1;
           })));
           assert.ok(await page.$eval('#staffEventDetails .detail-popout-body', n => n.scrollWidth <= n.clientWidth + 1));
           assert.equal(await page.$eval('main', n => n.inert), true);

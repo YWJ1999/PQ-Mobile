@@ -1358,7 +1358,7 @@
         <div class="sheet-content" style="padding: 18px 20px 24px; overflow-y: auto; background: var(--bg-sheet); flex: 1;">
            <div class="attendance-details-main" style="display: flex; flex-direction: column;">
               <div style="display: flex; justify-content: space-between; padding: 13px 0; border-bottom: 1px solid var(--border-subtle);">
-                 <span style="font-size: 13px; font-weight: 600; color: var(--text-secondary);">Employee #</span>
+                 <span style="font-size: 13px; font-weight: 600; color: var(--text-secondary);">Employee No.</span>
                  <span style="font-size: 13.5px; font-weight: 700; color: var(--text-primary);">EBB12</span>
               </div>
               <div style="display: flex; justify-content: space-between; padding: 13px 0; border-bottom: 1px solid var(--border-subtle);">
@@ -1548,7 +1548,7 @@
                 <div class="label">Employee</div>
                 <div class="value" data-feedback-meta-value>
                   <span id="fbMetaEmployeeName" style="display: block;">Farhan binti rahmat</span>
-                  <span id="fbMetaEmployeeNo" style="display: block; font-size: 11.5px; font-weight: 700; color: var(--text-muted); opacity: .8; font-family: monospace, sans-serif; margin-bottom: 4px;">#EBB12</span>
+                  <span id="fbMetaEmployeeNo" style="display: block; font-size: 11.5px; font-weight: 700; color: var(--text-muted); opacity: .8; font-family: monospace, sans-serif; margin-bottom: 4px;">EBB12</span>
                 </div>
               </div>
            </div>
@@ -2166,7 +2166,7 @@
       }));
       selectedClockCardIndex = 0;
       document.getElementById('fbMetaEmployeeName').textContent = params.get('feedbackEmployeeName') || 'Farhan binti rahmat';
-      document.getElementById('fbMetaEmployeeNo').textContent = `#${(params.get('feedbackEmployeeNo') || 'EBB12').replace(/^#+/, '')}`;
+      document.getElementById('fbMetaEmployeeNo').textContent = formatEmployeeNumber(params.get('feedbackEmployeeNo') || 'EBB12');
       // Keep the source fields with this history entry when the form is reloaded.
       const url = new URL(window.location.href);
       let record = history.state?.attendanceFeedback || {};

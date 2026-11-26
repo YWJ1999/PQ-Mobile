@@ -2,6 +2,7 @@ const assert = require('node:assert/strict');
 const path = require('node:path');
 const { pathToFileURL } = require('node:url');
 const puppeteer = require('puppeteer');
+const screenshotDir = process.env.PQ_SCREENSHOT_DIR || __dirname;
 
 (async () => {
   const browser = await puppeteer.launch({ headless: true, executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe', args: ['--allow-file-access-from-files'] });
@@ -23,7 +24,7 @@ const puppeteer = require('puppeteer');
         await page.click('.filter-trigger-btn');
         await page.waitForSelector('#filterModal.active');
         await new Promise(resolve => setTimeout(resolve, 350));
-        await page.screenshot({ path: path.resolve(__dirname, `staff-attendance-filter-${theme}-${width}-${height}.png`) });
+        await page.screenshot({ path: path.resolve(screenshotDir, `staff-attendance-filter-${theme}-${width}-${height}.png`) });
         await page.click('#filterModal .standard-filter-close');
         await page.waitForSelector('#filterModal', { hidden: true });
         assert.deepEqual(await page.$eval('#staffVerifyAll', node => ({ checked: node.checked, mixed: node.indeterminate })), { checked: false, mixed: false }, 'Verify All shows an empty checkbox until every visible record is verified');
@@ -73,33 +74,39 @@ const puppeteer = require('puppeteer');
         assert.ok(await page.$eval('.staff-card-item:last-child', card => card.getBoundingClientRect().bottom <= card.closest('.main-content').getBoundingClientRect().bottom), 'Last employee card is fully accessible');
         await page.$eval('#view-list .main-content', node => { node.scrollTop = 0; });
         assert.deepEqual(await page.$eval('#staffAttendanceUpdate', node => ({ hidden: node.hidden, disabled: node.disabled })), { hidden: true, disabled: true }, 'Update remains hidden before changes');
-        await page.screenshot({ path: path.resolve(__dirname, `staff-attendance-${theme}-${width}.png`) });
+        await page.screenshot({ path: path.resolve(screenshotDir, `staff-attendance-${theme}-${width}.png`) });
         assert.equal(await page.$$eval('.staff-card-item', nodes => nodes.length), 4);
         assert.equal(await page.$$eval('.staff-card-item input[type="checkbox"]', nodes => nodes.length), 4, 'Each record has a Verify checkbox');
         const cards = await page.$$eval('.staff-card-item', nodes => nodes.map(card => {
-          const name = card.querySelector('.staff-hdr-name');
-          const id = card.querySelector('.staff-hdr-empno');
+          const fields = [...card.querySelectorAll('.attendance-record-detail')];
+          const [shift, clock, normal, ot] = fields.map(field => field.getBoundingClientRect());
           return {
             radius: getComputedStyle(card).borderRadius,
-            id: id.textContent,
-            idBelowName: id.getBoundingClientRect().top >= name.getBoundingClientRect().bottom,
-            labels: [...card.querySelectorAll('.attendance-record-detail > span')].map(node => node.textContent),
-            date: card.querySelector('.attendance-record-reference')?.textContent,
-            shift: card.querySelector('.history-time-row')?.textContent,
+            heading: card.querySelector('.staff-hdr-name').textContent,
+            empNo: card.dataset.empNo,
+            subtitle: card.querySelector('.staff-card-subtitle').textContent,
+            labels: fields.map(field => field.firstElementChild.textContent),
+            values: [...card.querySelectorAll('[data-shift-code], .staff-shift-time, [data-clock-times], [data-normal-hours], [data-ot-hours]')].map(node => node.textContent),
+            twoColumns: shift.top === clock.top && normal.top === ot.top && normal.top > shift.top &&
+              shift.left === normal.left && clock.left === ot.left && clock.left > shift.right,
             status: card.querySelector('.attendance-exception-status')?.textContent.trim(),
             actions: [...card.querySelectorAll('.staff-card-actions button')].map(node => node.textContent.trim())
           };
         }));
         for (const card of cards) {
           assert.equal(card.radius, '18px');
-          assert.match(card.id, /^#/);
-          assert.equal(card.idBelowName, true);
-          assert.deepEqual(card.labels, ['Day Type', 'Clock Times', 'Normal Hours', 'OT Hours']);
-          assert.match(card.date, /^Date: /);
-          assert.ok(card.shift);
+          assert.ok(card.heading.startsWith(`${card.empNo} - `));
+          assert.ok(card.subtitle);
+          assert.deepEqual(card.labels, ['Shift', 'Clock times', 'Normal hours', 'OT hours']);
+          assert.equal(card.twoColumns, true);
           assert.equal(card.status, 'No Exception');
           assert.deepEqual(card.actions, ['Feedback']);
         }
+        const chan = cards.find(card => card.empNo === '000009');
+        assert.equal(chan.heading, '000009 - Chan Mee Ling');
+        assert.equal(chan.subtitle, 'Barista Operations');
+        assert.deepEqual(chan.values, ['W01', '8:30 AM – 5:30 PM', '08:22', '0.00', '0.00']);
+        assert.deepEqual(cards.find(card => card.empNo === '004199').values, ['W02', '8:00 AM – 5:00 PM', '07:50', '8.00', '0.00']);
         assert.equal(await page.$eval('[data-emp-no="000100"] .staff-verify-checkbox', node => node.checked), false, 'Staff records do not start pre-verified');
         await page.click('[data-emp-no="000008"] .staff-verify-checkbox');
         assert.deepEqual(await page.$eval('#staffAttendanceUpdate', node => ({ hidden: node.hidden, disabled: node.disabled })), { hidden: false, disabled: false }, 'Verification changes reveal and enable Update');
@@ -115,7 +122,7 @@ const puppeteer = require('puppeteer');
         assert.equal(updateAfterScroll.right, updateBeforeScroll.right);
         assert.ok(updateAfterScroll.rightGap >= 16 && updateAfterScroll.rightGap <= 24 && updateAfterScroll.bottomGap >= 16 && updateAfterScroll.bottomGap <= 24, 'Update is anchored at bottom right');
         assert.equal(updateAfterScroll.lastCardAboveButton, true, 'Bottom spacing keeps the last card actions above Update');
-        await page.screenshot({ path: path.resolve(__dirname, `staff-attendance-scroll-bottom-${theme}-${width}.png`) });
+        await page.screenshot({ path: path.resolve(screenshotDir, `staff-attendance-scroll-bottom-${theme}-${width}.png`) });
         await page.click('#staffAttendanceUpdate');
         assert.deepEqual(await page.$eval('#staffAttendanceUpdate', node => ({ hidden: node.hidden, disabled: node.disabled })), { hidden: true, disabled: true }, 'Update saves the current verification state and hides again');
         await page.$eval('#view-list .main-content', node => { node.scrollTop = 0; });
@@ -127,7 +134,7 @@ const puppeteer = require('puppeteer');
         await page.click('#staffVerifyAll');
         assert.equal(await page.evaluate(() => masterStaffDataset.find(item => item.cleanEmpNo === '000008').verified), false, 'Verify All clears checked records in the visible filter');
         assert.equal(await page.evaluate(() => masterStaffDataset.find(item => item.cleanEmpNo === '000100').verified), false, 'Verify All preserves unchecked records outside the filter');
-        assert.equal(await page.$eval('.staff-hdr-name', node => node.textContent), 'Aqilah antasha', 'Draft filters do not change the rendered records on verification');
+        assert.equal(await page.$eval('.staff-hdr-name', node => node.textContent), '000008 - Aqilah antasha', 'Draft filters do not change the rendered records on verification');
         await page.evaluate(() => history.replaceState({ staffHistorySentinel: true }, ''));
         await page.click('.btn-action-feedback');
         await page.waitForSelector('#feedbackModalOverlay', { visible: true });
@@ -143,12 +150,12 @@ const puppeteer = require('puppeteer');
         });
         assert.ok(feedbackScroll.top > 0 && feedbackScroll.formBottom <= feedbackScroll.viewportBottom, 'Feedback form scrolls to its submit actions');
         assert.equal(await page.$eval('#fbMetaEmployeeName', node => node.textContent), 'Aqilah antasha');
-        assert.equal(await page.$eval('#fbMetaEmployeeNo', node => node.textContent), '#000008');
+        assert.equal(await page.$eval('#fbMetaEmployeeNo', node => node.textContent), '000008');
         assert.equal(await page.$eval('#fbMetaDate', node => node.textContent), 'Sun 20 Sep 2026');
         await page.click('[data-feedback-back]');
         await page.waitForSelector('.staff-card-item');
         assert.equal(await page.evaluate(() => history.state?.staffHistorySentinel), true, 'Feedback Back returns to the original Staff history entry');
-        assert.equal(await page.$eval('.staff-hdr-name', node => node.textContent), 'Aqilah antasha', 'Returning preserves the applied filter rather than applying a draft');
+        assert.equal(await page.$eval('.staff-hdr-name', node => node.textContent), '000008 - Aqilah antasha', 'Returning preserves the applied filter rather than applying a draft');
         assert.equal(await page.$eval('#filterKeyword', node => node.value), 'Kavitha', 'Returning preserves draft filter fields');
         assert.deepEqual(await page.$eval('#staffAttendanceUpdate', node => ({ hidden: node.hidden, disabled: node.disabled })), { hidden: false, disabled: false }, 'Returning preserves unsaved verification and its Update action');
         assert.equal(await page.evaluate(() => masterStaffDataset.find(item => item.cleanEmpNo === '000100').verified), false);
@@ -164,7 +171,7 @@ const puppeteer = require('puppeteer');
           return Math.abs(sheet.getBoundingClientRect().left - overlay.getBoundingClientRect().left) < 2 && Number(getComputedStyle(overlay).opacity) > .99;
         });
         assert.equal(await page.$eval('#fbMetaEmployeeName', node => node.textContent), 'Kavitha Raj');
-        assert.equal(await page.$eval('#fbMetaEmployeeNo', node => node.textContent), '#004199');
+        assert.equal(await page.$eval('#fbMetaEmployeeNo', node => node.textContent), '004199');
         assert.equal(await page.$eval('#fbMetaShift', node => node.textContent), '8.00AM-5.00PM (W02)');
         assert.deepEqual(await page.$$eval('#fbClockCardsTrack .fb-clock-pill-blue', nodes => nodes.map(node => node.textContent.trim())), ['07:50']);
         const feedbackAction = width === 420 ? 'draft' : height === 640 ? 'submit' : 'cancel';
@@ -185,7 +192,7 @@ const puppeteer = require('puppeteer');
         await page.click('.staff-card-details-trigger');
         await page.waitForSelector('#detailsModal', { visible: true });
         assert.equal(await page.$eval('#staffDetailsTitle', node => node.textContent), 'Attendance Details');
-        assert.match(await page.$eval('#detailsModalTableBody', node => node.textContent), /#000008[\s\S]*Aqilah antasha[\s\S]*20 Sep 2026/);
+        assert.match(await page.$eval('#detailsModalTableBody', node => node.textContent), /000008[\s\S]*Aqilah antasha[\s\S]*20 Sep 2026/);
         await page.keyboard.press('Escape');
         await page.waitForSelector('#detailsModal', { hidden: true });
         await page.evaluate(() => {
@@ -204,7 +211,7 @@ const puppeteer = require('puppeteer');
         await page.keyboard.press('Escape');
         assert.equal(await page.$eval('#view-list .main-content', node => node.scrollWidth > node.clientWidth), false);
         assert.deepEqual(errors, []);
-        await page.screenshot({ path: path.resolve(__dirname, `staff-attendance-exception-${theme}-${width}.png`) });
+        await page.screenshot({ path: path.resolve(screenshotDir, `staff-attendance-exception-${theme}-${width}.png`) });
         console.log(`PASS staff attendance ${theme} ${width}x${height}: actual scrolling, conditional Update and save, cards, verification and Feedback`);
         await page.close();
       }

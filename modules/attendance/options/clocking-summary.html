@@ -389,17 +389,6 @@
     .staff-info-col { flex: 1; min-width: 0; }
     .staff-name-text { font-size: 14px; font-weight: 800; color: var(--text-primary); line-height: 1.25; }
     
-    /* REPOSITORY RULE (AGENTS.md):
-       Employee ID placed directly BELOW name with leading # and muted typography */
-    .staff-emp-badge {
-      font-size: 11.5px;
-      font-weight: 700;
-      color: var(--text-muted);
-      opacity: 0.8;
-      font-family: monospace, sans-serif;
-      margin-bottom: 4px;
-      display: block;
-    }
     
     .staff-meta-row {
       display: flex;
@@ -710,9 +699,9 @@
               <button type="button" class="view-chart-btn record-chart-button" onclick="openDetailsChart()"><i class="fa-solid fa-chart-simple" aria-hidden="true"></i><span>Chart</span></button>
             </div>
             <div class="attendance-report-summary-row">
-              <div class="clocking-details-actions" aria-label="Clocking exports">
-                <button type="button" id="clockingExportPdf" onclick="printClockingDetails()" title="View PDF" aria-label="View PDF"><i class="fa-solid fa-file-pdf" aria-hidden="true"></i><span>View PDF</span></button>
-                <button type="button" id="clockingExportExcel" onclick="exportClockingDetails()" title="View Excel" aria-label="View Excel"><i class="fa-solid fa-file-excel" aria-hidden="true"></i><span>View Excel</span></button>
+              <div class="clocking-details-actions" role="group" aria-label="Clocking exports">
+                <button type="button" id="clockingExportPdf" class="action-icon-btn pdf" onclick="printClockingDetails()" title="View PDF" aria-label="View PDF"><i class="fa-solid fa-file-pdf" aria-hidden="true"></i></button>
+                <button type="button" id="clockingExportExcel" class="action-icon-btn excel" onclick="exportClockingDetails()" title="View Excel" aria-label="View Excel"><i class="fa-solid fa-file-excel" aria-hidden="true"></i></button>
               </div>
             </div>
           </div>

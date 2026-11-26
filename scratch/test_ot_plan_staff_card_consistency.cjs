@@ -29,8 +29,6 @@ const pageUrl = pathToFileURL(path.resolve(__dirname, '../modules/attendance/opt
       radius: getComputedStyle(card).borderRadius,
       headerBackground: getComputedStyle(card.querySelector('.history-card-header')).backgroundImage,
       name: card.querySelector('.ot-staff-name')?.textContent.trim(),
-      idFollowsName: card.querySelector('.ot-staff-name')?.nextElementSibling?.classList.contains('emp-id-label') || false,
-      id: card.querySelector('.emp-id-label')?.textContent.trim(),
       labels: [...card.querySelectorAll('.ot-staff-detail > span')].map(node => node.textContent.trim()),
       job: card.querySelector('.ot-staff-job').textContent,
       otHours: card.querySelector('.ot-hours-input').value,
@@ -39,9 +37,7 @@ const pageUrl = pathToFileURL(path.resolve(__dirname, '../modules/attendance/opt
 
     assert.equal(firstCard.radius, '18px');
     assert.match(firstCard.headerBackground, /rgb\(21, 85, 63\).*rgb\(34, 129, 86\)/);
-    assert.equal(firstCard.name, 'Aqilah Antasha');
-    assert.equal(firstCard.idFollowsName, true);
-    assert.equal(firstCard.id, '#000008');
+    assert.equal(firstCard.name, '000008 - Aqilah Antasha');
     assert.deepEqual(firstCard.labels, ['Planned OT', 'MTD OT']);
     assert.equal(firstCard.job, 'Admin Executive');
     assert.equal(firstCard.otHours, '2.5');

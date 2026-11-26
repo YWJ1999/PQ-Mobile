@@ -38,7 +38,7 @@
         </div>
         <div class="hist-tab-switcher" role="tablist" aria-label="Violation type">
           <button type="button" id="boxContinuous" class="hist-tab-btn active" role="tab" aria-selected="true" aria-controls="viewContinuous" onclick="switchViolationTab('continuous')"><span>Continuous Work</span></button>
-          <button type="button" id="boxRest" class="hist-tab-btn" role="tab" aria-selected="false" aria-controls="viewRest" tabindex="-1" onclick="switchViolationTab('rest')"><span>Below 30 Rest Hour</span></button>
+          <button type="button" id="boxRest" class="hist-tab-btn" role="tab" aria-selected="false" aria-controls="viewRest" tabindex="-1" onclick="switchViolationTab('rest')"><span>Rest under 30 hours</span></button>
         </div>
         <div id="viewContinuous" class="violation-list" role="tabpanel" aria-labelledby="boxContinuous"></div>
         <div id="viewRest" class="violation-list" role="tabpanel" aria-labelledby="boxRest" hidden></div>
@@ -80,6 +80,7 @@
     <notification-sheet></notification-sheet>
     <favourite-sheet></favourite-sheet>
   </div>
+  <script src="../../../js/attendance/date-display.js"></script>
   <script src="../../../js/attendance-violation-report.js"></script>
 </body>
 </html>

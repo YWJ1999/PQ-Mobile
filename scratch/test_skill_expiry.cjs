@@ -43,8 +43,7 @@ const url = (file = 'skill-expiry.html', query = '') => pathToFileURL(path.join(
     await navigate('tr[data-level="4"] .cs-row-link', '#csEmployeeCards');
     assert.equal(await total(), '3');
     assert.deepEqual(await page.$$eval('#csSelectionSummary .cs-summary-field strong', nodes => nodes.map(node => node.textContent)), ['Effective Communication', '4']);
-    assert.equal(await page.$eval('.cs-employee-id', node => node.textContent), '#EBB12');
-    assert.equal(await page.$eval('.cs-employee-id', node => node.previousElementSibling.textContent), 'Farhan Binti Rahmat');
+    assert.equal(await page.$eval('.cs-employee-name', node => node.textContent), 'EBB12 - Farhan Binti Rahmat');
     assert.deepEqual(await page.$$eval('.cs-employee-card:first-child dt', nodes => nodes.map(node => node.textContent)), ['Department', 'Position', 'Competency', 'Level', 'Expiry Date']);
     assert.deepEqual(await page.$$eval('.cs-employee-card:first-child dd', nodes => nodes.map(node => node.textContent)), ['Human Resource', 'Group HR Manager', 'Effective Communication', '4', '14 Sept 2027']);
     await click('#csViewChart');
@@ -78,7 +77,7 @@ const url = (file = 'skill-expiry.html', query = '') => pathToFileURL(path.join(
     assert.equal(await total(), '1');
     await navigate('tr[data-level="3"] .cs-row-link', '#csEmployeeCards');
     assert.equal(await total(), '1');
-    assert.equal(await page.$eval('.cs-employee-name', node => node.textContent), 'Alex Tan');
+    assert.equal(await page.$eval('.cs-employee-name', node => node.textContent), 'EBB05 - Alex Tan');
     for (const [key, value] of Object.entries(combined)) assert.equal(new URL(page.url()).searchParams.get(key), value);
     await navigate('#csBack', '#csTable[data-kind="levels"]');
     await navigate('#csBack', '#csTable[data-kind="summary"]');

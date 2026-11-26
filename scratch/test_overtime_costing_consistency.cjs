@@ -2,10 +2,12 @@ const assert = require('node:assert/strict');
 const path = require('node:path');
 const { pathToFileURL } = require('node:url');
 const puppeteer = require('puppeteer');
+const screenshotDir = process.argv[2] || __dirname;
 
 const money = text => Number(text.replace(/[^0-9.-]/g, ''));
 const sum = values => Math.round(values.reduce((total, value) => total + value, 0) * 100) / 100;
 const tableTotal = async page => sum((await page.$$eval('#overtimeCostingTableBody td:nth-child(3)', nodes => nodes.map(node => node.textContent))).map(money));
+const recordCount = page => page.$eval('record-chart-count', node => node.textContent.trim());
 const close = (actual, expected, message) => assert.ok(Math.abs(actual - expected) < .001, `${message}: ${actual} != ${expected}`);
 
 (async () => {
@@ -29,10 +31,13 @@ const close = (actual, expected, message) => assert.ok(Math.abs(actual - expecte
         ['9 Dec 2022', 'HUMAN RESOURCES', '218.88'],
         ['23 Nov 2022', 'N/A', '262.80']
       ], 'Use exactly the complete visible screenshot records');
-      assert.equal(await page.$$eval('#costingMetricValue, #costingSourceReference, .hours-highlight-exports', nodes => nodes.length), 0);
+      assert.equal(await page.$$eval('#costingMetricValue, #costingSourceReference', nodes => nodes.length), 0);
       assert.doesNotMatch(await page.$eval('#highlightReportView', node => node.textContent), /Visible Records Cost|Source report total|Charts include visible records only/);
       const total = sum(records.map(row => money(row[2])));
-      assert.equal(await page.$eval('.attendance-report-summary-label', node => node.textContent), 'Total Cost');
+      assert.equal(await recordCount(page), `${records.length} Records`);
+      assert.equal(await page.$eval('.attendance-report-summary-row:first-child .record-chart-button', node => node.textContent), 'View Chart');
+      assert.equal(await page.$eval('.attendance-report-summary-row:nth-child(2) .attendance-report-summary-label', node => node.textContent), 'Total Cost');
+      assert.deepEqual(await page.$$eval('.attendance-report-summary-row:nth-child(2) .hours-highlight-exports button', buttons => buttons.map(button => button.getAttribute('aria-label'))), ['Export PDF', 'Export Excel']);
       close(money(await page.$eval('#costingTotalCost', node => node.textContent)), total, 'Summary cost');
       close(await tableTotal(page), total, 'Report sum');
       assert.equal(await page.$$eval('#overtimeCostingTableBody button, #overtimeCostingTableBody [onclick], #overtimeCostingTableBody a', nodes => nodes.length), 0, 'Table must have no drilldown');
@@ -41,7 +46,7 @@ const close = (actual, expected, message) => assert.ok(Math.abs(actual - expecte
       assert.equal(await page.$$eval('.modal-overlay:not([hidden])', nodes => nodes.length), 0);
       assert.equal(await page.$eval('.view-chart-btn', node => getComputedStyle(node).whiteSpace), 'nowrap');
       assert.ok(await page.$('.view-chart-btn .fa-chart-pie'));
-      await page.screenshot({ path: path.resolve(__dirname, `overtime-costing-table-${theme}-${width}.png`) });
+      await page.screenshot({ path: path.resolve(screenshotDir, `overtime-costing-table-${theme}-${width}.png`) });
       await page.click('.view-chart-btn');
       assert.equal(await page.$$eval('#highlightChartView > section', nodes => nodes.length), 3);
       close(money(await page.$eval('#highlightCenterTotal', node => node.textContent)), total, 'Chart sum');
@@ -54,7 +59,7 @@ const close = (actual, expected, message) => assert.ok(Math.abs(actual - expecte
       }
       await page.select('#highlightMetricSelect', 'costCenter');
       close(money(await page.$eval('#highlightCenterTotal', node => node.textContent)), total, 'Dimension change keeps total');
-      await page.screenshot({ path: path.resolve(__dirname, `overtime-costing-chart-${theme}-${width}.png`) });
+      await page.screenshot({ path: path.resolve(screenshotDir, `overtime-costing-chart-${theme}-${width}.png`) });
       await page.click('#highlightViewTrend');
       close(money(await page.$eval('#trendTotalCost', node => node.textContent)), total, 'Trend sum');
       const months = await page.$$eval('[data-costing-trend-bar]', nodes => nodes.map(node => ({ month: node.dataset.costingTrendBar, total: Number(node.dataset.costingValue) })));
@@ -64,7 +69,7 @@ const close = (actual, expected, message) => assert.ok(Math.abs(actual - expecte
         { month: '2026-07', total: 241.20 }
       ], 'Trend must use screenshot dates and amounts');
       close(sum(months.map(month => month.total)), total, 'All months add to report');
-      await page.screenshot({ path: path.resolve(__dirname, `overtime-costing-trend-${theme}-${width}.png`) });
+      await page.screenshot({ path: path.resolve(screenshotDir, `overtime-costing-trend-${theme}-${width}.png`) });
       for (const month of months) {
         await page.click(`[data-costing-trend-bar="${month.month}"]`);
         assert.equal(await page.$eval('#highlightAnalysisView', node => node.hidden), false);
@@ -77,7 +82,7 @@ const close = (actual, expected, message) => assert.ok(Math.abs(actual - expecte
       }
       await page.click('#trendTotalCard');
       close(money(await page.$eval('#highlightAnalysisCenterTotal', node => node.textContent)), total, 'Period drilldown');
-      await page.screenshot({ path: path.resolve(__dirname, `overtime-costing-analysis-${theme}-${width}.png`) });
+      await page.screenshot({ path: path.resolve(screenshotDir, `overtime-costing-analysis-${theme}-${width}.png`) });
       await page.click('.header-btn-icon');
       await page.click('.header-btn-icon');
       await page.click('.header-btn-icon');
@@ -97,6 +102,7 @@ const close = (actual, expected, message) => assert.ok(Math.abs(actual - expecte
       await page.waitForSelector('#highlightFilterModal', { hidden: true });
       const expectedCentre = sum(records.filter(row => row[1] === centre).map(row => money(row[2])));
       close(await tableTotal(page), expectedCentre, 'Cost Centre filter');
+      assert.equal(await recordCount(page), '1 Record');
       close(money(await page.$eval('#costingTotalCost', node => node.textContent)), expectedCentre, 'Filtered summary cost');
       await page.click('.view-chart-btn');
       close(money(await page.$eval('#highlightCenterTotal', node => node.textContent)), expectedCentre, 'Filtered chart');
@@ -110,6 +116,7 @@ const close = (actual, expected, message) => assert.ok(Math.abs(actual - expecte
       assert.equal(await page.$eval('#highlightFilterModal', node => node.hidden), false, 'Reject reversed dates');
       await page.click('#highlightResetFilter');
       close(await tableTotal(page), total, 'Reset');
+      assert.equal(await recordCount(page), `${records.length} Records`);
       // A date range with matching data must update the table and both chart paths.
       await page.click('#highlightFilterTrigger');
       await page.$eval('#filterFromDate', node => { node.value = '2022-11-23'; });
@@ -134,6 +141,8 @@ const close = (actual, expected, message) => assert.ok(Math.abs(actual - expecte
       await page.$eval('#filterToDate', node => { node.value = '2030-01-31'; });
       await page.click('#highlightApplyFilter');
       assert.match(await page.$eval('#overtimeCostingTableBody', node => node.textContent), /No records/);
+      assert.equal(await recordCount(page), '0 Records');
+      assert.equal(await page.$eval('#costingTotalCost', node => node.textContent), '0.00');
       await page.click('.view-chart-btn');
       assert.equal(await page.$eval('#highlightCenterTotal', node => node.textContent), '0.00');
       assert.equal(await page.$$eval('#highlightDonutCircles circle', nodes => nodes.length), 0);
@@ -147,7 +156,7 @@ const close = (actual, expected, message) => assert.ok(Math.abs(actual - expecte
       await page.click('#highlightResetFilter');
       await page.click('#highlightFilterTrigger');
       assert.deepEqual(await page.$$eval('#filterStatus option', nodes => nodes.map(node => node.textContent)), ['All Statuses', 'Unspecified'], 'Do not invent approval statuses');
-      await page.screenshot({ path: path.resolve(__dirname, `overtime-costing-filter-${theme}-${width}.png`) });
+      await page.screenshot({ path: path.resolve(screenshotDir, `overtime-costing-filter-${theme}-${width}.png`) });
       await page.keyboard.press('Escape');
       assert.equal(await page.$eval('#highlightFilterModal', node => node.hidden), true);
       assert.equal(await page.evaluate(() => document.activeElement.id), 'highlightFilterTrigger', 'Close restores focus');

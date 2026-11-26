@@ -156,14 +156,14 @@ async function assertOverlayFitsAtWidths(page, selector) {
       assert.equal(details.title, 'Attendance Advice Approval');
       assert.match(details.classes, /approval-record-page/);
       assert.deepEqual(details.labels, [
-        'Employee #', 'Name', 'Date', 'Shift', 'Day Type', 'Shift Group', 'Supervisor', 'Clock Times',
+        'Employee No.', 'Name', 'Date', 'Shift', 'Day Type', 'Shift Group', 'Supervisor', 'Clock Times',
         'Normal Hours', 'Late In Minutes', 'Late Reason', 'Early Out Minutes', 'Early Out Reason',
         'Time Off Minutes', 'Time Off Reason', 'Absent', 'Absent Reason', 'Leave Code', 'Approved OT Hours',
         'Unapproved OT Hours', 'Exception', 'Document #'
       ]);
       assert.deepEqual(details.values, [
-        '#EBB12', 'Farhan binti rahmat', '15 Sep 2026', '8.30AM–5.30PM (W01)', 'Workday', 'GROUP A',
-        '#EBB04', '07:38', '0.00', '0', 'Not applicable', 'Clock-out missing', '-', '-',
+        'EBB12', 'Farhan binti rahmat', '15 Sep 2026', '8.30AM–5.30PM (W01)', 'Workday', 'GROUP A',
+        'EBB04', '07:38', '0.00', '0', 'Not applicable', 'Clock-out missing', '-', '-',
         '-', 'No', 'Not applicable', '-', '0.00', '0.00', 'Missing Clock Out', '–'
       ]);
       assert.equal(details.hasLeaveSection, false);

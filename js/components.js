@@ -20,6 +20,23 @@ function getInitialPageTheme() {
 document.documentElement.dataset.theme = getInitialPageTheme();
 
 const previewUserName = 'Sarah Jenkins';
+function formatEmployeeNumber(value) {
+  return String(value ?? '').trim().replace(/^#+/, '').trim();
+}
+
+const employeeCardHeading = (() => {
+  function text(empNo, name) {
+    const parts = [formatEmployeeNumber(empNo), String(name ?? '').trim()];
+    return parts.filter(part => part && !/^[-–—]$/.test(part)).join(' - ') || '—';
+  }
+  function html(empNo, name) {
+    const span = document.createElement('span');
+    span.textContent = text(empNo, name);
+    return span.innerHTML;
+  }
+  return { text, html };
+})();
+
 const recordDeleteLabel = 'Delete Record';
 const recordDeleteLabelHTML = `<i class="fa-regular fa-trash-can" aria-hidden="true"></i><span>${recordDeleteLabel}</span>`;
 const recordCardActionLabels = {
@@ -63,15 +80,36 @@ const recordSubmitDate = (() => {
     const date = format(value);
     element.classList.add('record-submit-date');
     element.hidden = !date;
-    element.textContent = date ? 'Submit Date: ' + date : '';
+    if (!date) {
+      element.replaceChildren();
+      return element;
+    }
+    const tableRow = element.localName === 'tr';
+    const definition = element.localName === 'div';
+    const label = document.createElement(tableRow ? 'th' : definition ? 'dt' : 'span');
+    const detail = document.createElement(tableRow ? 'td' : definition ? 'dd' : 'strong');
+    if (tableRow) {
+      label.scope = 'row';
+      label.className = 'detail-popout-label';
+      detail.className = 'detail-popout-value';
+    }
+    label.textContent = tableRow ? 'Submit Date:' : 'Submit Date';
+    detail.textContent = date;
+    element.replaceChildren(label, ' ', detail);
     return element;
   }
-  const create = value => set(document.createElement('span'), value);
-  function html(value) {
-    const line = create(value);
+  const create = (value, tag = 'span') => set(document.createElement(tag), value);
+  function insert(panel, value, before = null) {
+    const tag = { dl: 'div', tbody: 'tr' }[panel.localName] || 'span';
+    const field = create(value, tag);
+    if (!field.hidden) panel.insertBefore(field, before);
+    return field;
+  }
+  function html(value, tag) {
+    const line = create(value, tag);
     return line.hidden ? '' : line.outerHTML;
   }
-  return { format, set, create, html };
+  return { format, set, create, html, append: insert, prepend: (panel, value) => insert(panel, value, panel.firstChild) };
 })();
 
 // Read-only record details share a palette independent of the card header and action buttons.
@@ -390,8 +428,7 @@ class LeftProfileDrawer extends HTMLElement {
               <div class="drawer-avatar-badge"></div>
             </div>
             <div class="drawer-user-info">
-              <div class="drawer-user-name">${previewUserName}</div>
-              <div class="drawer-employee-id">#EBB01</div>
+              <div class="drawer-user-name">${employeeCardHeading.html('EBB01', previewUserName)}</div>
               <div class="drawer-user-role">Senior Product Designer</div>
               <div class="drawer-user-email">sarah.j@peoplequest.com</div>
             </div>
@@ -1569,15 +1606,15 @@ function createApprovalCardDetails(fields) {
   summary.className = 'approval-card-summary';
   const details = document.createElement('dl');
   details.className = 'approval-card-details';
+  let submitDate;
   for (const [label, value] of fields) {
-    const text = value == null || value === '' ? '-' : value;
     if (/^(?:Submit Date|Submitted Date|Submitted On|Submitted)$/i.test(label)) {
-      const submitted = recordSubmitDate.create(value);
-      submitted.classList.add('approval-card-submitted');
-      if (!submitted.hidden) summary.append(submitted);
+      submitDate = value;
       continue;
     }
+    const text = value == null || value === '' ? '-' : value;
     const row = document.createElement('div');
+    if (label === 'Reason') row.className = 'record-reason-field';
     const term = document.createElement('dt');
     term.textContent = label;
     const description = document.createElement('dd');
@@ -1585,6 +1622,7 @@ function createApprovalCardDetails(fields) {
     row.append(term, description);
     details.append(row);
   }
+  if (submitDate) recordSubmitDate.append(details, submitDate).classList.add('approval-card-submitted');
   if (details.childElementCount) summary.append(details);
   return summary;
 }
@@ -1631,7 +1669,6 @@ class PendingApprovalCard extends HTMLElement {
   render() {
     const userName = this.getAttribute('user-name') || 'Employee Name';
     const rawEmpId = this.getAttribute('emp-id') || '000000';
-    const empId = rawEmpId.startsWith('#') ? rawEmpId : `#${rawEmpId}`;
     const dept = this.getAttribute('dept') || 'Department';
     const docStatus = recordReviewStatusLabel(this.getAttribute('doc-status') || 'Pending');
     const claimDate = this.getAttribute('claim-date') || this.getAttribute('date') || 'DD/MM/YYYY';
@@ -1686,9 +1723,7 @@ class PendingApprovalCard extends HTMLElement {
               <input type="checkbox" class="approval-card-checkbox" style="width: 20px; height: 20px; accent-color: #ffffff; cursor: pointer; border-radius: 6px;">
             </div>
             <div>
-              <div style="font-size: 14.5px; font-weight: 800; color: #ffffff;">${userName}</div>
-              <!-- AGENTS.md Employee ID Presentation Standard: directly BELOW name, leading #, subtle muted typography -->
-              <div style="font-size: 11.5px; font-weight: 700; color: rgba(255, 255, 255, 0.7); opacity: 0.8; font-family: monospace, sans-serif; margin-bottom: 2px;">${empId}</div>
+              <div style="font-size: 14.5px; font-weight: 800; color: #ffffff;">${employeeCardHeading.html(rawEmpId, userName)}</div>
               <div style="font-size: 11px; font-weight: 700; color: rgba(255, 255, 255, 0.85);">${dept}</div>
             </div>
           </div>

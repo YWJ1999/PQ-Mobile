@@ -56,7 +56,7 @@ const storageKey = 'peoplehcm.competencyAssessments.v1';
       { label: 'Skill Group', value: 'People Area' },
       { label: 'Record', value: '1' }
     ]);
-    assert.equal(await page.$eval('#staffAssessEmployeeId', node => node.textContent.trim()), '#EBB06');
+    assert.equal(await page.$eval('#staffAssessEmployeeId', node => node.textContent.trim()), 'EBB06');
     assert.equal(await page.$eval('.csa-card-header', node => node.textContent.trim()), 'Effective Communication');
     assert.deepEqual(await page.$$eval('.csa-card-detail dd', nodes => nodes.map(node => node.textContent.trim())), ['4', '2', '2', '-2']);
     for (const theme of ['dark', 'light']) for (const width of [360, 420]) {

@@ -5,7 +5,6 @@
   const filterKeys = ['keyword', 'company', 'department', 'job', 'period', 'type'];
   const theme = () => document.documentElement.dataset.theme === 'light' ? 'light' : 'dark';
   const display = value => value === '' || value == null ? '—' : String(value);
-  const employeeId = value => value ? `#${String(value).replace(/^#+/, '')}` : '';
   const element = (tag, className, text) => {
     const node = document.createElement(tag);
     if (className) node.className = className;
@@ -91,16 +90,15 @@
       }
       url.searchParams.set('theme', theme());
       history.replaceState(null, '', url);
-      const keyword = filters.keyword.toLowerCase();
-      const visible = store.all().filter(record => (!keyword || [record.employee.name, employeeId(record.employee.empNo), record.evaluationRef,
+      const keyword = formatEmployeeNumber(filters.keyword).toLowerCase();
+      const visible = store.all().filter(record => (!keyword || [record.employee.name, formatEmployeeNumber(record.employee.empNo), record.evaluationRef,
         record.company, record.employee.department, record.employee.position, record.period, record.type].join(' ').toLowerCase().includes(keyword))
         && Object.entries(metadata).every(([key, value]) => !filters[key] || value(record) === filters[key]));
       $('evaluationCards').replaceChildren(...visible.map(record => {
         const card = element('article', 'evaluation-card');
         card.dataset.evaluationId = record.id;
         const header = element('header', 'evaluation-card-header');
-        header.append(element('h2', 'evaluation-employee-name', display(record.employee.name)),
-          element('span', 'evaluation-employee-id', employeeId(record.employee.empNo)),
+        header.append(element('h2', 'evaluation-employee-name', employeeCardHeading.text(record.employee.empNo, record.employee.name)),
           element('span', 'evaluation-reference', display(record.evaluationRef)));
         const details = element('dl', 'evaluation-card-details');
         for (const [label, value] of [['Period', record.period], ['Type', record.type]]) {
@@ -344,8 +342,7 @@
 
     $('evaluationPageTitle').textContent = adding ? 'Add Goal' : 'Edit ' + title;
     $('evaluationItemSectionTitle').textContent = title;
-    $('evaluationItemContext').replaceChildren(element('strong', 'evaluation-context-name', record.employee.name),
-      element('span', 'self-evaluation-employee-id', employeeId(record.employee.empNo)),
+    $('evaluationItemContext').replaceChildren(element('strong', 'evaluation-context-name', employeeCardHeading.text(record.employee.empNo, record.employee.name)),
       element('span', 'evaluation-context-reference', record.evaluationRef));
     $('evaluationItemTitle').readOnly = !adding;
     $('evaluationItemWeightage').readOnly = !adding;

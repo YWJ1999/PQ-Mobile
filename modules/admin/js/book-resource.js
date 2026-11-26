@@ -71,7 +71,7 @@ document.addEventListener('DOMContentLoaded', () => {
       [
         ['References', record.meetingRef],
         ['Status', record.status === 'plan' ? 'Plan' : 'Confirmed'],
-        ['Emp #', '#' + record.employee.empNo.replace(/^#+/, '')],
+        ['Emp No.', formatEmployeeNumber(record.employee.empNo)],
         ['Name', record.employee.name],
         ['Booking Date', formatDate(record.date)],
         ['Start', record.startTime],

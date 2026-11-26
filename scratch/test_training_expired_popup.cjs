@@ -20,7 +20,7 @@ const index = pathToFileURL(path.join(__dirname, '../modules/training-competency
     assert.equal(await page.$eval('#trainingExpiredDetail', node => node.getAttribute('aria-modal')), 'true');
     assert.equal(await page.$eval('#trainingExpiredDetailTitle', node => node.textContent), 'First Aid');
     assert.equal(await page.$$eval('.tec-employee-card', nodes => nodes.length), 4);
-    assert.equal(await page.$eval('.tec-employee-id', node => node.previousElementSibling.textContent), 'Ahmad Faizal');
+    assert.equal(await page.$eval('.tec-employee-name', node => node.textContent), 'E001234 - Ahmad Faizal');
     assert.equal(await page.$$('.tec-summary .fa-chevron-right, .tec-employee-card .fa-chevron-right').then(nodes => nodes.length), 0, 'Cards do not show chevrons');
     await page.click('[data-expired-level="2"]');
     assert.equal(page.url(), initialUrl);

@@ -27,13 +27,11 @@ const puppeteer = require('puppeteer');
     })), { records: '8', totalLabel: 'Total Scheduled Days', total: '168.00', chart: 'View Chart' });
 
     const employeeCards = await page.$$eval('#details-list-container .summary-history-card', cards => cards.map(card => ({
-      name: card.querySelector('.staff-name-text').textContent.trim(),
-      id: card.querySelector('.staff-name-text').nextElementSibling.textContent.trim(),
+      heading: card.querySelector('.staff-name-text').textContent.trim(),
       rows: [...card.querySelectorAll('.summary-history-detail')].map(row => row.textContent.replace(/\s+/g, ' ').trim())
     })));
     assert.equal(employeeCards.length, 8);
-    assert.equal(employeeCards[0].name, 'John Tan');
-    assert.equal(employeeCards[0].id, '#EBB01');
+    assert.equal(employeeCards[0].heading, 'EBB01 - John Tan');
     assert.deepEqual(employeeCards[0].rows, ['Job Title Senior Developer', 'Scheduled Days 22', 'Scheduled Hours 176.00']);
     assert.equal(await page.$$eval('#details-list-container .summary-history-card .fa-chevron-right', icons => icons.length), 0);
 
@@ -67,7 +65,7 @@ const puppeteer = require('puppeteer');
       shift: document.getElementById('ad-shift').textContent.trim(),
       clock: document.getElementById('ad-clock-times').textContent.trim()
     })), {
-      employee: '#EBB01',
+      employee: 'EBB01',
       name: 'John Tan',
       date: '14 Sep 2026',
       shift: '8:30 AM - 5:30 PM (GROUP A)',
@@ -103,11 +101,11 @@ const puppeteer = require('puppeteer');
     await page.evaluate(() => document.documentElement.setAttribute('data-theme', 'light'));
     assert.equal(await page.$eval('#headerTitle', node => node.textContent.trim()), 'Staff Normal Present Days Summary');
     assert.deepEqual(await page.$eval('#details-list-container .summary-history-card', card => ({
-      name: card.querySelector('.staff-name-text').textContent.trim(),
+      heading: card.querySelector('.staff-name-text').textContent.trim(),
       rows: [...card.querySelectorAll('.summary-history-detail')].map(row => row.textContent.replace(/\s+/g, ' ').trim()),
       arrows: card.querySelectorAll('.fa-chevron-right').length
     })), {
-      name: 'John Tan',
+      heading: 'EBB01 - John Tan',
       rows: ['Job Title Senior Developer', 'Scheduled Days 22', 'Work Days 22', 'Attendance Rate 100%'],
       arrows: 0
     });
@@ -118,8 +116,7 @@ const puppeteer = require('puppeteer');
       total: overview.querySelector('#daily-total-hours').textContent.trim()
     })), { records: '22', total: '176.00' });
     assert.deepEqual(await page.$eval('#daily-list-container .summary-history-card', card => ({
-      name: card.querySelector('.staff-name-text').textContent.trim(),
-      id: card.querySelector('.summary-history-employee-id').textContent.trim(),
+      heading: card.querySelector('.staff-name-text').textContent.trim(),
       date: card.querySelector('.summary-history-date').textContent.trim(),
       rows: [...card.querySelectorAll('.summary-history-detail')].map(row => row.textContent.replace(/\s+/g, ' ').trim()),
       status: card.querySelector('.summary-history-card-end .summary-history-status').textContent.replace(/\s+/g, ' ').trim(),
@@ -129,8 +126,7 @@ const puppeteer = require('puppeteer');
         getComputedStyle(card.querySelector('.summary-history-card-header')).color,
       arrows: card.querySelectorAll('.fa-chevron-right').length
     })), {
-      name: 'John Tan',
-      id: '#EBB01',
+      heading: 'EBB01 - John Tan',
       date: 'Mon, 14 Sep 2026',
       rows: [
         'Shift 8:30 AM - 5:30 PM (GROUP A)',
@@ -151,7 +147,7 @@ const puppeteer = require('puppeteer');
       normalHours: document.getElementById('ad-normal-hours').textContent.trim(),
       absent: document.getElementById('ad-absent').textContent.trim(),
       exception: document.getElementById('ad-exception').textContent.trim()
-    })), { employee: '#EBB01', normalHours: '08:00', absent: 'No', exception: '-' });
+    })), { employee: 'EBB01', normalHours: '08:00', absent: 'No', exception: '-' });
     await page.click('#modal-attendance-details .modal-close-round');
     await page.waitForSelector('#modal-attendance-details', { hidden: true });
 
@@ -160,8 +156,7 @@ const puppeteer = require('puppeteer');
     assert.deepEqual(await page.$eval('#daily-list-container .summary-history-card', card => {
       const status = card.querySelector('.summary-history-card-end .summary-history-status');
       return {
-        name: card.querySelector('.staff-name-text').textContent.trim(),
-        id: card.querySelector('.summary-history-employee-id').textContent.trim(),
+        heading: card.querySelector('.staff-name-text').textContent.trim(),
         date: card.querySelector('.summary-history-date').textContent.trim(),
         rows: [...card.querySelectorAll('.summary-history-detail')].map(row => row.textContent.replace(/\s+/g, ' ').trim()),
         status: status.textContent.replace(/\s+/g, ' ').trim(),
@@ -172,8 +167,7 @@ const puppeteer = require('puppeteer');
         arrows: card.querySelectorAll('.fa-chevron-right').length
       };
     }), {
-      name: 'Michael Chen',
-      id: '#EBB04',
+      heading: 'EBB04 - Michael Chen',
       date: 'Mon, 14 Sep 2026',
       rows: [
         'Shift 8:30 AM - 5:30 PM (GROUP A)',
@@ -217,14 +211,12 @@ const puppeteer = require('puppeteer');
     });
     assert.equal(await page.$$eval('#details-list-container .summary-history-card', cards => cards.length), 32);
     assert.deepEqual(await page.$eval('#details-list-container .summary-history-card', card => ({
-      name: card.querySelector('.staff-name-text').textContent.trim(),
-      id: card.querySelector('.summary-history-employee-id').textContent.trim(),
+      heading: card.querySelector('.staff-name-text').textContent.trim(),
       date: card.querySelector('.summary-history-date').textContent.trim(),
       rows: [...card.querySelectorAll('.summary-history-detail')].map(row => row.textContent.replace(/\s+/g, ' ').trim()),
       arrows: card.querySelectorAll('.fa-chevron-right').length
     })), {
-      name: 'Sarah Lee',
-      id: '#EBB02',
+      heading: 'EBB02 - Sarah Lee',
       date: 'Mon, 14 Sep 2026',
       rows: [
         'Shift 9:00 AM - 6:00 PM (GROUP B)',
@@ -241,7 +233,7 @@ const puppeteer = require('puppeteer');
       name: document.getElementById('ad-name').textContent.trim(),
       exception: document.getElementById('ad-exception').textContent.trim()
     })), {
-      employee: '#EBB02',
+      employee: 'EBB02',
       name: 'Sarah Lee',
       exception: 'Odd Clocking'
     });
@@ -263,14 +255,12 @@ const puppeteer = require('puppeteer');
     });
     assert.equal(await page.$$eval('#details-list-container .summary-history-card', cards => cards.length), 48);
     assert.deepEqual(await page.$eval('#details-list-container .summary-history-card', card => ({
-      name: card.querySelector('.staff-name-text').textContent.trim(),
-      id: card.querySelector('.summary-history-employee-id').textContent.trim(),
+      heading: card.querySelector('.staff-name-text').textContent.trim(),
       date: card.querySelector('.summary-history-date').textContent.trim(),
       rows: [...card.querySelectorAll('.summary-history-detail')].map(row => row.textContent.replace(/\s+/g, ' ').trim()),
       arrows: card.querySelectorAll('.fa-chevron-right').length
     })), {
-      name: 'John Tan',
-      id: '#EBB01',
+      heading: 'EBB01 - John Tan',
       date: 'Mon, 14 Sep 2026',
       rows: [
         'Shift 8:30 AM - 5:30 PM (GROUP A)',
@@ -287,7 +277,7 @@ const puppeteer = require('puppeteer');
       name: document.getElementById('ad-name').textContent.trim(),
       approvedOt: document.getElementById('ad-approved-ot').textContent.trim()
     })), {
-      employee: '#EBB01',
+      employee: 'EBB01',
       name: 'John Tan',
       approvedOt: '2.00'
     });
@@ -309,14 +299,12 @@ const puppeteer = require('puppeteer');
     });
     assert.equal(await page.$$eval('#details-list-container .summary-history-card', cards => cards.length), 7);
     assert.deepEqual(await page.$eval('#details-list-container .summary-history-card', card => ({
-      name: card.querySelector('.staff-name-text').textContent.trim(),
-      id: card.querySelector('.summary-history-employee-id').textContent.trim(),
+      heading: card.querySelector('.staff-name-text').textContent.trim(),
       date: card.querySelector('.summary-history-date').textContent.trim(),
       rows: [...card.querySelectorAll('.summary-history-detail')].map(row => row.textContent.replace(/\s+/g, ' ').trim()),
       arrows: card.querySelectorAll('.fa-chevron-right').length
     })), {
-      name: 'Michael Chen',
-      id: '#EBB04',
+      heading: 'EBB04 - Michael Chen',
       date: 'Mon, 14 Sep 2026',
       rows: [
         'Shift 8:30 AM - 5:30 PM (GROUP A)',
@@ -334,7 +322,7 @@ const puppeteer = require('puppeteer');
       unapprovedOt: document.getElementById('ad-unapproved-ot').textContent.trim(),
       exception: document.getElementById('ad-exception').textContent.trim()
     })), {
-      employee: '#EBB04',
+      employee: 'EBB04',
       name: 'Michael Chen',
       unapprovedOt: '2.00',
       exception: 'Unapproved OT'
@@ -357,14 +345,12 @@ const puppeteer = require('puppeteer');
     });
     assert.equal(await page.$$eval('#details-list-container .summary-history-card', cards => cards.length), 9);
     assert.deepEqual(await page.$eval('#details-list-container .summary-history-card', card => ({
-      name: card.querySelector('.staff-name-text').textContent.trim(),
-      id: card.querySelector('.summary-history-employee-id').textContent.trim(),
+      heading: card.querySelector('.staff-name-text').textContent.trim(),
       date: card.querySelector('.summary-history-date').textContent.trim(),
       rows: [...card.querySelectorAll('.summary-history-detail')].map(row => row.textContent.replace(/\s+/g, ' ').trim()),
       arrows: card.querySelectorAll('.fa-chevron-right').length
     })), {
-      name: 'Sarah Lee',
-      id: '#EBB02',
+      heading: 'EBB02 - Sarah Lee',
       date: 'Mon, 14 Sep 2026',
       rows: [
         'Shift 9:00 AM - 6:00 PM (GROUP B)',
@@ -383,7 +369,7 @@ const puppeteer = require('puppeteer');
       overtimeDescription: document.getElementById('ad-ot-desc').textContent.trim(),
       overtimeHours: document.getElementById('ad-ot-hours').textContent.trim()
     })), {
-      employee: '#EBB02',
+      employee: 'EBB02',
       name: 'Sarah Lee',
       overtimeVisible: true,
       overtimeDescription: 'Planned OT Hours',
@@ -408,15 +394,13 @@ const puppeteer = require('puppeteer');
     });
     assert.equal(await page.$$eval('#details-list-container .summary-history-card', cards => cards.length), 2);
     assert.deepEqual(await page.$eval('#details-list-container .summary-history-card', card => ({
-      name: card.querySelector('.staff-name-text').textContent.trim(),
-      id: card.querySelector('.summary-history-employee-id').textContent.trim(),
+      heading: card.querySelector('.staff-name-text').textContent.trim(),
       date: card.querySelector('.summary-history-date').textContent.trim(),
       rows: [...card.querySelectorAll('.summary-history-detail')].map(row => row.textContent.replace(/\s+/g, ' ').trim()),
       theme: card.classList.contains('theme-purple'),
       arrows: card.querySelectorAll('.fa-chevron-right').length
     })), {
-      name: 'Sarah Lee',
-      id: '#EBB02',
+      heading: 'EBB02 - Sarah Lee',
       date: 'Mon, 14 Sep 2026',
       rows: [
         'Shift 9:00 AM - 6:00 PM (GROUP B)',
@@ -435,7 +419,7 @@ const puppeteer = require('puppeteer');
       date: document.getElementById('ad-date').textContent.trim(),
       clockTimes: document.getElementById('ad-clock-times').textContent.trim()
     })), {
-      employee: '#EBB02',
+      employee: 'EBB02',
       name: 'Sarah Lee',
       date: '14 Sep 2026',
       clockTimes: '08:30 - 17:30'
@@ -459,15 +443,13 @@ const puppeteer = require('puppeteer');
     });
     assert.equal(await page.$$eval('#details-list-container .summary-history-card', cards => cards.length), 39);
     assert.deepEqual(await page.$eval('#details-list-container .summary-history-card', card => ({
-      name: card.querySelector('.staff-name-text').textContent.trim(),
-      id: card.querySelector('.summary-history-employee-id').textContent.trim(),
+      heading: card.querySelector('.staff-name-text').textContent.trim(),
       date: card.querySelector('.summary-history-date').textContent.trim(),
       rows: [...card.querySelectorAll('.summary-history-detail')].map(row => row.textContent.replace(/\s+/g, ' ').trim()),
       theme: card.classList.contains('theme-purple'),
       arrows: card.querySelectorAll('.fa-chevron-right').length
     })), {
-      name: 'Sarah Lee',
-      id: '#EBB02',
+      heading: 'EBB02 - Sarah Lee',
       date: 'Mon, 14 Sep 2026',
       rows: [
         'Shift 9:00 AM - 6:00 PM (GROUP B)',
@@ -484,7 +466,7 @@ const puppeteer = require('puppeteer');
       absent: document.getElementById('ad-absent').textContent.trim(),
       exception: document.getElementById('ad-exception').textContent.trim()
     })), {
-      employee: '#EBB02',
+      employee: 'EBB02',
       absent: 'Yes',
       exception: 'Absent'
     });
@@ -506,15 +488,13 @@ const puppeteer = require('puppeteer');
     });
     assert.equal(await page.$$eval('#details-list-container .summary-history-card', cards => cards.length), 12);
     assert.deepEqual(await page.$eval('#details-list-container .summary-history-card', card => ({
-      name: card.querySelector('.staff-name-text').textContent.trim(),
-      id: card.querySelector('.summary-history-employee-id').textContent.trim(),
+      heading: card.querySelector('.staff-name-text').textContent.trim(),
       date: card.querySelector('.summary-history-date').textContent.trim(),
       rows: [...card.querySelectorAll('.summary-history-detail')].map(row => row.textContent.replace(/\s+/g, ' ').trim()),
       theme: card.classList.contains('theme-purple'),
       arrows: card.querySelectorAll('.fa-chevron-right').length
     })), {
-      name: 'Sarah Lee',
-      id: '#EBB02',
+      heading: 'EBB02 - Sarah Lee',
       date: 'Mon, 14 Sep 2026',
       rows: [
         'Shift 9:00 AM - 6:00 PM (GROUP B)',
@@ -534,7 +514,7 @@ const puppeteer = require('puppeteer');
       leaveDescription: document.getElementById('ad-leave-description').textContent.trim(),
       leaveHours: document.getElementById('ad-leave-hours').textContent.trim()
     })), {
-      employee: '#EBB02',
+      employee: 'EBB02',
       leaveVisible: true,
       leaveCode: 'AL',
       leaveDescription: 'Annual Leave',
@@ -558,15 +538,13 @@ const puppeteer = require('puppeteer');
     });
     assert.equal(await page.$$eval('#details-list-container .summary-history-card', cards => cards.length), 2);
     assert.deepEqual(await page.$eval('#details-list-container .summary-history-card', card => ({
-      name: card.querySelector('.staff-name-text').textContent.trim(),
-      id: card.querySelector('.summary-history-employee-id').textContent.trim(),
+      heading: card.querySelector('.staff-name-text').textContent.trim(),
       date: card.querySelector('.summary-history-date').textContent.trim(),
       rows: [...card.querySelectorAll('.summary-history-detail')].map(row => row.textContent.replace(/\s+/g, ' ').trim()),
       theme: card.classList.contains('theme-purple'),
       arrows: card.querySelectorAll('.fa-chevron-right').length
     })), {
-      name: 'Michael Chen',
-      id: '#EBB04',
+      heading: 'EBB04 - Michael Chen',
       date: 'Mon, 14 Sep 2026',
       rows: [
         'Shift 8:30 AM - 5:30 PM (GROUP A)',
@@ -583,7 +561,7 @@ const puppeteer = require('puppeteer');
       name: document.getElementById('ad-name').textContent.trim(),
       clockTimes: document.getElementById('ad-clock-times').textContent.trim()
     })), {
-      employee: '#EBB04',
+      employee: 'EBB04',
       name: 'Michael Chen',
       clockTimes: '08:30 - 17:30'
     });

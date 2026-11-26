@@ -80,8 +80,7 @@
       const heading = node('div', 'history-card-heading');
       heading.append(
         node('h4', 'history-card-title', store.resources.find(resource => resource.id === record.resource).name),
-        node('span', 'booking-employee-name', record.employee.name),
-        node('span', 'booking-employee-id', '#' + record.employee.empNo.replace(/^#+/, ''))
+        node('span', 'booking-employee-name', employeeCardHeading.text(record.employee.empNo, record.employee.name))
       );
       header.append(heading, node('span', 'status-pill ' + (planned ? 'draft' : 'approved'), planned ? 'Plan' : 'Confirmed'));
       const details = node('dl', 'history-card-details workplace-booking-rows');

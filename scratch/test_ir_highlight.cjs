@@ -22,7 +22,7 @@ const pageUrl = theme => pathToFileURL(path.join(root, 'modules/employee-career/
       assert.equal(await page.$eval('#irHighlightTitle', node => node.textContent.trim()), 'IR Highlight');
       assert.equal(await page.$eval('#irHighlightTotalRecords', node => node.textContent.trim()), '7');
       assert.equal(await page.$eval('#irHighlightTotalCases', node => node.textContent.trim()), '14');
-      assert.deepEqual(await page.$$eval('#irHighlightTable thead th', nodes => nodes.map(node => node.textContent.trim())), ['Emp #', 'Name', 'Cases']);
+      assert.deepEqual(await page.$$eval('#irHighlightTable thead th', nodes => nodes.map(node => node.textContent.trim())), ['Emp No.', 'Name', 'Cases']);
       assert.equal(await page.$$eval('#irHighlightTable tbody tr', nodes => nodes.length), 7);
 
       const firstRow = await page.$eval('#irHighlightTable tbody tr', row => ({
@@ -30,7 +30,7 @@ const pageUrl = theme => pathToFileURL(path.join(root, 'modules/employee-career/
         name: row.cells[1].textContent.trim(),
         cases: row.querySelector('.ir-highlight-cases-button')?.textContent.trim()
       }));
-      assert.deepEqual(firstRow, { empNo: '#EBB12', name: 'Farhan Binti Rahmat', cases: '3' });
+      assert.deepEqual(firstRow, { empNo: 'EBB12', name: 'Farhan Binti Rahmat', cases: '3' });
 
       assert.deepEqual(await page.$eval('#irHighlightViewChart', button => ({
         text: button.textContent.trim(),

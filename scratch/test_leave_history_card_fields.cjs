@@ -37,9 +37,28 @@ async function run() {
     await page.evaluate(() => switchHistoryTab('leave'));
     const leave = await firstCardSnapshot(page);
     assert.equal(leave.hasStatusBadge, true, 'Leave cards must retain the current status badge design');
-    assert.match(leave.detailsText, /Dates/);
     assert.match(leave.detailsText, /Days \/ Hours/);
-    assert.doesNotMatch(leave.detailsText, /Submitted|Approver|Duration/);
+    assert.doesNotMatch(leave.detailsText, /Submit Date|Approver/);
+
+    const readFields = ref => page.$eval(`#myHistoryCardsList [data-ref="${ref}"] .card-details-box`, box =>
+      Object.fromEntries([...box.children].map(field => [field.firstElementChild.textContent.trim(), field.lastElementChild.textContent.trim()])));
+    for (const [ref, dates, duration, reason] of [
+      ['LV-2026-0055', '25/09/2026 To 25/09/2026', 'Full Day', 'Draft application'],
+      ['LV-2026-0041', '10/09/2026 To 11/09/2026', '2.0 Days', 'Personal / Family Event'],
+      ['LV-2026-0047', '22/09/2026 To 22/09/2026', 'Half Day (4.0 Hours PM)', 'Personal Appointment']
+    ]) {
+      const fields = await readFields(ref);
+      assert.deepEqual([fields.Dates, fields.Duration, fields.Reason], [dates, duration, reason], ref);
+    }
+    await page.evaluate(() => {
+      localStorage.setItem(LeaveRequest.storageKey, JSON.stringify([{ status: 'approved', request: {
+        docRef: 'LV-SAVED-RANGE', type: 'Annual Leave', fromDate: '31 Dec 2026', toDate: '2 Jan 2027',
+        duration: 'Full Day', reason: 'Family <visit> & travel', leaveDays: '3', submitDate: '2026-12-01'
+      } }]));
+      renderHistoryCards();
+    });
+    const saved = await readFields('LV-SAVED-RANGE');
+    assert.deepEqual([saved.Dates, saved.Duration, saved.Reason], ['31/12/2026 To 02/01/2027', 'Full Day', 'Family <visit> & travel']);
 
     await page.evaluate(() => switchHistoryTab('credit'));
     const credit = await firstCardSnapshot(page);
@@ -55,12 +74,25 @@ async function run() {
     assert.equal(timeOff.hasStatusBadge, true, 'Time Off cards must retain the current status badge design');
     assert.equal(timeOff.employeeName, '');
     assert.equal(timeOff.employeeId, '');
-    assert.doesNotMatch(timeOff.cardText, /Farhan binti rahmat|#EBB12/);
+    assert.doesNotMatch(timeOff.cardText, /Farhan binti rahmat|EBB12/);
     assert.match(timeOff.cardText, /Ref: OT-2026-0008/);
     assert.doesNotMatch(timeOff.cardText, /Late Start|Early Leave|Outstation/);
     assert.match(timeOff.detailsText, /Event Date/);
     assert.match(timeOff.detailsText, /Reason/);
-    assert.doesNotMatch(timeOff.detailsText, /Start & End Time/);
+    for (const [ref, time, hours] of [
+      ['OT-2026-0008', '10:00 AM - 12:00 PM', '2.00'],
+      ['OT-2026-0006', '4:00 PM - 6:00 PM', '2.00'],
+      ['OT-2026-0004', '9:00 AM - 1:00 PM', '4.00']
+    ]) {
+      const fields = await readFields(ref);
+      assert.deepEqual([fields.Time, fields.Hours], [time, hours], ref);
+    }
+
+    await page.click('#myHistoryCardsList [data-ref="OT-2026-0004"] h3');
+    await page.waitForSelector('#historyDetailsTableBody tr', { visible: true });
+    const detail = await page.$$eval('#historyDetailsTableBody tr', rows =>
+      Object.fromEntries(rows.map(row => [...row.cells].map(cell => cell.textContent.trim()))));
+    assert.deepEqual([detail['Start Time'], detail['End Time'], detail.Hours], ['9:00 AM', '1:00 PM', '4.00']);
 
     assert.deepEqual(errors, []);
     console.log('PASS: Leave history cards show the required fields while retaining the existing card design.');

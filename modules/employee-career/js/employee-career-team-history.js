@@ -89,11 +89,6 @@
       .format(new Date(`${value}-01T00:00:00Z`));
   }
 
-  function employeeId(value, prefix = '#') {
-    const number = String(value ?? '').trim().replace(/^#+/, '');
-    return number ? prefix + number : '';
-  }
-
   function confirmationFilterSummary() {
     const { startDate, endDate } = confirmationFilter;
     if (startDate && endDate) return `${formatDate(startDate)} - ${formatDate(endDate)}`;
@@ -106,11 +101,11 @@
     const records = Array.isArray(data[kind]) ? data[kind] : [];
     if (kind === 'staff-engagement') {
       const { keyword, startDate, endDate, status } = engagementFilter;
-      const query = keyword.trim().toLowerCase();
+      const query = formatEmployeeNumber(keyword).toLowerCase();
       return records.filter(record => {
         const text = [record.reference, record.id, record.interviewerName, record.interviewerPosition, record.employeeName,
-          employeeId(record.empNo), record.position, employeeId(record.intervieweeNo), record.intervieweePosition,
-          employeeId(record.submitterNo), record.reason, record.flightRisk, record.recommendation].join(' ').toLowerCase();
+          formatEmployeeNumber(record.empNo), record.position, formatEmployeeNumber(record.intervieweeNo), record.intervieweePosition,
+          formatEmployeeNumber(record.submitterNo), record.reason, record.flightRisk, record.recommendation].join(' ').toLowerCase();
         const interviewDate = String(record.interviewDate || '');
         return (!query || text.includes(query)) && (!status || String(record.status || '').toLowerCase() === status.toLowerCase()) &&
           (!(startDate || endDate) || (interviewDate && (!startDate || interviewDate >= startDate) && (!endDate || interviewDate <= endDate)));
@@ -126,9 +121,9 @@
     }
     if (kind === 'staff-exit') {
       const { keyword, startDate, endDate, status } = exitFilter;
-      const query = keyword.trim().toLowerCase();
+      const query = formatEmployeeNumber(keyword).toLowerCase();
       return records.filter(record => {
-        const text = [record.employeeName, '#' + String(record.empNo || '').replace(/^#+/, ''), record.position, record.id, record.reason, record.exitType].join(' ').toLowerCase();
+        const text = [record.employeeName, formatEmployeeNumber(record.empNo), record.position, record.id, record.reason, record.exitType].join(' ').toLowerCase();
         const noticeDate = String(record.noticeDate || '');
         return (!query || text.includes(query)) && (!status || String(record.status || '').toLowerCase() === status.toLowerCase()) &&
           (!(startDate || endDate) || (noticeDate && (!startDate || noticeDate >= startDate) && (!endDate || noticeDate <= endDate)));
@@ -161,7 +156,7 @@
 
   function fieldMarkup(fields) {
     return (Array.isArray(fields) ? fields : []).map(([label, value]) => `
-      <span class="history-card-row">
+      <span class="history-card-row${label === 'Reason' ? ' record-reason-field' : ''}">
         <span>${escape(label)}</span>
         <strong>${escape(value || '\u2014')}</strong>
       </span>`).join('');
@@ -170,7 +165,7 @@
   function cardMarkup(record) {
     const status = statusMarkup(record);
     const employee = record.employeeName || '—';
-    const id = employeeId(record.empNo);
+    const id = formatEmployeeNumber(record.empNo);
     const isConfirmation = kind === 'staff-confirmation';
     const isExit = kind === 'staff-exit';
     const isRequest = kind === 'staff-request';
@@ -195,14 +190,14 @@
     return `<${tag} ${triggerAttributes} class="history-card-item team-history-card" data-status="${status.tone}" aria-label="${hasDetails ? 'View details for ' : ''}${escape(accessibleName)}">
       <span class="history-card-header">
         <span class="history-card-heading">
-          <span class="team-history-employee-identity"><span class="history-employee-name">${escape(employee)}</span>${id ? `<span class="team-history-employee-id">${escape(id)}</span>` : ''}</span>
+          <span class="team-history-employee-identity"><span class="history-employee-name">${employeeCardHeading.html(id, employee)}</span></span>
           <span class="team-history-employee-position">${escape(record.position || '—')}</span>
         </span>
         ${status.html}
       </span>
-      ${recordSubmitDate.html(record.submittedDate ?? record.submitDate)}
       <span class="history-card-details team-history-card-details">
         ${fieldMarkup(fields)}
+        ${recordSubmitDate.html(record.submittedDate ?? record.submitDate)}
       </span>
     </${tag}>`;
   }
@@ -283,14 +278,14 @@
     const overlay = $(`${prefix}DetailsOverlay`);
     const display = value => value === '' || value == null ? '—' : String(value);
     const blacklist = record.isBlacklist ?? record.blacklist;
-    const empNo = String(record.empNo ?? '').replace(/^#+/, '');
+    const empNo = formatEmployeeNumber(record.empNo);
     const categoryFields = category === 'staff-engagement' ? [
-      ['Emp #', employeeId(record.empNo)],
+      ['Emp No.', formatEmployeeNumber(record.empNo)],
       ['Name', record.employeeName],
       ['Position', record.position],
-      ['Interviewee #', employeeId(record.intervieweeNo)],
+      ['Interviewee No.', formatEmployeeNumber(record.intervieweeNo)],
       ['Interviewee Position', record.intervieweePosition],
-      ['Submitter #', employeeId(record.submitterNo)],
+      ['Submitter No.', formatEmployeeNumber(record.submitterNo)],
       ['Interview Date', formatDate(record.interviewDate)],
       ['Flight Risk', record.flightRisk],
       ['Recommendation', record.recommendation],
@@ -319,7 +314,7 @@
       ['Reason', record.reason],
       ['Remarks', record.remarks]
     ] : category === 'staff-exit' ? [
-      ['Emp #', empNo ? `#${empNo}` : null],
+      ['Emp No.', empNo || null],
       ['Name', record.employeeName],
       ['Position', record.position],
       ['Notice Date', formatDate(record.noticeDate)],
@@ -332,7 +327,7 @@
       ['Remarks', record.remarks],
       ['HR Remarks', record.hrRemarks ?? record.hrRemark]
     ] : [
-      ['Emp #', `#${String(record.empNo || '').replace(/^#+/, '')}`],
+      ['Emp No.', formatEmployeeNumber(record.empNo)],
       ['Name', record.employeeName],
       ['Position', record.position],
       ['Hire Date', formatDate(record.hireDate)],

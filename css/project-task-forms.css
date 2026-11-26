@@ -138,23 +138,12 @@
   display: flex;
   flex-direction: column;
 }
-.project-assignee-name {
-  overflow: hidden;
+.project-assignee-copy strong {
   color: var(--text-primary);
   font-size: 11.5px;
   font-weight: 800;
   line-height: 1.35;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.project-assignee-id {
-  margin-bottom: 4px;
-  color: var(--text-muted);
-  font-family: monospace, sans-serif;
-  font-size: 11.5px;
-  font-weight: 700;
-  line-height: 1.2;
-  opacity: 0.8;
+  overflow-wrap: anywhere;
 }
 .project-assignee-selection {
   display: flex;

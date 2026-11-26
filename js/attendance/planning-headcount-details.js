@@ -31,7 +31,7 @@ customElements.define('planning-headcount-details', class extends HTMLElement {
         </dl>
         <div class="summary-table-card">
           <table class="planning-detail-table headcount-employee-table" id="headcountEmployeeTable" aria-label="Employees in this headcount">
-            <thead><tr><th scope="col">Emp #</th><th scope="col">Name</th></tr></thead>
+            <thead><tr><th scope="col">Emp No.</th><th scope="col">Name</th></tr></thead>
             <tbody id="headcountEmployeeRows"></tbody>
           </table>
           <p class="planning-detail-empty" id="headcountEmpty" hidden></p>
@@ -93,7 +93,7 @@ customElements.define('planning-headcount-details', class extends HTMLElement {
     rows.replaceChildren();
     for (const employee of employees) {
       const row = rows.insertRow();
-      row.insertCell().textContent = '#' + employee.id;
+      row.insertCell().textContent = formatEmployeeNumber(employee.id);
       row.insertCell().textContent = employee.name;
     }
     const missingRoster = this.headcount > 0 && this.employees.length === 0;

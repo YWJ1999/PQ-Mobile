@@ -300,16 +300,14 @@
       queue.replaceChildren(...records.map(record => {
         const card = template.content.firstElementChild.cloneNode(true);
         card.dataset.reference = card.dataset.approvalId = record.id;
-        const employeeId = '#' + String(record.employeeId).replace(/^#+/, '');
-        card.querySelector('.project-approval-employee-name').textContent = record.employeeName;
-        card.querySelector('.project-approval-employee-id').textContent = employeeId;
+        card.querySelector('.project-approval-employee-name').textContent = employeeCardHeading.text(record.employeeId, record.employeeName);
         const box = card.querySelector('.approval-card-checkbox');
         box.checked = checked.has(record.id);
         box.setAttribute('aria-label', 'Select ' + record.id + ' for ' + record.employeeName);
         card.querySelector('[data-project-approval-menu]').setAttribute('aria-label', 'Options for ' + record.id);
         const link = card.querySelector('.approval-record-link');
         link.href = PendingApprovalPage.href('details', record.id);
-        link.prepend(recordSubmitDate.create(record.submittedAt));
+        recordSubmitDate.append(link.querySelector('.approval-card-details'), record.submittedAt);
         card.querySelector('[data-field="date"] dd').textContent = record.dateLabel;
         card.querySelector('[data-field="normal-hours"] dd').textContent = (record.normalMinutes / 60).toFixed(2) + ' hrs';
         card.querySelector('[data-field="ot-hours"] dd').textContent = (record.overtimeMinutes / 60).toFixed(2) + ' hrs';
@@ -411,15 +409,13 @@
         if (!record) return false;
         closeOverlay(false);
         if (view === 'details') {
-          recordSubmitDate.set(document.getElementById('projectApprovalSubmitDate'), record.submittedAt);
           TimesheetView.review(document.getElementById('projectApprovalRequest'), record);
           document.getElementById('projectApprovalApproverComments').value = '';
           details.dataset.reference = id;
         } else {
           recordSubmitDate.set(document.getElementById('projectWorkflowSubmitDate'), record.submittedAt);
           document.getElementById('projectApprovalWorkflowReference').textContent = id;
-          document.getElementById('projectApprovalWorkflowName').textContent = record.employeeName;
-          document.getElementById('projectApprovalWorkflowEmployeeId').textContent = '#' + String(record.employeeId).replace(/^#+/, '');
+          document.getElementById('projectApprovalWorkflowName').textContent = employeeCardHeading.text(record.employeeId, record.employeeName);
           const backup = PendingApprovalBackup.assigned('timesheet', id);
           const assignment = document.getElementById('projectApprovalWorkflowBackup');
           assignment.hidden = !backup;

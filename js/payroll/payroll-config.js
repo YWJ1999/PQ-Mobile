@@ -314,7 +314,7 @@ window.PAYROLL_CONFIG = {
       },
       partA: {
         name: 'SARAH JENKINS',
-        empNo: '#EBB01',
+        empNo: 'EBB01',
         designation: 'Senior Product Designer',
         nric: '920415-14-5892',
         passportNo: '-',
@@ -368,7 +368,7 @@ window.PAYROLL_CONFIG = {
       },
       partA: {
         name: 'SARAH JENKINS',
-        empNo: '#EBB01',
+        empNo: 'EBB01',
         designation: 'Product Designer',
         nric: '920415-14-5892',
         passportNo: '-',

@@ -99,7 +99,7 @@ html body :is(.history-card-item, .history-item-card, .project-history-card, .in
   color: var(--record-header-ink) !important;
 }
 
-/* References are secondary; employee IDs remain directly below the name. */
+/* Secondary details in card headers */
 html body :is(.history-card-item, .history-item-card, .project-history-card)
 :is(.history-card-ref, .project-history-card-reference, .summary-history-date, .summary-history-shift, .team-history-record-ref, .team-history-request-ref, .record-card-header h3 + div) {
   display: block;
@@ -110,13 +110,6 @@ html body :is(.history-card-item, .history-item-card, .project-history-card)
   line-height: 1.4;
   opacity: 1;
   overflow-wrap: anywhere;
-}
-html body :is(.history-card-header, .record-card-header, .incident-history-card-header, .active-headcount-employee-card .manpower-employee-identity)
-:is(.employee-id, .employee-id-standard, .history-employee-id, .team-history-employee-id, .staff-feedback-emp-no, .goal-summary-employee-id, .incident-history-id, .booking-employee-id, .daily-ot-card-id, .staff-emp-badge) {
-  color: var(--record-header-muted) !important;
-  font: 700 11.5px monospace, sans-serif !important;
-  opacity: 1;
-  margin-bottom: 4px;
 }
 
 html body :is(.history-card-item, .history-item-card, .project-history-card)
@@ -200,22 +193,72 @@ html .phone-container :is(.history-card-details, .summary-history-details, .card
   text-align: left;
 }
 
+html .phone-container .leave-history-details {
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) !important;
+  color: var(--text-primary);
+}
+.leave-history-details:has(> .record-submit-date) > .record-reason-field {
+  grid-column: 1 / -1;
+}
+
+html .phone-container .time-off-history-details {
+  color: var(--text-primary);
+  row-gap: 16px !important;
+}
+/* Reason spans the two dates. Time and Hours share the row below them. */
+html .phone-container .time-off-history-details:has(> .record-submit-date:not([hidden])) {
+  grid-template-rows: max-content 1fr auto;
+}
+.time-off-history-details:has(> .record-submit-date:not([hidden])) > .record-reason-field {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+}
+
+.leave-history-details > .record-submit-date > strong,
+.record-date-field,
+:is(span, div).record-submit-date {
+  --record-value-weight: 600;
+}
+/* Match the other values on Leave Credit cards and cards with a Reason. */
+.leave-credit-history-details > .record-submit-date,
+:is(.card-details-box, .history-card-details, .approval-card-details):has(> .record-reason-field) > .record-submit-date {
+  --record-value-weight: inherit;
+}
+span.record-submit-date {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
 .record-submit-date {
-  display: block;
-  margin: 0 0 10px;
-  color: var(--text-muted);
+  margin: 0;
   text-align: start;
+}
+span.record-submit-date > span,
+tr.record-submit-date {
+  color: var(--text-muted);
   font-size: 10.5px;
   font-weight: 700;
   line-height: 1.4;
-  font-variant-numeric: tabular-nums;
 }
-.record-submit-date[hidden] { display: none; }
-:is(.history-card-header, .record-card-header, .project-history-card-top, .summary-history-card-header) + .record-submit-date {
-  margin-top: 12px;
+span.record-submit-date > strong {
+  color: var(--text-primary);
+  font-size: 11.5px;
+  font-weight: var(--record-value-weight);
+  line-height: 1.4;
 }
-html body .phone-container :is(.history-card-item, .history-item-card, .project-history-card) .record-submit-date:not([hidden]) + :is(.history-card-details, .card-details-box, .project-history-card-details) {
-  margin-top: 0 !important;
+.record-submit-date > :last-child { font-variant-numeric: tabular-nums; }
+.record-submit-date[hidden] { display: none !important; }
+tr.record-submit-date > :is(th, td) {
+  padding: 7px 10px;
+  border: 1px solid var(--border-subtle);
+  text-align: start;
+}
+tr.record-submit-date > th { background: var(--bg-input); }
+tr.record-submit-date > td { color: var(--text-primary); }
+.phone-container :is(.history-card-details, .card-details-box, .project-history-card-details, .approval-card-details) > .record-submit-date {
+  grid-column: 1;
 }
 
 /* Older History renderers wrap their fields in an extra group. */
@@ -223,7 +266,7 @@ html .phone-container .history-card-details > :is(.history-card-fields, .attenda
   display: contents !important;
 }
 
-html .phone-container :is(.history-card-details, .summary-history-details, .card-details-box, .project-history-card-details, .incident-history-details, .manpower-employee-card-details) > :is(div, span):not(.history-card-fields, .tax-relief-stat-grid, .record-detail-note),
+html .phone-container :is(.history-card-details, .summary-history-details, .card-details-box, .project-history-card-details, .incident-history-details, .manpower-employee-card-details) > :is(div, span):not(.history-card-fields, .attendance-history-facts, .tax-relief-stat-grid, .record-detail-note, [hidden]),
 html .phone-container .history-card-details > :is(.history-card-fields, .attendance-history-facts, .tax-relief-stat-grid) > :is(div, span) {
   display: flex !important;
   flex-direction: column !important;
@@ -240,7 +283,7 @@ html .phone-container .history-card-details > :is(.history-card-fields, .attenda
   overflow-wrap: anywhere;
 }
 
-html .phone-container :is(.history-card-details, .summary-history-details, .card-details-box, .project-history-card-details, .incident-history-details, .manpower-employee-card-details) > :is(div, span):not(.history-card-fields, .tax-relief-stat-grid, .record-detail-note) > :first-child,
+html .phone-container :is(.history-card-details, .summary-history-details, .card-details-box, .project-history-card-details, .incident-history-details, .manpower-employee-card-details) > :is(div, span):not(.history-card-fields, .attendance-history-facts, .tax-relief-stat-grid, .record-detail-note) > :first-child,
 html .phone-container .history-card-details > :is(.history-card-fields, .attendance-history-facts, .tax-relief-stat-grid) > :is(div, span) > :first-child {
   min-width: 0;
   margin: 0 !important;
@@ -252,13 +295,13 @@ html .phone-container .history-card-details > :is(.history-card-fields, .attenda
   white-space: normal !important;
 }
 
-html .phone-container :is(.history-card-details, .summary-history-details, .card-details-box, .project-history-card-details, .incident-history-details, .manpower-employee-card-details) > :is(div, span):not(.history-card-fields, .tax-relief-stat-grid, .record-detail-note) > :last-child,
+html .phone-container :is(.history-card-details, .summary-history-details, .card-details-box, .project-history-card-details, .incident-history-details, .manpower-employee-card-details) > :is(div, span):not(.history-card-fields, .attendance-history-facts, .tax-relief-stat-grid, .record-detail-note) > :last-child,
 html .phone-container .history-card-details > :is(.history-card-fields, .attendance-history-facts, .tax-relief-stat-grid) > :is(div, span) > :last-child {
   min-width: 0;
   max-width: 100%;
   margin: 0 !important;
   font-size: 11.5px !important;
-  font-weight: 800;
+  font-weight: var(--record-value-weight, 800);
   line-height: 1.4 !important;
   text-align: left !important;
   white-space: pre-line !important;
@@ -266,7 +309,7 @@ html .phone-container .history-card-details > :is(.history-card-fields, .attenda
   font-variant-numeric: tabular-nums;
 }
 
-html .phone-container :is(.record-detail-note, .training-feedback-card-detail:only-child) {
+html .phone-container :is(.record-detail-note, .training-feedback-card-detail[data-field="description"]) {
   grid-column: 1 / -1;
 }
 

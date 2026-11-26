@@ -33,7 +33,7 @@ function renderConfirmNewUsers(records) {
     identity.className = 'confirm-new-user-identity';
     const name = document.createElement('h3');
     name.className = 'confirm-new-user-name';
-    name.textContent = displayValue(record.name);
+    name.textContent = employeeCardHeading.text(record.empNo, record.name);
     const identityValue = document.createElement('p');
     identityValue.className = 'confirm-new-user-identity-number';
     identityValue.dataset.field = 'identity';

@@ -4,7 +4,7 @@ const puppeteer = require('puppeteer');
 
 const pageUrl = `file:///${path.resolve(__dirname, '../leave.html').replace(/\\/g, '/')}`;
 const expectedLabels = [
-  'Employee #', 'Name', 'Leave Type', 'Leave Year', 'Full Enti', 'Entitled', 'B/Fwd',
+  'Employee No.', 'Name', 'Leave Type', 'Leave Year', 'Full Enti', 'Entitled', 'B/Fwd',
   'Total', 'Adjustment', 'Credit', 'Excess Cut', 'Shared', 'S/N', 'Expired',
   'Final Total', 'Last Update'
 ];
@@ -36,7 +36,7 @@ const expectedLabels = [
 
     assert.equal(result.title, 'Staff Leave Entitlement Details');
     assert.deepEqual(result.labels, expectedLabels);
-    assert.equal(result.values[0], '#00035');
+    assert.equal(result.values[0], '00035');
     assert.equal(result.values[1], 'George bill');
     assert.equal(result.values[2], 'ANNUAL LEAVE');
     assert.equal(result.values[3], '2026');

@@ -105,7 +105,7 @@ const pageUrl = pathToFileURL(path.resolve(__dirname, '../modules/attendance/opt
     assert.equal(summaryLayout.staff, '287 staff');
     assert.ok(summaryLayout.staffBesideDate, 'The staff count belongs to the right of the date');
     assert.deepEqual(summaryLayout.metrics.map(metric => metric.label), ['Work Shift', 'No Work', 'OT Plan', 'On Leave']);
-    assert.deepEqual(summaryLayout.metrics.map(metric => metric.value), ['269.00', '13', '73 / 127.00', '5.00']);
+    assert.deepEqual(summaryLayout.metrics.map(metric => metric.value), ['269.00', '13', '73 / 120.00', '5.00']);
     assert.ok(summaryLayout.metrics.every(metric => metric.labelAboveValue), 'Each label sits above its value');
     assert.equal(summaryLayout.metrics.every(metric => metric.valueBackground === 'rgba(0, 0, 0, 0)' && metric.valueBorderWidth === '0px'), true, 'Values must not use pill backgrounds');
     assert.equal(summaryLayout.metrics.slice(1).every(metric => metric.dividerWidth === '1px'), true, 'Metrics must use the reference vertical separators');

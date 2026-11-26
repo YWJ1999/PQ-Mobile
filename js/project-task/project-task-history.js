@@ -558,7 +558,8 @@
       createDataRow('Scheduled', formatSchedule(record)),
       createDataRow('Deadline', formatDate(record.deadline))
     );
-    card.append(createCardTop(record.title, record.id, record.status), recordSubmitDate.create(record.submittedAt), details);
+    recordSubmitDate.append(details, record.submittedAt);
+    card.append(createCardTop(record.title, record.id, record.status), details);
     const actions = createCardActions(record, 'work-plan');
     if (actions) card.append(actions);
     makeCardInteractive(card, () => HistoryRecordPage.open('work-plan', record.id, card));
@@ -576,7 +577,8 @@
       createDataRow('Normal Hours', formatMinutes(record.normalMinutes)),
       createDataRow('OT Hours', formatMinutes(record.overtimeMinutes))
     );
-    card.append(createCardTop(formatDate(record.date), record.id, record.status), recordSubmitDate.create(record.submittedAt), details);
+    recordSubmitDate.append(details, record.submittedAt);
+    card.append(createCardTop(formatDate(record.date), record.id, record.status), details);
     const actions = createCardActions(record, 'timesheet');
     if (actions) card.append(actions);
     makeCardInteractive(card, () => HistoryRecordPage.open('timesheet', record.id, card));
@@ -779,7 +781,9 @@
 
   function replaceProjectHistoryDetailContent(record, kind) {
     const content = kind === 'work-plan' ? [renderWorkPlanDetails(record)] : renderTimesheetDetails(record);
-    byId('projectHistoryDetailContent').replaceChildren(recordSubmitDate.create(record.submittedAt), ...content);
+    const submitted = recordSubmitDate.format(record.submittedAt);
+    if (submitted) content[0].prepend(createDetailRow('Submit Date', submitted));
+    byId('projectHistoryDetailContent').replaceChildren(...content);
     renderProjectDetailActions(record, kind);
   }
 

@@ -71,7 +71,7 @@
   function validationError(message, field) {
     $('staffIncidentError').textContent = message; $('staffIncidentError').hidden = false; field.setAttribute('aria-invalid', 'true'); field.focus();
   }
-  [...employees.values()].sort((a,b) => a.empNo.localeCompare(b.empNo)).forEach(employee => $('staffIncidentEmployee').add(new Option(`#${employee.empNo} — ${employee.name}`, employee.empNo)));
+  [...employees.values()].sort((a,b) => a.empNo.localeCompare(b.empNo)).forEach(employee => $('staffIncidentEmployee').add(new Option(`${formatEmployeeNumber(employee.empNo)} — ${employee.name}`, employee.empNo)));
   [...actions.keys()].sort().forEach(type => $('staffIncidentType').add(new Option(type, type)));
   $('staffIncidentEmployee').addEventListener('change', syncEmployee); $('staffIncidentType').addEventListener('change', syncActions);
   form.addEventListener('input', clearFeedback); form.addEventListener('change', clearFeedback);

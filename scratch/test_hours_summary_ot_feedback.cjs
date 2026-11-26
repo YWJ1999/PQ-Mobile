@@ -65,7 +65,7 @@ const summaryUrl = pathToFileURL(path.resolve(__dirname, '../modules/attendance/
       assert.equal(await page.$eval('.fb-clock-pill-blue', node => node.innerText), '17:40');
       assert.equal(await page.$eval('.fb-clock-pill-white', node => node.innerText), '17:40');
       assert.equal(await page.$eval('#fbMetaEmployeeName', node => node.innerText), 'Farhan binti rahmat');
-      assert.equal(await page.$eval('#fbMetaEmployeeNo', node => node.innerText), '#EBB12');
+      assert.equal(await page.$eval('#fbMetaEmployeeNo', node => node.innerText), 'EBB12');
       for (const width of [360, 390, 420]) {
         await page.setViewport({ width, height: 950 });
         assert.equal(await page.$eval('#feedbackModalOverlay .hero-info-banner', node => node.scrollWidth <= node.clientWidth + 1), true, `Employee details fit at ${width}px`);

@@ -43,13 +43,12 @@ const url = (file = 'competency-summary.html', query = '') => pathToFileURL(path
     await navigate('tr[data-level="4"] .cs-row-link', '#csEmployeeCards');
     assert.equal(await total(), '3');
     assert.equal(await page.$$('.cs-employee-card').then(nodes => nodes.length), 3);
-    assert.equal(await page.$eval('.cs-employee-id', node => node.previousElementSibling.className), 'cs-employee-name');
-    assert.equal(await page.$eval('.cs-employee-id', node => node.textContent), '#EBB12');
+    assert.equal(await page.$eval('.cs-employee-name', node => node.textContent), 'EBB12 - Farhan Binti Rahmat');
     await click('#csViewChart');
     assert.equal(await page.$eval('#csChartTotal', node => node.textContent), '3');
     await click('#csBack');
     await navigate('.cs-employee-card[data-emp="EBB12"]', '#csEmployeeSummary');
-    assert.deepEqual(await page.$$eval('#csEmployeeSummary .cs-summary-field > span', nodes => nodes.map(node => node.textContent)), ['Emp #', 'Name', 'Branch', 'Department', 'Position']);
+    assert.deepEqual(await page.$$eval('#csEmployeeSummary .cs-summary-field > span', nodes => nodes.map(node => node.textContent)), ['Emp No.', 'Name', 'Branch', 'Department', 'Position']);
     assert.deepEqual(await page.$$eval('#csTable th', nodes => nodes.map(node => node.textContent)), ['Competency', 'Level', 'Chge', 'Gap']);
     assert.equal(await page.$$('#csTable tbody tr[data-competency]').then(nodes => nodes.length), 3);
     assert.deepEqual(await page.$$eval('#csTable tbody tr:first-child td', nodes => nodes.map(node => node.textContent)), ['Effective Communication', '4', '+1', '0']);
@@ -62,7 +61,7 @@ const url = (file = 'competency-summary.html', query = '') => pathToFileURL(path
     assert.match(page.url(), /competency-summary-employee\.html/);
     assert.equal(new URL(page.url()).searchParams.get('competency'), 'effective-communication');
     await click('#csTable tbody .cs-row-link');
-    assert.deepEqual(await page.$$eval('#csEmployeeDetails th', nodes => nodes.map(node => node.textContent)), ['Emp #', 'Name', 'Company', 'Branch', 'Department', 'Job Title']);
+    assert.deepEqual(await page.$$eval('#csEmployeeDetails th', nodes => nodes.map(node => node.textContent)), ['Emp No.', 'Name', 'Company', 'Branch', 'Department', 'Job Title']);
     assert.equal(await page.$$('.cs-assessment-record').then(nodes => nodes.length), 2);
     assert.deepEqual(await page.$$eval('.cs-assessment-record:first-child th', nodes => nodes.map(node => node.textContent)), ['Assess Date', 'Level', 'Remarks', 'Assessor']);
     await page.keyboard.press('Tab');

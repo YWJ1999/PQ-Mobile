@@ -107,8 +107,8 @@ async function checkSubmittedCV(browser) {
       assert.equal(await page.$eval('#careerPendingEmpty', n => n.hidden), true);
       const card = await page.$eval('.approval-request-card', n => ({
         text: n.textContent.replace(/\s+/g, ' ').trim(),
-        idBelowName: n.querySelector('.employee-name').nextElementSibling?.classList.contains('employee-id'),
-        submitDate: n.querySelector('.approval-card-submitted')?.textContent,
+        heading: n.querySelector('.employee-name').textContent,
+        submitDate: n.querySelector('.approval-card-submitted dd')?.textContent,
         details: [...n.querySelectorAll('.career-pending-review .approval-card-details > div')].map(field => ({
           label: field.querySelector('dt')?.textContent.trim(),
           value: field.querySelector('dd')?.textContent.trim()
@@ -120,14 +120,15 @@ async function checkSubmittedCV(browser) {
         icons: n.querySelectorAll('[data-career-approval-action] i, [data-career-approval-action] svg, [data-career-approval-action] img').length,
         colours: [...n.querySelectorAll('[data-career-approval-action]')].map(b => getComputedStyle(b).backgroundColor)
       }));
-      for (const value of ['Farhan binti rahmat', '#EBB12', 'ECR00000000000000563', '13/10/2026']) {
+      for (const value of ['Farhan binti rahmat', 'EBB12', 'ECR00000000000000563', '13/10/2026']) {
         assert.ok(card.text.includes(value), 'Card includes ' + value);
       }
-      assert.equal(card.idBelowName, true);
-      assert.equal(card.submitDate, 'Submit Date: 13/10/2026');
+      assert.equal(card.heading, 'EBB12 - Farhan binti rahmat');
+      assert.equal(card.submitDate, '13/10/2026');
       assert.deepEqual(card.details, [
-        { label: 'Reference #', value: 'ECR00000000000000563' }
-      ], 'Reference # appears below the submit date');
+        { label: 'Reference #', value: 'ECR00000000000000563' },
+        { label: 'Submit Date', value: '13/10/2026' }
+      ], 'Submit Date follows the request reference');
       assert.equal(card.hasStatusRow, false, 'The card no longer repeats a Pending Approval status row');
       assert.equal(card.hasBackupAssignment, false, 'The card details stay limited to the two requested fields');
       assert.equal((card.text.match(/13\/10\/2026/g) || []).length, 1);
@@ -155,7 +156,7 @@ async function checkSubmittedCV(browser) {
       );
       assert.ok(await page.$eval('#cv-panel-personal .cv-history-detail-employee', n => (
         n.textContent.includes('Farhan binti rahmat') &&
-        n.querySelector('.history-employee-name').nextElementSibling?.textContent === '#EBB12'
+        n.querySelector('.history-employee-name').nextElementSibling?.textContent === 'EBB12'
       )));
       assert.ok(await page.$eval('#cv-panel-personal', n => (
         ['Farhan', '22 Apr 1960', '0', 'ebb12@gmail.com', 'Married', '18 Jul 1984', 'A212222048', '25 Mar 2015', 'AX000234496', '12 Aug 2021']

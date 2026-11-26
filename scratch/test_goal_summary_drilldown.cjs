@@ -29,15 +29,14 @@ const file=pathToFileURL(path.resolve(__dirname,'../modules/performance/options/
         '100% uses the teal approved treatment while lower results remain purple'
       );
       assert.deepEqual(await page.$$eval('#goalSummaryEmployeeCards .goal-summary-employee-card',cards=>cards.map(card=>({
-        name:card.querySelector('.goal-summary-employee-name').textContent.trim(),id:card.querySelector('.goal-summary-employee-id').textContent.trim(),status:card.querySelector('.status-pill').textContent.trim(),
+        name:card.querySelector('.goal-summary-employee-name').textContent.trim(),status:card.querySelector('.status-pill').textContent.trim(),
         fields:[...card.querySelectorAll('.goal-summary-employee-detail')].map(field=>[field.querySelector('dt').textContent.trim(),field.querySelector('dd').textContent.trim()])
       }))),[
-        {name:'Farhan Binti Rahmat',id:'#EBB12',status:'90.00%',fields:[['Department','Human Resource'],['Job','Group HR Manager'],['Period','2026'],['Goal','Reduce Staff Attrition']]},
-        {name:'Farhan Binti Rahmat',id:'#EBB12',status:'80.00%',fields:[['Department','Human Resource'],['Job','Group HR Manager'],['Period','2026'],['Goal','Improve Staff Satisfaction']]},
-        {name:'Nur Izzati',id:'#EBB03',status:'100.00%',fields:[['Department','Finance'],['Job','Finance Analyst'],['Period','2026'],['Goal','Improve team knowledge sharing']]}
+        {name:'EBB12 - Farhan Binti Rahmat',status:'90.00%',fields:[['Department','Human Resource'],['Job','Group HR Manager'],['Period','2026'],['Goal','Reduce Staff Attrition']]},
+        {name:'EBB12 - Farhan Binti Rahmat',status:'80.00%',fields:[['Department','Human Resource'],['Job','Group HR Manager'],['Period','2026'],['Goal','Improve Staff Satisfaction']]},
+        {name:'EBB03 - Nur Izzati',status:'100.00%',fields:[['Department','Finance'],['Job','Finance Analyst'],['Period','2026'],['Goal','Improve team knowledge sharing']]}
       ]);
       assert.ok(await page.$eval('.goal-summary-employee-card',node=>parseFloat(getComputedStyle(node).borderTopLeftRadius)===20&&parseFloat(getComputedStyle(node).borderLeftWidth)===5));
-      assert.ok(await page.$eval('.goal-summary-employee-id',node=>getComputedStyle(node).fontSize==='11.5px'&&getComputedStyle(node).opacity==='0.8'));
       assert.deepEqual(await page.$eval('#goalSummaryEmployeeViewChart',node=>({text:node.textContent.trim(),barIcon:!!node.querySelector('.fa-chart-simple')})),{text:'Chart',barIcon:true});
       await page.screenshot({path:path.join(__dirname,`goal-summary-employee-cards-${theme}-${width}.png`)});
       await page.click('#goalSummaryEmployeeViewChart');assert.equal(await page.$eval('#goalSummaryChartTotal',node=>node.textContent.trim()),'3');

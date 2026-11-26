@@ -32,10 +32,10 @@ async function filter(page, values) {
       assert.equal(new URL(page.url()).pathname, new URL(url).pathname);
       assert.equal(await page.$eval('html', node => node.dataset.theme), theme);
       assert.ok(await page.$('#assetTable'), 'Asset Highlight must contain the employee asset report');
-      assert.deepEqual(await page.$$eval('#assetTable th', nodes => nodes.map(node => node.textContent)), ['Emp#', 'Name', 'Count', 'Value']);
+      assert.deepEqual(await page.$$eval('#assetTable th', nodes => nodes.map(node => node.textContent)), ['Emp No.', 'Name', 'Count', 'Value']);
       assert.equal((await rows(page)).length, 8);
       assert.equal(await page.$eval('record-chart-count', node => node.textContent.trim()), '8 Records');
-      assert.deepEqual((await rows(page)).find(row => row[0] === '#EBB01'), ['#EBB01', 'Muhammad ali bin man', '3', '5,170.00']);
+      assert.deepEqual((await rows(page)).find(row => row[0] === 'EBB01'), ['EBB01', 'Muhammad ali bin man', '3', '5,170.00']);
       assert.equal(await page.$('#assetTotalCount'), null, 'Summary must omit Total Count');
       assert.equal(await page.$('#assetTotalValue'), null, 'Summary must omit Total Value');
       assert.deepEqual(await tableTotals(page), { count: 12, valueCents: 2967000 });
@@ -68,9 +68,9 @@ async function filter(page, values) {
       await filter(page, { company: 'PQ Services Sdn Bhd' });
       assert.equal((await rows(page)).length, 4);
       await filter(page, { branch: 'Penang' });
-      assert.deepEqual((await rows(page)).map(row => row[0]), ['#99104', '#EBB41']);
+      assert.deepEqual((await rows(page)).map(row => row[0]), ['99104', 'EBB41']);
       await filter(page, { department: 'Finance' });
-      assert.deepEqual((await rows(page)).map(row => row[0]), ['#EBB27', '#EBB30']);
+      assert.deepEqual((await rows(page)).map(row => row[0]), ['EBB27', 'EBB30']);
       await filter(page, { keyword: 'EBB01', assetType: 'Monitor', effectiveDate: '2026-10-01', company: 'PeopleHCM Sdn Bhd', branch: 'Headquarters (HQ)', department: 'IT Support & Systems' });
       assert.deepEqual(await tableTotals(page), { count: 1, valueCents: 85000 });
       await page.click('#assetViewChart');

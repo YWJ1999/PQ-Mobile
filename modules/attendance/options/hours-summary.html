@@ -1018,7 +1018,7 @@
           <h1 id="headerTitle">Hours Summary</h1>
           <p class="hours-summary-period" id="filterSummaryText">16 Aug – 14 Sep 2026</p>
         </div>
-        <button type="button" class="hours-header-button hours-header-filter hours-filter-trigger" onclick="openFilterModal()" aria-label="Filter hours summary" aria-haspopup="dialog" aria-controls="modal-filter" aria-describedby="filterSummaryText"><i class="fa-solid fa-sliders" aria-hidden="true"></i></button>
+        <button type="button" class="hours-header-button hours-header-filter hours-filter-trigger standard-filter-summary-trigger" onclick="openFilterModal()" aria-label="Filter hours summary" aria-haspopup="dialog" aria-controls="modal-filter" aria-describedby="filterSummaryText"><i class="fa-solid fa-sliders standard-filter-summary-trigger-glyph" aria-hidden="true"></i></button>
       </div>
     </header>
 
@@ -1172,7 +1172,7 @@
           <div style="display: flex; flex-direction: column;">
             
             <table id="attendance-hours-details-table" class="detail-popout-table"><tbody>
-              <tr><td class="detail-popout-label">Employee #</td><td class="detail-popout-value"><span id="ad-emp-no">EBB12</span></td></tr>
+              <tr><td class="detail-popout-label">Employee No.</td><td class="detail-popout-value"><span id="ad-emp-no">EBB12</span></td></tr>
             
             <tr><td class="detail-popout-label">Name</td><td class="detail-popout-value"><span id="ad-name">Farhan binti rahmat</span></td></tr>
             
@@ -1758,13 +1758,13 @@
       if (!data) data = sampleWorkDays[0];
 
       // Populate elements
-      document.getElementById("ad-emp-no").innerText = data.empNo || "EBB12";
+      document.getElementById("ad-emp-no").innerText = formatEmployeeNumber(data.empNo) || "EBB12";
       document.getElementById("ad-name").innerText = data.name || "Farhan binti rahmat";
       document.getElementById("ad-date").innerText = data.fullDate || data.date || "14 Sep 2026";
       document.getElementById("ad-shift").innerText = data.shiftFull || data.shift || "8.30AM-5.30PM (W01)";
       document.getElementById("ad-day-type").innerText = data.dayType || "Work Day";
       document.getElementById("ad-shift-group").innerText = data.shiftGroup || "GROUP A";
-      document.getElementById("ad-supervisor").innerText = data.supervisor || "EBB04";
+      document.getElementById("ad-supervisor").innerText = formatEmployeeNumber(data.supervisor) || "EBB04";
       document.getElementById("ad-clock-times").innerText = data.clockRaw || data.clockTimes || "-";
       document.getElementById("ad-normal-hours").innerText = data.normalHours || "-";
       document.getElementById("ad-late-in").innerText = data.lateIn || "-";

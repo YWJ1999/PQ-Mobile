@@ -334,8 +334,8 @@
   const submitDateLines = new Map();
   function adaptSubmitDates() {
     const current = new Set();
-    function show(source, before, raw, hideSource = true) {
-      if (!before) return;
+    function show(source, panel, raw, hideSource = true) {
+      if (!panel) return;
       const text = raw.trim();
       const match = text.match(/^(?:[a-z]{3},?\s+)?(\d{1,2})[ /]([a-z]+|\d{1,2})[ /](\d{4})(.*)$/i);
       let formatted = '';
@@ -357,24 +357,40 @@
       }
       let line = submitDateLines.get(source);
       if (!line) {
-        line = document.createElement('span');
+        const tableRow = source.matches('tr');
+        const definition = panel.matches('dl');
+        line = document.createElement(tableRow ? 'tr' : definition ? 'div' : 'span');
         line.className = 'web-record-submit-date';
-        const label = document.createElement('span');
-        label.textContent = 'Submit Date:';
-        line.append(label, document.createTextNode(' '));
+        const label = document.createElement(tableRow ? 'th' : definition ? 'dt' : 'span');
+        const value = document.createElement(tableRow ? 'td' : definition ? 'dd' : 'strong');
+        if (tableRow) label.scope = 'row';
+        label.textContent = tableRow ? 'Submit Date:' : 'Submit Date';
+        line.append(label, ' ', value);
         submitDateLines.set(source, line);
       }
-      line.lastChild.nodeValue = ' ' + formatted;
-      if (line.nextElementSibling !== before) before.before(line);
+      if (line.lastElementChild.textContent !== formatted) line.lastElementChild.textContent = formatted;
+      if (line.localName === 'tr') {
+        if (panel.firstElementChild !== line) panel.prepend(line);
+      } else if (panel.lastElementChild !== line) {
+        panel.append(line);
+      }
     }
     const panels = '.history-card-details,.card-details-box,.payroll-approval-field-grid,.tax-relief-detail-table,.leave-highlight-detail-body';
     for (const label of document.querySelectorAll(
-      '.history-card-row > :first-child,.history-card-details span:first-child,.attendance-history-fact dt,' +
+      '.history-card-row > :first-child,.history-card-details span:first-child,.attendance-history-fact dt,#myHistoryCardsList .card-details-box > div > span:first-child,' +
       'tr > :first-child,.payroll-approval-field > :first-child,.tax-relief-detail-row > :first-child,.leave-highlight-detail-label,.sheet-content div > span:first-child'
     )) {
-      if (!/^(?:submit date|submitted(?: date| on)?|submission date|提交日期)\s*[:：]?$/i.test(label.textContent.trim())) continue;
+      if (label.closest('.web-record-submit-date')) continue;
+      const name = label.textContent.trim();
+      if (name === 'Event Date' || name === window.PeopleHcmWebI18n?.t('Event Date')) {
+        addClass(label.parentElement, 'web-record-event-date');
+        continue;
+      }
+      if (!/^(?:submit date|submitted(?: date| on)?|submission date|提交日期)\s*[:：]?$/i.test(name)) continue;
       const value = label.nextElementSibling;
-      if (value) show(label.parentElement, label.closest(panels) || label.closest('table') || label.closest('.sheet-content > *'), value.textContent);
+      const field = label.parentElement;
+      const panel = field.matches('tr') ? field.parentElement : label.closest(panels) || field.parentElement;
+      if (value) show(field, panel, value.textContent);
     }
     for (const source of document.querySelectorAll(
       '.payroll-approval-date,.approval-request-card span:has(>strong:only-child),.relief-card-body span:has(>strong:only-child),' +
@@ -387,7 +403,8 @@
       if (!match) continue;
       const field = source.previousElementSibling?.matches('i.fa-calendar-check') ? source.parentElement : source;
       const statusRow = source.closest('.payroll-approval-status-row') || (field !== source && field.parentElement);
-      show(field, statusRow || source, match[1]);
+      const panel = source.closest(panels) || statusRow?.nextElementSibling || source.closest('.history-card-item')?.querySelector(panels) || field.parentElement;
+      show(field, panel, match[1]);
     }
     for (const note of document.querySelectorAll('#changeRequestHistoryList .change-history-date')) {
       const dated = note.textContent.trim().match(/^Submitted on (.+?)\s*•\s*(.+)$/i);

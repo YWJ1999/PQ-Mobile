@@ -29,10 +29,6 @@
     return `${file}?${query}`;
   }
 
-  function employeeId(value) {
-    return `#${String(value || '').replace(/^#/, '')}`;
-  }
-
   function progress(activity) {
     const latest = [...activity.records].sort((left, right) => left.end.localeCompare(right.end) || left.start.localeCompare(right.start)).at(-1);
     return latest?.progress ?? 0;
@@ -103,7 +99,7 @@
       if (field === 'employee') {
         strong.append(
           node('span', 'sld-employee-name', value.name),
-          node('span', 'sld-employee-id', employeeId(value.empNo))
+          node('span', 'sld-employee-id', formatEmployeeNumber(value.empNo))
         );
       } else {
         strong.textContent = value;

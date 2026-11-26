@@ -19,42 +19,39 @@ const pageUrl = pathToFileURL(path.resolve(__dirname, '../modules/attendance/opt
     await page.setViewport({ width: 390, height: 900 });
     await page.goto(pageUrl + '?theme=light', { waitUntil: 'load' });
 
-    const summaries = [
-      ['view-ot-plan-summary', '2'],
-      ['view-approved-ot-summary', '1'],
-      ['view-pending-ot-summary', '2'],
-      ['view-leave-summary', '3']
-    ];
-
-    for (const [viewId, expectedRecords] of summaries) {
-      await page.evaluate(id => openSummaryViewFromCal(id), viewId);
-      const summary = await page.$eval(`#${viewId} .calendar-summary-meta`, card => {
-        const rows = Array.from(card.querySelectorAll('.calendar-summary-meta-row'));
-        const cardStyle = getComputedStyle(card);
-        const recordStyle = getComputedStyle(rows[1]);
-        const valueStyle = getComputedStyle(rows[1].querySelector('.calendar-summary-meta-value'));
-        return {
-          display: cardStyle.display,
-          columns: cardStyle.gridTemplateColumns,
-          background: cardStyle.backgroundColor,
-          rowTexts: rows.map(row => row.textContent.replace(/\s+/g, ' ').trim()),
-          recordBorderTop: recordStyle.borderTopWidth,
-          recordValue: rows[1].querySelector('.calendar-summary-meta-value').textContent.trim(),
-          recordValueColor: valueStyle.color,
-          iconCount: card.querySelectorAll('i').length
-        };
-      });
-
-      assert.equal(summary.display, 'grid');
-      assert.equal(summary.iconCount, 0);
-      assert.equal(summary.rowTexts[0], 'Date: 15 Sep 2026');
-      assert.equal(summary.rowTexts[1], `${expectedRecords} ${expectedRecords === '1' ? 'Record' : 'Records'}`);
-      assert.equal(summary.recordValue, expectedRecords);
-      assert.equal(summary.recordBorderTop, '1px');
-      assert.notEqual(summary.background, 'rgb(255, 255, 255)');
-      assert.equal(summary.recordValueColor, 'rgb(124, 58, 237)');
+    await page.click('#tabCalendarBtn');
+    for (const [kind, viewId, count, hours, shifts] of [
+      ['total', 'view-ot-plan-summary', '73', '127.00', 2],
+      ['approved', 'view-approved-ot-summary', '28', '45.00', 1],
+      ['pending', 'view-pending-ot-summary', '45', '82.00', 2]
+    ]) {
+      await page.click('#calSummaryCard .is-' + kind);
+      const view = '#' + viewId;
+      assert.deepEqual(await page.$$eval(view + ' dd', nodes => nodes.map(el => el.textContent)), ['15 Sep 2026', count, hours]);
+      assert.equal(await page.$$eval(view + ' details[open]', nodes => nodes.length), shifts);
+      if (shifts > 1) await page.click(view + ' details:first-child summary');
+      await page.click(view + ' details:last-child tbody tr:last-child td:last-child');
+      assert.equal(await page.$eval('#view-ot-plan-detail', el => el.classList.contains('active')), true);
+      await page.click('#view-ot-plan-detail [aria-label="Back"]');
+      assert.equal(await page.evaluate(() => document.activeElement.closest('.view-container').id), viewId);
+      assert.equal(await page.$eval(view + ' details:first-child', group => group.open), shifts === 1);
+      await page.click(view + ' [aria-label="Back"]');
     }
 
+    await page.evaluate(() => openSummaryViewFromCal('view-leave-summary'));
+    assert.deepEqual(await page.$$eval('leave-summary dd', nodes => nodes.map(el => el.textContent)), ['15 Sep 2026', '6']);
+    assert.deepEqual(await page.$$eval('leave-summary tbody tr', rows => rows.map(row => [...row.cells].map(cell => cell.textContent))), [
+      ['Annual Leave', '3'], ['Medical Leave', '2'], ['Unpaid Leave', '1']
+    ]);
+    await page.click('leave-summary tbody tr:last-child button');
+    assert.deepEqual(await page.$eval('leave-employee-detail .shift-employee-overview', card =>
+      [...card.querySelectorAll('h2, [data-date], [data-shift], dd')].map(node => node.textContent)
+    ), ['Unpaid Leave', '15 Sep 2026', '8.30:17.30W', '1', '1.00']);
+    assert.deepEqual(await page.$$eval('leave-employee-detail tbody tr', rows =>
+      rows.map(row => [...row.cells].map(cell => cell.textContent))
+    ), [['000019 - Tee ang lung', 'ACCOUNT EXECUTIVE', '1.00']]);
+    await page.click('#view-leave-detail [aria-label="Back"]');
+    assert.equal(await page.evaluate(() => document.activeElement.closest('tr').querySelector('th').textContent), 'Unpaid Leave');
     assert.deepEqual(errors, []);
     console.log('OT Plan calendar summary header consistency checks passed.');
   } finally {

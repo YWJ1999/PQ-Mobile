@@ -11,6 +11,7 @@ async function inspect(browser, theme, width) {
   page.on('pageerror', error => errors.push(error.message));
   await page.setViewport({ width, height: 950, deviceScaleFactor: 1 });
   await page.goto(pathToFileURL(path.resolve(__dirname, '../modules/attendance/options/clocking-summary.html')).href + `?theme=${theme}`, { waitUntil: 'networkidle0' });
+  assert.ok(await page.evaluate(() => clockingTransactions.every(record => record.location?.trim())), 'Every sample clocking must include a location across all dates');
   const summary = () => page.evaluate(() => ({
     records: document.getElementById('totalRecordsVal').textContent.trim(),
     count: document.getElementById('totalCountVal').textContent.trim(),
@@ -69,7 +70,6 @@ async function inspect(browser, theme, width) {
     const [pdf, excel] = actions.querySelectorAll('button');
     const total = toolbar.querySelector('#detailsRecordCount');
     const rows = toolbar.querySelectorAll('.attendance-report-summary-row');
-    const actionBox = actions.getBoundingClientRect();
     const chartBox = chart.getBoundingClientRect();
     const pdfBox = pdf.getBoundingClientRect();
     const excelBox = excel.getBoundingClientRect();
@@ -83,8 +83,15 @@ async function inspect(browser, theme, width) {
       exportsShareRow: Math.abs(pdfBox.top - excelBox.top) < 2,
       chartAboveExports: chartBox.bottom < pdfBox.top,
       exportsRightAligned: Math.abs(excelBox.right - rows[1].getBoundingClientRect().right) < 2,
-      secondRowText: rows[1].textContent.replace(/\s+/g, ' ').trim(),
-      exportPillsMatchChart: [pdf, excel].every(button => ['borderRadius', 'padding', 'fontSize', 'fontWeight', 'whiteSpace'].every(key => getComputedStyle(button)[key] === getComputedStyle(chart)[key]))
+      secondRowText: rows[1].textContent.trim(),
+      exportGap: excelBox.left - pdfBox.right,
+      exportButtons: [pdf, excel].map(button => {
+        const style = getComputedStyle(button);
+        return {
+          icon: button.querySelector('i[aria-hidden="true"]').className,
+          width: style.width, height: style.height, radius: style.borderRadius, color: style.color
+        };
+      })
     };
   }), {
     labels: ['Chart', 'View PDF', 'View Excel'],
@@ -96,34 +103,41 @@ async function inspect(browser, theme, width) {
     exportsShareRow: true,
     chartAboveExports: true,
     exportsRightAligned: true,
-    secondRowText: 'View PDF View Excel',
-    exportPillsMatchChart: true
-  }, 'Clocking details use the Leave summary card with exports only in the second row');
+    secondRowText: '',
+    exportGap: 12,
+    exportButtons: [
+      { icon: 'fa-solid fa-file-pdf', width: '36px', height: '36px', radius: '10px', color: 'rgb(239, 68, 68)' },
+      { icon: 'fa-solid fa-file-excel', width: '36px', height: '36px', radius: '10px', color: 'rgb(16, 185, 129)' }
+    ]
+  }, 'Clocking details use the shared attendance export icons in the second row');
+  const expectedCardFields = {
+    mode: 'Manual Input (People HR)', radius: '18px', leftBorder: '1px', cardPadding: '18px',
+    headerHasStatusFill: true, statusInHeader: true, labels: ['Clock Time', 'Clock Mode', 'Location']
+  };
+  const timesSquareLocation = 'Times Square Office, Kuala Lumpur';
   assert.deepEqual(await page.$$eval('#detailsListContainer .staff-clock-card', nodes => nodes.map(node => ({
-    name: node.querySelector('.staff-name-text').textContent.trim(),
-    id: node.querySelector('.staff-name-text').nextElementSibling.textContent.trim(),
+    heading: node.querySelector('.staff-name-text').textContent.trim(),
     time: node.querySelector('.clocking-record-time').textContent.trim(),
     status: node.querySelector('.clocking-status-badge')?.textContent.trim() || '',
     mode: node.querySelector('.clocking-record-mode').textContent.trim(),
     radius: getComputedStyle(node).borderRadius,
     leftBorder: getComputedStyle(node).borderLeftWidth,
     cardPadding: getComputedStyle(node).padding,
-    headerHasPurpleFill: getComputedStyle(node.querySelector('.clocking-record-header')).backgroundImage !== 'none',
+    headerHasStatusFill: getComputedStyle(node.querySelector('.clocking-record-header')).backgroundImage !== 'none',
     statusInHeader: Boolean(node.querySelector('.clocking-record-header > .clocking-status-badge')),
-    idBelowName: node.querySelector('.staff-emp-badge').getBoundingClientRect().top >= node.querySelector('.staff-name-text').getBoundingClientRect().bottom,
     labels: [...node.querySelectorAll('.clocking-record-body > .clocking-record-field .clocking-record-label')].map(label => label.textContent.trim())
   }))), [
-    { name: 'Asmawi idris', id: '#EBB15', time: '08:18', status: 'Clock In', mode: 'Manual Input (People HR)', radius: '18px', leftBorder: '5px', cardPadding: '16px', headerHasPurpleFill: false, statusInHeader: true, idBelowName: true, labels: ['Clock Time', 'Clock Mode'] },
-    { name: 'Asmawi idris', id: '#EBB15', time: '19:53', status: 'Clock Out', mode: 'Manual Input (People HR)', radius: '18px', leftBorder: '5px', cardPadding: '16px', headerHasPurpleFill: false, statusInHeader: true, idBelowName: true, labels: ['Clock Time', 'Clock Mode'] },
-    { name: 'Natasha thean mei hoi', id: '#A0001', time: '07:58', status: 'Clock In', mode: 'Manual Input (People HR)', radius: '18px', leftBorder: '5px', cardPadding: '16px', headerHasPurpleFill: false, statusInHeader: true, idBelowName: true, labels: ['Clock Time', 'Clock Mode', 'Location'] },
-    { name: 'Natasha thean mei hoi', id: '#A0001', time: '18:47', status: 'Clock Out', mode: 'Manual Input (People HR)', radius: '18px', leftBorder: '5px', cardPadding: '16px', headerHasPurpleFill: false, statusInHeader: true, idBelowName: true, labels: ['Clock Time', 'Clock Mode'] }
+    { ...expectedCardFields, heading: 'EBB15 - Asmawi idris', time: '08:18', status: 'Clock In' },
+    { ...expectedCardFields, heading: 'EBB15 - Asmawi idris', time: '19:53', status: 'Clock Out' },
+    { ...expectedCardFields, heading: 'A0001 - Natasha thean mei hoi', time: '07:58', status: 'Clock In' },
+    { ...expectedCardFields, heading: 'A0001 - Natasha thean mei hoi', time: '18:47', status: 'Clock Out' }
   ], 'Clocking detail cards use the History Card hierarchy with Clock Type as the status badge');
   assert.deepEqual(await page.$eval('#detailsListContainer .clocking-out-card', node => ({
-    border: getComputedStyle(node).borderLeftColor,
+    header: getComputedStyle(node.querySelector('.clocking-record-header')).backgroundImage,
     badge: getComputedStyle(node.querySelector('.clocking-status-badge')).color
   })), {
-    border: 'rgb(124, 58, 237)',
-    badge: 'rgb(124, 58, 237)'
+    header: 'linear-gradient(105deg, rgb(89, 35, 152), rgb(126, 43, 229))',
+    badge: 'rgb(255, 255, 255)'
   }, 'Clock Out uses the consistent purple status treatment');
   assert.deepEqual(await page.$$eval('#detailsListContainer .clocking-record-location-field', nodes => nodes.map(node => {
     const card = node.closest('.staff-clock-card');
@@ -137,7 +151,7 @@ async function inspect(browser, theme, width) {
       hasIconTile: Boolean(node.querySelector('.clocking-record-location-icon')),
       usesRegularFieldLayout: node.classList.contains('clocking-record-field'),
       locationDisplay: getComputedStyle(node).display,
-      locationJustify: getComputedStyle(node).justifyContent,
+      locationDirection: getComputedStyle(node).flexDirection,
       locationGap: getComputedStyle(node).gap,
       locationPadding: getComputedStyle(node).padding,
       locationBorderTop: getComputedStyle(node).borderTopWidth,
@@ -147,46 +161,46 @@ async function inspect(browser, theme, width) {
       hasFullscreenIcon: Boolean(mapButton?.querySelector('.fa-expand')),
       mapInsideDetails: Boolean(card.querySelector('.clocking-record-body .clocking-map-btn')),
       actionIsDirectChild: actions?.parentElement === card,
-      actionRightAligned: actions ? getComputedStyle(actions).justifyContent === 'flex-end' : false,
+      actionRightAligned: mapButton && Math.abs(actions.getBoundingClientRect().right - mapButton.getBoundingClientRect().right) < 1,
       actionMarginTop: actions ? getComputedStyle(actions).marginTop : '',
       mapButtonPadding: styles?.padding || '',
       mapButtonRadius: styles?.borderRadius || '',
       mapButtonFontSize: styles?.fontSize || '',
       mapButtonFontWeight: styles?.fontWeight || '',
-      mapButtonHasFill: styles?.backgroundImage !== 'none',
+      mapButtonFill: styles?.backgroundColor,
       mapButtonShadow: styles?.boxShadow || ''
     };
-  })), [{
-    employee: 'Natasha thean mei hoi',
-    location: 'Times Square Office, Kuala Lumpur',
+  })), ['EBB15 - Asmawi idris', 'EBB15 - Asmawi idris', 'A0001 - Natasha thean mei hoi', 'A0001 - Natasha thean mei hoi'].map(employee => ({
+    employee,
+    location: timesSquareLocation,
     mapButton: 'View Map',
     hasIconTile: false,
     usesRegularFieldLayout: true,
     locationDisplay: 'flex',
-    locationJustify: 'space-between',
-    locationGap: '16px',
+    locationDirection: 'column',
+    locationGap: '2px',
     locationPadding: '0px',
     locationBorderTop: '0px',
-    locationValueAlign: 'right',
-    locationValueSize: '12px',
+    locationValueAlign: 'left',
+    locationValueSize: '11.5px',
     locationValueWeight: '800',
     hasFullscreenIcon: false,
     mapInsideDetails: false,
     actionIsDirectChild: true,
     actionRightAligned: true,
     actionMarginTop: '12px',
-    mapButtonPadding: '8px 16px',
-    mapButtonRadius: '20px',
-    mapButtonFontSize: '12px',
-    mapButtonFontWeight: '700',
-    mapButtonHasFill: true,
-    mapButtonShadow: 'rgba(124, 58, 237, 0.2) 0px 4px 10px 0px'
-  }], 'Only the located record shows a Leave History-style View Map action outside the inner details panel');
+    mapButtonPadding: '8px 14px',
+    mapButtonRadius: '12px',
+    mapButtonFontSize: '11.5px',
+    mapButtonFontWeight: '800',
+    mapButtonFill: 'rgb(124, 58, 237)',
+    mapButtonShadow: 'rgba(124, 58, 237, 0.22) 0px 4px 12px 0px, rgba(255, 255, 255, 0.12) 0px 1px 0px 0px inset'
+  })), 'Each located record shows its location and View Map action');
   await page.$eval('#detailsListContainer .clocking-map-btn', button => button.scrollIntoView({ block: 'center' }));
   await page.click('#detailsListContainer .clocking-map-btn');
   assert.notEqual(await page.$eval('#view-map', node => getComputedStyle(node).display), 'none');
   assert.equal(await page.$eval('#pageHeaderTitle', node => node.textContent.trim()), 'Location Map');
-  assert.equal(await page.$eval('#clockingMapAddress', node => node.textContent.trim()), 'Times Square Office, Kuala Lumpur');
+  assert.equal(await page.$eval('#clockingMapAddress', node => node.textContent.trim()), timesSquareLocation);
   assert.equal(await page.$eval('#view-map', node => node.textContent.includes('Example Map')), false);
   assert.equal(await page.$eval('#clockingFullMap', node => node.querySelectorAll('iframe, a[href^="http"]').length), 0);
   assert.deepEqual(await page.$eval('#clockingFullMap', node => ({
@@ -204,11 +218,16 @@ async function inspect(browser, theme, width) {
     window.print = () => { window.clockingPrintRequested = true; };
   });
   await page.$eval('#clockingExportExcel', node => node.click());
-  const exported = await page.evaluate(async () => new DOMParser().parseFromString(await window.clockingExportBlob.text(), 'application/xml').getElementsByTagName('Row').length);
-  assert.equal(exported, 5, 'Excel exports the header and the four selected records');
+  const exportedLocations = await page.evaluate(async () => {
+    const workbook = new DOMParser().parseFromString(await window.clockingExportBlob.text(), 'application/xml');
+    return Array.from(workbook.getElementsByTagName('Row'), row => row.lastElementChild.textContent);
+  });
+  const expectedExportLocations = ['Location', ...Array(4).fill(timesSquareLocation)];
+  assert.deepEqual(exportedLocations, expectedExportLocations, 'Excel includes the location of each selected record');
   await page.$eval('#clockingExportPdf', node => node.click());
   assert.equal(await page.evaluate(() => window.clockingPrintRequested), true);
   assert.deepEqual(await page.$$eval('.clocking-print-report tbody tr', nodes => nodes.map(node => node.children[3].textContent)), ['08:18', '19:53', '07:58', '18:47']);
+  assert.deepEqual(await page.$$eval('.clocking-print-report tr', nodes => nodes.map(node => node.lastElementChild.textContent)), expectedExportLocations);
   await new Promise(resolve => setTimeout(resolve, 300));
   await page.screenshot({ path: path.resolve(__dirname, `clocking-details-${theme}-${width}.png`) });
   await page.click('#view-details .view-chart-btn');
@@ -225,9 +244,9 @@ async function inspect(browser, theme, width) {
   assert.equal(await page.$$eval('#view-chart > section', nodes => nodes.length), 3);
   assert.equal(await page.$$eval('button', nodes => nodes.some(node => /View Trend/.test(node.textContent))), false);
   await page.screenshot({ path: path.resolve(__dirname, `clocking-chart-${theme}-${width}.png`) });
-  await page.click('#summaryChartLegendGrid .attendance-report-legend-row');
+  await page.click('#summaryChartLegendGrid .attendance-report-legend-row:last-child');
   assert.notEqual(await page.$eval('#view-details', node => getComputedStyle(node).display), 'none');
-  assert.equal(await page.$$eval('#detailsListContainer .staff-clock-card', nodes => nodes.length), 4);
+  assert.deepEqual(await page.$$eval('#detailsListContainer .staff-clock-card', cards => cards.map(card => card.querySelector('.clocking-record-location').textContent.trim())), ['Mid Valley Office', 'Mid Valley Office']);
   await page.click('.header-btn-icon');
   assert.notEqual(await page.$eval('#view-chart', node => getComputedStyle(node).display), 'none');
   await page.click('.header-btn-icon');
@@ -266,6 +285,12 @@ async function inspect(browser, theme, width) {
   await page.$eval('.filter-reset-btn', node => node.click());
   await page.waitForSelector('#filterModal', { hidden: true });
   assert.equal((await summary()).count, '6');
+  await page.evaluate(() => showClockingDetails({
+    records: [undefined, '   '].map(location => ({ ...clockingTransactions[0], location }))
+  }));
+  assert.deepEqual(await page.$$eval('.clocking-record-location', nodes => nodes.map(node => node.textContent)), ['Not recorded', 'Not recorded']);
+  assert.deepEqual(await page.evaluate(() => clockingExportRows().slice(1).map(row => row.at(-1))), ['Not recorded', 'Not recorded']);
+  assert.equal(await page.$$eval('#detailsListContainer .clocking-map-btn', buttons => buttons.length), 0);
   assert.deepEqual(errors, []);
   await page.close();
 }

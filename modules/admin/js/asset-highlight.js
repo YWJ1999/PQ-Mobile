@@ -48,7 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
     tbody.replaceChildren();
     [...employees.values()].sort((a, b) => a.empNo.localeCompare(b.empNo)).forEach(employee => {
       const row = element('tr');
-      [`#${employee.empNo}`, employee.name, integer(employee.count), money(employee.valueCents)].forEach(value => row.append(element('td', '', value)));
+      [formatEmployeeNumber(employee.empNo), employee.name, integer(employee.count), money(employee.valueCents)].forEach(value => row.append(element('td', '', value)));
       tbody.append(row);
     });
     $('assetTotalRecords').textContent = integer(employees.size);

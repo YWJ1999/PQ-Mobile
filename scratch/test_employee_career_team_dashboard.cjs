@@ -144,8 +144,7 @@ const puppeteer = require('puppeteer');
       assert.equal(await page.$eval('.career-event-person-date', node => node.dateTime), '1966-10-13');
       assert.ok(await page.$$eval('.career-event-person', nodes => nodes.length > 0 && nodes.every(node => {
         const name = node.querySelector('.career-event-person-name');
-        const id = node.querySelector('.career-event-person-id');
-        return id.textContent.startsWith('#') && id.getBoundingClientRect().top >= name.getBoundingClientRect().bottom - 1;
+        return /^[^#\s]+ - .+/.test(name.textContent);
       })));
       await navigate('#staffEventBack');
       assert.deepEqual(await readEvents(), [['Birthday', 44]]);

@@ -129,7 +129,7 @@
         </header>
         <div class="history-record-content detail-popout-body">
           <table id="attendanceDetailsMainTable" class="detail-popout-table"><tbody>
-            <tr><td class="detail-popout-label">Employee #</td><td class="detail-popout-value" id="detailEmployeeNo">#EBB12</td></tr>
+            <tr><td class="detail-popout-label">Employee No.</td><td class="detail-popout-value" id="detailEmployeeNo">EBB12</td></tr>
             <tr><td class="detail-popout-label">Name</td><td class="detail-popout-value" id="detailEmployeeName">Farhan binti rahmat</td></tr>
             <tr><td class="detail-popout-label">Date</td><td class="detail-popout-value" id="detailDate">&ndash;</td></tr>
             <tr><td class="detail-popout-label">Shift</td><td class="detail-popout-value" id="detailShift">&ndash;</td></tr>
@@ -319,8 +319,8 @@
       const hasUnapprovedOt = card.dataset.status === 'unapproved-ot';
       return {
         ...card.dataset,
-        employeeNo: '#EBB12', employeeName: 'Farhan binti rahmat',
-        dayType: card.querySelector('[data-day-type]').textContent, shiftGroup: 'GROUP A', supervisor: '#EBB04',
+        employeeNo: 'EBB12', employeeName: 'Farhan binti rahmat',
+        dayType: card.querySelector('[data-day-type]').textContent, shiftGroup: 'GROUP A', supervisor: 'EBB04',
         approvedOtHours: '0.00', unapprovedOtHours: hasUnapprovedOt ? card.dataset.otHours : '0.00',
         documentNo: '–',
         overtimeInfo: hasUnapprovedOt ? { code: '–', description: 'Unapproved OT', hours: card.dataset.otHours, uot: 'Yes' } : null
@@ -359,13 +359,13 @@
     function renderAttendanceDetails(card) {
       activeAttendanceDetailCard = card;
       const data = cardData(card);
-      document.getElementById('detailEmployeeNo').textContent = data.employeeNo;
+      document.getElementById('detailEmployeeNo').textContent = formatEmployeeNumber(data.employeeNo);
       document.getElementById('detailEmployeeName').textContent = data.employeeName;
       document.getElementById('detailDate').textContent = data.date;
       document.getElementById('detailShift').textContent = data.shift;
       document.getElementById('detailDayType').textContent = data.dayType;
       document.getElementById('detailShiftGroup').textContent = data.shiftGroup;
-      document.getElementById('detailSupervisor').textContent = data.supervisor;
+      document.getElementById('detailSupervisor').textContent = formatEmployeeNumber(data.supervisor);
       document.getElementById('detailTimes').textContent = data.times;
       document.getElementById('detailNormalHours').textContent = data.normalHours;
       AttendanceAdviceFields.render(document.getElementById('pendingFeedbackAdviceFields'), data);

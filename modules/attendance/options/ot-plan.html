@@ -9,6 +9,7 @@
   <script src="../../../js/components.js"></script>
   <script src="../../../js/calendar-month.js" defer></script>
   <script src="../../../js/attendance/planning-calendar.js" defer></script>
+  <script src="../../../js/attendance/work-shift-summary.js" defer></script>
   <script src="../../../js/attendance/planning-headcount-details.js" defer></script>
   <script src="../../../js/app.js" defer></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -254,42 +255,6 @@
     .staff-history-row:last-child { border-bottom: 0; }
     .staff-history-hours { text-align: right; color: var(--purple-primary); font-weight: 800; font-variant-numeric: tabular-nums; }
 
-    .calendar-summary-meta {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr);
-      gap: 0;
-      margin: 12px 16px 4px;
-      padding: 12px 14px;
-      border: 1px solid var(--border-subtle);
-      border-radius: 18px;
-      background: var(--record-summary-background);
-      box-shadow: none;
-    }
-    .calendar-summary-meta-row {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      min-width: 0;
-    }
-    .calendar-summary-meta-row + .calendar-summary-meta-row {
-      margin-top: 10px;
-      padding-top: 10px;
-      border-top: 1px solid var(--border-subtle);
-    }
-    .calendar-summary-meta-label {
-      color: var(--text-muted);
-      font-size: 11px;
-      font-weight: 700;
-    }
-    .calendar-summary-meta-value {
-      color: var(--text-primary);
-      font-size: 12.5px;
-      font-weight: 800;
-    }
-    .calendar-summary-meta-row:last-child .calendar-summary-meta-value {
-      color: var(--purple-primary);
-    }
-
     /* Sticky Bottom Action Bar */
     .sticky-bottom-bar {
       position: relative;
@@ -514,84 +479,6 @@
       background: linear-gradient(135deg, rgba(124, 58, 237, 0.15) 0%, rgba(167, 139, 250, 0.05) 100%);
       border-color: rgba(167, 139, 250, 0.25);
     }
-    .history-card-item.calendar-purple-card,
-    [data-theme="dark"] .history-card-item.calendar-purple-card,
-    html[data-theme="dark"] .history-card-item.calendar-purple-card {
-      display: block;
-      width: 100%;
-      padding: 0;
-      overflow: hidden;
-      border-color: var(--border-subtle);
-      background: var(--bg-card);
-      color: var(--text-primary);
-      text-align: left;
-    }
-    .calendar-purple-card-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      padding: 11px 14px;
-      background: var(--purple-primary);
-      color: #ffffff;
-    }
-    .calendar-purple-card-header > i { font-size: 12px; opacity: .8; }
-    .calendar-purple-card-title { font-size: 13.5px; font-weight: 800; line-height: 1.25; }
-    .calendar-purple-card .calendar-purple-card-header .history-time-row { margin: 0; color: inherit; }
-    .calendar-purple-card-body {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 8px;
-      padding: 12px 14px 14px;
-    }
-    .calendar-purple-detail {
-      min-width: 0;
-      padding: 9px 10px;
-      border-radius: 12px;
-      border: 1px solid var(--border-subtle);
-      background: var(--bg-input);
-    }
-    .calendar-purple-detail.full-width { grid-column: 1 / -1; }
-    .calendar-purple-label { display: block; margin-bottom: 3px; color: var(--text-muted); font-size: 10px; font-weight: 700; }
-    .calendar-purple-detail .summary-value { display: block; color: var(--text-primary); font-size: 12.5px; font-weight: 800; overflow-wrap: anywhere; }
-    .history-card-item.employee-purple-card,
-    [data-theme="dark"] .history-card-item.employee-purple-card,
-    html[data-theme="dark"] .history-card-item.employee-purple-card {
-      padding: 0;
-      overflow: hidden;
-      flex-direction: column;
-      align-items: stretch;
-      flex-shrink: 0;
-      border-color: var(--border-subtle);
-      background: var(--bg-card);
-    }
-    .employee-purple-header {
-      padding: 11px 14px 10px;
-      background: var(--purple-primary);
-      color: #ffffff;
-    }
-    .employee-card-name { font-size: 14px; font-weight: 800; line-height: 1.25; }
-    .employee-card-id { margin-top: 2px; color: rgba(255, 255, 255, 0.78); font-family: monospace, sans-serif; font-size: 11.5px; font-weight: 700; }
-    .employee-purple-body {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 8px;
-      padding: 12px 14px 14px;
-    }
-    .employee-purple-body.single-column { grid-template-columns: minmax(0, 1fr); }
-    .shift-detail-info-card {
-      border-radius: 18px !important;
-      background: var(--record-summary-background) !important;
-      box-shadow: none !important;
-    }
-    .shift-detail-info-date { margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1px solid var(--border-subtle); }
-    .shift-detail-info-rows { display: grid; gap: 4px; }
-    .shift-detail-info-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: baseline; column-gap: 12px; font-size: 12px; }
-    .shift-detail-info-label { min-width: 0; color: var(--text-muted); font-weight: 600; line-height: 1.35; }
-    .shift-detail-info-value { min-width: 0; color: var(--text-primary); font-weight: 800; line-height: 1.35; text-align: right; overflow-wrap: anywhere; font-variant-numeric: tabular-nums; }
-    .shift-detail-info-value.is-accent { color: var(--purple-primary); }
-    .shift-detail-info-date .shift-detail-info-label { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
-    .shift-detail-info-date .shift-detail-info-value { font-size: 12.5px; }
     .history-time-row { font-size: 14.5px; font-weight: 800; color: var(--purple-primary); margin-bottom: 5px; display: flex; align-items: center; gap: 6px; }
     [data-theme="dark"] .history-time-row, html[data-theme="dark"] .history-time-row { color: #c084fc; }
     .history-time-row.ot-time { color: #d97706; }
@@ -616,6 +503,7 @@
 
   </style>
   <link rel="stylesheet" href="../../../css/form-section-headings.css">
+  <link rel="stylesheet" href="../../../css/attendance-work-shift-summary.css">
 </head>
 <body>
   <preview-top-bar active-page="attendance"></preview-top-bar>
@@ -702,17 +590,17 @@
             <span class="cal-summary-staff" id="calSummaryStaff"></span>
           </div>
           <div class="cal-summary-stats">
-            <button type="button" class="cal-summary-stat is-approved" onclick="openSummaryViewFromCal('view-approved-ot-summary')" aria-label="View approved OT summary, 28 staff and 45 hours">
+            <button type="button" class="cal-summary-stat is-approved" data-ot-status="approved" onclick="openSummaryViewFromCal('view-approved-ot-summary')">
               <span class="cal-summary-stat-label">Approved OT</span>
-              <strong class="cal-summary-stat-val">28 / 45.00</strong>
+              <strong class="cal-summary-stat-val"></strong>
             </button>
-            <button type="button" class="cal-summary-stat is-pending" onclick="openSummaryViewFromCal('view-pending-ot-summary')" aria-label="View pending OT summary, 45 staff and 82 hours">
+            <button type="button" class="cal-summary-stat is-pending" data-ot-status="pending" onclick="openSummaryViewFromCal('view-pending-ot-summary')">
               <span class="cal-summary-stat-label">Pending OT</span>
-              <strong class="cal-summary-stat-val">45 / 82.00</strong>
+              <strong class="cal-summary-stat-val"></strong>
             </button>
-            <button type="button" class="cal-summary-stat is-total" onclick="openSummaryViewFromCal('view-ot-plan-summary')" aria-label="View total OT summary, 73 staff and 127 hours">
+            <button type="button" class="cal-summary-stat is-total" data-ot-status="" onclick="openSummaryViewFromCal('view-ot-plan-summary')">
               <span class="cal-summary-stat-label">Total OT</span>
-              <strong class="cal-summary-stat-val">73 / 127.00</strong>
+              <strong class="cal-summary-stat-val"></strong>
             </button>
           </div>
         </section>
@@ -790,149 +678,7 @@
           </div>
         </div>
       </div>
-      <div style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 16px; margin: 12px 16px 4px; padding: 10px 14px; display: flex; align-items: center; justify-content: space-between; box-shadow: var(--shadow-sm);">
-        <div style="display: flex; align-items: center; gap: 10px;">
-          <div style="width: 32px; height: 32px; border-radius: 10px; background: rgba(124, 58, 237, 0.15); color: var(--purple-primary); display: flex; align-items: center; justify-content: center; font-size: 13px;">
-            <i class="fa-regular fa-calendar-check"></i>
-          </div>
-          <div>
-            <div style="font-size: 10px; font-weight: 800; color: var(--purple-primary); letter-spacing: 0.5px; text-transform: uppercase;">DATE FILTER</div>
-            <div style="font-size: 12.5px; font-weight: 800; color: var(--text-primary);" id="wsSummaryDateFilter">23 Sep 2026</div>
-          </div>
-        </div>
-        <div style="background: var(--bg-input); border: 1px solid var(--border-subtle); padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 700; color: var(--text-muted);">
-          6 Records
-        </div>
-      </div>
-      <div class="scroll-body">
-        
-        <!-- Card 1 -->
-        <a href="javascript:void(0)" onclick="openWorkShiftDetail('0700:1500', 22, '176.00', '145.60')" class="history-card-item" style="display: block; text-decoration: none; padding: 14px 16px;">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-            <div class="history-time-row" style="font-size: 15px; font-weight: 800; color: var(--text-primary); margin-bottom: 0;">
-              0700:1500
-            </div>
-            <div style="color: var(--text-muted); font-size: 13px; opacity: 0.6;">
-              <i class="fa-solid fa-chevron-right"></i>
-            </div>
-          </div>
-          <div style="font-size: 12.5px; font-weight: 700; color: var(--text-primary); margin-bottom: 2px;">
-            Headcount: <span style="font-weight: 800;">22 Staff</span>
-          </div>
-          <div style="font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 2px;">
-            Scheduled Hours: <span style="color: var(--text-primary); font-weight: 700;">176.00</span>
-          </div>
-          <div style="font-size: 12px; font-weight: 600; color: var(--text-muted);">
-            Work Hours: <span style="color: var(--text-primary); font-weight: 700;">145.60</span>
-          </div>
-        </a>
-
-        <!-- Card 2 -->
-        <a href="javascript:void(0)" onclick="openWorkShiftDetail('0800:1700(B)', 3, '24.00', '24.00')" class="history-card-item" style="display: block; text-decoration: none; padding: 14px 16px;">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-            <div class="history-time-row" style="font-size: 15px; font-weight: 800; color: var(--text-primary); margin-bottom: 0;">
-              0800:1700(B)
-            </div>
-            <div style="color: var(--text-muted); font-size: 13px; opacity: 0.6;">
-              <i class="fa-solid fa-chevron-right"></i>
-            </div>
-          </div>
-          <div style="font-size: 12.5px; font-weight: 700; color: var(--text-primary); margin-bottom: 2px;">
-            Headcount: <span style="font-weight: 800;">3 Staff</span>
-          </div>
-          <div style="font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 2px;">
-            Scheduled Hours: <span style="color: var(--text-primary); font-weight: 700;">24.00</span>
-          </div>
-          <div style="font-size: 12px; font-weight: 600; color: var(--text-muted);">
-            Work Hours: <span style="color: var(--text-primary); font-weight: 700;">24.00</span>
-          </div>
-        </a>
-
-        <!-- Card 3 -->
-        <a href="javascript:void(0)" onclick="openWorkShiftDetail('0815:1715', 1, '8.00', '8.00')" class="history-card-item" style="display: block; text-decoration: none; padding: 14px 16px;">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-            <div class="history-time-row" style="font-size: 15px; font-weight: 800; color: var(--text-primary); margin-bottom: 0;">
-              0815:1715
-            </div>
-            <div style="color: var(--text-muted); font-size: 13px; opacity: 0.6;">
-              <i class="fa-solid fa-chevron-right"></i>
-            </div>
-          </div>
-          <div style="font-size: 12.5px; font-weight: 700; color: var(--text-primary); margin-bottom: 2px;">
-            Headcount: <span style="font-weight: 800;">1 Staff</span>
-          </div>
-          <div style="font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 2px;">
-            Scheduled Hours: <span style="color: var(--text-primary); font-weight: 700;">8.00</span>
-          </div>
-          <div style="font-size: 12px; font-weight: 600; color: var(--text-muted);">
-            Work Hours: <span style="color: var(--text-primary); font-weight: 700;">8.00</span>
-          </div>
-        </a>
-
-        <!-- Card 4 -->
-        <a href="javascript:void(0)" onclick="openWorkShiftDetail('0830:1730', 1, '8.00', '8.00')" class="history-card-item" style="display: block; text-decoration: none; padding: 14px 16px;">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-            <div class="history-time-row" style="font-size: 15px; font-weight: 800; color: var(--text-primary); margin-bottom: 0;">
-              0830:1730
-            </div>
-            <div style="color: var(--text-muted); font-size: 13px; opacity: 0.6;">
-              <i class="fa-solid fa-chevron-right"></i>
-            </div>
-          </div>
-          <div style="font-size: 12.5px; font-weight: 700; color: var(--text-primary); margin-bottom: 2px;">
-            Headcount: <span style="font-weight: 800;">1 Staff</span>
-          </div>
-          <div style="font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 2px;">
-            Scheduled Hours: <span style="color: var(--text-primary); font-weight: 700;">8.00</span>
-          </div>
-          <div style="font-size: 12px; font-weight: 600; color: var(--text-muted);">
-            Work Hours: <span style="color: var(--text-primary); font-weight: 700;">8.00</span>
-          </div>
-        </a>
-
-        <!-- Card 5 -->
-        <a href="javascript:void(0)" onclick="openWorkShiftDetail('1500:2300', 1, '8.00', '0.00')" class="history-card-item" style="display: block; text-decoration: none; padding: 14px 16px;">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-            <div class="history-time-row" style="font-size: 15px; font-weight: 800; color: var(--text-primary); margin-bottom: 0;">
-              1500:2300
-            </div>
-            <div style="color: var(--text-muted); font-size: 13px; opacity: 0.6;">
-              <i class="fa-solid fa-chevron-right"></i>
-            </div>
-          </div>
-          <div style="font-size: 12.5px; font-weight: 700; color: var(--text-primary); margin-bottom: 2px;">
-            Headcount: <span style="font-weight: 800;">1 Staff</span>
-          </div>
-          <div style="font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 2px;">
-            Scheduled Hours: <span style="color: var(--text-primary); font-weight: 700;">8.00</span>
-          </div>
-          <div style="font-size: 12px; font-weight: 600; color: var(--text-muted);">
-            Work Hours: <span style="color: var(--text-primary); font-weight: 700;">0.00</span>
-          </div>
-        </a>
-
-        <!-- Card 6 -->
-        <a href="javascript:void(0)" onclick="openWorkShiftDetail('8.30:17.30W', 242, '1,936.00', '1,316.09')" class="history-card-item" style="display: block; text-decoration: none; padding: 14px 16px;">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-            <div class="history-time-row" style="font-size: 15px; font-weight: 800; color: var(--purple-primary); margin-bottom: 0;">
-              8.30:17.30W
-            </div>
-            <div style="color: var(--text-muted); font-size: 13px; opacity: 0.6;">
-              <i class="fa-solid fa-chevron-right"></i>
-            </div>
-          </div>
-          <div style="font-size: 12.5px; font-weight: 700; color: var(--text-primary); margin-bottom: 2px;">
-            Headcount: <span style="font-weight: 800;">242 Staff</span>
-          </div>
-          <div style="font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 2px;">
-            Scheduled Hours: <span style="color: var(--text-primary); font-weight: 700;">1,936.00</span>
-          </div>
-          <div style="font-size: 12px; font-weight: 600; color: var(--text-muted);">
-            Work Hours: <span style="color: var(--text-primary); font-weight: 700;">1,316.09</span>
-          </div>
-        </a>
-
-      </div>
+      <work-shift-summary class="scroll-body"></work-shift-summary>
     </div>
 
     <!-- ================= VIEW: NO WORK SUMMARY ================= -->
@@ -948,37 +694,7 @@
           </div>
         </div>
       </div>
-      <div style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 16px; margin: 12px 16px 4px; padding: 10px 14px; display: flex; align-items: center; justify-content: space-between; box-shadow: var(--shadow-sm);">
-        <div style="display: flex; align-items: center; gap: 10px;">
-          <div style="width: 32px; height: 32px; border-radius: 10px; background: rgba(124, 58, 237, 0.15); color: var(--purple-primary); display: flex; align-items: center; justify-content: center; font-size: 13px;">
-            <i class="fa-regular fa-calendar-check"></i>
-          </div>
-          <div>
-            <div style="font-size: 10px; font-weight: 800; color: var(--purple-primary); letter-spacing: 0.5px; text-transform: uppercase;">DATE FILTER</div>
-            <div style="font-size: 12.5px; font-weight: 800; color: var(--text-primary);" id="nwSummaryDateFilter">23 Sep 2026</div>
-          </div>
-        </div>
-        <div style="background: var(--bg-input); border: 1px solid var(--border-subtle); padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 700; color: var(--text-muted);">
-          1 Record
-        </div>
-      </div>
-      <div class="scroll-body">
-        
-        <a href="javascript:void(0)" onclick="openNoWorkDetail('Rest / Off Day', 13)" class="history-card-item feedback-theme" style="display: block; text-decoration: none; padding: 14px 16px;">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-            <div class="history-time-row feedback-time" style="font-size: 15px; font-weight: 800; margin-bottom: 0;">
-              Rest / Off Day
-            </div>
-            <div style="color: var(--text-muted); font-size: 13px; opacity: 0.6;">
-              <i class="fa-solid fa-chevron-right"></i>
-            </div>
-          </div>
-          <div style="font-size: 12.5px; font-weight: 700; color: var(--text-primary);">
-            Headcount: <span style="font-weight: 800;">13 Staff</span>
-          </div>
-        </a>
-
-      </div>
+      <no-work-summary class="scroll-body"></no-work-summary>
     </div>
 
     <!-- ================= VIEW: OT PLAN SUMMARY ================= -->
@@ -990,65 +706,11 @@
             <button type="button" class="icon-btn-ghost" onclick="goBackToCalendar()" aria-label="Back">
               <i class="fa-solid fa-chevron-left"></i>
             </button>
-            <h1 style="font-size: 19px; font-weight: 800; color: #ffffff; margin: 0;">OT Plan Summary</h1>
+            <h1 tabindex="-1" style="font-size: 19px; font-weight: 800; color: #ffffff; margin: 0;">OT Plan Summary</h1>
           </div>
         </div>
       </div>
-      <div class="calendar-summary-meta">
-        <div class="calendar-summary-meta-row">
-          <span class="calendar-summary-meta-label">Date:</span>
-          <strong class="calendar-summary-meta-value" id="otSummaryDateFilter">23 Sep 2026</strong>
-        </div>
-        <div class="calendar-summary-meta-row record-summary-metric">
-          <strong class="calendar-summary-meta-value" data-record-count>2</strong>
-          <span class="calendar-summary-meta-label">Records</span>
-        </div>
-      </div>
-      <div class="scroll-body">
-        
-        <a href="javascript:void(0)" onclick="openOtPlanDetail('8.30:17.30W', 'OT 1.5 BEFORE WORK', 28, '28.00')" class="history-card-item calendar-purple-card">
-          <div class="calendar-purple-card-header">
-            <div class="history-time-row calendar-purple-card-title">8.30:17.30W</div>
-            <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
-          </div>
-          <div class="calendar-purple-card-body">
-            <div class="calendar-purple-detail full-width">
-              <span class="calendar-purple-label">OT Type</span>
-              <span class="summary-value">OT 1.5 BEFORE WORK</span>
-            </div>
-            <div class="calendar-purple-detail">
-              <span class="calendar-purple-label">Headcount</span>
-              <span class="summary-value">28</span>
-            </div>
-            <div class="calendar-purple-detail">
-              <span class="calendar-purple-label">Hours</span>
-              <span class="summary-value">28.00</span>
-            </div>
-          </div>
-        </a>
-
-        <a href="javascript:void(0)" onclick="openOtPlanDetail('8.30:17.30W', '1.5 OT', 59, '106.00')" class="history-card-item calendar-purple-card">
-          <div class="calendar-purple-card-header">
-            <div class="history-time-row calendar-purple-card-title">8.30:17.30W</div>
-            <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
-          </div>
-          <div class="calendar-purple-card-body">
-            <div class="calendar-purple-detail full-width">
-              <span class="calendar-purple-label">OT Type</span>
-              <span class="summary-value">1.5 OT</span>
-            </div>
-            <div class="calendar-purple-detail">
-              <span class="calendar-purple-label">Headcount</span>
-              <span class="summary-value">59</span>
-            </div>
-            <div class="calendar-purple-detail">
-              <span class="calendar-purple-label">Hours</span>
-              <span class="summary-value">106.00</span>
-            </div>
-          </div>
-        </a>
-
-      </div>
+      <ot-plan-summary class="scroll-body"></ot-plan-summary>
     </div>
 
     <!-- ================= VIEW: APPROVED OT SUMMARY ================= -->
@@ -1060,44 +722,11 @@
             <button type="button" class="icon-btn-ghost" onclick="goBackToCalendar()" aria-label="Back">
               <i class="fa-solid fa-chevron-left"></i>
             </button>
-            <h1 style="font-size: 19px; font-weight: 800; color: #ffffff; margin: 0;">Approved OT Summary</h1>
+            <h1 tabindex="-1" style="font-size: 19px; font-weight: 800; color: #ffffff; margin: 0;">Approved OT Summary</h1>
           </div>
         </div>
       </div>
-      <div class="calendar-summary-meta">
-        <div class="calendar-summary-meta-row">
-          <span class="calendar-summary-meta-label">Date:</span>
-          <strong class="calendar-summary-meta-value" id="approvedOtSummaryDateFilter">15 Sep 2026</strong>
-        </div>
-        <div class="calendar-summary-meta-row record-summary-metric">
-          <strong class="calendar-summary-meta-value" data-record-count>1</strong>
-          <span class="calendar-summary-meta-label">Record</span>
-        </div>
-      </div>
-      <div class="scroll-body">
-        
-        <a href="javascript:void(0)" onclick="openOtPlanDetail('8.30:17.30W', 'OT 1.5 BEFORE WORK', 28, '45.00')" class="history-card-item calendar-purple-card">
-          <div class="calendar-purple-card-header">
-            <div class="history-time-row calendar-purple-card-title">8.30:17.30W</div>
-            <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
-          </div>
-          <div class="calendar-purple-card-body">
-            <div class="calendar-purple-detail full-width">
-              <span class="calendar-purple-label">OT Type</span>
-              <span class="summary-value">OT 1.5 BEFORE WORK</span>
-            </div>
-            <div class="calendar-purple-detail">
-              <span class="calendar-purple-label">Headcount</span>
-              <span class="summary-value">28</span>
-            </div>
-            <div class="calendar-purple-detail">
-              <span class="calendar-purple-label">Hours</span>
-              <span class="summary-value">45.00</span>
-            </div>
-          </div>
-        </a>
-
-      </div>
+      <ot-plan-summary class="scroll-body" data-ot-status="approved"></ot-plan-summary>
     </div>
 
     <!-- ================= VIEW: PENDING OT SUMMARY ================= -->
@@ -1109,65 +738,11 @@
             <button type="button" class="icon-btn-ghost" onclick="goBackToCalendar()" aria-label="Back">
               <i class="fa-solid fa-chevron-left"></i>
             </button>
-            <h1 style="font-size: 19px; font-weight: 800; color: #ffffff; margin: 0;">Pending OT Summary</h1>
+            <h1 tabindex="-1" style="font-size: 19px; font-weight: 800; color: #ffffff; margin: 0;">Pending OT Summary</h1>
           </div>
         </div>
       </div>
-      <div class="calendar-summary-meta">
-        <div class="calendar-summary-meta-row">
-          <span class="calendar-summary-meta-label">Date:</span>
-          <strong class="calendar-summary-meta-value" id="pendingOtSummaryDateFilter">15 Sep 2026</strong>
-        </div>
-        <div class="calendar-summary-meta-row record-summary-metric">
-          <strong class="calendar-summary-meta-value" data-record-count>2</strong>
-          <span class="calendar-summary-meta-label">Records</span>
-        </div>
-      </div>
-      <div class="scroll-body">
-        
-        <a href="javascript:void(0)" onclick="openOtPlanDetail('8.30:17.30W', 'OT 1.5 AFTER WORK', 35, '62.00')" class="history-card-item calendar-purple-card">
-          <div class="calendar-purple-card-header">
-            <div class="history-time-row calendar-purple-card-title">8.30:17.30W</div>
-            <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
-          </div>
-          <div class="calendar-purple-card-body">
-            <div class="calendar-purple-detail full-width">
-              <span class="calendar-purple-label">OT Type</span>
-              <span class="summary-value">OT 1.5 AFTER WORK</span>
-            </div>
-            <div class="calendar-purple-detail">
-              <span class="calendar-purple-label">Headcount</span>
-              <span class="summary-value">35</span>
-            </div>
-            <div class="calendar-purple-detail">
-              <span class="calendar-purple-label">Hours</span>
-              <span class="summary-value">62.00</span>
-            </div>
-          </div>
-        </a>
-
-        <a href="javascript:void(0)" onclick="openOtPlanDetail('0700:1500', 'OT 2.0 REST DAY', 10, '20.00')" class="history-card-item calendar-purple-card">
-          <div class="calendar-purple-card-header">
-            <div class="history-time-row calendar-purple-card-title">0700:1500</div>
-            <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
-          </div>
-          <div class="calendar-purple-card-body">
-            <div class="calendar-purple-detail full-width">
-              <span class="calendar-purple-label">OT Type</span>
-              <span class="summary-value">OT 2.0 REST DAY</span>
-            </div>
-            <div class="calendar-purple-detail">
-              <span class="calendar-purple-label">Headcount</span>
-              <span class="summary-value">10</span>
-            </div>
-            <div class="calendar-purple-detail">
-              <span class="calendar-purple-label">Hours</span>
-              <span class="summary-value">20.00</span>
-            </div>
-          </div>
-        </a>
-
-      </div>
+      <ot-plan-summary class="scroll-body" data-ot-status="pending"></ot-plan-summary>
     </div>
 
     <!-- ================= VIEW: LEAVE SUMMARY ================= -->
@@ -1179,74 +754,11 @@
             <button type="button" class="icon-btn-ghost" onclick="goBackToCalendar()" aria-label="Back">
               <i class="fa-solid fa-chevron-left"></i>
             </button>
-            <h1 style="font-size: 19px; font-weight: 800; color: #ffffff; margin: 0;">Leave Summary</h1>
+            <h1 tabindex="-1" style="font-size: 19px; font-weight: 800; color: #ffffff; margin: 0;">Leave Summary</h1>
           </div>
         </div>
       </div>
-      <div class="calendar-summary-meta">
-        <div class="calendar-summary-meta-row">
-          <span class="calendar-summary-meta-label">Date:</span>
-          <strong class="calendar-summary-meta-value" id="lvSummaryDateFilter">23 Sep 2026</strong>
-        </div>
-        <div class="calendar-summary-meta-row record-summary-metric">
-          <strong class="calendar-summary-meta-value" data-record-count>3</strong>
-          <span class="calendar-summary-meta-label">Records</span>
-        </div>
-      </div>
-      <div class="scroll-body">
-        
-        <a href="javascript:void(0)" onclick="openLeaveDetail('ANNUAL LEAVE', '8.30:17.30W', 3)" class="history-card-item feedback-theme" style="display: block; text-decoration: none; padding: 14px 16px;">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-            <div class="history-time-row feedback-time" style="font-size: 15px; font-weight: 800; margin-bottom: 0;">
-              ANNUAL LEAVE
-            </div>
-            <div style="color: var(--text-muted); font-size: 13px; opacity: 0.6;">
-              <i class="fa-solid fa-chevron-right"></i>
-            </div>
-          </div>
-          <div style="font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 2px;">
-            Shift: <span style="color: var(--text-primary); font-weight: 700;">8.30:17.30W</span>
-          </div>
-          <div style="font-size: 12.5px; font-weight: 700; color: var(--text-primary);">
-            Headcount: <span style="font-weight: 800;">3.00 Staff</span>
-          </div>
-        </a>
-
-        <a href="javascript:void(0)" onclick="openLeaveDetail('MEDICAL LEAVE', '8.30:17.30W', 2)" class="history-card-item feedback-theme" style="display: block; text-decoration: none; padding: 14px 16px;">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-            <div class="history-time-row feedback-time" style="font-size: 15px; font-weight: 800; margin-bottom: 0;">
-              MEDICAL LEAVE
-            </div>
-            <div style="color: var(--text-muted); font-size: 13px; opacity: 0.6;">
-              <i class="fa-solid fa-chevron-right"></i>
-            </div>
-          </div>
-          <div style="font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 2px;">
-            Shift: <span style="color: var(--text-primary); font-weight: 700;">8.30:17.30W</span>
-          </div>
-          <div style="font-size: 12.5px; font-weight: 700; color: var(--text-primary);">
-            Headcount: <span style="font-weight: 800;">2.00 Staff</span>
-          </div>
-        </a>
-
-        <a href="javascript:void(0)" onclick="openLeaveDetail('UNPAID LEAVE', '8.30:17.30W', 1)" class="history-card-item feedback-theme" style="display: block; text-decoration: none; padding: 14px 16px;">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-            <div class="history-time-row feedback-time" style="font-size: 15px; font-weight: 800; margin-bottom: 0;">
-              UNPAID LEAVE
-            </div>
-            <div style="color: var(--text-muted); font-size: 13px; opacity: 0.6;">
-              <i class="fa-solid fa-chevron-right"></i>
-            </div>
-          </div>
-          <div style="font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 2px;">
-            Shift: <span style="color: var(--text-primary); font-weight: 700;">8.30:17.30W</span>
-          </div>
-          <div style="font-size: 12.5px; font-weight: 700; color: var(--text-primary);">
-            Headcount: <span style="font-weight: 800;">1.00 Staff</span>
-          </div>
-        </a>
-
-      </div>
+      <leave-summary class="scroll-body"></leave-summary>
     </div>
 
     <!-- ================= VIEW: WORK SHIFT EMPLOYEE DETAIL ================= -->
@@ -1258,39 +770,11 @@
             <button type="button" class="icon-btn-ghost" onclick="switchView('view-work-shift-summary')" aria-label="Back">
               <i class="fa-solid fa-chevron-left"></i>
             </button>
-            <h1 style="font-size: 18px; font-weight: 800; color: #ffffff; margin: 0;">Work Shift Employee Detail</h1>
+            <h1 tabindex="-1" style="font-size: 18px; font-weight: 800; color: #ffffff; margin: 0;">Work Shift Employee Detail</h1>
           </div>
         </div>
       </div>
-      <!-- Info Header Card -->
-      <div style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 16px; margin: 12px 16px 6px; padding: 12px 16px; box-shadow: var(--shadow-sm);">
-        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1px solid var(--border-subtle);">
-          <i class="fa-regular fa-calendar-check" style="color: var(--purple-primary); font-size: 13px;"></i>
-          <span style="font-size: 11px; font-weight: 800; color: var(--purple-primary); text-transform: uppercase; letter-spacing: 0.5px;">Date:</span>
-          <span style="font-size: 12.5px; font-weight: 800; color: var(--text-primary);" id="wsDetailDate">23 Sep 2026</span>
-        </div>
-        <div style="display: flex; flex-direction: column; gap: 4px;">
-          <div style="display: flex; justify-content: space-between; font-size: 12px;">
-            <span style="color: var(--text-muted); font-weight: 600;">Shift:</span>
-            <span style="color: var(--text-primary); font-weight: 800;" id="wsDetailShift">0700:1500</span>
-          </div>
-          <div style="display: flex; justify-content: space-between; font-size: 12px;">
-            <span style="color: var(--text-muted); font-weight: 600;">Total Headcount:</span>
-            <span style="color: var(--text-primary); font-weight: 800;" id="wsDetailHeadcount">22</span>
-          </div>
-          <div style="display: flex; justify-content: space-between; font-size: 12px;">
-            <span style="color: var(--text-muted); font-weight: 600;">Total Scheduled Hours:</span>
-            <span style="color: var(--text-primary); font-weight: 800;" id="wsDetailScheduledHours">176.00</span>
-          </div>
-          <div style="display: flex; justify-content: space-between; font-size: 12px;">
-            <span style="color: var(--text-muted); font-weight: 600;">Total Work Hours:</span>
-            <span style="color: var(--text-primary); font-weight: 800;" id="wsDetailWorkHours">145.60</span>
-          </div>
-        </div>
-      </div>
-      <!-- Scroll Body with Employee Cards -->
-      <div class="scroll-body" id="wsEmployeeCardsContainer" style="flex: 1; overflow-y: auto; padding: 10px 16px 40px; display: flex; flex-direction: column; gap: 10px; scrollbar-width: none; -ms-overflow-style: none;">
-      </div>
+      <work-shift-employee-detail class="scroll-body"></work-shift-employee-detail>
     </div>
 
     <!-- ================= VIEW: NO WORK EMPLOYEE DETAIL ================= -->
@@ -1302,31 +786,11 @@
             <button type="button" class="icon-btn-ghost" onclick="switchView('view-no-work-summary')" aria-label="Back">
               <i class="fa-solid fa-chevron-left"></i>
             </button>
-            <h1 style="font-size: 18px; font-weight: 800; color: #ffffff; margin: 0;">No Work Employee Detail</h1>
+            <h1 tabindex="-1" style="font-size: 18px; font-weight: 800; color: #ffffff; margin: 0;">No Work Employee Detail</h1>
           </div>
         </div>
       </div>
-      <!-- Info Header Card -->
-      <div style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 16px; margin: 12px 16px 6px; padding: 12px 16px; box-shadow: var(--shadow-sm);">
-        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1px solid var(--border-subtle);">
-          <i class="fa-regular fa-calendar-check" style="color: var(--purple-primary); font-size: 13px;"></i>
-          <span style="font-size: 11px; font-weight: 800; color: var(--purple-primary); text-transform: uppercase; letter-spacing: 0.5px;">Date:</span>
-          <span style="font-size: 12.5px; font-weight: 800; color: var(--text-primary);" id="nwDetailDate">23 Sep 2026</span>
-        </div>
-        <div style="display: flex; flex-direction: column; gap: 4px;">
-          <div style="display: flex; justify-content: space-between; font-size: 12px;">
-            <span style="color: var(--text-muted); font-weight: 600;">Shift:</span>
-            <span style="color: var(--text-primary); font-weight: 800;" id="nwDetailShift">Rest / Off Day</span>
-          </div>
-          <div style="display: flex; justify-content: space-between; font-size: 12px;">
-            <span style="color: var(--text-muted); font-weight: 600;">Total Headcount:</span>
-            <span style="color: var(--text-primary); font-weight: 800;" id="nwDetailHeadcount">13</span>
-          </div>
-        </div>
-      </div>
-      <!-- Scroll Body with Employee Cards -->
-      <div class="scroll-body" id="nwEmployeeCardsContainer" style="flex: 1; overflow-y: auto; padding: 10px 16px 40px; display: flex; flex-direction: column; gap: 10px; scrollbar-width: none; -ms-overflow-style: none;">
-      </div>
+      <no-work-employee-detail class="scroll-body"></no-work-employee-detail>
     </div>
 
     <!-- ================= VIEW: OT PLAN EMPLOYEE DETAIL ================= -->
@@ -1335,41 +799,14 @@
         <phone-status-bar time="9:41" style="color: #ffffff;"></phone-status-bar>
         <div class="header-nav">
           <div class="header-title-wrap">
-            <button type="button" class="icon-btn-ghost" onclick="switchView('view-ot-plan-summary')" aria-label="Back">
+            <button type="button" class="icon-btn-ghost" onclick="switchView(otDetailSummaryView, true)" aria-label="Back">
               <i class="fa-solid fa-chevron-left"></i>
             </button>
-            <h1 style="font-size: 18px; font-weight: 800; color: #ffffff; margin: 0;">OT Plan Employee Detail</h1>
+            <h1 tabindex="-1" style="font-size: 18px; font-weight: 800; color: #ffffff; margin: 0;">OT Plan Employee Detail</h1>
           </div>
         </div>
       </div>
-      <!-- Info Header Card -->
-      <div class="record-summary-card shift-detail-info-card" style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 16px; margin: 12px 16px 6px; padding: 12px 16px; box-shadow: var(--shadow-sm);">
-        <div class="shift-detail-info-row shift-detail-info-date">
-          <span class="shift-detail-info-label">Date:</span>
-          <span class="shift-detail-info-value" id="otDetailDate">23 Sep 2026</span>
-        </div>
-        <div class="shift-detail-info-rows">
-          <div class="shift-detail-info-row">
-            <span class="shift-detail-info-label">Shift:</span>
-            <span class="shift-detail-info-value" id="otDetailShift">8.30:17.30W</span>
-          </div>
-          <div class="shift-detail-info-row">
-            <span class="shift-detail-info-label">OT Type:</span>
-            <span class="shift-detail-info-value is-accent" id="otDetailOtType">OT 1.5 BEFORE WORK</span>
-          </div>
-          <div class="shift-detail-info-row">
-            <span class="shift-detail-info-label">Total Headcount:</span>
-            <span class="shift-detail-info-value" id="otDetailHeadcount">28</span>
-          </div>
-          <div class="shift-detail-info-row">
-            <span class="shift-detail-info-label">Total Hours:</span>
-            <span class="shift-detail-info-value" id="otDetailTotalHours">28.00</span>
-          </div>
-        </div>
-      </div>
-      <!-- Scroll Body with Employee Cards -->
-      <div class="scroll-body" id="otEmployeeCardsContainer" style="flex: 1; overflow-y: auto; padding: 10px 16px 40px; display: flex; flex-direction: column; gap: 10px; scrollbar-width: none; -ms-overflow-style: none;">
-      </div>
+      <ot-plan-employee-detail class="scroll-body"></ot-plan-employee-detail>
     </div>
 
     <!-- ================= VIEW: LEAVE EMPLOYEE DETAIL ================= -->
@@ -1378,34 +815,14 @@
         <phone-status-bar time="9:41" style="color: #ffffff;"></phone-status-bar>
         <div class="header-nav">
           <div class="header-title-wrap">
-            <button type="button" class="icon-btn-ghost" onclick="switchView('view-leave-summary')" aria-label="Back">
+            <button type="button" class="icon-btn-ghost" onclick="switchView('view-leave-summary', true)" aria-label="Back">
               <i class="fa-solid fa-chevron-left"></i>
             </button>
-            <h1 style="font-size: 18px; font-weight: 800; color: #ffffff; margin: 0;">Leave Employee Detail</h1>
+            <h1 tabindex="-1" style="font-size: 18px; font-weight: 800; color: #ffffff; margin: 0;">Leave Employee Detail</h1>
           </div>
         </div>
       </div>
-      <!-- Info Header Card -->
-      <div style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 16px; margin: 12px 16px 6px; padding: 12px 16px; box-shadow: var(--shadow-sm);">
-        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1px solid var(--border-subtle);">
-          <i class="fa-regular fa-calendar-check" style="color: var(--purple-primary); font-size: 13px;"></i>
-          <span style="font-size: 11px; font-weight: 800; color: var(--purple-primary); text-transform: uppercase; letter-spacing: 0.5px;">Date:</span>
-          <span style="font-size: 12.5px; font-weight: 800; color: var(--text-primary);" id="lvDetailDate">23 Sep 2026</span>
-        </div>
-        <div style="display: flex; flex-direction: column; gap: 4px;">
-          <div style="display: flex; justify-content: space-between; font-size: 12px;">
-            <span style="color: var(--text-muted); font-weight: 600;">Shift:</span>
-            <span style="color: var(--text-primary); font-weight: 800;" id="lvDetailShift">8.30:17.30W</span>
-          </div>
-          <div style="display: flex; justify-content: space-between; font-size: 12px;">
-            <span style="color: var(--text-muted); font-weight: 600;">Total Headcount:</span>
-            <span style="color: var(--text-primary); font-weight: 800;" id="lvDetailHeadcount">3</span>
-          </div>
-        </div>
-      </div>
-      <!-- Scroll Body with Employee Cards -->
-      <div class="scroll-body" id="lvEmployeeCardsContainer" style="flex: 1; overflow-y: auto; padding: 10px 16px 40px; display: flex; flex-direction: column; gap: 10px; scrollbar-width: none; -ms-overflow-style: none;">
-      </div>
+      <leave-employee-detail class="scroll-body"></leave-employee-detail>
     </div>
 
     <!-- Staff OT history -->
@@ -1458,9 +875,9 @@
         <div>
           <label for="modalSupervisorSelect" class="ot-form-label">Supervisor</label>
           <select id="modalSupervisorSelect" style="width: 100%; padding: 12px; border-radius: 12px; background: var(--bg-card); border: 1px solid var(--border-subtle); color: var(--text-primary); font-size: 13px; font-weight: 700; outline: none;">
-            <option value="EBB04">#EBB04 · Tech Lead</option>
-            <option value="000234">#000234 · Kevin Lim</option>
-            <option value="000450">#000450 · Jenny Koh</option>
+            <option value="EBB04">EBB04 · Tech Lead</option>
+            <option value="000234">000234 · Kevin Lim</option>
+            <option value="000450">000450 · Jenny Koh</option>
           </select>
         </div>
 
@@ -1639,7 +1056,7 @@
       </dl>
       <div class="summary-table-card">
         <table class="planning-detail-table ot-hours-schedule-table" id="otHoursScheduleTable" aria-label="Planned and approved OT hours by employee">
-          <thead><tr><th scope="col">Emp #</th><th scope="col">Name</th><th scope="col">Planned</th><th scope="col">Approved</th></tr></thead>
+          <thead><tr><th scope="col">Emp No.</th><th scope="col">Name</th><th scope="col">Planned</th><th scope="col">Approved</th></tr></thead>
           <tbody id="otHoursScheduleRows"></tbody>
         </table>
         <p class="planning-detail-empty" id="otHoursEmpty" hidden>No matching employees.</p>
@@ -1822,8 +1239,7 @@
               <span class="staff-verify-box" aria-hidden="true"><i class="fa-solid fa-check"></i></span>
             </label>
             <div class="staff-identity">
-              <a class="staff-name ot-staff-name" data-history-link href="${HistoryRecordPage.href('staff-ot', emp.id)}" aria-label="View OT history for ${emp.name}">${emp.name}</a>
-              <span class="emp-id-label">#${emp.id}</span>
+              <a class="staff-name ot-staff-name" data-history-link href="${HistoryRecordPage.href('staff-ot', emp.id)}" aria-label="View OT history for ${emp.name}">${employeeCardHeading.html(emp.id, emp.name)}</a>
               <span class="ot-staff-job">${emp.dept}</span>
             </div>
           </div>
@@ -2082,7 +1498,7 @@
         planned += plannedHours;
         approved += approvedHours;
         const row = body.insertRow();
-        for (const value of ['#' + employee.id, employee.name, plannedHours.toFixed(2), approvedHours.toFixed(2)]) {
+        for (const value of [formatEmployeeNumber(employee.id), employee.name, plannedHours.toFixed(2), approvedHours.toFixed(2)]) {
           row.insertCell().textContent = value;
         }
       }
@@ -2325,6 +1741,11 @@
     }
 
     const otCalendarHoursByDay = { 15: 2192, 16: 2192, 17: 8, 18: 8.5, 24: 0, 25: 0 };
+    let otDetailSummaryView = 'view-ot-plan-summary';
+
+    function calendarOtPlansForStatus(status) {
+      return status ? calendarOtPlans.filter(record => record.status === status) : calendarOtPlans;
+    }
 
     function otCalendarTotalsForDate(date) {
       const hours = otCalendarHoursByDay[date.getDate()];
@@ -2343,48 +1764,56 @@
         weekday: 'short', day: '2-digit', month: 'short', year: 'numeric'
       });
       document.getElementById('calSummaryStaff').textContent = `${totals.staff} staff`;
+      for (const button of document.querySelectorAll('#calSummaryCard [data-ot-status]')) {
+        const records = calendarOtPlansForStatus(button.dataset.otStatus);
+        const count = records.reduce((sum, record) => sum + record.headcount, 0);
+        const hours = formatShiftDuration(records.reduce((sum, record) => sum + record.hours, 0));
+        button.querySelector('.cal-summary-stat-val').textContent = `${count} / ${hours}`;
+        const label = button.querySelector('.cal-summary-stat-label').textContent;
+        button.setAttribute('aria-label', `View ${label} summary, ${count} staff and ${hours} hours`);
+      }
     }
 
     // Employee Detail Datasets for Summary Drill-downs
     const workShiftEmployeeDataset = [
-      { name: "Anderson ng", id: "000054", jobTitle: "ACCOUNT EXECUTIVE", scheduledHours: "8.00", workHours: "7.18" },
-      { name: "Yee seong liew", id: "000070", jobTitle: "PAYABLES EXECUTIVE", scheduledHours: "8.00", workHours: "7.23" },
-      { name: "Hanis", id: "0099", jobTitle: "ADMIN EXECUTIVE", scheduledHours: "8.00", workHours: "7.25" },
-      { name: "Danial", id: "500006", jobTitle: "FINANCE AUDIT MANAGER", scheduledHours: "8.00", workHours: "6.50" },
-      { name: "Tony", id: "500007", jobTitle: "HR MANAGER", scheduledHours: "8.00", workHours: "7.10" },
-      { name: "Sim", id: "500012", jobTitle: "RECRUITMENT OFFICER", scheduledHours: "8.00", workHours: "7.17" },
-      { name: "Muhammad ali bin man", id: "EBB01", jobTitle: "OPERATION DIRECTOR", scheduledHours: "8.00", workHours: "6.87" },
-      { name: "Farhan binti rahmat", id: "EBB12", jobTitle: "QUALITY ASSURANCE LEAD", scheduledHours: "8.00", workHours: "7.50" },
-      { name: "Chong Wei Lun", id: "000112", jobTitle: "SENIOR BARISTA", scheduledHours: "8.00", workHours: "8.00" },
-      { name: "Rachel Tan", id: "000145", jobTitle: "BARISTA", scheduledHours: "8.00", workHours: "7.80" },
-      { name: "Siti Nurhaliza", id: "000210", jobTitle: "BARISTA", scheduledHours: "8.00", workHours: "8.00" },
-      { name: "Kevin Lim", id: "000234", jobTitle: "SHIFT SUPERVISOR", scheduledHours: "8.00", workHours: "7.45" },
-      { name: "Amirul Hakim", id: "000305", jobTitle: "OPERATIONS ASSISTANT", scheduledHours: "8.00", workHours: "7.20" },
-      { name: "Nurul Izzah", id: "000318", jobTitle: "CASHIER", scheduledHours: "8.00", workHours: "6.90" },
-      { name: "David Low", id: "000340", jobTitle: "INVENTORY CLERK", scheduledHours: "8.00", workHours: "7.30" },
-      { name: "Grace Wong", id: "000388", jobTitle: "BARISTA", scheduledHours: "8.00", workHours: "7.15" },
-      { name: "Hassan Basri", id: "000412", jobTitle: "MAINTENANCE TECH", scheduledHours: "8.00", workHours: "8.00" },
-      { name: "Jenny Koh", id: "000450", jobTitle: "STORE SUPERVISOR", scheduledHours: "8.00", workHours: "7.60" },
-      { name: "Marcus Lee", id: "000489", jobTitle: "BARISTA", scheduledHours: "8.00", workHours: "6.80" },
-      { name: "Syed Saddiq", id: "000512", jobTitle: "LOGISTICS ASST", scheduledHours: "8.00", workHours: "7.10" },
-      { name: "Wendy Tan", id: "000555", jobTitle: "CUSTOMER SERVICE", scheduledHours: "8.00", workHours: "7.40" },
-      { name: "Zulhazmi bin Yusof", id: "000590", jobTitle: "SECURITY OFFICER", scheduledHours: "8.00", workHours: "7.50" }
+      { name: "Anderson Ng", id: "000054", jobTitle: "Account Executive", scheduledHours: "8.00", workHours: "7.18" },
+      { name: "Yee Seong Liew", id: "000070", jobTitle: "Payables Executive", scheduledHours: "8.00", workHours: "7.23" },
+      { name: "Hanis", id: "0099", jobTitle: "Admin Executive", scheduledHours: "8.00", workHours: "7.25" },
+      { name: "Danial", id: "500006", jobTitle: "Finance Audit Manager", scheduledHours: "8.00", workHours: "6.50" },
+      { name: "Tony", id: "500007", jobTitle: "HR Manager", scheduledHours: "8.00", workHours: "7.10" },
+      { name: "Sim", id: "500012", jobTitle: "Recruitment Officer", scheduledHours: "8.00", workHours: "7.17" },
+      { name: "Muhammad ali bin man", id: "EBB01", jobTitle: "Operation Director", scheduledHours: "8.00", workHours: "6.87" },
+      { name: "Farhan binti rahmat", id: "EBB12", jobTitle: "Quality Assurance Lead", scheduledHours: "8.00", workHours: "7.50" },
+      { name: "Chong Wei Lun", id: "000112", jobTitle: "Senior Barista", scheduledHours: "8.00", workHours: "8.00" },
+      { name: "Rachel Tan", id: "000145", jobTitle: "Barista", scheduledHours: "8.00", workHours: "7.80" },
+      { name: "Siti Nurhaliza", id: "000210", jobTitle: "Barista", scheduledHours: "8.00", workHours: "8.00" },
+      { name: "Kevin Lim", id: "000234", jobTitle: "Shift Supervisor", scheduledHours: "8.00", workHours: "7.45" },
+      { name: "Amirul Hakim", id: "000305", jobTitle: "Operations Assistant", scheduledHours: "8.00", workHours: "7.20" },
+      { name: "Nurul Izzah", id: "000318", jobTitle: "Cashier", scheduledHours: "8.00", workHours: "6.90" },
+      { name: "David Low", id: "000340", jobTitle: "Inventory Clerk", scheduledHours: "8.00", workHours: "7.30" },
+      { name: "Grace Wong", id: "000388", jobTitle: "Barista", scheduledHours: "8.00", workHours: "7.15" },
+      { name: "Hassan Basri", id: "000412", jobTitle: "Maintenance Tech", scheduledHours: "8.00", workHours: "8.00" },
+      { name: "Jenny Koh", id: "000450", jobTitle: "Store Supervisor", scheduledHours: "8.00", workHours: "7.60" },
+      { name: "Marcus Lee", id: "000489", jobTitle: "Barista", scheduledHours: "8.00", workHours: "6.80" },
+      { name: "Syed Saddiq", id: "000512", jobTitle: "Logistics Asst", scheduledHours: "8.00", workHours: "7.10" },
+      { name: "Wendy Tan", id: "000555", jobTitle: "Customer Service", scheduledHours: "8.00", workHours: "7.40" },
+      { name: "Zulhazmi bin Yusof", id: "000590", jobTitle: "Security Officer", scheduledHours: "8.00", workHours: "7.50" }
     ];
 
     const noWorkEmployeeDataset = [
-      { name: "TEST", id: "00012345", jobTitle: "ACCOUNT EXECUTIVE" },
-      { name: "hey", id: "012345", jobTitle: "BARTENDER" },
-      { name: "BHIM BAHADUR TAMANG", id: "620578", jobTitle: "PRODUCTION OPERATOR" },
-      { name: "PRITIMAN GURUNG", id: "620657", jobTitle: "PRODUCTION OPERATOR" },
-      { name: "HAFIZUR RAHMAN", id: "620675", jobTitle: "OPERATION DIRECTOR" },
-      { name: "MD SHOHEL", id: "620717", jobTitle: "PRODUCTION OPERATOR" },
-      { name: "SHER BAHADUR THAPA MAGAR", id: "620803", jobTitle: "PRODUCTION OPERATOR" },
-      { name: "DAN BAHADUR THAPA", id: "620836", jobTitle: "PRODUCTION OPERATOR" },
-      { name: "SANJIT KUMAR", id: "620890", jobTitle: "PRODUCTION OPERATOR" },
-      { name: "KISHOR TAMANG", id: "620912", jobTitle: "WAREHOUSE HELPER" },
-      { name: "MOHD FAHMI", id: "620945", jobTitle: "PACKING ASSISTANT" },
-      { name: "KAVITHA RAMASAMY", id: "620980", jobTitle: "QUALITY CHECKER" },
-      { name: "SURESH BABU", id: "621004", jobTitle: "CLEANING SPECIALIST" }
+      { name: "TEST", id: "00012345", jobTitle: "Account Executive" },
+      { name: "hey", id: "012345", jobTitle: "Bartender" },
+      { name: "Bhim Bahadur Tamang", id: "620578", jobTitle: "Production Operator" },
+      { name: "Pritiman Gurung", id: "620657", jobTitle: "Production Operator" },
+      { name: "HAFIZUR RAHMAN", id: "620675", jobTitle: "Operation Director" },
+      { name: "MD SHOHEL", id: "620717", jobTitle: "Production Operator" },
+      { name: "SHER BAHADUR THAPA MAGAR", id: "620803", jobTitle: "Production Operator" },
+      { name: "DAN BAHADUR THAPA", id: "620836", jobTitle: "Production Operator" },
+      { name: "SANJIT KUMAR", id: "620890", jobTitle: "Production Operator" },
+      { name: "KISHOR TAMANG", id: "620912", jobTitle: "Warehouse Helper" },
+      { name: "MOHD FAHMI", id: "620945", jobTitle: "Packing Assistant" },
+      { name: "KAVITHA RAMASAMY", id: "620980", jobTitle: "Quality Checker" },
+      { name: "SURESH BABU", id: "621004", jobTitle: "Cleaning Specialist" }
     ];
 
     const otPlanEmployeeDataset = [
@@ -2418,132 +1847,66 @@
       { name: "Nur Aini", id: "001490", jobTitle: "DATA ENTRY CLERK", hours: "1.00" }
     ];
 
+    const calendarOtPlans = [
+      { status: 'approved', shift: '8.30:17.30W', otType: 'OT 1.5 BEFORE WORK', headcount: 28, hours: 45, employees: otPlanEmployeeDataset },
+      { status: 'pending', shift: '8.30:17.30W', otType: 'OT 1.5 AFTER WORK', headcount: 35, hours: 62, employees: otPlanEmployeeDataset },
+      { status: 'pending', shift: '0700:1500', otType: 'OT 2.0 REST DAY', headcount: 10, hours: 20, employees: otPlanEmployeeDataset.slice(0, 10) }
+    ];
+
     const leaveEmployeeDataset = [
       { name: "Tee ang lung", id: "000019", jobTitle: "ACCOUNT EXECUTIVE", leaveType: "ANNUAL LEAVE", leaveDay: "1.00" },
       { name: "Tan li", id: "27637", jobTitle: "PRODUCTION OPERATOR", leaveType: "ANNUAL LEAVE", leaveDay: "1.00" },
       { name: "Ahmad bin ali", id: "EBB55", jobTitle: "PRODUCTION WORKER", leaveType: "ANNUAL LEAVE", leaveDay: "1.00" }
     ];
 
-    function openWorkShiftDetail(shiftTitle, count, schedHrs, workHrs) {
-      document.getElementById('wsDetailShift').textContent = shiftTitle;
-      document.getElementById('wsDetailHeadcount').textContent = count;
-      document.getElementById('wsDetailScheduledHours').textContent = schedHrs;
-      document.getElementById('wsDetailWorkHours').textContent = workHrs;
-      
-      const container = document.getElementById('wsEmployeeCardsContainer');
-      const list = count <= 3 ? workShiftEmployeeDataset.slice(0, count) : workShiftEmployeeDataset;
-      
-      container.innerHTML = list.map(emp => `
-        <div class="history-card-item" style="display: block; width: 100%; box-sizing: border-box; padding: 14px 16px; margin-bottom: 0;">
-          <div style="font-size: 14.5px; font-weight: 800; color: var(--text-primary); line-height: 1.2;">${emp.name}</div>
-          <div style="font-size: 11.5px; font-weight: 700; color: var(--text-muted); opacity: 0.8; font-family: monospace, sans-serif; margin-bottom: 6px; margin-top: 2px;">#${emp.id}</div>
-          <div style="font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 2px;">
-            Job Title: <span style="color: var(--text-primary); font-weight: 700;">${emp.jobTitle}</span>
-          </div>
-          <div style="font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 2px;">
-            Scheduled Hours: <span style="color: var(--text-primary); font-weight: 700;">${emp.scheduledHours || schedHrs}</span>
-          </div>
-          <div style="font-size: 12px; font-weight: 600; color: var(--text-muted);">
-            Work Hours: <span style="color: var(--text-primary); font-weight: 700;">${emp.workHours || '8.00'}</span>
-          </div>
-        </div>
-      `).join('');
-      
-      switchView('view-work-shift-detail');
+    const otWorkShiftRecords = [
+      { shift: '0700:1500', headcount: 22, scheduledHours: 176, workHours: 145.6 },
+      { shift: '0800:1700(B)', headcount: 3, scheduledHours: 24, workHours: 24 },
+      { shift: '0815:1715', headcount: 1, scheduledHours: 8, workHours: 8 },
+      { shift: '0830:1730', headcount: 1, scheduledHours: 8, workHours: 8 },
+      { shift: '1500:2300', headcount: 1, scheduledHours: 8, workHours: 0 },
+      { shift: '8.30:17.30W', headcount: 242, scheduledHours: 1936, workHours: 1316.09 }
+    ];
+
+    function openWorkShiftDetail(shift, headcount, scheduledHours, workHours, employees) {
+      const view = document.getElementById('view-work-shift-detail');
+      const detail = view.querySelector('work-shift-employee-detail');
+      const roster = employees ?? (headcount <= 3 ? workShiftEmployeeDataset.slice(0, headcount) : workShiftEmployeeDataset);
+      detail.render({ shift, headcount, scheduledHours, workHours, employees: roster });
+      switchView(view.id);
+      detail.scrollTop = 0;
+      view.querySelector('h1').focus({ preventScroll: true });
     }
 
-    function openNoWorkDetail(shiftTitle, count) {
-      document.getElementById('nwDetailShift').textContent = shiftTitle;
-      document.getElementById('nwDetailHeadcount').textContent = count;
-      
-      const container = document.getElementById('nwEmployeeCardsContainer');
-      container.innerHTML = noWorkEmployeeDataset.map(emp => `
-        <div class="history-card-item feedback-theme" style="display: block; width: 100%; box-sizing: border-box; padding: 14px 16px; margin-bottom: 0;">
-          <div style="font-size: 14.5px; font-weight: 800; color: var(--text-primary); line-height: 1.2;">${emp.name}</div>
-          <div style="font-size: 11.5px; font-weight: 700; color: var(--text-muted); opacity: 0.8; font-family: monospace, sans-serif; margin-bottom: 6px; margin-top: 2px;">#${emp.id}</div>
-          <div style="font-size: 12px; font-weight: 600; color: var(--text-muted);">
-            Job Title: <span style="color: var(--text-primary); font-weight: 700;">${emp.jobTitle}</span>
-          </div>
-        </div>
-      `).join('');
-      
-      switchView('view-no-work-detail');
+    function openNoWorkDetail(shift, headcount, employees = noWorkEmployeeDataset) {
+      const view = document.getElementById('view-no-work-detail');
+      const detail = view.querySelector('no-work-employee-detail');
+      detail.render({ shift, headcount, employees });
+      switchView(view.id);
+      detail.scrollTop = 0;
+      view.querySelector('h1').focus({ preventScroll: true });
     }
 
-    function openOtPlanDetail(shiftTitle, otType, count, totalHrs) {
-      document.getElementById('otDetailShift').textContent = shiftTitle;
-      document.getElementById('otDetailOtType').textContent = otType;
-      document.getElementById('otDetailHeadcount').textContent = count;
-      document.getElementById('otDetailTotalHours').textContent = totalHrs;
-      
-      const container = document.getElementById('otEmployeeCardsContainer');
-      const list = Array.from({ length: count }, (_, index) => otPlanEmployeeDataset[index] || {
-        name: `OT Plan Staff ${index + 1}`,
-        id: String(index + 1).padStart(6, '0'),
-        jobTitle: 'ACCOUNT EXECUTIVE',
-        hours: '1.00'
-      });
-      
-      container.innerHTML = list.map(emp => `
-        <div class="history-card-item employee-purple-card" style="width: 100%; box-sizing: border-box; margin-bottom: 0;">
-          <div class="employee-purple-header">
-            <div class="employee-card-name">${emp.name}</div>
-            <div class="employee-card-id">#${emp.id}</div>
-          </div>
-          <div class="employee-purple-body">
-            <div class="calendar-purple-detail full-width">
-              <span class="calendar-purple-label">Job Title</span>
-              <span class="summary-value">${emp.jobTitle}</span>
-            </div>
-            <div class="calendar-purple-detail full-width">
-              <span class="calendar-purple-label">Hours</span>
-              <span class="summary-value">${emp.hours || '1.00'}</span>
-            </div>
-          </div>
-        </div>
-      `).join('');
-      
-      switchView('view-ot-plan-detail');
+    function openOtPlanDetail(shift, otType, headcount, hours, summaryView = 'view-ot-plan-summary', employees = otPlanEmployeeDataset.slice(0, headcount)) {
+      otDetailSummaryView = summaryView;
+      const view = document.getElementById('view-ot-plan-detail');
+      const detail = view.querySelector('ot-plan-employee-detail');
+      detail.render({ date: selectedCalendarDate, shift, otType, headcount, hours, employees });
+      switchView(view.id);
+      detail.scrollTop = 0;
+      view.querySelector('h1').focus({ preventScroll: true });
     }
 
-    function openLeaveDetail(leaveType, shiftTitle, count) {
-      document.getElementById('lvDetailShift').textContent = shiftTitle;
-      document.getElementById('lvDetailHeadcount').textContent = count;
-      
-      const container = document.getElementById('lvEmployeeCardsContainer');
-      const list = leaveEmployeeDataset.map(emp => ({ ...emp, leaveType: leaveType }));
-      
-      container.innerHTML = list.map(emp => `
-        <div class="history-card-item feedback-theme" style="display: block; width: 100%; box-sizing: border-box; padding: 14px 16px; margin-bottom: 0;">
-          <div style="font-size: 14.5px; font-weight: 800; color: var(--text-primary); line-height: 1.2;">${emp.name}</div>
-          <div style="font-size: 11.5px; font-weight: 700; color: var(--text-muted); opacity: 0.8; font-family: monospace, sans-serif; margin-bottom: 6px; margin-top: 2px;">#${emp.id}</div>
-          <div style="font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 2px;">
-            Job Title: <span style="color: var(--text-primary); font-weight: 700;">${emp.jobTitle}</span>
-          </div>
-          <div style="font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 2px;">
-            Leave Type: <span style="color: var(--purple-primary); font-weight: 800;">${emp.leaveType}</span>
-          </div>
-          <div style="font-size: 12px; font-weight: 600; color: var(--text-muted);">
-            Leave Day: <span style="color: var(--text-primary); font-weight: 700;">${emp.leaveDay}</span>
-          </div>
-        </div>
-      `).join('');
-      
-      switchView('view-leave-detail');
+    function openLeaveDetail(leaveType, shift, headcount, employees = leaveEmployeeDataset.slice(0, headcount), leaveDays) {
+      const view = document.getElementById('view-leave-detail');
+      const detail = view.querySelector('leave-employee-detail');
+      detail.render({ date: selectedCalendarDate, shift, leaveType, headcount, leaveDays, employees });
+      switchView(view.id);
+      detail.scrollTop = 0;
+      view.querySelector('h1').focus({ preventScroll: true });
     }
 
     function openSummaryViewFromCal(viewId) {
-      const selectedCalDateText = selectedCalendarDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).replace('Sept', 'Sep');
-      if (document.getElementById('wsSummaryDateFilter')) document.getElementById('wsSummaryDateFilter').textContent = selectedCalDateText;
-      if (document.getElementById('nwSummaryDateFilter')) document.getElementById('nwSummaryDateFilter').textContent = selectedCalDateText;
-      if (document.getElementById('otSummaryDateFilter')) document.getElementById('otSummaryDateFilter').textContent = selectedCalDateText;
-      if (document.getElementById('approvedOtSummaryDateFilter')) document.getElementById('approvedOtSummaryDateFilter').textContent = selectedCalDateText;
-      if (document.getElementById('pendingOtSummaryDateFilter')) document.getElementById('pendingOtSummaryDateFilter').textContent = selectedCalDateText;
-      if (document.getElementById('lvSummaryDateFilter')) document.getElementById('lvSummaryDateFilter').textContent = selectedCalDateText;
-      if (document.getElementById('wsDetailDate')) document.getElementById('wsDetailDate').textContent = selectedCalDateText;
-      if (document.getElementById('nwDetailDate')) document.getElementById('nwDetailDate').textContent = selectedCalDateText;
-      if (document.getElementById('otDetailDate')) document.getElementById('otDetailDate').textContent = selectedCalDateText;
-      if (document.getElementById('lvDetailDate')) document.getElementById('lvDetailDate').textContent = selectedCalDateText;
       switchView(viewId);
     }
 
@@ -2554,16 +1917,51 @@
       }
     }
 
-    function switchView(viewId) {
+    function switchView(viewId, restoreSummary = false) {
+      const target = document.getElementById(viewId);
+      const groupedSummary = target?.querySelector('leave-summary, ot-plan-summary');
+      const previousRow = restoreSummary && groupedSummary?.selectedButton;
+      if (viewId === 'view-work-shift-summary') {
+        document.querySelector('#view-work-shift-summary work-shift-summary').render({
+          date: selectedCalendarDate,
+          records: otWorkShiftRecords,
+          onSelect: record => openWorkShiftDetail(record.shift, record.headcount, record.scheduledHours, record.workHours)
+        });
+      } else if (viewId === 'view-no-work-summary') {
+        document.querySelector('#view-no-work-summary no-work-summary').render({
+          date: selectedCalendarDate,
+          records: [{ shift: 'Rest / Off Day', headcount: 13 }],
+          onSelect: record => openNoWorkDetail(record.shift, record.headcount)
+        });
+      } else if (groupedSummary?.matches('ot-plan-summary') && !previousRow) {
+        groupedSummary.render({
+          date: selectedCalendarDate,
+          records: calendarOtPlansForStatus(groupedSummary.dataset.otStatus),
+          onSelect: record => openOtPlanDetail(record.shift, record.otType, record.headcount, record.hours, viewId, record.employees)
+        });
+      } else if (groupedSummary?.matches('leave-summary') && !previousRow) {
+        groupedSummary.render({
+          date: selectedCalendarDate,
+          records: [
+            { shift: '8.30:17.30W', leaveType: 'ANNUAL LEAVE', headcount: 3, employees: leaveEmployeeDataset },
+            { shift: '8.30:17.30W', leaveType: 'MEDICAL LEAVE', headcount: 2, employees: leaveEmployeeDataset.slice(0, 2) },
+            { shift: '8.30:17.30W', leaveType: 'UNPAID LEAVE', headcount: 1, employees: leaveEmployeeDataset.slice(0, 1) }
+          ],
+          onSelect: record => openLeaveDetail(record.leaveType, record.shift, record.headcount, record.employees, record.leaveDays)
+        });
+      }
       document.querySelectorAll('.view-container').forEach(el => {
         el.classList.remove('active');
         // also ensure inline display is updated for safety
         el.style.display = 'none';
       });
-      const target = document.getElementById(viewId);
       if (target) {
         target.classList.add('active');
         target.style.display = 'flex';
+        if (groupedSummary) {
+          if (!previousRow) groupedSummary.scrollTop = 0;
+          (previousRow || target.querySelector('h1')).focus({ preventScroll: true });
+        }
       }
     }
 

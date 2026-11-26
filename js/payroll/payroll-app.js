@@ -449,10 +449,6 @@
       card.className = 'team-relief-card';
       card.id = `relief-card-${item.id}`;
 
-      // AGENTS.md Employee ID Presentation Standard:
-      // Employee ID MUST be placed directly BELOW employee name, with leading #, subtle muted typography
-      const formattedEmpId = `#${(item.empNo || '000000').replace(/^#+/, '')}`;
-
       const isPending = item.status === 'pending';
       const statusBadge = isPending 
         ? `<span class="relief-status-pill pending"><i class="fa-solid fa-clock"></i> Pending Review</span>`
@@ -468,11 +464,7 @@
               ${item.avatar}
             </div>
             <div>
-              <div style="font-size: 14px; font-weight: 800; color: #ffffff;">${item.userName}</div>
-              <!-- AGENTS.md Employee ID Standard: Directly BELOW name -->
-              <div style="font-size: 11.5px; font-weight: 700; color: rgba(255, 255, 255, 0.7); opacity: 0.8; font-family: monospace, sans-serif; margin-bottom: 2px;">
-                ${formattedEmpId}
-              </div>
+              <div style="font-size: 14px; font-weight: 800; color: #ffffff;">${employeeCardHeading.html(item.empNo, item.userName)}</div>
               <div style="font-size: 11px; font-weight: 600; color: rgba(255, 255, 255, 0.85);">${item.dept}</div>
             </div>
           </div>
@@ -483,7 +475,6 @@
 
         <!-- Card Body -->
         <div class="relief-card-body">
-          ${recordSubmitDate.html(item.submitDate)}
           <div style="margin-bottom: 12px;">${statusBadge}</div>
 
           <!-- 2-Column Info Grid -->
@@ -498,6 +489,7 @@
                 <i class="fa-regular fa-calendar" style="font-size: 11px; margin-right: 3px;"></i>${item.claimDate}
               </div>
             </div>
+            ${recordSubmitDate.html(item.submitDate)}
           </div>
 
           <!-- Structured Amount & Statutory Limit Box -->
@@ -604,8 +596,7 @@
       if (el) el.textContent = text || '-';
     };
 
-    setEl('receiptModalEmpName', item.userName);
-    setEl('receiptModalEmpId', `#${item.empNo.replace(/^#+/, '')}`);
+    setEl('receiptModalEmpName', employeeCardHeading.text(item.empNo, item.userName));
     setEl('receiptModalCategory', item.category);
     setEl('receiptModalSubCategory', item.subCategory);
     setEl('receiptModalAmount', `RM ${item.amount.toFixed(2)}`);

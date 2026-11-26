@@ -12,7 +12,7 @@
     if (record.incidentAction) actions.get(record.incidentType).add(record.incidentAction);
   });
   const text = value => value === null || value === undefined || value === '' ? '—' : String(value);
-  const employeeId = record => record.empNo ? `#${String(record.empNo).replace(/^#+/, '')}` : '—';
+  const employeeId = record => formatEmployeeNumber(record.empNo) || '—';
   function dateValid(value) {
     if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
     const date = new Date(`${value}T00:00:00Z`);
@@ -41,7 +41,7 @@
     if (filters.closed && record.isClosed !== (filters.closed === 'true')) return false;
     if ((filters.start || filters.end) && !dateValid(day)) return false;
     if (filters.start && day < filters.start || filters.end && day > filters.end) return false;
-    return !filters.keyword || [record.reference, record.name, employeeId(record), record.incidentDate, dateText(record.incidentDate), record.incidentType, record.incidentAction, record.remarks].join(' ').toLowerCase().includes(filters.keyword.toLowerCase());
+    return !filters.keyword || [record.reference, record.name, employeeId(record), record.incidentDate, dateText(record.incidentDate), record.incidentType, record.incidentAction, record.remarks].join(' ').toLowerCase().includes(formatEmployeeNumber(filters.keyword).toLowerCase());
   }
   function render() {
     visible = records.filter(matches).sort((a, b) => String(b.incidentDate || '').localeCompare(String(a.incidentDate || '')) || String(b.reference).localeCompare(String(a.reference)));
@@ -50,7 +50,7 @@
       const card = element('article', 'incident-history-card'); card.dataset.reference = record.reference;
       const header = element('div', 'incident-history-card-header');
       const identity = element('span', 'incident-history-identity');
-      identity.append(element('strong', 'incident-history-name', text(record.name)), element('span', 'incident-history-id', employeeId(record)));
+      identity.append(element('strong', 'incident-history-name', employeeCardHeading.text(record.empNo, record.name)));
       const trigger = element('a', 'incident-history-details-trigger');
       trigger.href = HistoryRecordPage.href('incident', record.reference); trigger.dataset.historyLink = '';
       trigger.setAttribute('aria-label', `View incident details for ${text(record.name)} ${employeeId(record)}, ${dateText(record.incidentDate)}, ${text(record.incidentType)}`);
@@ -124,7 +124,7 @@
     const created = dateText(record.createdDate), time = /(?:T|\s)(\d{2}:\d{2})/.exec(String(record.createdDate || ''))?.[1];
     const yesNo = value => value === true ? 'Yes' : value === false ? 'No' : null;
     $('incidentHistoryDetailsRows').replaceChildren(
-      detailRow('Reference #', record.reference), detailRow('Emp #', employeeId(record), 'empNo'), detailRow('Name', record.name),
+      detailRow('Reference #', record.reference), detailRow('Emp No.', employeeId(record), 'empNo'), detailRow('Name', record.name),
       detailRow('Incident Date', dateText(record.incidentDate)), detailRow('Created Date', time ? `${created} ${time}` : created),
       detailRow('Incident Type', record.incidentType), detailRow('Incident Action', record.incidentAction), detailRow('Measure Value', record.measureValue),
       detailRow('Merit', yesNo(record.merit)), detailRow('Value', record.value), detailRow('Remarks', record.remarks),

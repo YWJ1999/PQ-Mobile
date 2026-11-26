@@ -86,8 +86,7 @@ const url = pathToFileURL(path.resolve(__dirname, '../modules/employee-career/op
         assert.ok(await page.$eval('main', node => node.scrollWidth <= node.clientWidth + 1), `No main overflow at ${width}px`);
         assert.ok(await page.$$eval('.staff-feedback-card', nodes => nodes.every(node => node.scrollWidth <= node.clientWidth + 1)));
         assert.ok(await page.$$eval('.staff-feedback-card', nodes => nodes.every(node => {
-          const id = node.querySelector('.staff-feedback-emp-no');
-          return id.textContent.startsWith('#') && id.getBoundingClientRect().top >= node.querySelector('.staff-feedback-name').getBoundingClientRect().bottom;
+          return /^[^\s#]+ - .+/.test(node.querySelector('.staff-feedback-name').textContent);
         })));
       }
       await page.setViewport({ width: 390, height: 950 });
@@ -124,11 +123,7 @@ const url = pathToFileURL(path.resolve(__dirname, '../modules/employee-career/op
       }), { id: 'staffFeedbackReviewTitle', visible: true }, 'A short viewport opens Review with visible non-scrolling focus');
       assert.deepEqual(await page.$$eval('[role=tab]', tabs => tabs.map(tab => [tab.textContent.trim(), tab.getAttribute('aria-selected')])), [['Feedback', 'true'], ['Review', 'false']]);
       assert.equal(await page.$eval('#staffFeedbackSubmitReview', node => node.getClientRects().length), 0);
-      assert.deepEqual(await page.$eval('.staff-feedback-review-identity', card => {
-        const name = card.querySelector('h2');
-        const id = name.nextElementSibling;
-        return [name.textContent, id.textContent, id.getBoundingClientRect().top >= name.getBoundingClientRect().bottom];
-      }), ['AHMAD RAFY BIN ZULKIPLE', '#004177', true]);
+      assert.equal(await page.$eval('#staffFeedbackReviewName', name => name.textContent), '004177 - AHMAD RAFY BIN ZULKIPLE');
       assert.equal(await page.$eval('#staffFeedbackReviewAttachments a', link => link.download), 'Flexible-hours-note.txt');
       assert.ok(await page.$eval('#staffFeedbackPanel', node => {
         const rect = node.getBoundingClientRect();
@@ -136,7 +131,7 @@ const url = pathToFileURL(path.resolve(__dirname, '../modules/employee-career/op
       }), 'Review form stays within a 360px viewport');
       const readOnlyDetails = await page.$$eval('#staffFeedbackPanel [readonly]', nodes => nodes.map(node => [node.labels[0].textContent.trim(), node.value]));
       assert.deepEqual(readOnlyDetails.map(([label]) => label), ['Title', 'Type', 'Category', 'Feedback Date 1', 'Feedback Date 2', 'Reference 1', 'Reference 2', 'Feedback Note', 'Feedback Remarks']);
-      assert.equal(await page.$eval('#staffFeedbackReviewSubmitDate', node => node.textContent), 'Submit Date: 05/10/2026');
+      assert.equal(await page.$eval('#staffFeedbackReviewSubmitDate > strong', node => node.textContent), '05/10/2026');
       assert.deepEqual(Object.fromEntries(readOnlyDetails), {
         'Type': 'Suggestion',
         'Category': 'Policy',
@@ -284,7 +279,7 @@ const url = pathToFileURL(path.resolve(__dirname, '../modules/employee-career/op
     const details = await page.$$eval('#staffFeedbackDetailsTable tr', rows => Object.fromEntries(rows.map(row => [row.cells[0].textContent.trim(), row.cells[1].textContent.trim()])));
     assert.equal(await page.$eval('#staffFeedbackDetailsSubmitDate', node => node.textContent), 'Submit Date: 04/09/2026');
     assert.deepEqual(details, {
-      'Emp #': '#004177', 'Name': 'Ahmad Rafy', 'Type': 'Suggestion', 'Category': 'Policy', 'Title': 'Shift suggestion',
+      'Emp No.': '004177', 'Name': 'Ahmad Rafy', 'Type': 'Suggestion', 'Category': 'Policy', 'Title': 'Shift suggestion',
       'Feedback Date 1': '2 Sept 2026', 'Feedback Date 2': '3 Sept 2026', 'Feedback Note': 'Start at 8 or 9 AM.',
       'Feedback Remarks': 'For morning shifts.', 'Reviewer Comment': 'Review next week.',
       'Reviewed By': 'Sarah Tan', 'Reviewed Date': '5 Sept 2026', 'Rating': '0', 'Reward': '0', 'Status': 'Pending', 'Attachment': 'shift-note.txtinvalid.txt'
@@ -336,7 +331,7 @@ const url = pathToFileURL(path.resolve(__dirname, '../modules/employee-career/op
     await navigate('.staff-feedback-review-button');
     assert.deepEqual(await page.$$eval('#staffFeedbackPanel [readonly]', nodes => nodes.slice(-3).map(node => node.value)),
       ['External-42', 'Start at 8 or 9 AM.', 'For morning shifts.']);
-    assert.equal(await page.$eval('#staffFeedbackReviewSubmitDate', node => node.textContent), 'Submit Date: 04/09/2026');
+    assert.equal(await page.$eval('#staffFeedbackReviewSubmitDate > strong', node => node.textContent), '04/09/2026');
     assert.equal(await page.$$eval('#staffFeedbackReviewAttachments a', nodes => nodes.length), 1);
     await page.click('#staffReviewTab');
     assert.deepEqual(await page.$$eval('#staffReviewPanel [readonly]', nodes => nodes.map(node => node.value)),

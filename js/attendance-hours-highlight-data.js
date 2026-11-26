@@ -3,7 +3,7 @@
 // Period totals cannot be distributed across dates without the missing records.
 window.ATTENDANCE_HOURS_HIGHLIGHTS = {
   overtime: {
-    title: 'Overtime Highlights', metric: 'Approved OT Hours', detailTitle: 'Overtime Highlight Details',
+    title: 'Overtime Highlights', metric: 'Approved OT Hours',
     from: '2026-09-08', to: '2026-10-07',
     employees: [
       { empNo: '1122333', name: 'Test2', hours: 7.50, branch: 'TIMES SQ', department: 'Operations', position: 'Operations Executive', details: [
@@ -27,11 +27,11 @@ window.ATTENDANCE_HOURS_HIGHLIGHTS = {
     from: '2026-09-08', to: '2026-10-07',
     employees: [
       { empNo: '000008', name: 'Aqilah Antasha', hours: 128.50, branch: 'USJ 20', department: 'Operations', position: 'Operations Executive', details: [
-        { date: '2026-09-17', shift: '8.00AM–5.00PM', clockTimes: ['1957'], hours: 8.00, exception: 'Absent' },
-        { date: '2026-09-18', shift: '8.00AM–5.30PM', clockTimes: ['1957'], hours: 8.50, exception: 'Absent' },
-        { date: '2026-09-19', shift: '8.30AM–5.30PM (W01)', clockTimes: ['1738'], hours: 8.00, exception: 'Absent' },
-        { date: '2026-09-20', shift: '8.30AM–5.30PM (W01)', clockTimes: ['1953'], hours: 8.00, exception: 'Absent' },
-        { date: '2026-09-21', shift: '8.30AM–5.30PM (W01)', clockTimes: ['1955'], hours: 8.00 }
+        { date: '2026-09-17', shift: '8:00 AM – 5:00 PM', clockTimes: ['1957'], hours: 8.00, exception: 'Absent' },
+        { date: '2026-09-18', shift: '8:00 AM – 5:30 PM', clockTimes: ['0755', '1202', '1258', '1731', '1957'], hours: 8.50, exception: 'Absent' },
+        { date: '2026-09-19', shift: '8:30 AM – 5:30 PM (W01)', clockTimes: ['0827', '1159', '1258', '1510', '1523', '1738'], hours: 8.00, exception: 'Absent' },
+        { date: '2026-09-20', shift: '8:30 AM – 5:30 PM (W01)', clockTimes: ['1953'], hours: 8.00, exception: 'Absent' },
+        { date: '2026-09-21', shift: '8:30 AM – 5:30 PM (W01)', clockTimes: ['1955'], hours: 8.00 }
       ] },
       { empNo: '000009', name: 'Chan Mee Ling', hours: 168.00, branch: 'TIMES SQ', department: 'Sales', position: 'Sales Executive', details: [] },
       { empNo: '0000100', name: 'Loh Siew Hong', hours: 168.00, branch: 'TIMES SQ', department: 'Retail Operations', position: 'Store Supervisor', details: [] },

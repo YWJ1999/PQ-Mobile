@@ -552,9 +552,38 @@
         </div>
 
         <!-- 3. Staff Attendance Cards List -->
-        <div id="staffCardsContainer">
-          <!-- Dynamically rendered attendance cards matching exact screenshot data -->
-        </div>
+        <div id="staffCardsContainer"></div>
+        <template id="staffAttendanceCard">
+          <article class="history-card-item staff-card-item">
+            <div class="attendance-record-top history-card-header">
+              <label class="staff-verify-control">
+                <input type="checkbox" class="staff-verify-checkbox">
+                <span class="staff-verify-box" aria-hidden="true"><i class="fa-solid fa-check"></i></span>
+              </label>
+              <h2 class="staff-card-heading">
+                <button type="button" class="staff-card-details-trigger" aria-haspopup="dialog" aria-controls="detailsModal">
+                  <span class="staff-hdr-name"></span>
+                  <span class="staff-card-subtitle"></span>
+                </button>
+              </h2>
+              <span class="attendance-exception-status card-status-badge"><i aria-hidden="true"></i><span></span></span>
+            </div>
+            <div class="staff-card-body">
+              <button type="button" class="attendance-record-summary-panel history-card-details" aria-haspopup="dialog" aria-controls="detailsModal">
+                <span class="attendance-record-detail">
+                  <span>Shift</span>
+                  <strong><span data-shift-code></span> <small class="staff-shift-time"></small></strong>
+                </span>
+                <span class="attendance-record-detail"><span>Clock times</span><strong data-clock-times></strong></span>
+                <span class="attendance-record-detail"><span>Normal hours</span><strong data-normal-hours></strong></span>
+                <span class="attendance-record-detail"><span>OT hours</span><strong data-ot-hours></strong></span>
+              </button>
+              <div class="staff-card-actions history-card-actions">
+                <button type="button" class="btn-action-feedback">Feedback</button>
+              </div>
+            </div>
+          </article>
+        </template>
 
       </div>
       <button type="button" id="staffAttendanceUpdate" class="staff-update-button" onclick="updateStaffAttendanceVerification()" disabled hidden>Verify selected (<span data-selected-count>0</span>)</button>
@@ -595,7 +624,6 @@
         <div class="main-content staff-follow-up-body">
           <div class="history-card-item staff-follow-up-context">
             <strong id="followUpEmployeeName" class="staff-hdr-name"></strong>
-            <span id="followUpEmployeeId" class="staff-hdr-empno"></span>
             <div class="attendance-record-detail"><span>Date</span><strong id="followUpDate"></strong></div>
             <div class="attendance-record-detail"><span>Shift</span><strong id="followUpShift"></strong></div>
           </div>
@@ -713,9 +741,10 @@
 
     const masterStaffDataset = [
       {
-        empNo: '#000008',
+        empNo: '000008',
         cleanEmpNo: '000008',
         name: 'Aqilah antasha',
+        assignment: 'Admin Executive',
         date: '20 Sep 2026',
         shift: '8.30AM-5.30PM (W01)',
         times: '07:44',
@@ -740,9 +769,10 @@
         verified: false
       },
       {
-        empNo: '#000009',
+        empNo: '000009',
         cleanEmpNo: '000009',
-        name: 'Chan mee ling',
+        name: 'Chan Mee Ling',
+        assignment: 'Barista Operations',
         date: '20 Sep 2026',
         shift: '8.30AM-5.30PM (W01)',
         times: '08:22',
@@ -767,9 +797,10 @@
         verified: false
       },
       {
-        empNo: '#000100',
+        empNo: '000100',
         cleanEmpNo: '000100',
         name: 'Loh Siew Hong',
+        assignment: 'Account Executive',
         date: '20 Sep 2026',
         shift: '8.30AM-5.30PM (W01)',
         times: '08:05',
@@ -794,9 +825,10 @@
         verified: false
       },
       {
-        empNo: '#004199',
+        empNo: '004199',
         cleanEmpNo: '004199',
         name: 'Kavitha Raj',
+        assignment: 'Plant Operations',
         date: '20 Sep 2026',
         shift: '8.00AM-5.00PM (W02)',
         times: '07:50',
@@ -888,7 +920,7 @@
     }
 
     function getFilteredStaffRecords() {
-      const keyword = document.getElementById('filterKeyword')?.value.toLowerCase().trim() || '';
+      const keyword = formatEmployeeNumber(document.getElementById('filterKeyword')?.value).toLowerCase();
       const branchFilter = document.getElementById('filterBranchSelect')?.value || 'all';
       const deptFilter = document.getElementById('filterDeptSelect')?.value || 'all';
       
@@ -919,6 +951,17 @@
       showToast('Attendance verification updated');
     }
 
+    function getStaffCardShift(shift) {
+      const value = String(shift ?? '').trim();
+      const parts = /^(.*?)\s*\(([^()]+)\)$/.exec(value);
+      if (!parts) return { code: value || '—', schedule: '' };
+
+      const schedule = parts[1]
+        .replace(/(\d{1,2})[.:](\d{2})\s*(am|pm)\b/gi, (_, hour, minute, period) => `${hour}:${minute} ${period.toUpperCase()}`)
+        .replace(/\s*[-–—]\s*/g, ' – ');
+      return { code: parts[2].trim(), schedule };
+    }
+
     function renderStaffCards(filtered = getFilteredStaffRecords()) {
       renderedStaffRecords = [...filtered];
 
@@ -947,29 +990,32 @@
       }
 
       container.replaceChildren();
+      const template = document.getElementById('staffAttendanceCard');
       for (const item of filtered) {
         const exception = String(item.exception ?? '').trim();
         const exceptionKey = exception.toLowerCase().replace(/[-_\s]+/g, ' ').trim()
           .replace(/^missing clock (?:in|out)$/, 'missing clock') || 'no exception';
         const hasException = exceptionKey !== 'no exception';
-        const card = document.createElement('article');
-        card.className = 'history-card-item staff-card-item';
+        const card = template.content.firstElementChild.cloneNode(true);
         card.classList.add(staffToneByException.get(exceptionKey) || 'theme-slate');
         card.dataset.empNo = item.cleanEmpNo;
-        card.innerHTML = '<div class="attendance-record-top history-card-header"><label class="staff-verify-control"><input type="checkbox" class="staff-verify-checkbox"><span class="staff-verify-box" aria-hidden="true"><i class="fa-solid fa-check"></i></span></label><button type="button" class="staff-card-details-trigger"><span class="staff-hdr-name"></span><span class="staff-hdr-empno"></span><span class="history-time-row"></span><span class="attendance-record-reference history-card-ref"></span></button><span class="attendance-exception-status card-status-badge"></span></div><button type="button" class="attendance-record-summary-panel history-card-details"></button><div class="staff-card-actions history-card-actions"><button type="button" class="btn-action-feedback">Feedback</button></div>';
-        card.querySelector('.staff-hdr-name').textContent = item.name;
-        card.querySelector('.staff-hdr-empno').textContent = `#${item.empNo.replace(/^#/, '')}`;
-        card.querySelector('.history-time-row').textContent = `Shift: ${item.shift}`;
-        card.querySelector('.attendance-record-reference').textContent = `Date: ${item.date}`;
+        const heading = employeeCardHeading.text(item.empNo, item.name);
+        const subtitle = item.assignment || item.dept;
+        card.querySelector('.staff-hdr-name').textContent = heading;
+        card.querySelector('.staff-card-subtitle').textContent = subtitle;
+        const shift = getStaffCardShift(item.shift);
+        card.querySelector('[data-shift-code]').textContent = shift.code;
+        card.querySelector('.staff-shift-time').textContent = shift.schedule;
+        card.querySelector('[data-clock-times]').textContent = item.times;
+        card.querySelector('[data-normal-hours]').textContent = item.normalHours;
+        card.querySelector('[data-ot-hours]').textContent = item.otHours;
         const details = card.querySelector('.staff-card-details-trigger');
         const panel = card.querySelector('.attendance-record-summary-panel');
         details.id = `attendance-header-${item.cleanEmpNo}`;
-        details.setAttribute('aria-label', `Attendance details for ${item.name}, ${item.empNo}, ${item.date}, ${item.shift}`);
+        details.setAttribute('aria-label', [heading, subtitle, `Attendance details for ${item.date}, ${item.shift}`].filter(Boolean).join('. '));
         panel.id = `attendance-summary-${item.cleanEmpNo}`;
         panel.setAttribute('aria-labelledby', details.id + ' ' + panel.id);
         for (const trigger of [details, panel]) {
-          trigger.setAttribute('aria-haspopup', 'dialog');
-          trigger.setAttribute('aria-controls', 'detailsModal');
           trigger.addEventListener('click', () => openDetailsModal(item.cleanEmpNo));
         }
         const verify = card.querySelector('.staff-verify-checkbox');
@@ -978,22 +1024,9 @@
         verify.addEventListener('change', () => toggleSingleVerify(item.cleanEmpNo));
         const status = card.querySelector('.attendance-exception-status');
         status.classList.toggle('is-exception', hasException);
-        const statusIcon = document.createElement('i');
+        const statusIcon = status.querySelector('i');
         statusIcon.className = 'fa-solid ' + (!hasException ? 'fa-circle-check' : exceptionKey === 'late in' ? 'fa-clock' : 'fa-triangle-exclamation');
-        statusIcon.setAttribute('aria-hidden', 'true');
-        const statusLabel = document.createElement('span');
-        statusLabel.textContent = hasException ? exception : 'No Exception';
-        status.append(statusIcon, statusLabel);
-        for (const [label, value] of [['Day Type', item.dayType], ['Clock Times', item.times], ['Normal Hours', item.normalHours], ['OT Hours', item.otHours]]) {
-          const row = document.createElement('span');
-          row.className = 'attendance-record-detail';
-          const key = document.createElement('span');
-          key.textContent = label;
-          const text = document.createElement('strong');
-          text.textContent = value;
-          row.append(key, text);
-          panel.append(row);
-        }
+        status.querySelector('span').textContent = hasException ? exception : 'No Exception';
         card.querySelector('.btn-action-feedback').addEventListener('click', () => openFeedbackModal(item.cleanEmpNo));
         container.append(card);
       }
@@ -1005,7 +1038,7 @@
         item.verified = !item.verified;
         renderStaffCards(renderedStaffRecords);
         document.querySelector(`[data-emp-no="${cleanEmpNo}"] .staff-verify-checkbox`)?.focus({ preventScroll: true });
-        showToast(`Verification ${item.verified ? 'checked' : 'unchecked'} for #${cleanEmpNo}`);
+        showToast(`Verification ${item.verified ? 'checked' : 'unchecked'} for ${cleanEmpNo}`);
       }
     }
 
@@ -1025,7 +1058,7 @@
       attendanceDialogReturnFocus = document.activeElement;
 
       const rows = [
-        { key: 'Employee #', val: `#${item.empNo.replace(/^#/, '')}` },
+        { key: 'Employee No.', val: formatEmployeeNumber(item.empNo) },
         { key: 'Name', val: item.name },
         { key: 'Date', val: item.date },
         { key: 'Shift', val: item.shift },
@@ -1093,8 +1126,7 @@
       if (!item) return;
       followUpRecord = item;
       followUpReturnFocus = document.activeElement;
-      document.getElementById('followUpEmployeeName').textContent = item.name;
-      document.getElementById('followUpEmployeeId').textContent = `#${item.empNo.replace(/^#/, '')}`;
+      document.getElementById('followUpEmployeeName').textContent = employeeCardHeading.text(item.empNo, item.name);
       document.getElementById('followUpDate').textContent = item.date;
       document.getElementById('followUpShift').textContent = item.shift;
       document.getElementById('staffFollowUpForm').reset();

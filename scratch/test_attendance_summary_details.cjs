@@ -125,7 +125,7 @@ async function checkAttendance(browser, desktopUrl) {
     await page.waitForSelector('#detailsModal', { visible: true });
     const staff = await page.$$eval('#detailsModalTableBody tr', rows =>
       Object.fromEntries(rows.map(row => [...row.cells].map(cell => cell.textContent.trim()))));
-    assert.ok(staff['Employee #'].endsWith('000009'));
+    assert.ok(staff['Employee No.'].endsWith('000009'));
     assert.equal(staff['Clock Times'], '08:22');
     await page.click('#detailsModal .popout-close-btn');
     await page.waitForSelector('#detailsModal', { hidden: true });

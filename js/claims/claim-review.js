@@ -130,7 +130,7 @@ const ClaimReview = (() => {
         const key = keys.find(key => item[key] != null);
         const box = field(label, item[key] ?? dates[keys[0]]);
         if (label === 'Employee' && item.empNo) {
-          box.lastElementChild.append(element('div', 'employee-id-standard', '#' + String(item.empNo).replace(/^#+/, '')));
+          box.lastElementChild.append(element('div', 'employee-id-standard', formatEmployeeNumber(item.empNo)));
         }
         entry.append(box);
       }

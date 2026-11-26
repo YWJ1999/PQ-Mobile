@@ -52,7 +52,7 @@ async function assertFullPageForm(page, overlaySelector) {
       document.getElementById('fbMetaShift').textContent.trim(),
       document.getElementById('fbMetaEmployeeName').textContent.trim(),
       document.getElementById('fbMetaEmployeeNo').textContent.trim()
-    ]), ['Mon 14 Sep 2026', '8.30AM–5.30PM (W01)', 'Farhan binti rahmat', '#EBB12']);
+    ]), ['Mon 14 Sep 2026', '8.30AM–5.30PM (W01)', 'Farhan binti rahmat', 'EBB12']);
     const details = await page.$eval('#feedbackDetailsForm', form =>
       Array.from(form.querySelectorAll('label[for]'), label =>
         [label.textContent.trim(), label.control.value, label.control.getClientRects().length > 0]

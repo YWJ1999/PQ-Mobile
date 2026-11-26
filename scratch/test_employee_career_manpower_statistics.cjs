@@ -20,7 +20,7 @@ const statisticsLabels = [
   'Average Performance Score', 'Annual Attrition %'
 ];
 const employeeDetailLabels = [
-  'Employee #', 'Name', 'Position', 'Superior', 'Job', 'Company', 'Branch',
+  'Employee No.', 'Name', 'Position', 'Superior', 'Job', 'Company', 'Branch',
   'Base', 'Division', 'Department', 'Section', 'Cost Center', 'Line', 'Service Years'
 ];
 const controlledAggregate = [
@@ -107,21 +107,18 @@ const missingValueStaff = [{
         const header = card.querySelector('.manpower-employee-identity');
         const details = card.querySelector('.manpower-employee-card-details');
         const name = header?.querySelector('.employee-name');
-        const id = header?.querySelector('.employee-id');
         return header && details
-          && name && name.nextElementSibling === id && /^#\S+/.test(id.textContent)
+          && name && /^[^\s#]+ - .+/.test(name.textContent)
           && details.textContent.includes('Position') && details.textContent.includes('Department')
           && !card.querySelector('.fa-chevron-right');
       })), 'Every staff card separates its purple identity header from the Position and Department body');
       const employeeCardVisuals = await page.$eval('#manpowerStaffList .manpower-employee-card', card => {
         const header = card.querySelector('.manpower-employee-identity');
         const name = header.querySelector('.employee-name');
-        const id = header.querySelector('.employee-id');
         const details = card.querySelector('.manpower-employee-card-details');
         const cardStyle = getComputedStyle(card);
         const headerStyle = getComputedStyle(header);
         const nameStyle = getComputedStyle(name);
-        const idStyle = getComputedStyle(id);
         const detailsStyle = getComputedStyle(details);
         const cardRect = card.getBoundingClientRect();
         const headerRect = header.getBoundingClientRect();
@@ -145,8 +142,6 @@ const missingValueStaff = [{
             && Math.abs(headerRect.right - cardRect.right) <= 2,
           bodyFollowsHeader: detailsRect.top >= headerRect.bottom,
           nameIsWhite: nameStyle.color === 'rgb(255, 255, 255)',
-          idIsTranslucentWhite: idStyle.color.startsWith('rgba(255, 255, 255,')
-            || (idStyle.color === 'rgb(255, 255, 255)' && Number(idStyle.opacity) < 1),
           detailsUseTwoColumns: rowRects.length === 2
             && Math.abs(rowRects[0].top - rowRects[1].top) <= 1
             && rowRects[0].right < rowRects[1].left,
@@ -173,7 +168,6 @@ const missingValueStaff = [{
         headerMatchesCardEdges: true,
         bodyFollowsHeader: true,
         nameIsWhite: true,
-        idIsTranslucentWhite: true,
         detailsUseTwoColumns: true,
         detailsBorder: '0px',
         detailsBackground: 'rgba(0, 0, 0, 0)',
@@ -218,7 +212,7 @@ const missingValueStaff = [{
         row.querySelector('th').textContent,
         row.querySelector('td').textContent
       ])));
-      assert.equal(employeeDetails['Employee #'], '#000031');
+      assert.equal(employeeDetails['Employee No.'], '000031');
       assert.equal(employeeDetails.Name, 'Navin');
       assert.equal(employeeDetails.Position, 'ACCOUNT EXECUTIVE');
       assert.equal(employeeDetails.Job, 'ACCOUNT EXECUTIVE');

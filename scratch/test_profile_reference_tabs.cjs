@@ -19,7 +19,7 @@ const categories = [
     assert.equal(work.Position.toUpperCase(), 'GROUP HR MANAGER', 'Position must match the photo');
     assert.equal(await page.$eval('.me-pass-title', node=>node.textContent), 'Group HR Manager');
     assert.equal(await page.$eval('.me-emp-fullname', node=>node.textContent), 'Sarah Jenkins');
-    assert.equal(await page.$eval('.me-emp-code', node=>node.textContent), '#EBB01');
+    assert.equal(await page.$eval('.me-emp-code', node=>node.textContent), 'EBB01');
     const referenceOrder = categories.map(([slug])=>'bento-'+slug);
     assert.deepEqual(await page.$$eval('#meMainScroll > .profile-section', nodes=>nodes.filter(node=>!node.hidden).map(node=>node.id)), referenceOrder, 'Default view displays every category in photo order');
     assert.equal(await page.$eval('.me-jump-pill.active', node=>node.dataset.category), 'all');

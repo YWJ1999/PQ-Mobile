@@ -20,16 +20,16 @@ const cleanText = value => value
 const headers = [...table[0].matchAll(/<th[^>]*>([\s\S]*?)<\/th>/g)]
   .map(match => cleanText(match[1]));
 
-assert.deepEqual(headers, ['Emp #', 'Name', 'Days', 'Branch', 'Department', 'Position']);
+assert.deepEqual(headers, ['Emp No.', 'Name', 'Days', 'Branch', 'Department', 'Position']);
 
 const rows = [...table[0].matchAll(/<tr[^>]*>([\s\S]*?)<\/tr>/g)].slice(1);
 assert.equal(rows.length, 4);
 
 const expectedRows = [
-  ['#004177', 'AHMAD RAFY BIN ZULKIPLE', '2.00', 'HEADQUARTERS (HQ)', 'ADMINISTRATION DEPARTMENT', 'ADMIN MANAGER'],
-  ['#TEST69', 'TEST69 Test', '3.00', 'NORTHERN REGION BRANCH', 'FINANCE & ACCOUNTING DEPARTMENT', 'ACCOUNT EXECUTIVE'],
-  ['#007216', 'HAILIZAM BIN MOHAMED IKHSAN', '1.00', 'SOUTHERN REGION BRANCH', 'SALES & MARKETING DEPARTMENT', 'SALES REPRESENTATIVE'],
-  ['#006611', 'POR SUAT BEE', '5.00', 'HEADQUARTERS (HQ)', 'FINANCE & ACCOUNTING DEPARTMENT', 'PAYABLES EXECUTIVE']
+  ['004177', 'AHMAD RAFY BIN ZULKIPLE', '2.00', 'HEADQUARTERS (HQ)', 'ADMINISTRATION DEPARTMENT', 'ADMIN MANAGER'],
+  ['TEST69', 'TEST69 Test', '3.00', 'NORTHERN REGION BRANCH', 'FINANCE & ACCOUNTING DEPARTMENT', 'ACCOUNT EXECUTIVE'],
+  ['007216', 'HAILIZAM BIN MOHAMED IKHSAN', '1.00', 'SOUTHERN REGION BRANCH', 'SALES & MARKETING DEPARTMENT', 'SALES REPRESENTATIVE'],
+  ['006611', 'POR SUAT BEE', '5.00', 'HEADQUARTERS (HQ)', 'FINANCE & ACCOUNTING DEPARTMENT', 'PAYABLES EXECUTIVE']
 ];
 
 rows.forEach((row, index) => {

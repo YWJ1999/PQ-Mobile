@@ -183,7 +183,7 @@
               <div class="payslip-pdf-employee">
                 <small>Employee</small>
                 <strong id="payslipPdfEmployeeName">Sarah Jenkins</strong>
-                <span id="payslipPdfEmployeeId">#EBB01</span>
+                <span id="payslipPdfEmployeeId">EBB01</span>
               </div>
               <div class="payslip-pdf-period-block">
                 <small>Payroll Period</small>
@@ -268,7 +268,7 @@
       document.getElementById('payslipPdfFilePeriod').textContent = periodLabel;
       document.getElementById('payslipPdfCompany').textContent = data.company || defaults.company || '—';
       document.getElementById('payslipPdfEmployeeName').textContent = employee.name || 'Employee';
-      document.getElementById('payslipPdfEmployeeId').textContent = `#${String(employee.empNo || '—').replace(/^#/, '')}`;
+      document.getElementById('payslipPdfEmployeeId').textContent = formatEmployeeNumber(employee.empNo) || '—';
       document.getElementById('payslipPdfPeriod').textContent = periodLabel;
       document.getElementById('payslipPdfEarnings').textContent = payslipMoney(data.totalEarnings);
       document.getElementById('payslipPdfDeductions').textContent = payslipMoney(data.totalDeductions);

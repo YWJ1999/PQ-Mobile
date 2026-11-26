@@ -52,10 +52,10 @@ const pageUrl = theme => pathToFileURL(
           employeeId: option.querySelector('.project-assignee-name + .project-assignee-id').textContent.trim()
         }))),
         [
-          { name: 'Farhan binti rahmat', employeeId: '#EBB12' },
-          { name: 'Aina Rahman', employeeId: '#EBB27' },
-          { name: 'Daniel Lee', employeeId: '#EBB41' },
-          { name: 'Nur Izzati', employeeId: '#EBB36' }
+          { name: 'Farhan binti rahmat', employeeId: 'EBB12' },
+          { name: 'Aina Rahman', employeeId: 'EBB27' },
+          { name: 'Daniel Lee', employeeId: 'EBB41' },
+          { name: 'Nur Izzati', employeeId: 'EBB36' }
         ]
       );
       await page.click('#workAssignmentAssignee-EBB12');

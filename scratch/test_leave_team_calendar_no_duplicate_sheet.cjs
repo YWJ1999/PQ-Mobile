@@ -17,46 +17,98 @@ const leaveUrl = pathToFileURL(path.resolve(__dirname, '..', 'leave.html')).href
     await page.setViewport({ width: 390, height: 950 });
     await page.goto(leaveUrl, { waitUntil: 'domcontentloaded' });
 
-    const hubResult = await page.evaluate(() => {
-      const day = document.querySelector('#hubTeamCalDaysGridContainer [data-day="11"]');
-      day?.click();
-      const overlay = document.getElementById('calDateDetailsDrawerOverlay');
-      return {
-        hasDay: Boolean(day),
-        hasInlineClick: Boolean(day?.getAttribute('onclick')),
-        cursor: day ? getComputedStyle(day).cursor : '',
-        overlayActive: Boolean(overlay?.classList.contains('active'))
-      };
-    });
+    const grid = '#hubTeamCalDaysGridContainer';
+    const day = date => grid + ' button[data-date="' + date + '"]';
+    const summary = () => page.$eval('#teamSelectedDateSummary', el => el.textContent);
+    const staff = () => page.$$eval('#teamSelectedDateStaff a', rows => rows.map(row => [
+      row.querySelector('.team-date-employee-name').textContent,
+      row.querySelector('.team-date-leave-type').textContent
+    ]));
+    const detail = '#teamCalendarLeavePage';
+    const openEmployee = async selector => {
+      await page.click('#teamSelectedDateStaff ' + selector);
+      await page.waitForSelector(detail, { visible: true });
+      assert.equal(await page.$(detail + ' [data-leave-form] :is(input, select, textarea, button, [onclick], [contenteditable], .peoplehcm-select-chevron)'), null);
+      return page.$$eval(detail + ' [data-review-field]', nodes =>
+        Object.fromEntries(nodes.map(node => [node.dataset.reviewField, node.textContent])));
+    };
+    const backToCalendar = async () => {
+      await page.click(detail + ' [data-history-back]');
+      await page.waitForSelector(detail, { hidden: true });
+    };
 
-    assert.deepEqual(hubResult, {
-      hasDay: true,
-      hasInlineClick: false,
-      cursor: 'default',
-      overlayActive: false
-    });
+    assert.equal(await summary(), '11 Sep 2026 · 4 employees on leave');
+    await page.click(day('2026-09-15') + ' .team-leave-calendar-count');
+    assert.equal(await summary(), '15 Sep 2026 · 2 employees on leave');
+    assert.deepEqual(await staff(), [
+      ['NURFARHANA BINTI MOHAMAD YUSOFF', 'Annual Leave'],
+      ['WAN MOHD HANAPI BIN WAN HUSSIM', 'Replacement Leave']
+    ]);
+    const replacement = await openEmployee('a:last-child');
+    assert.equal(await page.$eval('#teamCalendarLeaveEmployee', el => el.textContent), '008025 - WAN MOHD HANAPI BIN WAN HUSSIM');
+    assert.equal(replacement.type, 'Replacement Leave');
+    assert.equal(replacement.reason, 'Weekend Shift Replacement');
+    assert.equal(replacement.fromDate, '15 Sep 2026');
+    assert.equal(replacement.toDate, replacement.fromDate);
+    assert.equal(replacement.leaveDays, '1');
+    assert.equal(await page.$$eval(detail + ' button', nodes => nodes.length), 1);
+    await backToCalendar();
+    assert.equal(await summary(), '15 Sep 2026 · 2 employees on leave');
+    assert.equal(await page.$eval('#teamSelectedDateStaff a:last-child', el => document.activeElement === el), true);
 
-    const managerResult = await page.evaluate(() => {
-      showLeaveSection('viewLeaveCalendar');
-      const day = document.querySelector('#teamCalDaysGrid [data-day="11"]');
-      day?.click();
-      const overlay = document.getElementById('calDateDetailsDrawerOverlay');
-      return {
-        hasDay: Boolean(day),
-        hasInlineClick: Boolean(day?.getAttribute('onclick')),
-        cursor: day ? getComputedStyle(day).cursor : '',
-        overlayActive: Boolean(overlay?.classList.contains('active'))
-      };
-    });
+    const annual = await openEmployee('a:first-child');
+    assert.equal(annual.type, 'Annual Leave');
+    assert.equal(annual.fromDate, '15 Sep 2026');
+    assert.equal(annual.toDate, '16 Sep 2026');
+    assert.equal(annual.leaveDays, '2');
+    assert.equal(await page.$eval('#teamCalendarLeaveReference', el => el.textContent), 'Ref: LV-2026-0062');
+    await backToCalendar();
 
-    assert.deepEqual(managerResult, {
-      hasDay: true,
-      hasInlineClick: false,
-      cursor: 'default',
-      overlayActive: false
-    });
+    await page.click(day('2026-09-11'));
+    const emergency = await openEmployee('a:last-child');
+    assert.equal(emergency.type, 'Emergency Leave');
+    assert.equal(emergency.duration, 'Half Day');
+    assert.equal(emergency.leaveDays, '0.5');
+    assert.equal(await page.$eval('#teamCalendarLeaveStatus', el => el.textContent), 'Pending Approval');
+    assert.equal(await page.$eval('#teamCalendarLeaveReference', el => el.textContent), '');
+    await backToCalendar();
+    const medical = await openEmployee('a:nth-child(2)');
+    assert.equal(medical.type, 'Sick Leave');
+    assert.equal(medical.reason, 'Fever & Flu');
+    assert.equal(medical.mcChitNo, '—');
+    assert.equal(annual.mcChitNo, undefined);
+    await backToCalendar();
 
-    console.log('PASS: Team leave calendars no longer open the duplicate date details sheet.');
+    await page.focus(day('2026-09-14'));
+    await page.keyboard.press('Enter');
+    assert.equal(await summary(), '14 Sep 2026 · 0 employees on leave');
+    assert.deepEqual(await staff(), []);
+    assert.equal(await page.$eval('#teamSelectedDateEmpty', el => el.innerText), 'No leave scheduled for this date.');
+    assert.equal(await page.$eval(grid + ' [aria-pressed="true"]', el => el.dataset.date), '2026-09-14');
+
+    await page.click(day('2026-10-01'));
+    assert.equal(await page.$eval('#teamCalMonthText', el => el.textContent), 'October 2026');
+    assert.equal(await summary(), '1 Oct 2026 · 0 employees on leave');
+    await page.click(day('2026-10-06'));
+    assert.equal(await summary(), '6 Oct 2026 · 2 employees on leave');
+    assert.deepEqual(await staff(), []);
+    assert.equal(await page.$eval('#teamSelectedDateEmpty', el => el.innerText), 'Employee details are unavailable for this date.');
+    await page.click(day('2026-09-29'));
+    assert.equal(await summary(), '29 Sep 2026 · 2 employees on leave');
+    assert.equal(await page.$eval('#teamSelectedDateApply', el => el.value), '2026-09-29');
+    assert.equal(await page.$('#calDateDetailsDrawerOverlay.active'), null);
+    await page.click('#teamSelectedDateApply');
+    await page.waitForSelector('#viewApplyLeaveForm', { visible: true });
+    assert.equal(await page.$eval('#mainFromDateInput', el => el.value), '2026-09-29');
+    assert.equal(await page.$eval('#viewApplyLeaveForm [data-leave-field="reason"]', el => el.disabled), false);
+
+    // The standalone calendar uses its own date sheet.
+    await page.goto(leaveUrl + '&view=team-calendar', { waitUntil: 'domcontentloaded' });
+    await page.click('#teamCalDaysGrid [data-day="11"]');
+    await page.waitForSelector('#calDateDetailsDrawerOverlay.active');
+    assert.equal(await page.$eval('#calModalDateTitle', el => el.textContent), '11 September 2026');
+
+    console.log('PASS: Team calendar selection opens the employee’s read-only Leave Apply form and returns to the same date.');
   } finally {
     await browser.close();
   }

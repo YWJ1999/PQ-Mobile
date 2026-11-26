@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PeopleHCM - Overtime Detail</title>
+  <script src="../../../js/components.js"></script>
+  <script src="../../../js/app.js" defer></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../../assets/vendor/fontawesome-6.7.2/css/all.min.css">
+  <link rel="stylesheet" href="../../../css/theme.css">
+  <link rel="stylesheet" href="../../../css/app.css">
+  <link rel="stylesheet" href="../../../css/attendance-highlight-report.css">
+  <link rel="stylesheet" href="../../../css/attendance-hours-highlight.css">
+</head>
+<body class="attendance-highlight-page hours-highlight-page overtime-detail-page" data-highlight-kind="overtime">
+  <preview-top-bar active-page="attendance"></preview-top-bar>
+  <div class="phone-container">
+    <header class="cal-top-header">
+      <phone-status-bar time="9:41" style="color:#fff"></phone-status-bar>
+      <div class="hours-highlight-header">
+        <a id="overtimeDetailBack" class="header-btn-icon" href="overtime-highlight.html" aria-label="Back to Overtime Highlights">
+          <i class="fa-solid fa-chevron-left" aria-hidden="true"></i>
+        </a>
+        <div>
+          <h1 id="highlightDetailName">Overtime Detail</h1>
+          <p id="overtimeDetailSubtitle" class="overtime-detail-subtitle" hidden>Overtime Detail</p>
+        </div>
+      </div>
+    </header>
+    <main class="main-content">
+      <section id="overtimeDetailSummary" class="attendance-report-summary record-summary-card" aria-label="Overtime summary" hidden>
+        <div id="overtimeDetailCount" class="attendance-report-summary-row"></div>
+        <div class="attendance-report-summary-row">
+          <div>
+            <span class="attendance-report-summary-label">Approved OT Hours</span>
+            <strong id="highlightDetailsTotal" class="overtime-detail-total"></strong>
+          </div>
+        </div>
+      </section>
+      <div class="attendance-report-table-card overtime-detail-table-card">
+        <table class="attendance-report-table overtime-detail-table" aria-label="Overtime records">
+          <thead>
+            <tr><th scope="col">Date</th><th scope="col">OT Type</th><th scope="col" class="hours-number">Hours</th></tr>
+          </thead>
+          <tbody id="overtimeDetailRows"></tbody>
+        </table>
+      </div>
+    </main>
+  </div>
+  <script src="../../../js/attendance-hours-highlight-data.js"></script>
+  <script src="../../../js/attendance-hours-highlight.js"></script>
+</body>
+</html>

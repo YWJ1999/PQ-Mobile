@@ -46,16 +46,19 @@ async function snapshot(page, selectors) {
         await page.waitForSelector('.staff-card-item .staff-verify-control');
         const staff = {
           all: await snapshot(page, { control: '.verify-all-wrap', label: '.verify-all-wrap > span:last-child', box: '.verify-all-wrap .staff-verify-box' }),
-          single: await snapshot(page, { control: '.staff-verify-control', label: '.staff-verify-control > span:last-child', box: '.staff-verify-control .staff-verify-box' })
+          single: await snapshot(page, { control: '.staff-verify-control', label: '.staff-verify-control .staff-verify-label', box: '.staff-verify-control .staff-verify-box' })
         };
 
         assert.deepEqual(staff.all, individual.all, `${theme} ${width}px: Staff Verify All matches Individual Attendance`);
         assert.deepEqual(staff.single, individual.single, `${theme} ${width}px: Staff Verify matches Individual Attendance`);
         assert.equal(await page.$eval('.staff-card-item', card => card.scrollWidth > card.clientWidth), false, `${theme} ${width}px: controls fit the card`);
 
-        await page.click('.staff-card-item .staff-verify-control > span:last-child');
+        await page.click('.staff-card-item .staff-verify-control');
         assert.equal(await page.$eval('.staff-card-item .staff-verify-checkbox', node => node.checked), true, `${theme} ${width}px: Verify remains functional`);
-        assert.equal(await page.$eval('.staff-card-item .staff-verify-label', node => node.textContent.trim()), 'Verified', `${theme} ${width}px: verified label matches Individual Attendance`);
+        const checkboxLabel = await page.$eval('.staff-card-item .staff-verify-control', label => ({
+          visibleText: label.textContent.trim(), accessibleName: label.control.getAttribute('aria-label')
+        }));
+        assert.deepEqual(checkboxLabel, { visibleText: '', accessibleName: 'Verify attendance for Aqilah antasha, 20 Sep 2026' });
         await page.click('.verify-all-wrap > span:last-child');
         assert.equal(await page.$$eval('.staff-card-item .staff-verify-checkbox', nodes => nodes.every(node => node.checked)), true, `${theme} ${width}px: Verify All remains functional`);
         assert.equal(await page.$eval('#staffVerifyAllText', node => node.textContent.trim()), 'Verified All', `${theme} ${width}px: verified-all label matches Individual Attendance`);

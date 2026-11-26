@@ -313,9 +313,9 @@ const ClaimApplicationFields = (() => {
           <div class="select-wrapper">
             <select id="v1Passengers" class="form-ctrl" onchange="handlePassengerAdd(this)">
               <option value="" selected>- Select Passenger -</option>
-              <option value="Sarah Jenkins">Sarah Jenkins (#EBB01)</option>
-              <option value="Marcus Tan">Marcus Tan (#004177)</option>
-              <option value="Daniel Lee">Daniel Lee (#000582)</option>
+              <option value="Sarah Jenkins">Sarah Jenkins (EBB01)</option>
+              <option value="Marcus Tan">Marcus Tan (004177)</option>
+              <option value="Daniel Lee">Daniel Lee (000582)</option>
             </select>
           </div>
         </div>

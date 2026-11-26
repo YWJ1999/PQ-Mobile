@@ -75,7 +75,7 @@
   }
 
   $('staffAssessEmployee').textContent = employee.name;
-  $('staffAssessEmployeeId').textContent = `#${employee.empNo.replace(/^#+/, '')}`;
+  $('staffAssessEmployeeId').textContent = formatEmployeeNumber(employee.empNo);
   $('staffAssessDepartment').textContent = employee.department;
   $('staffAssessPosition').textContent = employee.position;
   $('staffAssessSkillGroup').textContent = skillGroup;

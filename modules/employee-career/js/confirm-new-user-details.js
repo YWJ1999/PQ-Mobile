@@ -13,9 +13,10 @@ function displayBirthDate(value) {
 function populateProfile() {
   const name = profile.name || 'New User';
   document.getElementById('newUserProfileAvatar').textContent = name.trim().split(/\s+/).slice(0, 2).map(part => part[0]).join('');
-  document.getElementById('newUserProfileName').textContent = name;
-  const id = profile.empNo || profile.identity;
-  document.getElementById('newUserProfileId').textContent = id ? '#' + String(id).replace(/^#+/, '') : '—';
+  document.getElementById('newUserProfileName').textContent = employeeCardHeading.text(profile.empNo, name);
+  const identity = document.getElementById('newUserProfileId');
+  identity.hidden = Boolean(profile.empNo);
+  identity.textContent = profile.identity ? '#' + String(profile.identity).replace(/^#+/, '') : '—';
 
   const fields = {
     ...profile,

@@ -105,7 +105,7 @@
           if (id) {
             const number = document.createElement('div');
             number.className = 'feedback-approval-employee-id';
-            number.textContent = '#' + String(id).replace(/^#+/, '');
+            number.textContent = formatEmployeeNumber(id);
             block.append(number);
           }
           return block;
@@ -133,6 +133,7 @@
         const table = document.createElement('table');
         table.className = 'record-detail-table';
         const body = table.createTBody();
+        recordSubmitDate.prepend(body, attendanceSubmitDate(data));
         for (const [label, value] of rows) {
           const row = body.insertRow();
           const title = row.insertCell();
@@ -170,7 +171,6 @@
       }
 
       function renderAttendanceApprovalDetails(record) {
-        recordSubmitDate.set(document.getElementById('attendanceApprovalSubmitDate'), attendanceSubmitDate(record));
         const data = { ...record, empId: record.id, dates: record.startDate === record.endDate ? record.startDate : [record.startDate, record.endDate].filter(Boolean).join(' - ') };
         const setVal = (id, val) => {
           const el = document.getElementById(id);
@@ -186,6 +186,7 @@
         document.getElementById('attFeedbackDetailsGroup').hidden = !isFeedbackModal;
         document.getElementById('attOtDetailsGroup').hidden = isFeedbackModal;
         if (isFeedbackModal) renderFeedbackApprovalDetails(data);
+        else recordSubmitDate.set(document.getElementById('otApprovalSubmitDate'), attendanceSubmitDate(record));
         for (const fieldId of ['attFieldFinalStatus', 'attFieldActionApprovalMethod']) {
           const row = document.getElementById(fieldId)?.closest('tr');
           if (row) row.hidden = isOtPlanModal;
@@ -228,13 +229,13 @@
         if (empEl) {
           const empName = data.name || 'Farhan binti rahmat';
           const rawEmpId = (data.empId || data.id || 'EBB12').replace(/^#+/, '');
-          empEl.innerHTML = '<div>' + empName + '</div><div style="font-size: 11.5px; font-weight: 700; color: var(--text-muted); opacity: 0.8; font-family: monospace, sans-serif; margin-top: 2px;">#' + rawEmpId + '</div>';
+          empEl.innerHTML = '<div>' + empName + '</div><div style="font-size: 11.5px; font-weight: 700; color: var(--text-muted); opacity: 0.8; font-family: monospace, sans-serif; margin-top: 2px;">' + rawEmpId + '</div>';
         }
 
         const supEl = document.getElementById('attFieldSupervisor');
         if (supEl) {
           const rawSup = (data.supervisor || 'EBB04').replace(/^#+/, '');
-          supEl.innerHTML = '<span style="font-family: monospace; font-weight: 700;">#' + rawSup + '</span>';
+          supEl.innerHTML = '<span style="font-family: monospace; font-weight: 700;">' + rawSup + '</span>';
         }
 
         setVal('attFieldOtDate', data.dates ? data.dates.split(' - ')[0] : (data.startDate || '15 Jul 2024'));
@@ -3198,11 +3199,11 @@
         <!-- Scrollable Details Content List as Table matching leave.html -->
         <div style="flex: 1; overflow-y: auto; padding: 14px 16px 14px 16px; display: flex; flex-direction: column; gap: 14px; scrollbar-width: none; background: var(--bg-sheet);">
 
-          <span id="attendanceApprovalSubmitDate" class="record-submit-date" hidden></span>
           <div id="attFeedbackDetailsGroup" hidden></div>
           <div id="attOtDetailsGroup" style="background: var(--bg-sheet); border: 1px solid var(--border-subtle); border-radius: 16px; overflow: hidden; box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05); flex-shrink: 0;">
             <table style="width: 100%; border-collapse: collapse; font-size: 12px; text-align: left;">
               <tbody>
+                <tr id="otApprovalSubmitDate" class="record-submit-date" hidden></tr>
                 <tr>
                   <td style="padding: 9px 12px; border-bottom: 1px solid var(--border-subtle); border-right: 1px solid var(--border-subtle); font-weight: 700; color: var(--text-muted); background: var(--bg-input); width: 42%;">Plan Status:</td>
                   <td style="padding: 9px 12px; border-bottom: 1px solid var(--border-subtle); color: var(--text-primary); width: 58%; font-weight: 700;" id="attFieldPlanStatus">Unplanned</td>
@@ -3215,12 +3216,12 @@
                   <td style="padding: 9px 12px; border-bottom: 1px solid var(--border-subtle); border-right: 1px solid var(--border-subtle); font-weight: 700; color: var(--text-muted); background: var(--bg-input); width: 42%;">Employee:</td>
                   <td style="padding: 9px 12px; border-bottom: 1px solid var(--border-subtle); color: var(--text-primary); width: 58%; font-weight: 700;" id="attFieldEmployee">
                     <div>Farhan binti rahmat</div>
-                    <div style="font-size: 11.5px; font-weight: 700; color: var(--text-muted); opacity: 0.8; font-family: monospace, sans-serif; margin-top: 2px;">#EBB12</div>
+                    <div style="font-size: 11.5px; font-weight: 700; color: var(--text-muted); opacity: 0.8; font-family: monospace, sans-serif; margin-top: 2px;">EBB12</div>
                   </td>
                 </tr>
                 <tr>
                   <td style="padding: 9px 12px; border-bottom: 1px solid var(--border-subtle); border-right: 1px solid var(--border-subtle); font-weight: 700; color: var(--text-muted); background: var(--bg-input); width: 42%;">Supervisor:</td>
-                  <td style="padding: 9px 12px; border-bottom: 1px solid var(--border-subtle); color: var(--text-primary); width: 58%; font-weight: 700;" id="attFieldSupervisor">#EBB04</td>
+                  <td style="padding: 9px 12px; border-bottom: 1px solid var(--border-subtle); color: var(--text-primary); width: 58%; font-weight: 700;" id="attFieldSupervisor">EBB04</td>
                 </tr>
                 <tr>
                   <td style="padding: 9px 12px; border-bottom: 1px solid var(--border-subtle); border-right: 1px solid var(--border-subtle); font-weight: 700; color: var(--text-muted); background: var(--bg-input); width: 42%;">OT Date:</td>
@@ -3978,8 +3979,7 @@
                     <input type="checkbox" class="approval-card-checkbox" value="${idx}" aria-label="Select request for ${item.name}" style="width: 20px; height: 20px; accent-color: #ffffff; cursor: pointer; border-radius: 6px;">
                   </div>
                   <div>
-                    <div style="font-size: 14.5px; font-weight: 800; color: #ffffff;">${item.name}</div>
-                    <div style="font-size: 11.5px; font-weight: 700; color: rgba(255, 255, 255, 0.85); opacity: 0.8; font-family: monospace, sans-serif; margin-bottom: 2px;">#${(item.id || '').replace(/^#+/, '')}</div>
+                    <div style="font-size: 14.5px; font-weight: 800; color: #ffffff;">${employeeCardHeading.html(item.id, item.name)}</div>
                     <div style="font-size: 11px; font-weight: 600; color: rgba(255, 255, 255, 0.85);">${item.dept || 'Staff'}</div>
                   </div>
                 </div>
@@ -4032,11 +4032,11 @@
           card.style.opacity = '0.5';
           card.style.pointerEvents = 'none';
         }
-        if (typeof showToast === 'function') showToast(`Approved request for ${id}`);
+        if (typeof showToast === 'function') showToast(`Approved request for ${formatEmployeeNumber(id)}`);
       }
 
       function handleStaffResubmit(id, btn) {
-        if (typeof showToast === 'function') showToast(`Requested resubmit for ${id}`);
+        if (typeof showToast === 'function') showToast(`Requested resubmit for ${formatEmployeeNumber(id)}`);
       }
 
       function handleStaffReject(id, btn) {
@@ -4048,7 +4048,7 @@
           card.style.opacity = '0.5';
           card.style.pointerEvents = 'none';
         }
-        if (typeof showToast === 'function') showToast(`Rejected request for ${id}`);
+        if (typeof showToast === 'function') showToast(`Rejected request for ${formatEmployeeNumber(id)}`);
       }
 
       function openStaffListModal(title, type) {
@@ -4109,11 +4109,8 @@
             header.className = 'workforce-employee-header';
             const name = document.createElement('h4');
             name.className = 'workforce-employee-name';
-            name.textContent = item.name;
-            const id = document.createElement('div');
-            id.className = 'workforce-employee-id';
-            id.textContent = '#' + (item.id || '').replace(/^#+/, '');
-            header.append(name, id);
+            name.textContent = employeeCardHeading.text(item.id, item.name);
+            header.append(name);
             const details = document.createElement('dl');
             details.className = 'workforce-employee-details';
             for (const [label, value] of [
@@ -4162,8 +4159,7 @@
                       <input type="checkbox" class="approval-card-checkbox" style="width: 20px; height: 20px; accent-color: #ffffff; cursor: pointer; border-radius: 6px;">
                     </div>
                     <div>
-                      <div style="font-size: 14.5px; font-weight: 800; color: #ffffff;">${item.name}</div>
-                      <div style="font-size: 11.5px; font-weight: 700; color: rgba(255, 255, 255, 0.85); opacity: 0.8; font-family: monospace, sans-serif; margin-bottom: 2px;">#${(item.id || '').replace(/^#+/, '')}</div>
+                      <div style="font-size: 14.5px; font-weight: 800; color: #ffffff;">${employeeCardHeading.html(item.id, item.name)}</div>
                     <div style="font-size: 11px; font-weight: 600; color: rgba(255, 255, 255, 0.85);">${item.dept || 'Staff'}</div>
                     </div>
                   </div>
@@ -4205,10 +4201,7 @@
             return `
           <div class="staff-card-item" style="border-radius: 14px; padding: 12px 14px; display: flex; flex-direction: column; gap: 3px;">
             <div style="font-size: 14.5px; font-weight: 800; color: var(--text-primary); line-height: 1.2;">
-              ${item.name}
-            </div>
-            <div style="font-size: 11.5px; font-weight: 700; color: var(--text-muted); opacity: 0.8; font-family: monospace, sans-serif; margin-bottom: 2px;">
-              #${(item.id || '').replace(/^#+/, '')}
+              ${employeeCardHeading.html(item.id, item.name)}
             </div>
             <div style="font-size: 11px; font-weight: 600; color: var(--text-muted);">
               ${item.dept}${item.branch ? ` • ${item.branch}` : ''}

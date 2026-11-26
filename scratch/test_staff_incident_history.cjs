@@ -28,9 +28,9 @@ const url = (file, theme) => pathToFileURL(path.join(root, 'modules/performance'
       assert.equal(await page.$('.history-categories'),null,'No unrelated history categories');
       assert.equal(await page.$eval('#incidentHistoryCount',el=>Number(el.textContent)),10);
       const source = await page.evaluate(()=>JSON.stringify(window.PERFORMANCE_INCIDENT_HIGHLIGHT_DATA));
-      const cards=await page.$$eval('.incident-history-card',els=>els.map(el=>({name:el.querySelector('.incident-history-name').textContent,id:el.querySelector('.incident-history-id').textContent,labels:[...el.querySelectorAll('dt')].map(el=>el.textContent),buttons:[...el.querySelectorAll('.incident-history-actions button')].map(el=>el.textContent.trim()),summaryBorder:getComputedStyle(el.querySelector('.incident-history-details')).borderTopWidth==='1px'&&getComputedStyle(el.querySelector('.incident-history-details')).borderRadius==='14px',leftBorder:getComputedStyle(el).borderLeftWidth==='5px'&&getComputedStyle(el).borderLeftColor==='rgb(16, 185, 129)',plainHeader:getComputedStyle(el.querySelector('.incident-history-card-header')).backgroundImage==='none',idBelow:el.querySelector('.incident-history-id').getBoundingClientRect().top>=el.querySelector('.incident-history-name').getBoundingClientRect().bottom})));
+      const cards=await page.$$eval('.incident-history-card',els=>els.map(el=>({name:el.querySelector('.incident-history-name').textContent,labels:[...el.querySelectorAll('dt')].map(el=>el.textContent),buttons:[...el.querySelectorAll('.incident-history-actions button')].map(el=>el.textContent.trim()),summaryBorder:getComputedStyle(el.querySelector('.incident-history-details')).borderTopWidth==='1px'&&getComputedStyle(el.querySelector('.incident-history-details')).borderRadius==='14px',leftBorder:getComputedStyle(el).borderLeftWidth==='5px'&&getComputedStyle(el).borderLeftColor==='rgb(16, 185, 129)',plainHeader:getComputedStyle(el.querySelector('.incident-history-card-header')).backgroundImage==='none'})));
       assert.equal(cards.length,10);
-      assert.ok(cards.every(card=>card.name&&card.id.startsWith('#')&&card.idBelow&&card.summaryBorder&&card.leftBorder&&card.plainHeader));
+      assert.ok(cards.every(card=>/^[^\s#]+ - .+/.test(card.name)&&card.summaryBorder&&card.leftBorder&&card.plainHeader));
       assert.deepEqual(cards[0].labels,['Date','Incident Type','Action','Remarks']);
       assert.deepEqual(cards[0].buttons,['Edit','Delete']);
       assert.equal(await page.$('.incident-history-actions button i'),null,'Edit and Delete contain only text');
@@ -41,8 +41,8 @@ const url = (file, theme) => pathToFileURL(path.join(root, 'modules/performance'
       const firstId=await page.$eval('.incident-history-card',el=>el.dataset.reference);
       await page.click('.incident-history-name');
       assert.equal(await page.$eval('#incidentHistoryDetailsModal',el=>el.getAttribute('aria-hidden')),'false','Clicking card opens its details');
-      assert.deepEqual(await page.$$eval('#incidentHistoryDetailsRows th',els=>els.map(el=>el.textContent)),['Reference #','Emp #','Name','Incident Date','Created Date','Incident Type','Incident Action','Measure Value','Merit','Value','Remarks','Is Closed?','Attachment']);
-      assert.deepEqual(await page.$$eval('#incidentHistoryDetailsRows td',els=>els.slice(0,10).map(el=>el.textContent)),['WI-2026-0006','#EBB01','Alex Tan','12 Oct 2026','12 Oct 2026 14:30','Commendation','Recognition','1 completed handover','Yes','5']);
+      assert.deepEqual(await page.$$eval('#incidentHistoryDetailsRows th',els=>els.map(el=>el.textContent)),['Reference #','Emp No.','Name','Incident Date','Created Date','Incident Type','Incident Action','Measure Value','Merit','Value','Remarks','Is Closed?','Attachment']);
+      assert.deepEqual(await page.$$eval('#incidentHistoryDetailsRows td',els=>els.slice(0,10).map(el=>el.textContent)),['WI-2026-0006','EBB01','Alex Tan','12 Oct 2026','12 Oct 2026 14:30','Commendation','Recognition','1 completed handover','Yes','5']);
       assert.equal(await page.$eval('#incidentHistoryDetailsRows tr:nth-child(12) td',el=>el.textContent),'Yes');
       assert.ok(await page.$eval('#incidentHistoryDetailsRows a',el=>el.href.endsWith('/assets/performance/handover-notes.txt')&&el.download==='handover-notes.txt'));
       assert.equal(await page.evaluate(()=>document.activeElement.id),'incidentHistoryDetailsClose');
@@ -73,7 +73,7 @@ const url = (file, theme) => pathToFileURL(path.join(root, 'modules/performance'
       await page.screenshot({path:path.join(__dirname,`staff-incident-history-filter-${theme}-${width}.png`)});
       await page.type('#incidentHistoryKeyword','Daniel');await page.click('#incidentHistoryApplyFilter');
       assert.equal(await page.$eval('#incidentHistoryCount',el=>Number(el.textContent)),2);
-      assert.ok(await page.$$eval('#incidentHistoryList .incident-history-name',els=>els.every(el=>el.textContent==='Daniel Wong')));
+      assert.ok(await page.$$eval('#incidentHistoryList .incident-history-name',els=>els.every(el=>el.textContent==='EBB02 - Daniel Wong')));
       await page.click('#incidentHistoryFilterTrigger');await page.click('#incidentHistoryResetFilter');await page.select('#incidentHistoryType','Attendance');await page.click('#incidentHistoryApplyFilter');
       assert.equal(await page.$eval('#incidentHistoryCount',el=>Number(el.textContent)),3,'Incident Type filters independently');
       await page.click('#incidentHistoryFilterTrigger');await page.click('#incidentHistoryResetFilter');

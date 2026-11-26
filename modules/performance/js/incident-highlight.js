@@ -12,7 +12,7 @@
   function display(value) { return value === '' || value == null ? '—' : String(value); }
   function numeric(value) { if (value === '' || value == null) return null; const number = Number(value); return Number.isFinite(number) ? number : null; }
   function numberText(value) { return value == null ? '—' : String(Number(Number(value).toFixed(2))); }
-  function employeeId(value) { const id = String(value ?? '').replace(/^#+/, ''); return id ? `#${id}` : '—'; }
+  const employeeId = value => formatEmployeeNumber(value) || '—';
   function meritKey(record) { return record.merit === true ? 'merit' : record.merit === false ? 'demerit' : ''; }
   function meritLabel(record) { const key = meritKey(record); return key === 'merit' ? 'Merit' : key === 'demerit' ? 'Demerit' : '—'; }
   function sumPoints(items) { const points = items.map(record => numeric(record.point)).filter(value => value != null); return points.length ? points.reduce((sum, value) => sum + value, 0) : null; }
@@ -111,7 +111,7 @@
     [...employee.incidents].sort((a, b) => String(b.incidentDate).localeCompare(String(a.incidentDate)) || String(b.createdDate).localeCompare(String(a.createdDate))).forEach(record => {
       const wrapper = node('div', 'incident-highlight-detail-record'), table = node('table', 'detail-popout-table'), tbody = node('tbody');
       table.dataset.incidentReference = record.reference || ''; table.setAttribute('aria-label', `Incident details ${display(record.reference)}`);
-      const fields = [['Employee #', employeeId(record.empNo)], ['Name', record.name], ['Incident Date', dateText(record.incidentDate)], ['Created Date', dateText(record.createdDate, true)],
+      const fields = [['Employee No.', employeeId(record.empNo)], ['Name', record.name], ['Incident Date', dateText(record.incidentDate)], ['Created Date', dateText(record.createdDate, true)],
         ['Incident Type', record.incidentType], ['Incident Action', record.incidentAction], ['Measure Value', record.measureValue],
         ['Merit', record.merit === true ? 'Yes' : record.merit === false ? 'No' : null], ['Remarks', record.remarks], ['Attachment', attachmentList(record)]];
       fields.forEach(([label, value]) => {
@@ -182,7 +182,7 @@
   $('incidentHighlightExportPdf').addEventListener('click', () => window.print());
   $('incidentHighlightExportExcel').addEventListener('click', () => {
     window.PeopleHcmHighlightExport.downloadCsv('incident-highlight.csv', [
-      ['Emp #', 'Name', 'Total', 'Branch', 'Department', 'Position'],
+      ['Emp No.', 'Name', 'Total', 'Branch', 'Department', 'Position'],
       ...state.employees.map(employee => [employeeId(employee.empNo), employee.name, employee.total, employee.branch, employee.department, employee.position]),
       ['Total Records', state.employees.length, '', '', '', ''],
       ['Total Points', '', totalPoints(visibleIncidents()), '', '', ''],

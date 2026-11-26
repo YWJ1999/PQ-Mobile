@@ -14,13 +14,17 @@
 .hours-highlight-page .filter-trigger-btn { display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; background: var(--bg-input); border: 1px solid var(--border-subtle); color: var(--purple-primary); font-size: 16px; }
 .hours-highlight-page .highlight-summary-total { font-size: 15px; font-weight: 800; color: var(--text-primary); }
 .hours-highlight-exports { display: flex; gap: 12px; }
-.hours-highlight-page .action-icon-btn { display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 10px; border: 1px solid var(--border-subtle); background: var(--bg-card); font-size: 16px; }
-.hours-highlight-page .action-icon-btn.pdf { color: #ef4444; }
-.hours-highlight-page .action-icon-btn.excel { color: #10b981; }
 .hours-highlight-page .highlight-table-card { min-height: 480px; }
 .hours-highlight-page .attendance-report-table .hours-number { text-align: right; }
 .hours-highlight-page .employee-id-cell { font: 700 11.5px monospace, sans-serif; color: var(--text-muted); opacity: .8; }
 .hours-highlight-page .hours-pill { background: var(--purple-subtle); border: 1px solid var(--purple-border); border-radius: 8px; padding: 4px 10px; color: var(--purple-primary); font-size: 13px; font-weight: 800; }
+.hours-highlight-page a.hours-pill { display: inline-block; text-decoration: none; }
+.hours-highlight-page a.hours-pill:hover { border-color: var(--purple-primary); }
+.hours-highlight-page a.hours-pill:focus-visible { outline: 2px solid var(--purple-primary); outline-offset: 2px; }
+#attendanceHighlightTableBody td.hours-number { position: relative; }
+#attendanceHighlightTableBody .hours-pill::after { content: ''; position: absolute; inset: 0; }
+.hours-highlight-page a.header-btn-icon { text-decoration: none; }
+.hours-highlight-page a.header-btn-icon:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
 .hours-highlight-page .branch-pill { display: inline-block; background: var(--bg-input); border: 1px solid var(--border-subtle); border-radius: 6px; padding: 3px 8px; color: var(--text-secondary); font-size: 11px; font-weight: 700; }
 .hours-highlight-page .highlight-analysis-card { margin-bottom: 14px; background: var(--bg-card); border: 1px solid var(--border-subtle); box-shadow: var(--shadow-card); }
 .hours-highlight-page .highlight-breakdown-card { border-radius: 24px; padding: 18px 18px 16px; }
@@ -70,21 +74,22 @@
 .hours-highlight-page .highlight-analysis-view .hours-highlight-chart-heading { display: block; text-align: center; }
 .hours-highlight-page .highlight-analysis-view .hours-highlight-chart-heading p { font-size: 13.5px; font-weight: 700; }
 .hours-highlight-page .modal-overlay { position: absolute; inset: 0; z-index: 1200; display: flex; align-items: center; justify-content: center; padding: 16px; background: rgba(15,23,42,.72); backdrop-filter: blur(8px); }
-.hours-highlight-page .highlight-details-dialog { display: flex; flex-direction: column; width: 100%; max-width: 370px; max-height: 85%; overflow: hidden; border-radius: 24px; border: 1px solid var(--border-subtle); background: var(--bg-card); box-shadow: var(--shadow-sheet); }
-.hours-highlight-page .highlight-details-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; padding: 18px 20px; background: linear-gradient(135deg,#4c1d95,#6d28d9 50%,#7c3aed); color: #fff; }
-.highlight-details-header h2 { margin: 0; font-size: 16px; font-weight: 800; line-height: 1.25; }
-.highlight-details-header small { display: block; margin-top: 4px; color: rgba(255,255,255,.75); font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .8px; }
-.hours-highlight-close { display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; width: 32px; height: 32px; border-radius: 50%; border: 1px solid rgba(255,255,255,.25); background: rgba(255,255,255,.18); color: #fff; font-size: 15px; }
-.hours-highlight-page .leave-highlight-details-list { display: flex; flex-direction: column; gap: 10px; padding: 16px 18px 18px; overflow-y: auto; min-height: 0; background: var(--bg-card); }
-.hours-highlight-detail-meta { display: flex; justify-content: space-between; gap: 8px; color: var(--text-muted); font-size: 12px; font-weight: 700; }
-.hours-highlight-page .leave-highlight-detail-record { flex-shrink: 0; overflow: hidden; border: 1px solid var(--border-subtle); border-radius: 16px; background: var(--bg-card); }
-.hours-highlight-page .leave-highlight-detail-date { padding: 9px 14px; color: #fff; background: linear-gradient(135deg,#4c1d95,#6d28d9 50%,#7c3aed); font: 800 12.5px monospace, sans-serif; }
-.hours-highlight-page .leave-highlight-detail-body { display: grid; grid-template-columns: minmax(0,1.4fr) minmax(0,1fr); gap: 10px 12px; margin: 12px 14px; padding: 10px 12px; border: 1px solid var(--border-subtle); border-radius: 12px; background: var(--bg-input); }
-.hours-highlight-page .leave-highlight-detail-field { min-width: 0; }
-.hours-highlight-page .leave-highlight-detail-label { margin-bottom: 4px; color: var(--text-muted); font-size: 10px; font-weight: 700; }
-.hours-highlight-page .leave-highlight-detail-value { color: var(--text-primary); font-size: 12.5px; font-weight: 800; line-height: 1.4; overflow-wrap: anywhere; }
-.hours-highlight-page .leave-highlight-detail-value[data-field="hours"] { font-size: 14px; font-weight: 900; letter-spacing: -.3px; }
-.hours-highlight-page .leave-highlight-detail-field.wide { grid-column: 1 / -1; }
+.overtime-detail-page .cal-top-header { flex: none; padding: 0; border-radius: 0; box-shadow: none; }
+.overtime-detail-page .hours-highlight-header { padding: 0 20px 16px; }
+.overtime-detail-page .hours-highlight-header h1 { overflow-wrap: anywhere; }
+.overtime-detail-page .main-content { padding-bottom: 16px; }
+.overtime-detail-subtitle { margin-top: 3px; color: rgba(255,255,255,.88); font-size: 12px; font-weight: 600; }
+.overtime-detail-total { display: block; margin-top: 3px; color: var(--text-primary); font-size: 20px; font-weight: 800; font-variant-numeric: tabular-nums; }
+.overtime-detail-table-card { min-height: 0; border-radius: 18px; }
+.overtime-detail-table { min-width: 0; }
+.overtime-detail-table :is(th, td) { padding: 12px; }
+.overtime-detail-table td { font-size: 13px; font-weight: 600; }
+.overtime-detail-table th:first-child { width: 32%; }
+.overtime-detail-table th:last-child { width: 1%; }
+.overtime-detail-table td:nth-child(2) { white-space: normal; overflow-wrap: anywhere; color: var(--text-primary); }
+.overtime-detail-table .hours-pill { display: inline-block; min-width: 3.5em; text-align: center; font-variant-numeric: tabular-nums; }
+.overtime-detail-table tr:last-child td { border-bottom: 0; }
+.overtime-detail-table td.attendance-report-empty { padding: 24px 16px; white-space: normal; }
 .hours-highlight-page .highlight-filter-sheet { display: flex; flex-direction: column; width: 100%; max-height: 88%; overflow: hidden; border-radius: 28px 28px 0 0; border: 1px solid var(--border-subtle); background: var(--bg-card); }
 .highlight-filter-handle { width: 36px; height: 4px; margin: 12px auto 16px; border-radius: 4px; background: var(--border-subtle); }
 .highlight-filter-header { display: flex; align-items: center; justify-content: space-between; padding: 0 20px 16px; gap: 14px; }
@@ -97,6 +102,6 @@
 [data-theme="dark"] .highlight-filter-form input[type="date"] { color-scheme: dark; }
 [data-theme="light"] .hours-highlight-page .modal-overlay { background: rgba(15,23,42,.44); }
 .hours-highlight-page .highlight-filter-overlay { align-items: flex-end; padding: 0; }
-@media (max-width: 380px) { .hours-highlight-chart-heading { flex-wrap: wrap; } .highlight-details-header { padding: 16px; } .hours-highlight-page .leave-highlight-details-list { padding: 14px; } }
+@media (max-width: 380px) { .hours-highlight-chart-heading { flex-wrap: wrap; } }
 @media (prefers-reduced-motion: reduce) { .hours-highlight-page *, .hours-highlight-page *::before { transition: none !important; animation: none !important; } }
 @media print { .hours-highlight-page preview-top-bar, .hours-highlight-page .cal-top-header, .hours-highlight-page phone-bottom-nav, .hours-highlight-page .modal-overlay, .hours-highlight-page button, .hours-highlight-page .filter-summary-bar { display: none !important; } .hours-highlight-page, .hours-highlight-page .phone-container, .hours-highlight-page .main-content { display: block; width: 100%; max-width: none; height: auto; padding: 0; overflow: visible; box-shadow: none; border-radius: 0; } .hours-highlight-page .attendance-report-table { min-width: 0; } .hours-highlight-page .hours-pill { display: inline-block !important; border: 0; } }

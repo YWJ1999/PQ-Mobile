@@ -16,6 +16,11 @@ const puppeteer = require('puppeteer');
     const url = pathToFileURL(path.resolve(__dirname, '../leave.html')).href;
     const overlay = '#historyDetailsModalOverlay';
     const actions = '#historyDetailsActions';
+    const openRecord = ref => page.$eval('#myHistoryCardsList [data-ref="' + ref + '"]', card => card.click());
+    const backToList = async () => {
+      await page.click(overlay + ' [data-history-back]');
+      await page.waitForSelector(overlay, { hidden: true });
+    };
     for (const theme of ['light', 'dark']) {
       await page.setViewport({ width: 390, height: 844 });
       await page.goto(url, { waitUntil: 'networkidle0' });
@@ -37,14 +42,14 @@ const puppeteer = require('puppeteer');
             const expected = tab === 'offtime' || !['draft', 'submitted', 'approved'].includes(card.status)
               ? [] : card.status === 'draft' ? ['Apply', 'Cancel'] : ['Cancel'];
             assert.deepEqual(card.buttons, expected);
-            await page.evaluate(ref => openHistoryDetailsModal(ref), card.ref);
+            await openRecord(card.ref);
             const detailLabels = expected.length === 2 ? ['Apply', 'Delete Record'] : expected;
             assert.deepEqual(await page.$$eval(`${actions} button`, buttons => buttons.map(button => button.textContent.trim())), detailLabels,
               `${theme}/${width}/${card.ref}: record detail actions`);
             assert.equal(await page.$eval(actions, node => node.hidden), !expected.length);
             if (expected.length) {
               const layout = await page.$eval(actions, node => {
-                const panel = node.closest('.history-details-dialog');
+                const panel = node.closest('.approval-record-layout');
                 const body = panel.querySelector('.history-details-body');
                 body.scrollTop = body.scrollHeight;
                 const footerStyle = getComputedStyle(node);
@@ -67,21 +72,22 @@ const puppeteer = require('puppeteer');
                 };
               });
               assert.ok(layout.directChild && layout.outsideScrollableBody && layout.fits);
-              assert.match(layout.icon, expected.length === 1 ? /fa-ban/ : /fa-trash-can/);
+              if (tab === 'credit' && expected.length === 1) assert.equal(layout.icon, undefined);
+              else assert.match(layout.icon, expected.length === 1 ? /fa-ban/ : /fa-trash-can/);
               assert.ok(expected.length === 2 ? layout.compactPair : layout.fullWidth, `${theme}/${width}/${card.ref}: action layout`);
               assert.match(layout.background, /rgb\(124, 58, 237\).*rgb\(109, 40, 217\)/);
               assert.equal(layout.colour, 'rgb(255, 255, 255)');
               if (width === 390 && tab === 'leave' && ['draft', 'submitted'].includes(card.status)) {
-                await page.screenshot({ path: path.join(__dirname, `leave_history_details_${card.status}_${theme}.png`) });
+                await page.screenshot({ path: path.join(process.env.SCREENSHOT_DIR || __dirname, `leave_history_details_${card.status}_${theme}.png`) });
               }
             }
-            await page.evaluate(() => closeHistoryDetailsModal());
+            await backToList();
           }
         }
       }
+      await page.evaluate(() => switchHistoryTab('leave'));
+      await openRecord('LV-2026-0055');
       await page.evaluate(() => {
-        switchHistoryTab('leave');
-        openHistoryDetailsModal('LV-2026-0055');
         const body = document.querySelector('.history-details-body');
         body.scrollTop = body.scrollHeight;
       });
@@ -103,18 +109,21 @@ const puppeteer = require('puppeteer');
       assert.match(await page.$eval('#historyDetailsTableBody', node => node.textContent), /Cancelled/);
 
       // A delayed card action must never replace a different record opened meanwhile.
+      await backToList();
       await page.evaluate(() => {
-        closeHistoryDetailsModal();
         cancelHistoryItem('LV-2026-0055', 'submitted');
-        openHistoryDetailsModal('LV-2026-0041');
       });
+      await openRecord('LV-2026-0041');
       await page.waitForFunction(() => HISTORY_LEAVE_DATA[0].status === 'submitted');
       assert.match(await page.$eval('#historyDetailsTableBody', node => node.textContent), /LV-2026-0041/);
 
+      await backToList();
       await page.evaluate(() => {
         HISTORY_LEAVE_DATA[0].status = 'draft';
         renderHistoryCards();
-        openHistoryDetailsModal('LV-2026-0055');
+      });
+      await openRecord('LV-2026-0055');
+      await page.evaluate(() => {
         window.__historyActionTimers = [];
         window.__historyActionOriginalSetTimeout = window.setTimeout;
         window.setTimeout = (callback, delay, ...args) => {

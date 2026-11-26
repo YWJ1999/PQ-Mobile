@@ -44,7 +44,7 @@ const pageUrl = pathToFileURL(path.resolve(__dirname, '../modules/attendance/opt
     assert.deepEqual(await page.$$eval('#headcountDetailPage dt', nodes => nodes.map(node => node.textContent)), ['Job title', 'Shift', 'Headcount']);
     assert.deepEqual(await page.$$eval('#headcountDetailPage dd', nodes => nodes.map(node => node.textContent)), ['Account Executive', 'N/A', '3']);
     assert.deepEqual(await page.$$eval('#headcountEmployeeRows tr', rows => rows.map(row => [...row.cells].map(cell => cell.textContent))), [
-      ['#000008', 'Aqilah Antasha'], ['#000009', 'Chan Mee Ling'], ['#000100', 'Loh Siew Hong']
+      ['000008', 'Aqilah Antasha'], ['000009', 'Chan Mee Ling'], ['000100', 'Loh Siew Hong']
     ]);
     assert.equal(await page.$eval('#summaryChartOffDescription', node => node.textContent), 'Off day, 274 staff (95.5%)');
     assert.equal(await page.$eval('#summaryChartW02Description', node => node.textContent), 'W02 regular day, 13 staff (4.5%)');
@@ -81,13 +81,13 @@ const pageUrl = pathToFileURL(path.resolve(__dirname, '../modules/attendance/opt
     await page.click(headcountLink);
     await page.waitForSelector('#headcountDetailPage:not([hidden])');
     assert.equal(page.url(), detailUrl);
-    assert.deepEqual(await page.$$eval('#headcountEmployeeTable thead th', nodes => nodes.map(node => node.textContent)), ['Emp #', 'Name']);
+    assert.deepEqual(await page.$$eval('#headcountEmployeeTable thead th', nodes => nodes.map(node => node.textContent)), ['Emp No.', 'Name']);
     assert.equal(await page.$eval('#headcountEmployeeTable th', cell => getComputedStyle(cell).color), 'rgb(255, 255, 255)');
     await page.click('#headcountFilterButton');
     await page.type('#headcountFilterKeyword', '#000100');
     await page.keyboard.press('Enter');
     await page.waitForSelector('#headcountFilterDialog', { hidden: true });
-    assert.deepEqual(await page.$$eval('#headcountEmployeeRows td', nodes => nodes.map(node => node.textContent)), ['#000100', 'Loh Siew Hong']);
+    assert.deepEqual(await page.$$eval('#headcountEmployeeRows td', nodes => nodes.map(node => node.textContent)), ['000100', 'Loh Siew Hong']);
     assert.equal(await page.$eval('#headcountDetailCount', node => node.textContent), '1');
     await page.click('#headcountFilterButton');
     await page.click('#headcountFilterDialog [type=reset]');

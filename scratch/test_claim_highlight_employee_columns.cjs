@@ -8,7 +8,7 @@ const pages = [
   {
     file: 'modules/claims/options/benefit-highlight.html',
     bodyId: 'benefitHighlightTableBody',
-    expectedId: '#EBB01',
+    expectedId: 'EBB01',
     expectedName: 'Sarah Jenkins',
     modalId: 'modalEmpIdBadge',
     modalName: 'modalEmpNameText'
@@ -16,7 +16,7 @@ const pages = [
   {
     file: 'modules/claims/options/expenses-highlight.html',
     bodyId: 'expensesHighlightTableBody',
-    expectedId: '#004177',
+    expectedId: '004177',
     expectedName: 'Marcus Tan',
     modalId: 'modalExpenseEmpIdBadge',
     modalName: 'modalExpenseEmpNameText'

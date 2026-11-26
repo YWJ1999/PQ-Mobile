@@ -3,6 +3,16 @@ const path = require('node:path');
 const { pathToFileURL } = require('node:url');
 const puppeteer = require('puppeteer');
 
+async function readViolationCards(page, panel) {
+  return page.$$eval(panel + ' .violation-card', cards => cards.map(card => ({
+    name: card.querySelector('.violation-card-name').textContent,
+    role: card.querySelector('.violation-card-role').textContent,
+    reason: card.querySelector('.violation-card-reason').textContent,
+    period: card.querySelector('.violation-card-period').textContent,
+    icon: card.querySelector('.violation-card-icon i').className
+  })));
+}
+
 // Catches stale date/counts, filters leaking before Apply, and details opening
 // with another employee's dates instead of the selected attendance records.
 (async () => {
@@ -16,6 +26,18 @@ const puppeteer = require('puppeteer');
         page.on('pageerror', error => errors.push(error.message));
         await page.goto(pathToFileURL(path.resolve(__dirname, '../modules/attendance/options/work-hour-violation.html')).href + `?theme=${theme}`, { waitUntil: 'domcontentloaded' });
         assert.equal(await page.$$eval('#viewContinuous .violation-card', cards => cards.length), 4, 'Cards must reflect the available filtered records');
+        assert.deepEqual((await readViolationCards(page, '#viewContinuous')).slice(0, 2), [
+          { name: '0000100 - LSH', role: 'Account Executive • Accounts', reason: '7 consecutive workdays', period: '10–16 Jan 2026', icon: 'fa-regular fa-calendar-days' },
+          { name: '000020 - Tay Siow Kung', role: 'BFT & Com. Executive • Human Resource', reason: '7 consecutive workdays', period: '10–16 Jan 2026', icon: 'fa-regular fa-calendar-days' }
+        ]);
+        const ranges = await page.evaluate(() => [
+          ['2026-01-16', '2026-01-16'], ['2024-02-28', '2024-03-01'], ['2025-12-31', '2026-01-02']
+        ].map(([startDate, date]) => violationSummary({ type: 'continuous', startDate, date })));
+        assert.deepEqual(ranges, [
+          { title: '1 consecutive workday', period: '16 Jan 2026' },
+          { title: '3 consecutive workdays', period: '28 Feb – 1 Mar 2024' },
+          { title: '3 consecutive workdays', period: '31 Dec 2025 – 2 Jan 2026' }
+        ]);
         assert.equal(await page.$('.attendance-report-summary'), null);
         assert.equal(await page.$('.view-chart-btn'), null);
         await page.click('#viewContinuous [data-violation-detail]');
@@ -34,7 +56,9 @@ const puppeteer = require('puppeteer');
         assert.equal(await page.$eval('#boxRest', el => el.getAttribute('aria-selected')), 'true');
         assert.equal(await page.$eval('#currentDateDisplay', el => el.textContent), '25 Sep 2026', 'Initial tab switch must select the latest available example date');
         assert.equal(await page.$$eval('#viewRest .violation-card', cards => cards.length), 1);
-        assert.equal(await page.$eval('#viewRest .violation-card-footer', el => el.textContent), 'Below 30 rest hours at 25/09/2026');
+        assert.deepEqual(await readViolationCards(page, '#viewRest'), [
+          { name: '000008 - Aqilah Antasha', role: 'Admin Executive • Administration', reason: 'Under 30 hours of rest', period: '25 Sep 2026', icon: 'fa-regular fa-clock' }
+        ]);
         await page.click('.filter-trigger-btn');
         await page.waitForSelector('#filterModal', { visible: true });
         assert.deepEqual(await page.$$eval('#violationFilterForm .form-field label', labels => labels.map(label => label.textContent)), ['Date', 'Branch', 'Department']);
@@ -46,7 +70,7 @@ const puppeteer = require('puppeteer');
         assert.equal(await page.$$eval('#viewRest .violation-card', cards => cards.length), 1);
         assert.equal(await page.$$eval('#viewContinuous .violation-card', cards => cards.length), 0);
         assert.equal(await page.$$eval('#viewRest .violation-card', cards => cards.length), 1);
-        assert.deepEqual(await page.$$eval('.hist-tab-btn', tabs => tabs.map(tab => tab.textContent)), ['Continuous Work', 'Below 30 Rest Hour']);
+        assert.deepEqual(await page.$$eval('.hist-tab-btn', tabs => tabs.map(tab => tab.textContent)), ['Continuous Work', 'Rest under 30 hours']);
         await page.screenshot({ path: path.resolve(__dirname, `violation-cards-${theme}-${width}.png`) });
         await page.click('#viewRest [data-violation-detail]');
         await page.waitForSelector('#detailModal', { visible: true });
@@ -128,8 +152,6 @@ const puppeteer = require('puppeteer');
         assert.equal(await page.$eval('#currentDateDisplay', el => el.textContent), '16 Jan 2026', 'Explicitly applied dates must remain selected when switching tabs');
         assert.equal(await page.$$eval('#viewRest .violation-card', cards => cards.length), 0, 'Explicit Jan 16 filter must not show September records');
         await page.click('#boxContinuous');
-        // Capture the final tab colors after the switcher transition settles.
-        await new Promise(resolve => setTimeout(resolve, 250));
         await page.screenshot({ path: path.resolve(__dirname, `violation-continuous-${theme}-${width}.png`) });
         assert.deepEqual(errors, []);
         console.log(`PASS ${theme} ${width}: no totals or charts, date, committed filters, tabs without counts, employee details and mobile layout`);

@@ -3,7 +3,7 @@ const path=require('node:path');
 const {pathToFileURL}=require('node:url');
 const puppeteer=require('puppeteer');
 const url=(file,theme)=>pathToFileURL(path.resolve(__dirname,'../modules/performance/'+file)).href+'?scope=team&theme='+theme;
-const labels=['Employee #','Name','Incident Date','Created Date','Incident Type','Incident Action','Measure Value','Merit','Remarks','Attachment'];
+const labels=['Employee No.','Name','Incident Date','Created Date','Incident Type','Incident Action','Measure Value','Merit','Remarks','Attachment'];
 (async()=>{
   const browser=await puppeteer.launch({headless:true,executablePath:'C:/Program Files/Google/Chrome/Application/chrome.exe',args:['--allow-file-access-from-files','--no-sandbox']});
   try {
@@ -18,8 +18,8 @@ const labels=['Employee #','Name','Incident Date','Created Date','Incident Type'
       assert.ok(page.url().includes('/options/incident-highlight.html'));
       assert.equal(await page.evaluate(()=>document.documentElement.dataset.theme),theme);
       const original=await page.evaluate(()=>JSON.stringify(window.PERFORMANCE_INCIDENT_HIGHLIGHT_DATA));
-      assert.deepEqual(await page.$$eval('#incidentHighlightTable thead th',nodes=>nodes.map(node=>node.textContent.trim())),['Emp #','Name','Total','Branch','Department','Position']);
-      assert.deepEqual(await page.$$eval('#incidentHighlightTable tbody tr',nodes=>nodes.map(node=>[node.cells[0].textContent.trim(),node.cells[1].textContent.trim(),node.cells[2].textContent.trim()])),[['#EBB01','Alex Tan','4'],['#EBB02','Daniel Wong','3'],['#EBB03','Nur Izzati','-2']]);
+      assert.deepEqual(await page.$$eval('#incidentHighlightTable thead th',nodes=>nodes.map(node=>node.textContent.trim())),['Emp No.','Name','Total','Branch','Department','Position']);
+      assert.deepEqual(await page.$$eval('#incidentHighlightTable tbody tr',nodes=>nodes.map(node=>[node.cells[0].textContent.trim(),node.cells[1].textContent.trim(),node.cells[2].textContent.trim()])),[['EBB01','Alex Tan','4'],['EBB02','Daniel Wong','3'],['EBB03','Nur Izzati','-2']]);
       const count=()=>page.$eval('#incidentHighlightTotalRecords',node=>node.textContent.trim());
       const total=()=>page.$eval('#incidentHighlightTotalPoints',node=>node.textContent.trim());
       assert.equal(await count(),'3');assert.equal(await total(),'5');
@@ -30,7 +30,7 @@ const labels=['Employee #','Name','Incident Date','Created Date','Incident Type'
       await page.click(trigger);
       assert.equal(await page.$$eval('#incidentHighlightDetailsList table',nodes=>nodes.length),6,'Total opens all matching employee incidents');
       assert.deepEqual(await page.$$eval('#incidentHighlightDetailsList > div:first-child table th',nodes=>nodes.map(node=>node.textContent.trim())),labels);
-      assert.deepEqual(await page.$$eval('#incidentHighlightDetailsList > div:first-child table td',nodes=>nodes.slice(0,-1).map(node=>node.textContent.trim())),['#EBB01','Alex Tan','12 Oct 2026','12 Oct 2026 14:30','Commendation','Recognition','1 completed handover','Yes','Completed the project handover ahead of schedule and prepared clear notes for the team.']);
+      assert.deepEqual(await page.$$eval('#incidentHighlightDetailsList > div:first-child table td',nodes=>nodes.slice(0,-1).map(node=>node.textContent.trim())),['EBB01','Alex Tan','12 Oct 2026','12 Oct 2026 14:30','Commendation','Recognition','1 completed handover','Yes','Completed the project handover ahead of schedule and prepared clear notes for the team.']);
       assert.ok(await page.$eval('#incidentHighlightDetailsList > div:first-child table tr:last-child a',node=>node.textContent.includes('handover-notes.txt')&&node.download==='handover-notes.txt'));
       assert.equal(await page.$('#incidentHighlightDetailEmpNo'), null);
       await page.setViewport({width,height:568});
@@ -102,7 +102,7 @@ const labels=['Employee #','Name','Incident Date','Created Date','Incident Type'
     assert.deepEqual(await edge.$$eval('#incidentHighlightTable tbody tr',nodes=>nodes.map(node=>node.cells[2].textContent.trim())),['0','—','-2']);
     await edge.click('[data-incident-employee="001"]');
     const values=await edge.$$eval('#incidentHighlightDetailsList > div:first-child td',nodes=>nodes.map(node=>node.textContent.trim()));
-    assert.equal(values[0],'#001');assert.equal(values[6],'0');assert.equal(values[8],'<img src=x onerror=alert(1)>');assert.equal(await edge.$('#incidentHighlightDetailsList img'),null);
+    assert.equal(values[0],'001');assert.equal(values[6],'0');assert.equal(values[8],'<img src=x onerror=alert(1)>');assert.equal(await edge.$('#incidentHighlightDetailsList img'),null);
     assert.equal(await edge.$$eval('#incidentHighlightDetailsList a',nodes=>nodes.length),1,'Unsafe attachment URLs remain plain text');
     assert.equal(await edge.$eval('#incidentHighlightDetailsList a',node=>node.rel),'noopener noreferrer');
     await edge.keyboard.press('Escape');await edge.click('#incidentHighlightFilterTrigger');

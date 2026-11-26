@@ -32,7 +32,7 @@ async function open(page, route) {
     assert.deepStrictEqual(employee, { name: 'Sarah Jenkins', empNo: 'EBB01' });
     await page.evaluate(() => window.ClaimsEngine.switchClaimScope('team'));
     const travelIdentity = await page.$eval('#team-trip-detail-card', el => el.innerText);
-    assert.match(travelIdentity, /Sarah Jenkins\s+#EBB01/);
+    assert.match(travelIdentity, /Sarah Jenkins\s+EBB01/);
   });
 
   test('Benefit Highlight uses singular title and no legacy table wording', async () => {

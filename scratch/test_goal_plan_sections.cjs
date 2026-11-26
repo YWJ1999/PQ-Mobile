@@ -41,8 +41,8 @@ async function navigate(page, selector) {
       assert.equal(await page.$eval('.goal-plan-footer', element => getComputedStyle(element).position), 'static');
       assert.deepEqual(await page.$eval('.goal-plan-footer', element => { const style = getComputedStyle(element); return [style.backgroundColor, style.borderTopWidth, style.boxShadow, style.paddingTop]; }), ['rgba(0, 0, 0, 0)', '0px', 'none', '0px']);
       assert.ok(await page.$eval('.goal-plan-content', element => { element.scrollTop = element.scrollHeight; const footer = document.querySelector('.goal-plan-footer').getBoundingClientRect(); const viewport = element.getBoundingClientRect(); return element.scrollTop > 0 && footer.bottom <= viewport.bottom - 70; }), 'Scrollable content reaches the complete action row');
-      assert.equal(await page.$eval('#goalPlanSupervisorName', element => element.value), 'Angeline Loren Alan  #EBB04');
-      assert.equal(await page.$eval('#goalPlanReportingName', element => element.value), 'Muhammad Ali Bin Man  #EBB01');
+      assert.equal(await page.$eval('#goalPlanSupervisorName', element => element.value), 'Angeline Loren Alan  EBB04');
+      assert.equal(await page.$eval('#goalPlanReportingName', element => element.value), 'Muhammad Ali Bin Man  EBB01');
       assert.equal(await page.$('#goalPlanReportingId'), null);
 
       await click(page, '[data-plan-section="goals"]');

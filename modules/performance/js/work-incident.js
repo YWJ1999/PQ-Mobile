@@ -91,7 +91,7 @@
     if (!files.childElementCount) files.textContent = 'No attachment';
     $('workIncidentDetailsRows').replaceChildren(
       detailRow('Reference #', record.reference), detailRow('Name', record.name),
-      detailRow('Emp #', `#${String(record.empNo).replace(/^#/, '')}`, 'empNo'),
+      detailRow('Emp No.', formatEmployeeNumber(record.empNo), 'empNo'),
       detailRow('Incident Date', formatDate(record.incidentDate)),
       detailRow('Created Date', `${formatDate(record.createdDate)} ${record.createdDate.slice(11, 16)}`.trim()),
       detailRow('Incident Type', record.incidentType), detailRow('Incident Action', record.incidentAction),

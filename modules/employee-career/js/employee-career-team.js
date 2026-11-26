@@ -87,7 +87,7 @@
   function employeeRow(record) {
     const row = element('li', 'career-event-person');
     const person = element('div');
-    person.append(element('strong', 'career-event-person-name', record.name), element('span', 'career-event-person-id', '#' + record.empNo));
+    person.append(element('strong', 'career-event-person-name', employeeCardHeading.text(record.empNo, record.name)));
     row.append(person);
     if (record.date) {
       const date = element('time', 'career-event-person-date', new Date(record.date + 'T12:00:00').toLocaleDateString('en-GB'));

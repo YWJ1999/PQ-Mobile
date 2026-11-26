@@ -4,12 +4,6 @@ const { pathToFileURL } = require('node:url');
 const puppeteer = require('puppeteer');
 
 const pageUrl = pathToFileURL(path.resolve(__dirname, '../modules/attendance/options/shift-plan.html')).href;
-const detailViews = [
-  'view-work-shift-detail',
-  'view-no-work-detail',
-  'view-ot-plan-detail',
-  'view-leave-detail'
-];
 
 (async () => {
   const browser = await puppeteer.launch({
@@ -26,34 +20,91 @@ const detailViews = [
       await page.setViewport({ width: 390, height: 900 });
       await page.goto(`${pageUrl}?theme=${theme}`, { waitUntil: 'load' });
 
-      for (const viewId of detailViews) {
-        await page.evaluate(id => switchView(id), viewId);
-        const presentation = await page.$eval(`#${viewId} .shift-detail-info-card`, card => {
-          const cardStyle = getComputedStyle(card);
-          const dateRow = card.querySelector('.shift-detail-info-date');
-          const standardSummaryStyle = getComputedStyle(document.querySelector('.list-header.record-summary-card'));
+      await page.click('#tabCalendarBtn');
+      await page.click('#calSummaryCard [data-kind="work"]');
+      await page.click('#view-work-shift-summary .work-shift-card');
+      const shiftLayout = await page.$eval('#view-work-shift-detail.active work-shift-employee-detail', detail => {
+        const overview = detail.querySelector('.work-shift-overview');
+        const card = detail.querySelector('.work-shift-employee-card');
+        const header = card.querySelector('header');
+        const surface = document.createElement('span');
+        surface.style.background = 'var(--record-approved-surface)';
+        header.append(surface);
+        const sharedGreen = getComputedStyle(surface).backgroundImage;
+        surface.remove();
+        const valuesAlign = region => {
+          const boxes = [...region.querySelectorAll('.work-shift-metrics strong')].map(el => el.getBoundingClientRect());
+          return boxes.every((box, index) => box.top === boxes[0].top && (index === 0 || box.left >= boxes[index - 1].right));
+        };
+        return {
+          theme: document.documentElement.dataset.theme,
+          totalColumns: overview.querySelectorAll('.work-shift-metrics strong').length,
+          employeeColumns: card.querySelectorAll('.work-shift-metrics strong').length,
+          totalsAligned: valuesAlign(overview),
+          employeeHoursAligned: valuesAlign(card),
+          greenHeader: sharedGreen !== 'none' && getComputedStyle(header).backgroundImage === sharedGreen,
+          radius: getComputedStyle(card).borderRadius,
+          fits: detail.scrollWidth <= detail.clientWidth && card.scrollWidth <= card.clientWidth
+        };
+      });
+      assert.deepEqual(shiftLayout, {
+        theme, totalColumns: 3, employeeColumns: 2, totalsAligned: true,
+        employeeHoursAligned: true, greenHeader: true, radius: '18px', fits: true
+      });
+
+      await page.click('#view-work-shift-detail [aria-label="Back"]');
+      await page.click('#view-work-shift-summary [aria-label="Back"]');
+      await page.click('#calSummaryCard [data-kind="off"]');
+      await page.click('.no-work-headcount');
+      const noWorkLayout = await page.$eval('#view-no-work-detail.active no-work-employee-detail', detail => {
+        const overview = detail.querySelector('dl');
+        const [shift, headcount] = [...overview.querySelectorAll('dd')].map(el => el.getBoundingClientRect());
+        const table = detail.querySelector('table');
+        const [first, second] = table.tBodies[0].rows;
+        const summaryHeader = document.querySelector('no-work-summary thead');
+        const card = table.parentElement;
+        detail.scrollTop = detail.scrollHeight;
+        const lastRow = table.tBodies[0].lastElementChild.getBoundingClientRect();
+        const viewport = detail.getBoundingClientRect();
+        return {
+          sideBySide: shift.top === headcount.top && shift.right <= headcount.left,
+          rightAligned: ['right', 'end'].includes(getComputedStyle(overview.lastElementChild).textAlign),
+          radius: getComputedStyle(card).borderRadius,
+          matchingHeader: getComputedStyle(table.tHead).backgroundImage === getComputedStyle(summaryHeader).backgroundImage,
+          striped: getComputedStyle(first).backgroundColor !== getComputedStyle(second).backgroundColor,
+          allRowsReachable: card.scrollHeight <= card.clientHeight + 1 && lastRow.top >= viewport.top && lastRow.bottom <= viewport.bottom + 1,
+          fits: detail.scrollWidth <= detail.clientWidth && table.scrollWidth <= table.clientWidth
+        };
+      });
+      assert.deepEqual(noWorkLayout, {
+        sideBySide: true, rightAligned: true, radius: '18px', matchingHeader: true, striped: true, allRowsReachable: true, fits: true
+      });
+
+      await page.click('#view-no-work-detail [aria-label="Back"]');
+      await page.click('#view-no-work-summary [aria-label="Back"]');
+      for (const [kind, report, metric] of [['ot', 'ot-plan', 'Total planned hours'], ['leave', 'leave', 'Total leave days']]) {
+        await page.click(`#calSummaryCard [data-kind="${kind}"]`);
+        await page.click(report + '-summary tbody button');
+        const presentation = await page.$eval(report + '-employee-detail .shift-employee-overview', card => {
+          const [headcount, duration] = [...card.querySelectorAll('dd')].map(el => el.getBoundingClientRect());
           return {
-            backgroundImage: cardStyle.backgroundImage,
-            standardBackgroundImage: standardSummaryStyle.backgroundImage,
-            borderRadius: cardStyle.borderRadius,
-            boxShadow: cardStyle.boxShadow,
-            dateDividerWidth: getComputedStyle(dateRow).borderBottomWidth,
-            iconCount: card.querySelectorAll('i').length
+            labels: [...card.querySelectorAll('dt')].map(label => label.textContent),
+            aligned: headcount.top === duration.top && headcount.right <= duration.left,
+            dateIcon: Boolean(card.querySelector('.fa-calendar-days')),
+            radius: getComputedStyle(card).borderRadius,
+            sharedSurface: getComputedStyle(card).backgroundImage === getComputedStyle(document.querySelector('.list-header.record-summary-card')).backgroundImage
           };
         });
-
-        assert.equal(presentation.backgroundImage, presentation.standardBackgroundImage, `${theme} ${viewId}: detail metadata must use the shared pale-purple summary color`);
-        assert.equal(presentation.borderRadius, '18px', `${theme} ${viewId}: detail metadata must use the shared rounded card shape`);
-        assert.equal(presentation.boxShadow, 'none', `${theme} ${viewId}: detail metadata must stay flat without a shadow`);
-        assert.equal(presentation.dateDividerWidth, '1px', `${theme} ${viewId}: Date must retain its separator line`);
-        assert.equal(presentation.iconCount, 0, `${theme} ${viewId}: Date must not show an icon`);
+        assert.deepEqual(presentation, { labels: ['Total headcount', metric], aligned: true, dateIcon: true, radius: '18px', sharedSurface: true });
+        await page.click(`#view-${report}-detail [aria-label="Back"]`);
+        await page.click(`#view-${report}-summary [aria-label="Back"]`);
       }
 
       assert.deepEqual(errors, []);
       await page.close();
     }
 
-    console.log('PASS: All Shift Plan employee detail metadata cards share the summary presentation.');
+    console.log('PASS: Shift totals, employee cards, No Work rosters and detail metadata align in both themes.');
   } finally {
     await browser.close();
   }

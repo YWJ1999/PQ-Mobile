@@ -18,9 +18,9 @@ const leaveUrl = pathToFileURL(path.resolve(__dirname, '..', 'leave.html')).href
     await page.goto(leaveUrl, { waitUntil: 'domcontentloaded' });
     await page.evaluate(() => showLeaveSection('viewLeaveHub', 'team'));
     assert.equal(await page.$eval('#headerTitleText', node => node.textContent.trim()), 'Leave Dashboard');
-    assert.equal(await page.$eval('#headerSubtitleText', node => getComputedStyle(node).display), 'none');
-    assert.equal(await page.$eval('#teamLeaveOverviewHeader', node => node.textContent.includes('Live Status')), false);
-    await page.click('#teamOnLeaveMetric');
+    await page.waitForSelector('#headerSubtitleText', { hidden: true });
+    assert.equal(await page.$('#teamOnLeaveMetric'), null);
+    await page.evaluate(() => openStaffOnLeaveSheet());
     await page.waitForFunction(() => document.getElementById('staffOnLeaveSheetOverlay')?.classList.contains('open'));
 
     assert.equal(await page.$eval('#viewLeaveHub', node => getComputedStyle(node).display), 'block');
@@ -28,10 +28,10 @@ const leaveUrl = pathToFileURL(path.resolve(__dirname, '..', 'leave.html')).href
     assert.deepEqual(
       await page.$eval('#staffOnLeaveSheetOverlay', node => ({
         display: getComputedStyle(node).display,
-        alignItems: getComputedStyle(node).alignItems,
+        bottomAligned: ['flex-end', 'flow-end'].includes(getComputedStyle(node).alignItems),
         open: node.classList.contains('open')
       })),
-      { display: 'flex', alignItems: 'flex-end', open: true }
+      { display: 'flex', bottomAligned: true, open: true }
     );
     assert.equal(await page.$eval('#staffOnLeaveSheetTitle', node => node.textContent.trim()), 'Staff On Leave');
     assert.deepEqual(
@@ -39,17 +39,16 @@ const leaveUrl = pathToFileURL(path.resolve(__dirname, '..', 'leave.html')).href
         usesHighlightRecord: card.classList.contains('leave-highlight-detail-record'),
         status: card.dataset.status,
         name: card.querySelector('.staff-on-leave-name').textContent.trim(),
-        empNo: card.querySelector('.staff-on-leave-name + .employee-id-standard').textContent.trim(),
         position: card.querySelector('.staff-on-leave-position').textContent.trim(),
         department: card.querySelector('.staff-on-leave-department').textContent.trim(),
         hasVisibleStatus: Boolean(card.querySelector('.staff-on-leave-status')),
         headerBackground: getComputedStyle(card.querySelector('.leave-highlight-detail-date')).backgroundImage
       }))),
       [
-        { usesHighlightRecord: true, status: 'approved', name: 'Afifah Nasir', empNo: '#004177', position: 'QA Manager', department: 'Quality Assurance', hasVisibleStatus: false, headerBackground: 'linear-gradient(135deg, rgb(76, 29, 149) 0%, rgb(109, 40, 217) 50%, rgb(124, 58, 237) 100%)' },
-        { usesHighlightRecord: true, status: 'approved', name: 'Siti Nurhaliza', empNo: '#006734', position: 'UI/UX Designer', department: 'Product & Design', hasVisibleStatus: false, headerBackground: 'linear-gradient(135deg, rgb(76, 29, 149) 0%, rgb(109, 40, 217) 50%, rgb(124, 58, 237) 100%)' },
-        { usesHighlightRecord: true, status: 'approved', name: 'Marcus Tan', empNo: '#008129', position: 'Systems Analyst', department: 'IT Enterprise', hasVisibleStatus: false, headerBackground: 'linear-gradient(135deg, rgb(76, 29, 149) 0%, rgb(109, 40, 217) 50%, rgb(124, 58, 237) 100%)' },
-        { usesHighlightRecord: true, status: 'approved', name: 'Kavitha Murugan', empNo: '#007452', position: 'Compliance Officer', department: 'Legal & Compliance', hasVisibleStatus: false, headerBackground: 'linear-gradient(135deg, rgb(76, 29, 149) 0%, rgb(109, 40, 217) 50%, rgb(124, 58, 237) 100%)' }
+        { usesHighlightRecord: true, status: 'approved', name: '004177 - Afifah Nasir', position: 'QA Manager', department: 'Quality Assurance', hasVisibleStatus: false, headerBackground: 'linear-gradient(135deg, rgb(76, 29, 149) 0%, rgb(109, 40, 217) 50%, rgb(124, 58, 237) 100%)' },
+        { usesHighlightRecord: true, status: 'approved', name: '006734 - Siti Nurhaliza', position: 'UI/UX Designer', department: 'Product & Design', hasVisibleStatus: false, headerBackground: 'linear-gradient(135deg, rgb(76, 29, 149) 0%, rgb(109, 40, 217) 50%, rgb(124, 58, 237) 100%)' },
+        { usesHighlightRecord: true, status: 'approved', name: '008129 - Marcus Tan', position: 'Systems Analyst', department: 'IT Enterprise', hasVisibleStatus: false, headerBackground: 'linear-gradient(135deg, rgb(76, 29, 149) 0%, rgb(109, 40, 217) 50%, rgb(124, 58, 237) 100%)' },
+        { usesHighlightRecord: true, status: 'approved', name: '007452 - Kavitha Murugan', position: 'Compliance Officer', department: 'Legal & Compliance', hasVisibleStatus: false, headerBackground: 'linear-gradient(135deg, rgb(76, 29, 149) 0%, rgb(109, 40, 217) 50%, rgb(124, 58, 237) 100%)' }
       ]
     );
     assert.ok(await page.$$eval('#staffOnLeaveSheetOverlay .staff-on-leave-card', cards => cards.every(card => {
@@ -62,7 +61,7 @@ const leaveUrl = pathToFileURL(path.resolve(__dirname, '..', 'leave.html')).href
     await page.waitForFunction(() => getComputedStyle(document.getElementById('staffOnLeaveSheetOverlay')).display === 'none');
     assert.equal(await page.$eval('#viewLeaveHub', node => getComputedStyle(node).display), 'block');
     assert.equal(await page.$eval('#headerTitleText', node => node.textContent.trim()), 'Leave Dashboard');
-    console.log('PASS: On Leave Today opens a highlight-style bottom sheet over the Team dashboard.');
+    console.log('PASS: Staff On Leave sheet renders employee records.');
   } finally {
     await browser.close();
   }

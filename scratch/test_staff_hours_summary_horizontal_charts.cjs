@@ -57,7 +57,7 @@ async function inspectChart(page, expected, daily = false) {
   assert.equal(actual.gridlines, actual.ticks.length, `${context}: grid matches the x axis`);
   if (expected.days) assert.ok(actual.ticks.every(Number.isInteger), context);
   if (daily) assert.equal(actual.year, '2026', context);
-  else assert.match(actual.employeeId, /^#EBB\d+$/, 'Employee ID appears below the name');
+  else assert.match(actual.employeeId, /^EBB\d+$/, 'The chart legend preserves the employee number');
   const maximum = actual.ticks.at(-1);
   for (let index = 0; index < actual.widths.length; index++) {
     assert.ok(Math.abs(actual.widths[index] - actual.values[index] / maximum * 100) < 0.02, `${context}: bar length matches the scale`);

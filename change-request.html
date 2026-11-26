@@ -648,7 +648,7 @@ DAMANSARA KOTA</textarea>
 
           <div class="change-field-card">
             <div class="change-field-label-row">
-              <label class="change-field-label">Member Employee #</label>
+              <label class="change-field-label">Member Employee No.</label>
             </div>
             <input type="text" class="change-input-box" id="input_fam_employee_no" value="" placeholder="e.g. EBB77">
           </div>
@@ -780,8 +780,7 @@ DAMANSARA KOTA</textarea>
               <span class="change-history-status pending">⏳ Pending HR Approval</span>
             </div>
             <div class="change-history-title">Personal Email &amp; Passport Renewal</div>
-            <span class="record-submit-date">Submit Date: 05/09/2026</span>
-            <div class="change-history-date">Route: HR Operations</div>
+            <div class="change-history-date"><span>Route: HR Operations</span><span class="record-submit-date"><span>Submit Date</span> <strong>05/09/2026</strong></span></div>
 
             <!-- Expandable Detail Breakdown -->
           </a>
@@ -828,7 +827,7 @@ DAMANSARA KOTA</textarea>
     <template data-change-record="REQ-2026-0891"><div class="change-history-top">
               <span class="change-history-id">REQ-2026-0891</span>
               <span class="change-history-status pending">⏳ Pending HR Approval</span>
-            </div><div class="change-history-title">Personal Email &amp; Passport Renewal</div><span class="record-submit-date">Submit Date: 05/09/2026</span>
+            </div><div class="change-history-date"><div class="change-history-title">Personal Email &amp; Passport Renewal</div><span class="record-submit-date"><span>Submit Date</span> <strong>05/09/2026</strong></span></div>
               <div style="font-size: 11px; font-weight: 800; color: var(--purple-primary); margin-bottom: 6px;">MODIFIED FIELDS BREAKDOWN:</div>
               <div style="display: flex; flex-direction: column; gap: 6px; font-size: 11px;">
                 <div style="background: var(--bg-input); padding: 8px 10px; border-radius: 8px;">
@@ -1399,13 +1398,13 @@ DAMANSARA KOTA</textarea>
     }
 
     function familyDetailsMarkup(record) {
-      const memberEmployeeId = record.memberEmployeeNo ? '#' + record.memberEmployeeNo.replace(/^#/, '') : '-';
+      const memberEmployeeId = formatEmployeeNumber(record.memberEmployeeNo) || '-';
       return familyDetailMarkup('Relationship', record.relation) +
         familyDetailMarkup('Birth Date', record.birthdate) +
         familyDetailMarkup('Rank', record.rank) +
         familyDetailMarkup('New NRIC #', record.nric) +
         familyDetailMarkup('Birth Cert #', record.birthcert) +
-        familyDetailMarkup('Member Employee #', memberEmployeeId) +
+        familyDetailMarkup('Member Employee No.', memberEmployeeId) +
         familyDetailMarkup('Tax Status', record.taxstatus) +
         familyDetailMarkup('Allocation', record.allocation ? record.allocation + '%' : '-') +
         familyDetailMarkup('Beneficiary', record.beneficiary ? 'Yes' : 'No');
@@ -1416,7 +1415,7 @@ DAMANSARA KOTA</textarea>
         ? '<span class="family-beneficiary-badge">Beneficiary</span>'
         : '';
       const employeeIdMarkup = record.memberEmployeeNo
-        ? '<div class="family-record-employee-id" data-family-employee-id>#' + escapeQualificationText(record.memberEmployeeNo.replace(/^#/, '')) + '</div>'
+        ? '<div class="family-record-employee-id" data-family-employee-id>' + escapeQualificationText(formatEmployeeNumber(record.memberEmployeeNo)) + '</div>'
         : '';
       return '<article class="family-record-card" data-family-index="' + index + '" data-family-name="' + escapeQualificationText(record.name) + '" data-family-relation="' + escapeQualificationText(record.relation) + '">' +
         '<div class="family-record-summary" onclick="toggleFamilyDetails(' + index + ')">' +
@@ -1471,7 +1470,7 @@ DAMANSARA KOTA</textarea>
         rank: record.rank || '- Select Rank-',
         nric: record.nric,
         birthcert: record.birthcert,
-        employee_no: record.memberEmployeeNo,
+        employee_no: formatEmployeeNumber(record.memberEmployeeNo),
         taxstatus: record.taxstatus || 'Deductible Child',
         allocation: record.allocation
       };
@@ -1516,7 +1515,7 @@ DAMANSARA KOTA</textarea>
         rank: value('rank'),
         nric: value('nric'),
         birthcert: value('birthcert'),
-        memberEmployeeNo: value('employee_no').replace(/^#/, ''),
+        memberEmployeeNo: formatEmployeeNumber(value('employee_no')),
         taxstatus: value('taxstatus'),
         allocation: value('allocation'),
         beneficiary: document.getElementById('fam_beneficiary').checked,
@@ -1550,7 +1549,7 @@ DAMANSARA KOTA</textarea>
     }
 
     function familyRecordSummary(record) {
-      return [record.name, record.memberEmployeeNo ? '#' + record.memberEmployeeNo.replace(/^#/, '') : '', record.relation, record.status].filter(Boolean).join(' | ');
+      return [record.name, formatEmployeeNumber(record.memberEmployeeNo), record.relation, record.status].filter(Boolean).join(' | ');
     }
 
     function saveFamilyMember() {
@@ -1773,8 +1772,7 @@ DAMANSARA KOTA</textarea>
         row.querySelector('.change-history-id').textContent = request.id;
         row.querySelector('.change-history-title').textContent = changes.map(item => item.label).join(', ');
         const detail = row.querySelector('.change-history-date');
-        detail.before(recordSubmitDate.create(request.submittedAt));
-        detail.textContent = changes.length + ' modified fields';
+        detail.append(document.createTextNode(changes.length + ' modified fields'), recordSubmitDate.create(request.submittedAt));
         list.prepend(row);
       }
       modifiedFields.forEach(item => {

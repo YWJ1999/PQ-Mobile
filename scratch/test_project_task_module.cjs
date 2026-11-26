@@ -97,7 +97,7 @@ const expected = {
           assert.equal(await page.$eval('#projectTeamProjectDetailsSubtitle', node => node.textContent.trim()), 'MOBILE APP FOR TIMESHEET · 19 Tasks');
           assert.deepEqual(
             await page.$$eval('#projectTeamPendingTaskTable thead th', cells => cells.map(cell => cell.textContent.trim())),
-            ['Task', 'Employee#', 'Deadline', 'Completion %']
+            ['Task', 'Employee', 'Deadline', 'Completion %']
           );
           assert.match(await page.$eval('#projectTeamPendingTaskTable thead', node => getComputedStyle(node).backgroundImage), /linear-gradient/);
           assert.equal(await page.$$eval('#projectTeamPendingTaskTable tbody tr:not(.project-team-task-empty-row)', rows => rows.length), 19);

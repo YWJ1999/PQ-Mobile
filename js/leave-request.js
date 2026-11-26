@@ -3,7 +3,7 @@ const LeaveRequest = (() => {
   const employee = { applicant: 'Farhan binti rahmat', empNo: 'EBB12', department: 'Human Resource', branch: 'Times Square Branch' };
   const source = () => document.querySelector('#viewApplyLeaveForm [data-leave-form]');
   const display = value => value == null || value === '' ? '—' : String(value);
-  const medical = type => ['medical leave', 'hospitalization leave', 'unpaid mc', 'unpaid hospitalization'].includes(String(type).toLowerCase());
+  const medical = type => ['medical leave', 'sick leave', 'hospitalization leave', 'unpaid mc', 'unpaid hospitalization'].includes(String(type).toLowerCase());
   const dateLabel = date => date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
   const files = data => Array.isArray(data.attachments) ? data.attachments : data.attachment ? [data.attachment] : [];
 
@@ -30,6 +30,7 @@ const LeaveRequest = (() => {
   function review(data) {
     const form = source().cloneNode(true);
     form.querySelector('[data-leave-heading]').textContent = data.leaveYear ? 'Leave Details (' + data.leaveYear + ')' : 'Leave Details';
+    form.querySelector('[data-leave-heading]').after(recordSubmitDate.create(data.submitDate));
     form.querySelector('#mainFormChecklistText').remove();
     const medicalGroup = form.querySelector('#mainMedicalFieldsGroup');
     if (medical(data.type) || [...medicalGroup.querySelectorAll('[data-leave-field]')].some(el => data[el.dataset.leaveField])) {
@@ -43,7 +44,8 @@ const LeaveRequest = (() => {
       value.dataset.reviewField = key;
       value.className = field.matches('.custom-toggle') ? 'leave-review-flag' : 'leave-review-value';
       value.textContent = display(typeof data[key] === 'boolean' ? (data[key] ? 'Yes' : 'No') : data[key]);
-      field.replaceWith(value);
+      const control = field.closest('.peoplehcm-select-wrap') || field;
+      control.replaceWith(value);
     }
     const attachment = form.querySelector('[data-leave-attachments]');
     const label = attachment.querySelector('label');
@@ -122,10 +124,9 @@ const LeaveRequest = (() => {
       name: request.applicant, empno: request.empNo, type: request.type, submitDate: request.submitDate,
       start: toHistoryISO(request.fromDate), end: toHistoryISO(request.toDate), days: request.leaveDays });
     card.querySelector('.approval-card-checkbox').checked = false;
-    const id = card.querySelector('.employee-id-standard');
-    id.previousElementSibling.textContent = request.applicant;
-    id.textContent = '#' + request.empNo;
-    id.nextElementSibling.textContent = request.department;
+    const heading = card.querySelector('.approval-employee-heading');
+    heading.textContent = employeeCardHeading.text(request.empNo, request.applicant);
+    heading.nextElementSibling.textContent = request.department;
     const link = card.querySelector('.approval-record-link');
     link.href = PendingApprovalPage.href('details', ref);
     link.replaceChildren(createApprovalCardDetails([['Submit Date', request.submitDate], ['Type', request.type], ['Reason', request.reason],

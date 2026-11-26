@@ -10,7 +10,7 @@
     ['New NRIC', ['newNric', 'nric', 'New NRIC/Birth Cert']],
     ['Birth Cert', ['birthCert', 'birthCertificate']],
     ['Tax Status', ['taxStatus']],
-    ['Member Employee#', ['memberEmployeeNo', 'Member Employee#', 'memberEmpNo', 'empNo']],
+    ['Member Employee No.', ['memberEmployeeNo', 'Member Employee#', 'memberEmpNo', 'empNo']],
     ['Beneficiary', ['beneficiary']],
     ['Allocation%', ['allocation', 'allocationPercent', 'allocationPercentage']],
     ['Attachment', ['attachments', 'attachment']]
@@ -20,7 +20,7 @@
     value = unwrap(value);
     if (value === '' || value == null || typeof value === 'object') return '\u2014';
     if (typeof value === 'boolean') return value ? 'Yes' : 'No';
-    if (label === 'Member Employee#') return '#' + String(value).replace(/^#+/, '');
+    if (label === 'Member Employee No.') return formatEmployeeNumber(value);
     if (label === 'Birth Date' && /^\d{4}-\d{2}-\d{2}$/.test(String(value))) {
       const date = new Date(value + 'T00:00:00');
       if (!Number.isNaN(date.getTime())) return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });

@@ -26,14 +26,12 @@ async function assertEmployeeCards(page, category) {
   const cards = await page.$$eval('#teamHistoryList .history-card-item', nodes => nodes.map(node => ({
     employee: node.querySelector('.team-history-employee-identity .history-employee-name')?.textContent.trim(),
     position: node.querySelector('.team-history-employee-identity + .team-history-employee-position')?.textContent.trim(),
-    id: node.querySelector('.team-history-employee-id')?.textContent,
     hasDetails: Boolean(node.querySelector('.history-card-details')),
     status: node.querySelector('.status-pill')?.textContent.trim() || ''
   })));
   assert.equal(cards.length, 2, `${category} has two provisional records`);
   cards.forEach(card => {
-    assert.ok(card.employee);
-    assert.match(card.id, /^#[A-Z0-9-]+$/, `${category} shows the employee number below the name`);
+    assert.match(card.employee, /^[A-Z0-9-]+ - .+/, `${category} shows the employee number and name in its heading`);
     assert.ok(card.position && card.position !== '—', `${category} shows the employee's position below their name`);
     assert.equal(card.hasDetails, true, `${category} uses the bordered history detail block`);
     assert.notEqual(card.status, '', `${category} displays a status`);
@@ -46,24 +44,24 @@ async function assertConfirmationCards(page) {
     position: node.querySelector('.team-history-employee-identity + .team-history-employee-position')?.textContent.trim(),
     status: node.querySelector('.status-pill')?.textContent.trim() || '',
     tone: node.dataset.status || '',
-    submitted: node.querySelector('.record-submit-date')?.textContent,
+    submitted: node.querySelector('.record-submit-date > strong')?.textContent,
     labels: [...node.querySelectorAll('.history-card-row > span')].map(label => label.textContent.trim()),
     values: [...node.querySelectorAll('.history-card-row > strong')].map(value => value.textContent.trim())
   })));
 
   assert.deepEqual(cards, [
     {
-      employee: 'Aina Rahman', position: 'People Operations Executive',
+      employee: 'EBB01 - Aina Rahman', position: 'People Operations Executive',
       status: 'To Resubmit', tone: 'resubmit',
       labels: ['Recommendation', 'Adjustment'],
-      submitted: 'Submit Date: 04/10/2026',
+      submitted: '04/10/2026',
       values: ['Confirm Employment', 'RM 300.00']
     },
     {
-      employee: 'Daniel Wong', position: 'Product Designer',
+      employee: 'EBB02 - Daniel Wong', position: 'Product Designer',
       status: 'To Resubmit', tone: 'resubmit',
       labels: ['Recommendation', 'Adjustment'],
-      submitted: 'Submit Date: 12/10/2026',
+      submitted: '12/10/2026',
       values: ['Further Review', 'No Adjustment']
     }
   ], 'Staff Confirmation cards use the approved fields, employee ID placement and To Resubmit status');
@@ -174,7 +172,7 @@ async function confirmationDetailSnapshot(page) {
     assert.deepEqual(await confirmationDetailSnapshot(page), [
       { label: 'Reference #', value: 'SC-2026-0015' },
       { label: 'Status', value: 'To Resubmit' },
-      { label: 'Emp #', value: '#EBB01' },
+      { label: 'Emp No.', value: 'EBB01' },
       { label: 'Name', value: 'Aina Rahman' },
       { label: 'Position', value: 'People Operations Executive' },
       { label: 'Hire Date', value: '15 Jan 2026' },
@@ -271,7 +269,7 @@ async function confirmationDetailSnapshot(page) {
     assert.equal(await page.$eval('#teamConfirmationFilterSummary', node => node.textContent.trim()), '12 Oct 2026 - 12 Oct 2026');
     assert.deepEqual(
       await page.$$eval('#teamHistoryList .team-history-employee-identity .history-employee-name', nodes => nodes.map(node => node.textContent.trim())),
-      ['Daniel Wong'],
+      ['EBB02 - Daniel Wong'],
       'Submitted date filter includes records that sit exactly on both boundaries'
     );
     await page.click('[data-confirmation-id="SC-2026-0016"]');
@@ -279,7 +277,7 @@ async function confirmationDetailSnapshot(page) {
     assert.deepEqual(danielDetails.filter((_, index) => [0, 1, 2, 3, 14].includes(index)), [
       { label: 'Reference #', value: 'SC-2026-0016' },
       { label: 'Status', value: 'To Resubmit' },
-      { label: 'Emp #', value: '#EBB02' },
+      { label: 'Emp No.', value: 'EBB02' },
       { label: 'Name', value: 'Daniel Wong' },
       { label: 'Attachment', value: 'No attachments' }
     ], 'Filtered cards open the matching record without stale detail values');

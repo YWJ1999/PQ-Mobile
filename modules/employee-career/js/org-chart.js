@@ -48,9 +48,8 @@
     avatar.dataset.tone = node.tone || 'violet';
     avatar.setAttribute('aria-hidden', 'true');
     const content = element('span', 'org-chart-card-content');
-    content.append(element('strong', 'org-chart-name', node.name));
-    if (node.empNo) content.append(element('span', 'org-chart-employee-id', `#${node.empNo}`));
-    else content.append(element('span', 'org-chart-vacant-label', 'Vacant role'));
+    content.append(element('strong', 'org-chart-name', employeeCardHeading.text(node.empNo, node.name)));
+    if (!node.empNo) content.append(element('span', 'org-chart-vacant-label', 'Vacant role'));
     content.append(element('span', 'org-chart-position', node.position));
     const metrics = element('span', 'org-chart-metrics');
     if (node.status === 'vacant') metrics.append(metric(node.unit));

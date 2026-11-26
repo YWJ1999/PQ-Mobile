@@ -168,6 +168,8 @@ async function checkRemainingMetricEvidence(page, buttons, metrics, back) {
 }
 
 async function checkLegend(page, container, metric, expected, checkColors) {
+  const outlinedInfo = metric === 'Normal Work Hours' && container === '#details-list-container' &&
+    new URL(page.url()).pathname.endsWith('/staff-hours-summary.html');
   const cards = await page.$$eval(container + ' .summary-history-card-header', headers => headers.map(header => {
     const style = getComputedStyle(header);
     const badge = header.querySelector('.summary-history-status');
@@ -212,7 +214,7 @@ async function checkLegend(page, container, metric, expected, checkColors) {
         'Absent OT': 'fa-clock-rotate-left', Absent: 'fa-user-xmark', 'On Leave': 'fa-plane-departure' }[card.label];
       assert.equal(card.glyph, expectedGlyph || (card.label.includes('%') ? 'fa-chart-pie' : 'fa-circle-exclamation'), metric);
     } else {
-      assert.equal(card.glyph, 'fa-circle-info', metric);
+      assert.equal(card.glyph, outlinedInfo ? 'fa-info' : 'fa-circle-info', metric);
     }
   }
   if (expected === null) {

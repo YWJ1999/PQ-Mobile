@@ -18,7 +18,7 @@ const url = pathToFileURL(path.resolve(__dirname, '../modules/employee-career/op
       await page.reload({ waitUntil: 'networkidle0' });
       assert.equal(await page.$('.employee-career-coming-card'), null);
       assert.deepEqual(await page.$$eval('#keyStaffNominationForm label', nodes => nodes.map(n => n.textContent.replace('*', '').trim())),
-        ['Employee #', 'Name', 'Position', 'Nomination Date', 'Talent Pool', 'Key Staff Level', 'Justification', 'Remarks']);
+        ['Employee No.', 'Name', 'Position', 'Nomination Date', 'Talent Pool', 'Key Staff Level', 'Justification', 'Remarks']);
       assert.deepEqual(await page.$$eval('#keyStaffNominationForm [required]', nodes => nodes.map(n => n.id)),
         ['nominationEmployee', 'nominationDate', 'nominationTalentPool', 'nominationKeyLevel', 'nominationJustification', 'nominationRemarks']);
       assert.equal(await page.$eval('#nominationName', n => n.readOnly), true);
@@ -29,7 +29,7 @@ const url = pathToFileURL(path.resolve(__dirname, '../modules/employee-career/op
       await page.select('#nominationEmployee', 'EBB02');
       assert.equal(await page.$eval('#nominationName', n => n.value), 'Daniel Wong');
       assert.equal(await page.$eval('#nominationPosition', n => n.value), 'Product Designer');
-      assert.equal(await page.$eval('#nominationEmployeeId', n => n.textContent), '#EBB02');
+      assert.equal(await page.$eval('#nominationEmployeeId', n => n.textContent), 'EBB02');
       await page.select('#nominationEmployee', '');
       assert.equal(await page.$eval('#nominationName', n => n.value), '');
       assert.equal(await page.$eval('#nominationPosition', n => n.value), '');

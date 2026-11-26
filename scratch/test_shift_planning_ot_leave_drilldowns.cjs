@@ -5,25 +5,6 @@ const puppeteer = require('puppeteer');
 
 const pageUrl = pathToFileURL(path.resolve(__dirname, '../modules/attendance/options/shift-plan.html')).href;
 
-async function readDetailInfoCard(page, viewSelector) {
-  return page.$eval(`${viewSelector} .shift-detail-info-card`, card => ({
-    iconCount: card.querySelectorAll('i').length,
-    rows: [...card.querySelectorAll('.shift-detail-info-row')].map(row => {
-      const label = row.querySelector('.shift-detail-info-label');
-      const value = row.querySelector('.shift-detail-info-value');
-      const rowStyle = getComputedStyle(row);
-      return {
-        label: label?.textContent.trim() || '',
-        value: value?.textContent.trim() || '',
-        display: rowStyle.display,
-        columnCount: rowStyle.gridTemplateColumns.split(' ').filter(Boolean).length,
-        labelColor: label ? getComputedStyle(label).color : '',
-        valueAlign: value ? getComputedStyle(value).textAlign : ''
-      };
-    })
-  }));
-}
-
 (async () => {
   const browser = await puppeteer.launch({
     headless: true,
@@ -43,80 +24,87 @@ async function readDetailInfoCard(page, viewSelector) {
       cells.find(cell => cell.querySelector('.grid-cal-date')?.textContent.trim() === '3').click();
     });
 
-    await page.$eval('[onclick*="view-ot-plan-summary"]', node => node.click());
-    assert.match(await page.$eval('#view-ot-plan-summary .shift-detail-info-date', node => node.textContent.replace(/\s+/g, ' ').trim()), /^Date: 03 Sep.* 2026$/);
-    assert.equal(await page.$eval('#otSummaryRecordCount', node => node.textContent.trim()), '2');
-    assert.equal(await page.$$eval('#view-ot-plan-summary .calendar-purple-card', cards => cards.length), 2);
-    assert.deepEqual(
-      await page.$$eval('#view-ot-plan-summary .calendar-purple-card', cards => cards.map(card => ({
-        title: card.querySelector('.calendar-purple-card-title').textContent.trim(),
-        values: [...card.querySelectorAll('.summary-value')].map(node => node.textContent.trim())
-      }))),
-      [
-        { title: '8.30:17.30W', values: ['OT 1.5 BEFORE WORK', '26', '26.00'] },
-        { title: '8.30:17.30W', values: ['1.5 OT', '55', '94.00'] }
-      ]
-    );
-    assert.equal(await page.$$eval('#view-ot-plan-summary .calendar-purple-card-header .fa-chevron-right', icons => icons.length), 2);
+    await page.click('#calSummaryCard [data-kind="ot"]');
+    assert.deepEqual(await page.$$eval('ot-plan-summary dd', nodes => nodes.map(el => el.textContent)), ['03 Sep 2026', '73', '120.00']);
+    assert.deepEqual(await page.$$eval('ot-plan-summary summary strong', nodes => nodes.map(el => el.textContent)), ['Shift · 8.30:17.30W']);
+    assert.deepEqual(await page.$$eval('ot-plan-summary tbody tr', rows => rows.map(row => [...row.cells].map(cell => cell.textContent))), [
+      ['OT 1.5 Before Work', '26', '26.00'], ['1.5 OT', '55', '94.00']
+    ]);
+    await page.focus('ot-plan-summary summary');
+    await page.keyboard.press('Enter');
+    assert.equal(await page.$eval('ot-plan-summary details', group => group.open), false);
+    await page.keyboard.press('Enter');
+    await page.click('ot-plan-summary tbody tr:first-child td:last-child');
+    assert.deepEqual(await page.$eval('ot-plan-employee-detail .shift-employee-overview', card =>
+      [...card.querySelectorAll('h2, [data-date], [data-shift], dd')].map(node => node.textContent)
+    ), ['OT 1.5 Before Work', '03 Sep 2026', '8.30:17.30W', '26', '26.00']);
+    assert.equal(await page.$$eval('ot-plan-employee-detail tbody tr', rows => rows.length), 26);
+    assert.deepEqual(await page.$eval('ot-plan-employee-detail tbody tr', row => [...row.cells].map(cell => cell.textContent)), [
+      '000016 - Raju Kumar', 'ACCOUNT EXECUTIVE', '1.00'
+    ]);
 
-    await page.click('#view-ot-plan-summary .calendar-purple-card');
-    assert.equal(await page.$eval('#otDetailOtType', node => node.textContent.trim()), 'OT 1.5 BEFORE WORK');
-    assert.equal(await page.$eval('#otDetailHeadcount', node => node.textContent.trim()), '26');
-    assert.equal(await page.$eval('#otDetailTotalHours', node => node.textContent.trim()), '26.00');
-    assert.equal(await page.$$eval('#otEmployeeCardsContainer .employee-purple-card', cards => cards.length), 26);
-    assert.equal(await page.$eval('#otEmployeeCardsContainer .employee-purple-card:first-child .employee-card-name', node => node.textContent.trim()), 'Raju Kumar');
-    assert.equal(await page.$eval('#otEmployeeCardsContainer .employee-purple-card:first-child .employee-card-name + .employee-card-id', node => node.textContent.trim()), '#000016');
-    assert.deepEqual(
-      await page.$$eval('#otEmployeeCardsContainer .employee-purple-card:first-child .summary-value', nodes => nodes.map(node => node.textContent.trim())),
-      ['ACCOUNT EXECUTIVE', '1.00']
-    );
-    assert.equal(await page.$('#otEmployeeCardsContainer .employee-purple-card .fa-chevron-right'), null);
-    const otDetailInfo = await readDetailInfoCard(page, '#view-ot-plan-detail');
-    assert.equal(otDetailInfo.iconCount, 0, 'OT Plan detail information must not show a date icon');
-    assert.deepEqual(otDetailInfo.rows.map(row => row.label), ['Date:', 'Shift:', 'OT Type:', 'Total Headcount:', 'Total Hours:']);
-    assert.match(otDetailInfo.rows[0].value, /^03 Sep.* 2026$/);
-    assert.deepEqual(otDetailInfo.rows.slice(1).map(row => row.value), ['8.30:17.30W', 'OT 1.5 BEFORE WORK', '26', '26.00']);
-    assert.equal(otDetailInfo.rows.every(row => row.display === 'grid' && row.columnCount === 2 && row.valueAlign === 'right'), true, 'OT Plan detail labels and values must share aligned columns');
-    assert.equal(otDetailInfo.rows.every(row => row.labelColor === 'rgb(100, 116, 139)'), true, 'OT Plan Date must use the same label color as every other field');
-    assert.equal(await page.$eval('#otDetailOtType', node => getComputedStyle(node).color), 'rgb(124, 58, 237)', 'OT Type must keep its existing purple emphasis');
+    await page.click('#view-ot-plan-detail [aria-label="Back"]');
+    assert.equal(await page.evaluate(() => document.activeElement.closest('tr').querySelector('th').textContent), 'OT 1.5 Before Work');
+    await page.click('#view-ot-plan-summary [aria-label="Back"]');
+    await page.evaluate(() => {
+      leaveEmployeeDataset[0].leaveDay = '0.50';
+      leaveEmployeeDataset[1].leaveDay = 0;
+      const annual = calendarGroups.find(group => group.type === 'ANNUAL LEAVE');
+      annual.employees = annual.employees.slice(0, 1);
+      annual.leaveDays = 1.75;
+    });
+    await page.click('#calSummaryCard [data-kind="leave"]');
+    assert.deepEqual(await page.$$eval('leave-summary dd', nodes => nodes.map(el => el.textContent)), ['03 Sep 2026', '5']);
+    assert.deepEqual(await page.$$eval('leave-summary summary strong', nodes => nodes.map(el => el.textContent)), ['Shift · 8.30:17.30W']);
+    assert.deepEqual(await page.$$eval('leave-summary tbody tr', rows => rows.map(row => [...row.cells].map(cell => cell.textContent))), [
+      ['Annual Leave', '2'], ['Medical Leave', '3'], ['Unpaid Leave', '1']
+    ]);
+    await page.focus('leave-summary summary');
+    await page.keyboard.press('Enter');
+    assert.equal(await page.$eval('leave-summary details', card => card.open), false);
+    await page.keyboard.press('Enter');
+    await page.click('leave-summary tbody tr:first-child button');
+    assert.deepEqual(await page.$$eval('leave-employee-detail dd', nodes => nodes.map(el => el.textContent)), ['2', '1.75']);
+    assert.equal(await page.$$eval('leave-employee-detail tbody tr', rows => rows.length), 1);
+    await page.click('#view-leave-detail [aria-label="Back"]');
+    await page.click('leave-summary tbody tr:nth-child(2) th');
+    assert.deepEqual(await page.$eval('leave-employee-detail .shift-employee-overview', card =>
+      [...card.querySelectorAll('h2, [data-date], [data-shift], dd')].map(node => node.textContent)
+    ), ['Medical Leave', '03 Sep 2026', '8.30:17.30W', '3', '1.50']);
+    assert.deepEqual(await page.$$eval('leave-employee-detail tbody tr', rows =>
+      rows.map(row => [...row.cells].map(cell => cell.textContent))
+    ), [
+      ['000073 - Ww', 'BFT & COM.EXECUTIVE', '0.50'],
+      ['M5545 - Juni Bte Razak', 'MANAGEMENT EXECUTIVE', '0.00'],
+      ['TEST6 - Test', 'FRONT DESK AGENT', '1.00']
+    ]);
+    await page.click('#view-leave-detail [aria-label="Back"]');
+    assert.equal(await page.evaluate(() => document.activeElement.closest('tr').querySelector('th').textContent), 'Medical Leave');
+    await page.click('#view-leave-summary [aria-label="Back"]');
+    await page.click('.planning-filter');
+    await page.type('#calendarFilterSearchKeyword', '000073');
+    await page.click('#applyFilterButton');
+    await page.waitForSelector('#filterModal', { hidden: true });
+    await page.click('#calSummaryCard [data-kind="leave"]');
+    assert.equal(await page.$eval('leave-summary [data-headcount]', el => el.textContent), '1', 'The selected employee counts once across leave types');
+    assert.deepEqual(await page.$$eval('leave-summary tbody td', cells => cells.map(el => el.textContent)), ['1', '1', '1']);
+    await page.click('leave-summary tbody tr:last-child button');
+    assert.deepEqual(await page.$$eval('leave-employee-detail tbody th', nodes => nodes.map(el => el.textContent)), ['000073 - Ww']);
+    assert.equal(await page.$eval('leave-employee-detail [data-leave-days]', node => node.textContent), '0.50');
 
-    await page.evaluate(() => switchView('view-leave-summary'));
-    assert.match(await page.$eval('#view-leave-summary .shift-detail-info-date', node => node.textContent.replace(/\s+/g, ' ').trim()), /^Date: 03 Sep.* 2026$/);
-    assert.equal(await page.$eval('#lvSummaryRecordCount', node => node.textContent.trim()), '3');
-    assert.equal(await page.$$eval('#view-leave-summary .calendar-purple-card', cards => cards.length), 3);
-    assert.deepEqual(
-      await page.$$eval('#view-leave-summary .calendar-purple-card', cards => cards.map(card => ({
-        title: card.querySelector('.calendar-purple-card-title').textContent.trim(),
-        values: [...card.querySelectorAll('.summary-value')].map(node => node.textContent.trim())
-      }))),
-      [
-        { title: '8.30:17.30W', values: ['ANNUAL LEAVE', '2.00'] },
-        { title: '8.30:17.30W', values: ['MEDICAL LEAVE', '3.00'] },
-        { title: '8.30:17.30W', values: ['UNPAID LEAVE', '1.00'] }
-      ]
-    );
-    assert.equal(await page.$$eval('#view-leave-summary .calendar-purple-card-header .fa-chevron-right', icons => icons.length), 3);
-
-    await page.click('#view-leave-summary .calendar-purple-card:nth-child(2)');
-    assert.equal(await page.$eval('#lvDetailHeadcount', node => node.textContent.trim()), '3');
-    assert.equal(await page.$$eval('#lvEmployeeCardsContainer .employee-purple-card', cards => cards.length), 3);
-    assert.equal(await page.$eval('#lvEmployeeCardsContainer .employee-purple-card:first-child .employee-card-name', node => node.textContent.trim()), 'Ww');
-    assert.equal(await page.$eval('#lvEmployeeCardsContainer .employee-purple-card:first-child .employee-card-name + .employee-card-id', node => node.textContent.trim()), '#000073');
-    assert.deepEqual(
-      await page.$$eval('#lvEmployeeCardsContainer .employee-purple-card:first-child .summary-value', nodes => nodes.map(node => node.textContent.trim())),
-      ['BFT & COM.EXECUTIVE', 'MEDICAL LEAVE', '1.00']
-    );
-    assert.equal(await page.$('#lvEmployeeCardsContainer .employee-purple-card .fa-chevron-right'), null);
-    const leaveDetailInfo = await readDetailInfoCard(page, '#view-leave-detail');
-    assert.equal(leaveDetailInfo.iconCount, 0, 'Leave detail information must not show a date icon');
-    assert.deepEqual(leaveDetailInfo.rows.map(row => row.label), ['Date:', 'Shift:', 'Total Headcount:']);
-    assert.match(leaveDetailInfo.rows[0].value, /^03 Sep.* 2026$/);
-    assert.deepEqual(leaveDetailInfo.rows.slice(1).map(row => row.value), ['8.30:17.30W', '3']);
-    assert.equal(leaveDetailInfo.rows.every(row => row.display === 'grid' && row.columnCount === 2 && row.valueAlign === 'right'), true, 'Leave detail labels and values must share aligned columns');
-    assert.equal(leaveDetailInfo.rows.every(row => row.labelColor === 'rgb(100, 116, 139)'), true, 'Leave Date must use the same label color as every other field');
+    await page.click('#view-leave-detail [aria-label="Back"]');
+    await page.click('#view-leave-summary [aria-label="Back"]');
+    await page.click('.planning-filter');
+    await page.$eval('#calendarFilterSearchKeyword', input => { input.value = '000016'; });
+    await page.click('#applyFilterButton');
+    await page.waitForSelector('#filterModal', { hidden: true });
+    await page.click('#calSummaryCard [data-kind="ot"]');
+    assert.deepEqual(await page.$$eval('ot-plan-summary dd', nodes => nodes.map(el => el.textContent)), ['03 Sep 2026', '1', '2.00']);
+    await page.click('ot-plan-summary tbody tr:last-child th');
+    assert.deepEqual(await page.$$eval('ot-plan-employee-detail tbody th', nodes => nodes.map(el => el.textContent)), ['000016 - Raju Kumar']);
 
     assert.deepEqual(errors, []);
-    console.log('PASS: OT Plan and Leave drill-downs use consistent purple cards and supplied data.');
+    console.log('PASS: OT Plan cards and grouped Leave Summary open the correct employee details for the selected date and filters.');
   } finally {
     await browser.close();
   }

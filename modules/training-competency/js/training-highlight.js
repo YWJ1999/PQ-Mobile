@@ -10,7 +10,7 @@
   let detailInerted = [];
   let inerted = [], returnFocus = null, detailTrigger = null, selectedEmployee = null, reportScroll = 0;
   const display = value => value === '' || value == null ? '—' : String(value);
-  const employeeId = value => value ? `#${String(value).replace(/^#+/, '')}` : '—';
+  const employeeId = value => formatEmployeeNumber(value) || '—';
   const numberText = value => Number(value).toFixed(2);
   const node = (tag, className, text) => {
     const element = document.createElement(tag);
@@ -267,7 +267,7 @@
 
   function exportExcel() {
     window.PeopleHcmHighlightExport.downloadCsv('training-highlight.csv', [
-      ['Emp #', 'Name', 'Days', 'Branch', 'Department', 'Position'],
+      ['Emp No.', 'Name', 'Days', 'Branch', 'Department', 'Position'],
       ...state.rows.map(record => [employeeId(record.empNo), display(record.name), record.days, display(record.branch), display(record.department), display(record.position)]),
       [], ['Total Records', state.rows.length], ['Total Training Days', total(state.sessions)], ['Current Filter', $('trainingHighlightFilterSummary').textContent]
     ]);

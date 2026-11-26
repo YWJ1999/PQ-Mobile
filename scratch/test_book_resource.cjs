@@ -84,11 +84,11 @@ async function screenshot(page, filename) {
       assert.match(detailDesign.headerBackground, /gradient/i);
       assert.match(detailDesign.bodyOverflow, /auto|scroll/);
       assert.notEqual(detailDesign.labelBackground, detailDesign.valueBackground);
-      assert.deepEqual(await page.$$eval('#bookingDetailsContent .detail-popout-label', nodes => nodes.map(node => node.textContent.trim())), ['References', 'Status', 'Emp #', 'Name', 'Booking Date', 'Start', 'End', 'Meeting Room #', 'Resource', 'Task', 'Purpose', 'Remark']);
+      assert.deepEqual(await page.$$eval('#bookingDetailsContent .detail-popout-label', nodes => nodes.map(node => node.textContent.trim())), ['References', 'Status', 'Emp No.', 'Name', 'Booking Date', 'Start', 'End', 'Meeting Room #', 'Resource', 'Task', 'Purpose', 'Remark']);
       const detailValues = await page.$$eval('#bookingDetailsContent .detail-popout-value', nodes => nodes.map(node => node.textContent.trim()));
       assert.equal(detailValues[0], 'MEET-001');
       assert.equal(detailValues[1], 'Plan');
-      assert.equal(detailValues[2], '#EBB12');
+      assert.equal(detailValues[2], 'EBB12');
       assert.equal(detailValues[3], 'Farhan binti rahmat');
       assert.equal(detailValues[5], '10:00');
       assert.equal(detailValues[6], '11:00');

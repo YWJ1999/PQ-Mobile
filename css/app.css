@@ -9409,6 +9409,14 @@ select option {
   font-size: 10.5px;
   color: var(--text-muted);
 }
+.change-history-date:has(> .record-submit-date:not([hidden])) {
+  display: grid;
+  gap: 4px;
+  padding: 10px 12px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  background: var(--bg-input);
+}
 
 /* Itemized Details & Sub-Section Styling */
 .change-itemized-wrapper {

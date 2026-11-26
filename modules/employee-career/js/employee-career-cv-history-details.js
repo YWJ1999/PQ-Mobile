@@ -31,7 +31,7 @@
     return {section: owner || 'personal', label};
   }
   const display = value => value === '' || value == null ? '\u2014' : escape(value);
-  const employee = row => `<span class="cv-history-detail-employee"><span class="history-employee-name">${display(row.name || row.employeeName)}</span>${row.empNo ? `<span class="history-employee-id">#${escape(String(row.empNo).replace(/^#/, ''))}</span>` : ''}</span>`;
+  const employee = row => `<span class="cv-history-detail-employee"><span class="history-employee-name">${display(row.name || row.employeeName)}</span>${row.empNo ? `<span class="history-employee-id">${escape(formatEmployeeNumber(row.empNo))}</span>` : ''}</span>`;
   const detailRow = (label, content, attributes = '', rowClass = '') => `<div class="cv-history-detail-row${rowClass ? ' ' + rowClass : ''}"><dt>${escape(label)}</dt><dd${attributes}>${content}</dd></div>`;
 
   const approvalPersonalFields = ['Name', 'Birth Date', 'Age', 'Personal Email', 'Passport #', 'Passport Expiry', 'Driving License', 'Driving License Expiry', 'Marital Status', 'Marriage Date'];
@@ -219,7 +219,9 @@
     const navigation = approval
       ? `<nav class="cv-stepper" aria-label="CV request sections"><ol class="cv-step-track" role="tablist" aria-label="CV details">${tabs}</ol></nav>`
       : `<div class="cv-history-navigation"><div class="cv-history-detail-tabs" role="tablist" aria-label="CV details">${tabs}</div></div>`;
-    const metadata = `<section class="cv-history-request-summary"><h3>Request overview</h3>${recordSubmitDate.html(submittedDate)}<dl class="cv-history-metadata cv-history-fields cv-history-overview">${[
+    const submitted = recordSubmitDate.format(submittedDate);
+    const metadata = `<section class="cv-history-request-summary"><h3>Request overview</h3><dl class="cv-history-metadata cv-history-fields cv-history-overview">${[
+      ...(submitted ? [['Submit Date', display(submitted)]] : []),
       ['Employee', employee(row)],
       ...(!approval ? [
         ['Document Status', statusMarkup],

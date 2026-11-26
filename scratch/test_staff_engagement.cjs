@@ -30,14 +30,14 @@ async function formAppearance(page) {
       await page.goto(url('staff-engagement.html') + '?theme=' + theme, { waitUntil: 'load' });
       assert.ok(await page.$('#staffEngagementForm'), 'Staff Engagement must contain its working form');
       assert.deepEqual(await formAppearance(page), appearance, 'Staff Engagement reuses the Confirm Staff form design');
-      assert.deepEqual(await page.$$eval('#staffEngagementForm label', nodes => nodes.map(node => node.textContent.replace('*', '').trim())), ['Employee #', 'Name', 'Position', 'Interviewee #', 'Interviewee Position', 'Interview Date', 'Positive Feedback', 'Negative Feedback', 'Flight Risk', 'Recommendation', 'Mitigation Action', 'Remarks']);
+      assert.deepEqual(await page.$$eval('#staffEngagementForm label', nodes => nodes.map(node => node.textContent.replace('*', '').trim())), ['Employee No.', 'Name', 'Position', 'Interviewee No.', 'Interviewee Position', 'Interview Date', 'Positive Feedback', 'Negative Feedback', 'Flight Risk', 'Recommendation', 'Mitigation Action', 'Remarks']);
       await page.click('#engagementSubmit');
       assert.equal(await page.evaluate(() => document.activeElement.id), 'engagementEmployee');
       assert.equal(await page.$eval('#employeeCareerToast', node => node.textContent), '');
       await page.select('#engagementEmployee', 'EBB02');
       assert.equal(await page.$eval('#engagementName', node => node.value), 'Daniel Wong');
       assert.equal(await page.$eval('#engagementPosition', node => node.value), 'Product Designer');
-      assert.equal(await page.$eval('#engagementEmployeeId', node => node.textContent), '#EBB02');
+      assert.equal(await page.$eval('#engagementEmployeeId', node => node.textContent), 'EBB02');
       assert.ok(await page.$eval('#engagementName', node => node.readOnly));
       assert.ok(await page.$eval('#engagementPosition', node => node.readOnly));
       await page.select('#engagementEmployee', '');

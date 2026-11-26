@@ -59,6 +59,7 @@
       cell.className = 'attendance-report-empty';
       cell.textContent = 'No records match the current filter.';
     }
+    document.getElementById('costingTotalRecords').textContent = records.length;
     document.getElementById('costingTotalCost').textContent = costText(sumCost(records));
     const parts = [selectedRange()];
     if (applied.costCenter !== 'all') parts.push(applied.costCenter);
@@ -223,6 +224,11 @@
       renderChart(currentSection === 'analysis');
     });
   }
+  document.getElementById('costingExportPdf').addEventListener('click', () => window.print());
+  document.getElementById('costingExportExcel').addEventListener('click', () => {
+    const rows = filteredRecords().map(record => [dateText(record.dateISO), record.costCenter, record.costVal]);
+    window.PeopleHcmHighlightExport.downloadCsv('overtime-costing.csv', [['Date', 'Cost Centre', 'Amount'], ...rows]);
+  });
   document.getElementById('highlightViewAll').addEventListener('click', () => { expandedChart = !expandedChart; renderChart(); });
   document.getElementById('highlightAnalysisViewAll').addEventListener('click', () => { expandedAnalysis = !expandedAnalysis; renderChart(true); });
   document.getElementById('highlightFilterForm').addEventListener('submit', event => { event.preventDefault(); submitFilter(); });

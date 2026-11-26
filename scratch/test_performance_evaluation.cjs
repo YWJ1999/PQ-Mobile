@@ -41,15 +41,13 @@ async function noOverflow(page) {
       assert.ok(await page.$('.record-summary-card .record-summary-metric .record-summary-value'), 'Uses the shared Total Records presentation');
       assert.deepEqual(await page.$$eval('.evaluation-card-header', nodes => nodes.map(node => ({
         name: node.querySelector('.evaluation-employee-name').textContent,
-        id: node.querySelector('.evaluation-employee-id').textContent,
-        idBelowName: node.querySelector('.evaluation-employee-id').previousElementSibling.classList.contains('evaluation-employee-name'),
         ref: node.querySelector('.evaluation-reference').textContent,
         purple: getComputedStyle(node).backgroundImage.includes('124, 58, 237')
       }))), [
-        { name: 'Farhan Binti Rahmat', id: '#EBB12', idBelowName: true, ref: 'PE-2026-0012', purple: true },
-        { name: 'Nur Izzati', id: '#EBB03', idBelowName: true, ref: 'PE-2026-0003', purple: true },
-        { name: 'Daniel Wong', id: '#EBB02', idBelowName: true, ref: 'PE-2026-0002', purple: true },
-        { name: 'Aina Rahman', id: '#EBB01', idBelowName: true, ref: 'PE-2025-0001', purple: true }
+        { name: 'EBB12 - Farhan Binti Rahmat', ref: 'PE-2026-0012', purple: true },
+        { name: 'EBB03 - Nur Izzati', ref: 'PE-2026-0003', purple: true },
+        { name: 'EBB02 - Daniel Wong', ref: 'PE-2026-0002', purple: true },
+        { name: 'EBB01 - Aina Rahman', ref: 'PE-2025-0001', purple: true }
       ]);
       assert.deepEqual(await page.$$eval('.evaluation-card:first-child dt', nodes => nodes.map(node => node.textContent)), ['Period', 'Type']);
       await noOverflow(page);

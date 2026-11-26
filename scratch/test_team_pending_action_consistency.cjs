@@ -44,7 +44,8 @@ const dashboards = [
       return String(total) + ' Tasks';
     }),
     preserve: async page => {
-      assert.ok(await page.$('#teamOnLeaveCount'), 'Leave team overview must remain');
+      assert.equal(await page.$('#teamLeaveOverviewHeader, #teamOnLeaveMetric, #teamUpcomingMetric'), null);
+      assert.ok(await page.$('#hubSectionTeam .team-action-required-card + #leaveTeamCalendarSectionTitle'));
     }
   },
   {

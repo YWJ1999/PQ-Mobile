@@ -88,7 +88,7 @@
     rows.forEach(row => {
       const item = element('tr', 'staff-event-person');
       const employee = element('td', 'staff-event-person-identity');
-      employee.append(element('strong', 'staff-event-person-name', row.name), element('span', 'staff-event-person-id', '#' + row.empNo));
+      employee.append(element('strong', 'staff-event-person-name', row.name), element('span', 'staff-event-person-id', formatEmployeeNumber(row.empNo)));
       const date = element('td', 'staff-event-person-date-column');
       const value = element(row.date ? 'time' : 'span', 'staff-event-person-date', formatDate(row.date));
       if (row.date) value.dateTime = row.date;

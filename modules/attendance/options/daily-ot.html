@@ -113,6 +113,12 @@
     .attendance-history-page .daily-ot-card { width: 100%; border-radius: 18px; color: var(--text-primary); text-align: left; font: inherit; }
     .daily-ot-card .card-status-badge { gap: 5px; }
     .daily-ot-card .card-status-badge i { font-size: 10px; }
+    #employeeCardList .daily-ot-card-details {
+      grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
+    }
+    .daily-ot-detail-row { grid-column: span 3; }
+    .daily-ot-hours-field { grid-column: span 2; align-self: stretch; }
+    .daily-ot-hours-field .daily-ot-detail-label { flex-grow: 1; }
     .popout-modal-card.approved-ot-dialog { width: 100%; max-width: 380px; max-height: 85%; border-radius: 18px; }
     .approved-ot-close { width: 30px; height: 30px; border: 1px solid rgba(255,255,255,.25); border-radius: 50%; background: rgba(255,255,255,.18); color: #fff; font-size: 20px; cursor: pointer; }
     .approved-ot-records { padding: 14px; overflow-y: auto; min-height: 0; }
@@ -1003,8 +1009,7 @@
         card.innerHTML = `
           <div class="history-card-header daily-ot-card-header">
             <div class="history-card-heading">
-              <div class="history-card-title daily-ot-card-name">${emp.name}</div>
-              <div class="daily-ot-card-id">#${emp.id}</div>
+              <div class="history-card-title daily-ot-card-name">${employeeCardHeading.html(emp.id, emp.name)}</div>
             </div>
             <span class="card-status-badge ${isUnapproved ? 'unapproved' : 'approved'}">
               <i class="fa-solid ${isUnapproved ? 'fa-clock-rotate-left' : 'fa-circle-check'}" aria-hidden="true"></i>
@@ -1020,15 +1025,15 @@
               <span class="attendance-history-fact-label daily-ot-detail-label">Clock Time</span>
               <span class="attendance-history-fact-value daily-ot-detail-value">${emp.clockTime}</span>
             </div>
-            <div class="attendance-history-fact daily-ot-detail-row">
+            <div class="attendance-history-fact daily-ot-detail-row daily-ot-hours-field">
               <span class="attendance-history-fact-label daily-ot-detail-label">Actual Hours</span>
               <span class="attendance-history-fact-value daily-ot-detail-value">${emp.actualHours}</span>
             </div>
-            <div class="attendance-history-fact daily-ot-detail-row">
+            <div class="attendance-history-fact daily-ot-detail-row daily-ot-hours-field">
               <span class="attendance-history-fact-label daily-ot-detail-label">Approved Hours</span>
               <span class="attendance-history-fact-value daily-ot-detail-value approved">${emp.approvedHours}</span>
             </div>
-            <div class="attendance-history-fact daily-ot-detail-row">
+            <div class="attendance-history-fact daily-ot-detail-row daily-ot-hours-field">
               <span class="attendance-history-fact-label daily-ot-detail-label">Unapproved Hours</span>
               <span class="attendance-history-fact-value daily-ot-detail-value ${isUnapproved ? 'unapproved' : ''}">${emp.unapprovedHours}</span>
             </div>

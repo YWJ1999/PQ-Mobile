@@ -21,7 +21,7 @@ const root = path.resolve(__dirname, '..');
       assert.equal(await page.$eval('h1', el => el.textContent), 'Self Review');
       assert.equal(await page.evaluate(() => document.documentElement.dataset.theme), theme);
       const fields = await page.$$eval('#selfReviewForm input[name]', els => Object.fromEntries(els.map(el => [el.name, el.value])));
-      assert.equal(fields.empNo, '#EBB12');
+      assert.equal(fields.empNo, 'EBB12');
       assert.equal(fields.reference, 'APP000000000233');
       assert.equal(fields.createdDate, '21/01/2009');
       assert.equal(fields.period, 'FY 2026A - Review 01');

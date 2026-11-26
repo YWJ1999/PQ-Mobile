@@ -4,12 +4,6 @@ const { pathToFileURL } = require('node:url');
 const puppeteer = require('puppeteer');
 
 const pageUrl = pathToFileURL(path.resolve(__dirname, '../modules/attendance/options/shift-plan.html')).href;
-const summaries = [
-  ['view-work-shift-summary', 'wsSummaryRecordCount'],
-  ['view-no-work-summary', 'nwSummaryRecordCount'],
-  ['view-ot-plan-summary', 'otSummaryRecordCount'],
-  ['view-leave-summary', 'lvSummaryRecordCount']
-];
 
 (async () => {
   const browser = await puppeteer.launch({
@@ -26,55 +20,73 @@ const summaries = [
       await page.setViewport({ width: 390, height: 900 });
       await page.goto(`${pageUrl}?theme=${theme}`, { waitUntil: 'load' });
 
-      for (const [viewId, countId] of summaries) {
-        await page.evaluate(id => switchView(id), viewId);
-        await page.waitForSelector(`#${viewId} .summary-detail-info-card`);
-        const layout = await page.$eval(`#${viewId}`, (view, currentCountId) => {
-          const overview = view.querySelector('.summary-detail-info-card');
-          const dateRow = overview.querySelector('.shift-detail-info-date');
-          const countValue = document.getElementById(currentCountId);
-          const countRow = countValue.closest('.shift-detail-info-row');
-          const dateBox = dateRow.getBoundingClientRect();
-          const countBox = countRow.getBoundingClientRect();
-          const overviewStyle = getComputedStyle(overview);
-          const detailStyle = getComputedStyle(document.querySelector('#view-work-shift-detail .shift-detail-info-card'));
-          const countStyle = getComputedStyle(countRow);
-          return {
-            visibleIconCount: [...overview.querySelectorAll('i')].filter(icon => icon.getClientRects().length > 0).length,
-            dateAboveTotal: dateBox.bottom <= countBox.top,
-            rowsShareWidth: Math.abs(dateBox.left - countBox.left) <= 1 && Math.abs(dateBox.right - countBox.right) <= 1,
-            dateLabelColor: getComputedStyle(dateRow.querySelector('.shift-detail-info-label')).color,
-            totalLabelColor: getComputedStyle(countRow.querySelector('.shift-detail-info-label')).color,
-            totalText: countRow.textContent.replace(/\s+/g, ' ').trim(),
-            count: countValue.textContent,
-            countAlignment: countStyle.alignItems,
-            overviewBackgroundImage: overviewStyle.backgroundImage,
-            detailBackgroundImage: detailStyle.backgroundImage,
-            overviewRadius: overviewStyle.borderRadius,
-            detailRadius: detailStyle.borderRadius,
-            overviewShadow: overviewStyle.boxShadow,
-            detailShadow: detailStyle.boxShadow,
-            dividerWidth: getComputedStyle(dateRow).borderBottomWidth
-          };
-        }, countId);
+      await page.click('#tabCalendarBtn');
+      await page.click('#calSummaryCard [data-kind="work"]');
+      const workLayout = await page.$eval('work-shift-summary', summary => {
+        const box = selector => summary.querySelector(selector).getBoundingClientRect();
+        const date = box('.work-shift-date');
+        const count = box('.work-shift-count');
+        const section = box('[data-section]');
+        const costCenter = box('[data-cost-center]');
+        const numbers = [...summary.querySelectorAll('.work-shift-metrics strong')].map(el => el.getBoundingClientRect());
+        return {
+          dateAndCount: date.right <= count.left && count.bottom > date.top,
+          scopeColumns: section.top === costCenter.top && section.right <= costCenter.left,
+          metricsAligned: numbers.length === 3 && numbers.every(rect => rect.top === numbers[0].top),
+          radius: getComputedStyle(summary.querySelector('.history-card-item')).borderRadius,
+          calendarIcon: !!summary.querySelector('.work-shift-date .fa-calendar-days'),
+          scope: [...summary.querySelectorAll('.work-shift-scope dd')].map(el => el.textContent)
+        };
+      });
+      assert.deepEqual(workLayout, {
+        dateAndCount: true, scopeColumns: true, metricsAligned: true, radius: '18px', calendarIcon: true,
+        scope: ['All companies', 'All sections', 'All cost centers']
+      });
 
-        assert.equal(layout.visibleIconCount, 0, `${theme} ${viewId}: Date must not show an icon`);
-        assert.equal(layout.dateAboveTotal, true, `${theme} ${viewId}: Date must occupy the first row and Total Records the second row`);
-        assert.equal(layout.rowsShareWidth, true, `${theme} ${viewId}: Date and Total Records must each use a full row`);
-        assert.equal(layout.dateLabelColor, layout.totalLabelColor, `${theme} ${viewId}: Date label must use the normal muted text color`);
-        assert.equal(layout.totalText, layout.count + (layout.count === '1' ? ' Record' : ' Records'));
-        assert.equal(layout.countAlignment, 'baseline');
-        assert.equal(layout.overviewBackgroundImage, layout.detailBackgroundImage, `${theme} ${viewId}: Summary and detail metadata must share the same surface`);
-        assert.equal(layout.overviewRadius, layout.detailRadius, `${theme} ${viewId}: Summary and detail metadata must share the same radius`);
-        assert.equal(layout.overviewShadow, layout.detailShadow, `${theme} ${viewId}: Summary and detail metadata must share the same shadow`);
-        assert.equal(layout.dividerWidth, '1px', `${theme} ${viewId}: Date must use a separator line above Total Records`);
-      }
+      await page.click('#view-work-shift-summary [aria-label="Back"]');
+      await page.click('#calSummaryCard [data-kind="off"]');
+      assert.deepEqual(await page.$$eval('no-work-summary .work-shift-scope dd', nodes => nodes.map(el => el.textContent)), workLayout.scope);
+      assert.deepEqual(await page.$$eval('.no-work-table [scope="col"]', cells => cells.map(el => el.textContent)), ['Shift', 'Headcount']);
+      assert.equal(await page.$eval('.no-work-table-card', el => getComputedStyle(el).borderRadius), workLayout.radius);
+      assert.equal(await page.$eval('.no-work-table td', el => getComputedStyle(el).textAlign), 'end');
+
+      await page.click('#view-no-work-summary [aria-label="Back"]');
+      await page.click('#calSummaryCard [data-kind="leave"]');
+      const leaveLayout = await page.$eval('leave-summary', summary => {
+        const [date, total] = [...summary.querySelectorAll('dd')].map(el => el.getBoundingClientRect());
+        return {
+          labels: [...summary.querySelectorAll('dt')].map(el => el.textContent),
+          sideBySide: date.right <= total.left && date.top === total.top,
+          radius: getComputedStyle(summary.querySelector('details')).borderRadius,
+          headcountAlignment: getComputedStyle(summary.querySelector('tbody td')).textAlign,
+          headerColor: getComputedStyle(summary.querySelector('summary')).color
+        };
+      });
+      assert.deepEqual(leaveLayout, {
+        labels: ['Date', 'Total headcount'], sideBySide: true, radius: '18px', headcountAlignment: 'end', headerColor: 'rgb(255, 255, 255)'
+      });
+
+      await page.click('#view-leave-summary [aria-label="Back"]');
+      await page.click('#calSummaryCard [data-kind="ot"]');
+      const otLayout = await page.$eval('ot-plan-summary', summary => {
+        const boxes = [...summary.querySelectorAll('dd')].map(el => el.getBoundingClientRect());
+        return {
+          labels: [...summary.querySelectorAll('dt')].map(el => el.textContent),
+          aligned: boxes.every(box => box.top === boxes[0].top),
+          columns: boxes[0].right <= boxes[1].left && boxes[1].right <= boxes[2].left,
+          hoursAccent: getComputedStyle(summary.querySelector('[data-planned-hours]')).color !== getComputedStyle(summary.querySelector('[data-headcount]')).color,
+          radius: getComputedStyle(summary.querySelector('details')).borderRadius
+        };
+      });
+      assert.deepEqual(otLayout, {
+        labels: ['Date', 'Total headcount', 'Total planned hours'], aligned: true, columns: true, hoursAccent: true, radius: '18px'
+      });
 
       assert.deepEqual(errors, []);
       await page.close();
     }
 
-    console.log('PASS: Shift Plan summary metadata uses two normal-color rows without date icons.');
+    console.log('PASS: Work Shift Summary context and metrics, plus the other Shift Plan summary layouts.');
   } finally {
     await browser.close();
   }

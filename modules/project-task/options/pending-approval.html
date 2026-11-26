@@ -54,7 +54,6 @@
             <input type="checkbox" class="approval-card-checkbox">
             <span class="project-approval-employee-copy">
               <strong class="project-approval-employee-name"></strong>
-              <span class="project-approval-employee-id"></span>
             </span>
             <span class="project-approval-status"><i class="fa-solid fa-hourglass-half" aria-hidden="true"></i><span>Pending</span></span>
             <button type="button" class="project-approval-menu-trigger" data-project-approval-menu><i class="fa-solid fa-ellipsis-vertical" aria-hidden="true"></i></button>
@@ -106,7 +105,6 @@
           </div>
         </header>
         <div class="project-approval-details-body">
-          <span id="projectApprovalSubmitDate" class="record-submit-date" hidden></span>
           <div id="projectApprovalRequest" class="project-form-page"></div>
           <section class="project-approval-comments-card" aria-labelledby="projectApprovalCommentsTitle">
             <label id="projectApprovalCommentsTitle" for="projectApprovalApproverComments">Approver Action Comments</label>
@@ -133,12 +131,11 @@
           </div>
         </header>
         <div class="project-approval-workflow-body">
-          <span id="projectWorkflowSubmitDate" class="record-submit-date" hidden></span>
           <div class="project-approval-workflow-person">
+            <span id="projectWorkflowSubmitDate" class="record-submit-date" hidden></span>
             <p id="projectApprovalWorkflowReference"></p>
             <small>Requested by</small>
             <strong id="projectApprovalWorkflowName"></strong>
-            <span id="projectApprovalWorkflowEmployeeId"></span>
           </div>
           <p class="approval-backup-assignment" id="projectApprovalWorkflowBackup" hidden></p>
           <ol class="project-approval-workflow-steps" id="projectApprovalWorkflowSteps">

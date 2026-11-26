@@ -252,9 +252,6 @@
     $('manpowerChartViewAll').querySelector('span').textContent = state.showAll ? 'Show top 5' : 'View all ' + plurals[state.metric];
     $('manpowerChartViewAll').querySelector('i').className = 'fa-solid ' + (state.showAll ? 'fa-chevron-up' : 'fa-chevron-down');
   }
-  function normalizeEmployeeId(value) {
-    return '#' + String(value || '').replace(/^#/, '');
-  }
   function renderStaffRecords(staff) {
     const list = $('manpowerStaffList');
     list.replaceChildren();
@@ -262,13 +259,10 @@
       const card = node('button', 'manpower-employee-card');
       card.type = 'button';
       card.dataset.empNo = employee.empNo;
-      card.setAttribute('aria-label', `View employee details for ${employee.name}, ${normalizeEmployeeId(employee.empNo)}`);
+      card.setAttribute('aria-label', `View employee details for ${employeeCardHeading.text(employee.empNo, employee.name)}`);
       const content = node('span', 'manpower-employee-card-content');
       const identity = node('span', 'manpower-employee-identity');
-      identity.append(
-        node('span', 'employee-name', employee.name),
-        node('span', 'employee-id', normalizeEmployeeId(employee.empNo))
-      );
+      identity.append(node('span', 'employee-name', employeeCardHeading.text(employee.empNo, employee.name)));
       const details = node('span', 'manpower-employee-card-details');
       const position = node('span', 'manpower-employee-card-row');
       position.append(node('span', '', 'Position'), node('strong', '', employee.position || '—'));
@@ -309,7 +303,7 @@
     if (!employee) return;
     const value = entry => entry === undefined || entry === null || entry === '' ? '—' : String(entry);
     const details = [
-      ['Employee #', normalizeEmployeeId(employee.empNo)],
+      ['Employee No.', formatEmployeeNumber(employee.empNo)],
       ['Name', value(employee.name)],
       ['Position', value(employee.position)],
       ['Superior', value(employee.superior)],

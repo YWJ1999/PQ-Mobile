@@ -43,6 +43,8 @@ const puppeteer = require('puppeteer');
     for (const current of [page, referencePage]) {
       await current.addStyleTag({ content: '* { transition: none !important; animation: none !important; }' });
       assert.equal(await current.$eval('.hours-summary-header #filterSummaryText', el => el.textContent), '16 Aug – 14 Sep 2026');
+      assert.ok(await current.$('.hours-summary-toolbar button.standard-filter-summary-trigger .fa-sliders.standard-filter-summary-trigger-glyph'));
+      assert.equal(await current.$('#view-dashboard .filter-summary-bar'), null);
       assert.equal(await current.$$eval('.hours-metric-percent', nodes => nodes.filter(node => node.textContent === '—').length), 2);
     }
     for (const theme of ['light', 'dark']) {
@@ -50,6 +52,12 @@ const puppeteer = require('puppeteer');
         for (const current of [page, referencePage]) {
           await current.setViewport({ width, height: 844 });
           await current.evaluate(value => document.documentElement.setAttribute('data-theme', value), theme);
+          const filterStyle = await current.$eval('.hours-header-filter', button => {
+            const style = getComputedStyle(button);
+            return [getComputedStyle(button.querySelector('.fa-sliders')).color, style.borderTopColor,
+              style.borderTopStyle, style.backgroundColor, style.backgroundImage];
+          });
+          assert.deepEqual(filterStyle, ['rgb(255, 255, 255)', 'rgb(255, 255, 255)', 'solid', 'rgba(0, 0, 0, 0)', 'none']);
         }
         const sections = await readSections(page);
         assert.deepEqual(sections, await readSections(referencePage), 'Both reports use the same table layout and colors');
@@ -96,11 +104,23 @@ const puppeteer = require('puppeteer');
       'Cost centre'
     ]);
 
-    await page.click('.bento-group-work .summary-kpi-card');
+    await page.click('[onclick*="Normal Work Hours"] button');
     assert.notEqual(await page.$eval('#view-list', node => getComputedStyle(node).display), 'none');
-    assert.equal(await page.$eval('#details-list-container .summary-history-card', node =>
-      node.querySelector('.staff-name-text').nextElementSibling.textContent.trim()
-    ), '#EBB01');
+    assert.equal(await page.$eval('#headerTitle', node => node.textContent.trim()), 'Staff Normal Work Hours Summary');
+    assert.equal(await page.$eval('#staff-list-total-value', node => node.textContent.trim()), '1076.00');
+    const headings = await page.$$eval('#details-list-container .staff-name-text', nodes => nodes.map(node => node.textContent.trim()));
+    assert.equal(headings.length, 8);
+    assert.deepEqual(headings.slice(0, 3), ['EBB01 - John Tan', 'EBB02 - Sarah Lee', 'EBB03 - Alex Wong']);
+    const workCards = '#details-list-container .summary-history-card';
+    const titles = await page.$$eval(workCards + ' .staff-name-text + .staff-job-title', nodes => nodes.map(node => node.textContent));
+    assert.deepEqual(titles, await page.evaluate(() => currentStaffItems.map(staff => staff.jobTitle)));
+    const fields = await page.$eval(workCards, card => [...card.querySelectorAll('.summary-history-detail')].map(row =>
+      [row.querySelector('span').textContent, row.querySelector('strong').textContent]));
+    assert.deepEqual(fields, [['Work Days', '22'], ['Normal Work Hours', '176.00']]);
+    await page.click(workCards + ' .staff-info-outline');
+    await page.waitForSelector('#view-daily-list', { visible: true });
+    assert.equal(await page.$eval('#daily-record-count', node => node.textContent), '22');
+    await page.evaluate(() => goBack());
     await page.evaluate(() => goBack());
 
     await page.click('.staff-hours-filter-trigger');

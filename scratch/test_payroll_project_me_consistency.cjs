@@ -54,9 +54,9 @@ const fileUrl = file => pathToFileURL(path.join(root, file)).href;
       const components = fs.readFileSync(path.join(root, 'js/components.js'), 'utf8');
       const me = fs.readFileSync(path.join(root, 'me.html'), 'utf8');
       const bonus = fs.readFileSync(path.join(root, 'bonus-history.html'), 'utf8');
-      assert.match(components, /drawer-user-name[^]*drawer-employee-id[^]*#EBB01/);
-      assert.match(me, /me-emp-fullname[^]*me-emp-code[^]*#EBB01/);
-      assert.match(bonus, /bonus-user-name[^]*employee-id-standard[^]*#EBB01/);
+      assert.match(components, /drawer-user-name[^]*drawer-employee-id[^]*EBB01/);
+      assert.match(me, /me-emp-fullname[^]*me-emp-code[^]*EBB01/);
+      assert.match(bonus, /bonus-user-name[^]*employee-id-standard[^]*EBB01/);
     });
 
     await check('EA print calls print and updates selected document year', () => {

@@ -1131,8 +1131,7 @@
               <i class="fa-solid ${statusIcon}"></i>
             </span>
           </div>
-          ${recordSubmitDate.html(item.submitDate || item.submittedDate)}
-          <div class="history-card-details">${detailsBlock}</div>
+          <div class="history-card-details">${detailsBlock}${recordSubmitDate.html(item.submitDate || item.submittedDate)}</div>
           ${actionHtml}
         `;
         card.querySelector('.history-card-title').textContent = item.savedClaim ? item.title : cardTitle;
@@ -1410,7 +1409,7 @@
               if (typeof passenger === 'object') {
                 const passengerName = passenger.name || passenger.passengerName || passenger.employeeName || `Passenger ${index + 1}`;
                 const passengerId = passenger.empNo || passenger.employeeId;
-                return [`Passenger ${index + 1}`, passengerId ? `${passengerName}<br><span style="color: var(--text-muted); font-size: 10.5px;">#${String(passengerId).replace(/^#/, '')}</span>` : passengerName];
+                return [`Passenger ${index + 1}`, passengerId ? `${passengerName}<br><span style="color: var(--text-muted); font-size: 10.5px;">${formatEmployeeNumber(passengerId)}</span>` : passengerName];
               }
               return [`Passenger ${index + 1}`, passenger];
             })
@@ -1428,7 +1427,7 @@
             ${travelTable([
               ['Reference #', item.id],
               ['Status', detailStatus],
-              ['Emp #', item.empNo ? `#${item.empNo}` : '—'],
+              ['Emp No.', formatEmployeeNumber(item.empNo) || '—'],
               ['Name', item.empName],
               ['Travel Period', item.claimPeriod],
               ['Start Date', item.dateFrom || item.date],
@@ -1488,7 +1487,7 @@
             ${travelTable([
               ['Reference #', item.id],
               ['Status', detailStatus],
-              ['Emp #', item.empNo ? `#${item.empNo}` : '—'],
+              ['Emp No.', formatEmployeeNumber(item.empNo) || '—'],
               ['Name', item.empName],
               ['Travel Request #', item.travelRequestNo],
               ['Claim Period', item.claimPeriod],
@@ -1583,7 +1582,7 @@
             ${detailTable([
               ['Reference #', item.id],
               ['Status', detailStatus],
-              ['Emp #', item.empNo ? `#${item.empNo}` : '—'],
+              ['Emp No.', formatEmployeeNumber(item.empNo) || '—'],
               ['Name', item.empName],
               ['Period', item.claimPeriod],
               ['Cost Center', item.costCenter],
@@ -1616,7 +1615,7 @@
             ${detailTable([
               ['Reference #', item.id],
               ['Status', detailStatus],
-              ['Emp #', item.empNo ? `#${item.empNo}` : '—'],
+              ['Emp No.', formatEmployeeNumber(item.empNo) || '—'],
               ['Name', item.empName],
               ['Travel Mileage Claim #', item.travelMileageClaimNo],
               ['Claim Period', item.claimPeriod],
@@ -1702,7 +1701,7 @@
             <tbody>
               ${renderRow('Reference #', item.id || 'CBF000000000220')}
               ${renderRow('Status', detailStatus)}
-              ${renderRow('Emp#', item.empNo ? `#${item.empNo}` : '#EBB12')}
+              ${renderRow('Emp No.', formatEmployeeNumber(item.empNo) || 'EBB12')}
               ${renderRow('Name', item.empName || 'Farhan binti rahmat')}
               ${renderRow('Currency', item.currency || 'USD')}
               ${renderRow('Amount', item.amount || '12.00')}
@@ -1744,7 +1743,8 @@
           </div>` }
         : legacyHistoryDetails(item);
       document.getElementById('claimHistoryDetailTitle').textContent = headerTitle;
-      container.innerHTML = recordSubmitDate.html(item.submitDate || item.submittedDate) + bodyHtml;
+      container.innerHTML = bodyHtml;
+      recordSubmitDate.prepend(container.querySelector('tbody'), item.submitDate || item.submittedDate);
       const footer = document.getElementById('claimHistoryDetailActions');
       footer.innerHTML = renderClaimHistoryActions(item, 'detail');
       footer.hidden = !footer.childElementCount;

@@ -21,7 +21,7 @@ const records = [
       ['Location', 'Head Office'],
       ['Meal', 'Yes'],
       ['Guest 1', 'Jane Tan \u2022 Meranti Retail \u2022 Customer \u2022 Operations Manager'],
-      ['Attendee 1', 'Farhan binti rahmat\n#EBB12\nHuman Resource \u2022 Group HR Manager'],
+      ['Attendee 1', 'Farhan binti rahmat\nEBB12\nHuman Resource \u2022 Group HR Manager'],
       ['Other Request', 'Floor Visit, Sitting Arrangement'],
       ['Attachments', 'visitor-list.pdf']
     ]
@@ -68,7 +68,7 @@ const detailLabels = () => [...document.querySelectorAll('#historyDetailBody .hi
       ['Quantity', '1'],
       ['UOM', 'Piece'], ['Reason', 'Inventory Request Reason 1']
     ]);
-    assert.equal(await page.$eval('[data-record-id="sample-inventory-0064"] .record-submit-date', node => node.textContent), 'Submit Date: 08/09/2026');
+    assert.equal(await page.$eval('[data-record-id="sample-inventory-0064"] .record-submit-date > strong', node => node.textContent), '08/09/2026');
     await page.click('[data-history-kind="guest-visit"]');
     await page.evaluate((key, seededRecords) => localStorage.setItem(key, JSON.stringify(seededRecords)), historyKey, records);
     await page.reload({ waitUntil: 'load' });
@@ -87,23 +87,43 @@ const detailLabels = () => [...document.querySelectorAll('#historyDetailBody .hi
     ]);
     assert.equal(await page.$eval('.history-card-item .status-pill', node => node.textContent.trim()), 'Pending');
 
-    await page.click('.history-card-item');
+    await page.click('.history-card-main');
     assert.equal(await page.$eval('#historyDetailTitle', node => node.textContent.trim()), 'Guest Visit Details');
-    assert.deepEqual(await page.evaluate(detailLabels), [
-      'Reference #', 'Status', 'Emp #', 'Name', 'Visit Date', 'Visit Time', 'Visitor',
-      'Location', 'Request Meal?', 'Floor Visit?', 'Sit Arrange?', 'Multi Room?', 'Remarks'
-    ]);
-    assert.equal(await page.$eval('#historyDetailBody [data-detail-field="Emp #"]', node => node.textContent.trim()), '#EBB12');
-    assert.deepEqual(await page.$$eval('.history-detail-section-title', nodes => nodes.map(node => node.textContent.trim())), [
-      'Guest Information', 'Internal Attendee', 'Attachment'
-    ]);
-    assert.ok((await page.$eval('#historyDetailBody', node => node.textContent)).includes('Meranti Retail'));
-    assert.ok((await page.$eval('#historyDetailBody', node => node.textContent)).includes('visitor-list.pdf'));
+    assert.deepEqual(await page.$$eval('#visitStartTime, #visitEndTime', inputs => inputs.map(input => input.value)), ['09:00', '10:00']);
+    assert.ok(await page.$eval('#visitMeal', input => input.checked && input.disabled));
+    assert.equal(await page.$eval('#visitAttachments', node => node.textContent), 'visitor-list.pdf');
+    await page.click('#visitTab-other');
+    assert.deepEqual(await page.$$eval('[data-other-request]:checked', inputs => inputs.map(input => input.value)), ['floor-visit', 'sitting-arrangement']);
+    await page.click('#visitTab-guest');
+    await page.click('#visitGuestList [data-toggle-record]');
+    assert.match(await page.$eval('#visitGuestList', node => node.innerText), /Jane Tan.*Meranti Retail.*Operations Manager/s);
+
+    // Structured submissions retain punctuation that the older display strings used as separators.
+    const visitId = await page.evaluate(() => WorkplaceHistoryStore.save({
+      kind: 'guest-visit', title: 'Meeting Room', date: '2026-10-08', fields: [],
+      guestVisit: {
+        visitDate: '2026-10-08', startTime: '14:30', endTime: '15:00', totalGuest: 1, location: 'Meeting Room', meal: false,
+        guests: [{ name: 'Alex', company: 'Acme • West', relation: 'Supplier', position: 'Manager' }],
+        attendees: [{ empNo: '0000101', name: 'Lee', department: 'Finance', position: 'Analyst' }],
+        otherRequests: ['multiple-rooms'], attachments: ['Badge, front.pdf'], remarks: 'Use the side entrance.'
+      }
+    }).id);
+    await page.goto(pageUrl + '#history/guest-visit/' + visitId, { waitUntil: 'load' });
+    assert.equal(await page.$eval('#visitLocation', node => node.value), 'Meeting Room');
+    assert.deepEqual(await page.$$eval('#visitAttachments .visit-attachment', nodes => nodes.map(node => node.textContent)), ['Badge, front.pdf']);
+    assert.equal(await page.$eval('#visitRemarks', node => node.readOnly && node.value), 'Use the side entrance.');
+    await page.click('#visitTab-guest');
+    await page.click('#visitGuestList [data-toggle-record]');
+    assert.equal(await page.$eval('#visitGuestList dd', node => node.innerText), 'Acme • West');
+    await page.click('#visitTab-attendee');
+    assert.equal(await page.$eval('#visitAttendeeList .visit-record-name', node => node.innerText), '0000101 - Lee');
+    await page.click('#visitTab-other');
+    assert.deepEqual(await page.$$eval('[data-other-request]:checked', nodes => nodes.map(node => node.value)), ['multiple-rooms']);
 
     await page.click('#closeHistoryDetails');
     await page.click('[data-history-kind="letter-request"]');
     assert.equal(await page.$eval('.history-card-title', node => node.textContent.trim()), 'Guarantee Letter');
-    assert.equal(await page.$eval('.history-card-header + .record-submit-date', node => node.textContent), 'Submit Date: 05/10/2026');
+    assert.equal(await page.$eval('.history-card-details > .record-submit-date > strong', node => node.textContent), '05/10/2026');
     assert.deepEqual(await page.$$eval('.history-card-item .history-card-row', rows => rows.map(row => [
       row.querySelector('span').textContent.replace(':', '').trim(),
       row.querySelector('strong').textContent.trim()
@@ -116,7 +136,7 @@ const detailLabels = () => [...document.querySelectorAll('#historyDetailBody .hi
     await page.click('.history-card-item');
     assert.equal(await page.$eval('#historyDetailTitle', node => node.textContent.trim()), 'Letter Request Details');
     assert.deepEqual(await page.evaluate(detailLabels), [
-      'Reference #', 'Status', 'Request Date', 'Type', 'Description', '1st Merge Text',
+      'Submit Date:', 'Reference #', 'Status', 'Request Date', 'Type', 'Description', '1st Merge Text',
       '2nd Merge Text', '3rd Merge Text', 'Reason', 'Remark', 'FileName', 'Acknowledged On'
     ]);
     assert.equal(await page.$eval('#historyDetailBody [data-detail-field="FileName"]', node => node.textContent.trim()), 'guarantee-letter.pdf');
@@ -131,12 +151,13 @@ const detailLabels = () => [...document.querySelectorAll('#historyDetailBody .hi
     await page.click('[data-history-kind="inventory-request"]');
     await page.click('[data-record-id="inventory-attachment"] .history-card-main');
     assert.match(await page.$eval('#historyDetailBody', n => n.textContent), /laptop-quote.pdf/, 'Existing inventory attachments remain visible');
-    await page.keyboard.press('Escape');
+    await page.click('#closeHistoryDetails');
+    await page.waitForFunction(() => !HistoryRecordPage.active);
     await page.click('[data-history-kind="letter-request"]');
     assert.equal(await page.$eval('[data-record-id="letter-draft-date"] .history-card-row:last-child strong', n => n.textContent), '—');
     await page.click('[data-record-id="letter-draft-date"] [data-history-action="apply"]');
-    const submitDate = await page.evaluate(() => 'Submit Date: ' + new Date().toLocaleDateString('en-GB'));
-    assert.equal(await page.$eval('[data-record-id="letter-draft-date"] .record-submit-date', n => n.textContent), submitDate, 'Reapplied letters display their new submit date');
+    const submitDate = await page.evaluate(() => new Date().toLocaleDateString('en-GB'));
+    assert.equal(await page.$eval('[data-record-id="letter-draft-date"] .record-submit-date > strong', n => n.textContent), submitDate, 'Reapplied letters display their new submit date');
     assert.equal(await page.$eval('main', node => node.scrollWidth <= node.clientWidth + 1), true, 'History page must fit the mobile viewport');
     assert.deepEqual(errors, []);
     console.log('PASS: Workplace History cards and grouped details use the consistent design.');

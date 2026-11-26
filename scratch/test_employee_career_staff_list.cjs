@@ -13,7 +13,7 @@ const puppeteer = require('puppeteer');
     for (const theme of ['light', 'dark']) {
       await page.goto(url + '?theme=' + theme, { waitUntil: 'networkidle0' });
       assert.equal(await page.$('.employee-career-coming-card'), null, 'Staff List must be implemented');
-      assert.deepEqual(await page.$$eval('#staffListTable th', nodes => nodes.map(node => node.textContent.trim())), ['Emp#', 'Name', 'Age', 'YOS', 'Branch', 'Department', 'Position']);
+      assert.deepEqual(await page.$$eval('#staffListTable th', nodes => nodes.map(node => node.textContent.trim())), ['Emp No.', 'Name', 'Age', 'YOS', 'Branch', 'Department', 'Position']);
       assert.equal(await page.$eval('[data-option-back]', node => new URL(node.href).searchParams.get('theme')), theme);
       assert.equal(await page.evaluate(() => typeof navTo), 'function');
       const fullCount = await page.$$eval('#staffListTable tbody tr', nodes => nodes.length);
@@ -22,7 +22,7 @@ const puppeteer = require('puppeteer');
       const records = await page.$$eval('#staffListTable tbody tr', nodes => nodes.map(node => [...node.cells].map(cell => cell.textContent.trim())));
       for (const record of records) {
         assert.equal(record.length, 7);
-        assert.match(record[0], /^#\w+/);
+        assert.match(record[0], /^\w+/);
         assert.ok(record[1] && Number(record[2]) > 0 && Number(record[3]) >= 0);
         assert.ok(record.slice(4).every(Boolean));
       }
@@ -84,7 +84,7 @@ const puppeteer = require('puppeteer');
         URL.createObjectURL = original;
         return blob.text();
       });
-      assert.match(exportText, /Emp#,Name,Age,YOS,Branch,Department,Position/);
+      assert.match(exportText, /Emp No.,Name,Age,YOS,Branch,Department,Position/);
       assert.equal(exportText.trim().split(/\r?\n/).length, 2);
       assert.ok(exportText.includes(records[0][1]));
       assert.ok(await page.evaluate(() => { let called = false; window.print = () => { called = true; }; document.getElementById('staffListExportPdf').click(); return called; }));

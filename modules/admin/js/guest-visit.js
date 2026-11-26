@@ -213,7 +213,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const employee = employees[id];
     $('visitStaffDepartment').value = employee?.department || '';
     $('visitStaffPosition').value = employee?.position || '';
-    $('visitSelectedStaffId').textContent = employee ? '#' + id : '';
+    $('visitSelectedStaffId').textContent = employee ? formatEmployeeNumber(id) : '';
     $('visitSelectedStaffId').hidden = !employee;
   }
   function renderAttendees() {
@@ -410,7 +410,7 @@ document.addEventListener('DOMContentLoaded', () => {
         fields: [['Visit Date', $('visitDate').value], ['Time', $('visitStartTime').value + ' – ' + $('visitEndTime').value],
           ['Total Guest', $('visitTotalGuest').value], ['Location', location], ['Meal', $('visitMeal').checked ? 'Yes' : 'No'],
           ...guests.map((guest, index) => ['Guest ' + (index + 1), `${guest.name} • ${guest.company} • ${guest.relation} • ${guest.position}`]),
-          ...attendeeIds.map((id, index) => ['Attendee ' + (index + 1), `${employees[id].name}\n#${id}\n${employees[id].department} • ${employees[id].position}`]),
+          ...attendeeIds.map((id, index) => ['Attendee ' + (index + 1), `${employees[id].name}\n${formatEmployeeNumber(id)}\n${employees[id].department} • ${employees[id].position}`]),
           ['Other Request', requests.join(', ') || 'None'], ['Attachments', attachments.map(file => file.name).join(', ') || 'None']]
       });
       historyRecordId = record.id;

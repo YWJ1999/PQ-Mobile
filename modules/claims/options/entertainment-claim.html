@@ -1070,8 +1070,7 @@
                     <i class="fa-solid fa-user"></i>
                   </div>
                   <div>
-                    <div style="font-size: 14px; font-weight: 800; color: var(--text-primary);">${item.name}</div>
-                    <div style="font-size: 11.5px; font-weight: 700; color: var(--text-muted); opacity: 0.8; font-family: monospace, sans-serif;">#${item.empNo}</div>
+                    <div style="font-size: 14px; font-weight: 800; color: var(--text-primary);">${employeeCardHeading.html(item.empNo, item.name)}</div>
                   </div>
                 </div>
                 <div style="display: flex; align-items: center; gap: 8px;">
@@ -1090,7 +1089,7 @@
                   </div>
                   <div>
                     <span style="color: var(--text-muted); font-weight: 600;">Employee ID:</span>
-                    <div style="font-weight: 800; color: var(--text-primary); margin-top: 2px;">#${item.empNo}</div>
+                    <div style="font-weight: 800; color: var(--text-primary); margin-top: 2px;">${formatEmployeeNumber(item.empNo)}</div>
                   </div>
                   <div>
                     <span style="color: var(--text-muted); font-weight: 600;">Position / Title:</span>
@@ -1413,10 +1412,10 @@
               <div class="select-wrapper">
                 <select id="employeeSelect" class="form-ctrl" onchange="handleEmployeeSelect(this.value)">
                   <option value="" ${!item ? 'selected' : ''}>- Select employee -</option>
-                  <option value="EBB01" ${item && item.empNo === 'EBB01' ? 'selected' : ''}>Sarah Jenkins (#EBB01)</option>
-                  <option value="004177" ${item && item.empNo === '004177' ? 'selected' : ''}>Marcus Tan (#004177)</option>
-                  <option value="0000101" ${item && item.empNo === '0000101' ? 'selected' : ''}>Aisha Omar (#0000101)</option>
-                  <option value="000582" ${item && item.empNo === '000582' ? 'selected' : ''}>Daniel Lee (#000582)</option>
+                  <option value="EBB01" ${item && item.empNo === 'EBB01' ? 'selected' : ''}>Sarah Jenkins (EBB01)</option>
+                  <option value="004177" ${item && item.empNo === '004177' ? 'selected' : ''}>Marcus Tan (004177)</option>
+                  <option value="0000101" ${item && item.empNo === '0000101' ? 'selected' : ''}>Aisha Omar (0000101)</option>
+                  <option value="000582" ${item && item.empNo === '000582' ? 'selected' : ''}>Daniel Lee (000582)</option>
                 </select>
               </div>
             </div>

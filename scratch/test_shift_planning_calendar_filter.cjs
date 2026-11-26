@@ -52,9 +52,11 @@ const pageUrl = pathToFileURL(path.resolve(__dirname, '../modules/attendance/opt
     await page.$eval('.cal-summary-stat.is-working', button => button.scrollIntoView({ block: 'center', behavior: 'instant' }));
     await page.click('.cal-summary-stat.is-working');
     await page.waitForSelector('#view-work-shift-summary.active');
-    await page.click('#view-work-shift-summary .calendar-purple-card');
+    await page.click('#view-work-shift-summary .work-shift-card');
     await page.waitForSelector('#view-work-shift-detail.active');
-    assert.deepEqual(await page.$$eval('#wsEmployeeCardsContainer .employee-card-id', items => items.map(node => node.textContent)), ['#000008']);
+    assert.deepEqual(await page.$$eval('.work-shift-employee-header h3', items => items.map(node => node.textContent)), ['000008 - Aqilah Antasha']);
+    assert.deepEqual(await page.$$eval('.work-shift-overview strong', items => items.map(node => node.textContent)), ['1', '8.00', '0.00']);
+    assert.deepEqual(await page.$$eval('.work-shift-employee-card strong', items => items.map(node => node.textContent)), ['8.00', '0.00']);
     await page.click('#view-work-shift-detail [aria-label="Back"]');
     await page.click('#view-work-shift-summary [aria-label="Back"]');
 

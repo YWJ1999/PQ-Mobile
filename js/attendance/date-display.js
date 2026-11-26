@@ -28,14 +28,15 @@
     const date = parse(value);
     return date ? `${weekdays[date.getUTCDay()]} ${dayMonth(date)} ${date.getUTCFullYear()}` : String(value || '—');
   }
-  function formatRange(from, to) {
+  function formatRange(from, to, { compactMonth = false } = {}) {
     const start = parse(from);
     const end = parse(to);
     if (!start || !end) return '';
     const last = `${dayMonth(end)} ${end.getUTCFullYear()}`;
     if (start.getTime() === end.getTime()) return last;
-    const first = start.getUTCFullYear() === end.getUTCFullYear()
-      ? dayMonth(start) : `${dayMonth(start)} ${start.getUTCFullYear()}`;
+    const sameYear = start.getUTCFullYear() === end.getUTCFullYear();
+    if (compactMonth && sameYear && start.getUTCMonth() === end.getUTCMonth()) return `${start.getUTCDate()}–${last}`;
+    const first = sameYear ? dayMonth(start) : `${dayMonth(start)} ${start.getUTCFullYear()}`;
     return `${first} – ${last}`;
   }
   function periodRange(period, asOfDate) {

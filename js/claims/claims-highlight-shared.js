@@ -39,7 +39,7 @@
     tableBody.innerHTML = records.map((record, index) => `
       <tr style="background:${index % 2 ? 'var(--bg-card-hover)' : 'var(--bg-card)'};border-bottom:1px solid var(--border-subtle);">
         <td class="highlight-employee-id" style="padding:12px 14px;white-space:nowrap;font:700 11.5px monospace;color:var(--text-muted);opacity:.8;">
-          #${escapeHtml(record.empNo)}
+          ${escapeHtml(formatEmployeeNumber(record.empNo))}
         </td>
         <td class="highlight-employee-name" style="padding:12px 14px;font-weight:800;color:var(--text-primary);font-size:13px;">
           ${escapeHtml(record.name)}

@@ -22,7 +22,7 @@ async function open(page, file, theme) {
   assert.equal(await page.$eval('html', node => node.dataset.theme), theme);
 }
 
-async function checkList(page, listSelector, context) {
+async function checkList(page, listSelector, context, tabId) {
   const footers = await page.$$eval(listSelector + ' :is(.history-card-actions, .record-card-actions, .project-history-card-actions, .career-history-card-actions)', nodes => nodes.map(footer => {
     const style = getComputedStyle(footer);
     const right = footer.getBoundingClientRect().right - parseFloat(style.paddingRight) - parseFloat(style.borderRightWidth);
@@ -45,7 +45,7 @@ async function checkList(page, listSelector, context) {
     if (buttons.length === 1) {
       const [button] = buttons;
       if (button.cancelsRecord) assert.equal(button.label, 'Cancel', context);
-      const icons = { Cancel: /fa-ban/, Delete: /fa-trash-can/, Edit: /fa-pencil/ };
+      const icons = { Cancel: tabId === 'histTabCredit' ? /^$/ : /fa-ban/, Delete: /fa-trash-can/, Edit: /fa-pencil/ };
       assert.ok(Object.hasOwn(icons, button.label), context);
       assert.match(button.icon, icons[button.label], context);
       assert.match(button.background, /rgb\(124, 58, 237\).*rgb\(109, 40, 217\)/, context);
@@ -79,9 +79,12 @@ async function run() {
           const tabs = await page.$$(tabSelector);
           assert.ok(tabs.length, file);
           for (const tab of tabs) {
-            const label = await tab.evaluate(button => { button.click(); return button.textContent.trim(); });
+            const [id, label] = await tab.evaluate(button => {
+              button.click();
+              return [button.id, button.textContent.trim()];
+            });
             await page.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))));
-            count += await checkList(page, listSelector, [theme, file, label].join(' / '));
+            count += await checkList(page, listSelector, [theme, file, label].join(' / '), id);
           }
         } else {
           count = await checkList(page, listSelector, theme + ' / ' + file);

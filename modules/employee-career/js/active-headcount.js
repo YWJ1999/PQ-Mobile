@@ -17,9 +17,6 @@
     return element;
   }
 
-  function normalizeEmployeeId(value) {
-    return '#' + String(value || '').replace(/^#/, '');
-  }
 
   function formatDate(value) {
     return new Date(value + 'T12:00:00').toLocaleDateString('en-GB', {
@@ -105,13 +102,10 @@
       const card = node('button', 'manpower-employee-card active-headcount-employee-card');
       card.type = 'button';
       card.dataset.empNo = employee.empNo;
-      card.setAttribute('aria-label', `View employee details for ${employee.name}, ${normalizeEmployeeId(employee.empNo)}`);
+      card.setAttribute('aria-label', `View employee details for ${employeeCardHeading.text(employee.empNo, employee.name)}`);
 
       const identity = node('span', 'manpower-employee-identity');
-      identity.append(
-        node('span', 'employee-name', employee.name),
-        node('span', 'employee-id', normalizeEmployeeId(employee.empNo))
-      );
+      identity.append(node('span', 'employee-name', employeeCardHeading.text(employee.empNo, employee.name)));
       const details = node('span', 'manpower-employee-card-details');
       const grade = node('span', 'manpower-employee-card-row');
       grade.append(node('span', '', 'Grade'), node('strong', 'active-headcount-employee-grade', employee.grade));
@@ -155,7 +149,7 @@
 
   function openEmployeeDetails(employee, trigger) {
     const values = [
-      ['Employee #', normalizeEmployeeId(employee.empNo)],
+      ['Employee No.', formatEmployeeNumber(employee.empNo)],
       ['Name', employee.name],
       ['Position', employee.position],
       ['Superior', employee.superior],

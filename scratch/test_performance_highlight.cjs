@@ -20,7 +20,7 @@ const labels=['Evaluation Date','Period','Appraisal Type','Position','Reporting 
       assert.equal(await page.evaluate(()=>document.documentElement.dataset.theme),theme);
       assert.equal(await page.$eval('#performanceHighlightTotalRecords',node=>node.textContent.trim()),'8');
       assert.equal(await page.$eval('#performanceHighlightAverageScore',node=>node.textContent.trim()),'82.25');
-      assert.deepEqual(await page.$$eval('#performanceHighlightTable thead th',nodes=>nodes.map(node=>node.textContent.trim())),['Emp #','Name','Score','Branch','Department','Position']);
+      assert.deepEqual(await page.$$eval('#performanceHighlightTable thead th',nodes=>nodes.map(node=>node.textContent.trim())),['Emp No.','Name','Score','Branch','Department','Position']);
       assert.deepEqual(await page.$eval('#performanceHighlightTable thead th',node=>({bg:getComputedStyle(node).backgroundColor,color:getComputedStyle(node).color})),{bg:'rgb(124, 58, 237)',color:'rgb(255, 255, 255)'});
       assert.deepEqual(await page.$eval('#performanceHighlightViewChart',node=>({text:node.textContent.trim(),barIcon:!!node.querySelector('.fa-chart-simple'),nowrap:getComputedStyle(node).whiteSpace})),{text:'Chart',barIcon:true,nowrap:'nowrap'});
       const original=await page.evaluate(()=>JSON.stringify(window.PERFORMANCE_HIGHLIGHT_DATA));

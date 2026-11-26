@@ -49,20 +49,18 @@ async function visibleCardIds(page) {
       oldHistoryCard: card.classList.contains('history-card-item'),
       detailsBox: card.querySelector('.staff-tna-card-details').classList.contains('card-details-box'),
       name: card.querySelector('.staff-tna-employee-name').textContent.trim(),
-      employeeId: card.querySelector('.staff-tna-employee-id').textContent.trim(),
-      idDirectlyBelowName: card.querySelector('.staff-tna-employee-name').nextElementSibling === card.querySelector('.staff-tna-employee-id'),
       labels: [...card.querySelectorAll('.staff-tna-card-detail span')].map(node => node.textContent.trim()),
       status: card.querySelector('[data-tna-status]').textContent.trim(),
       statusTheme: card.dataset.status,
       statusIcon: Boolean(card.querySelector('[data-tna-status] .fa-hourglass-half')),
       hasArrow: Boolean(card.querySelector('.fa-chevron-right')),
       actionCount: card.querySelectorAll('button').length,
-      role: card.getAttribute('role'),
+      detailLink: card.matches('a[data-history-link][href]'),
       tabIndex: card.tabIndex
     }))), [
-      { historyCard: true, oldHistoryCard: false, detailsBox: true, name: 'Farhan Binti Rahmat', employeeId: '#EBB12', idDirectlyBelowName: true, labels: ['Position', 'Period'], status: 'Next Approval', statusTheme: 'submitted', statusIcon: true, hasArrow: false, actionCount: 0, role: 'button', tabIndex: 0 },
-      { historyCard: true, oldHistoryCard: false, detailsBox: true, name: 'Mei Ling', employeeId: '#EBB06', idDirectlyBelowName: true, labels: ['Position', 'Period'], status: 'Next Approval', statusTheme: 'submitted', statusIcon: true, hasArrow: false, actionCount: 0, role: 'button', tabIndex: 0 },
-      { historyCard: true, oldHistoryCard: false, detailsBox: true, name: 'Daniel Wong', employeeId: '#EBB02', idDirectlyBelowName: true, labels: ['Position', 'Period'], status: 'Next Approval', statusTheme: 'submitted', statusIcon: true, hasArrow: false, actionCount: 0, role: 'button', tabIndex: 0 }
+      { historyCard: true, oldHistoryCard: false, detailsBox: true, name: 'EBB12 - Farhan Binti Rahmat', labels: ['Position', 'Period'], status: 'Next Approval', statusTheme: 'submitted', statusIcon: true, hasArrow: false, actionCount: 0, detailLink: true, tabIndex: 0 },
+      { historyCard: true, oldHistoryCard: false, detailsBox: true, name: 'EBB06 - Mei Ling', labels: ['Position', 'Period'], status: 'Next Approval', statusTheme: 'submitted', statusIcon: true, hasArrow: false, actionCount: 0, detailLink: true, tabIndex: 0 },
+      { historyCard: true, oldHistoryCard: false, detailsBox: true, name: 'EBB02 - Daniel Wong', labels: ['Position', 'Period'], status: 'Next Approval', statusTheme: 'submitted', statusIcon: true, hasArrow: false, actionCount: 0, detailLink: true, tabIndex: 0 }
     ]);
     assert.deepEqual(await page.$$eval('[data-tna-id="tna-2026-001"] .staff-tna-card-detail', rows => rows.map(row => ({
       display: getComputedStyle(row).display,
@@ -86,9 +84,9 @@ async function visibleCardIds(page) {
     }), {
       ariaLabel: null,
       labelledBy: 'tna-2026-001-employee-name',
-      describedBy: 'tna-2026-001-employee-id tna-2026-001-status tna-2026-001-position tna-2026-001-period',
-      labelledText: 'Farhan Binti Rahmat',
-      describedText: '#EBB12 Next Approval Group HR Manager 01 Jan 2026 – 31 Dec 2026'
+      describedBy: 'tna-2026-001-status tna-2026-001-position tna-2026-001-period',
+      labelledText: 'EBB12 - Farhan Binti Rahmat',
+      describedText: 'Next Approval Group HR Manager 01 Jan 2026 – 31 Dec 2026'
     }, 'The card accessible name and description expose the same employee metadata shown visually');
 
     await page.click('#staffTnaFilterTrigger');
@@ -139,14 +137,14 @@ async function visibleCardIds(page) {
     await page.click('#staffTnaFilterTrigger');
     await page.type('#staffTnaKeyword', '#EBB12');
     await page.click('#staffTnaApplyFilter');
-    assert.deepEqual(await visibleCardIds(page), ['tna-2026-001'], 'Search accepts the displayed # employee ID format');
+    assert.deepEqual(await visibleCardIds(page), ['tna-2026-001'], 'Search accepts older employee numbers with a leading hash');
     await page.click('#staffTnaFilterTrigger');
     await page.click('#staffTnaResetFilter');
     const firstCard = await page.$('[data-tna-id="tna-2026-001"]');
     await firstCard.focus();
     await page.keyboard.press('Enter');
     assert.equal(await page.$eval('#staffTnaDetailOverlay', node => node.hidden), false);
-    assert.equal(await page.$eval('main', node => node.inert), true);
+    assert.equal(await page.$eval('main', node => node.getClientRects().length), 0);
     assert.equal(await page.$eval('#staffTnaDetailTitle', node => node.textContent.trim()), 'Staff TNA Details');
     assert.equal(await page.$$('.staff-tna-detail-section-title').then(nodes => nodes.length), 0, 'Detail content must not add inner purple section headers');
     assert.deepEqual(await page.$$eval('.staff-tna-detail-section', sections => sections.map(section => ({
@@ -171,19 +169,19 @@ async function visibleCardIds(page) {
         listBorderRadius: getComputedStyle(node).borderTopLeftRadius
       };
     }), { sectionBorderWidth: '0px', sectionBorderRadius: '0px', listBorderRadius: '0px' }, 'Application details starts as a direct square table without a card wrapper');
-    assert.equal(await page.$eval('#staffTnaSubmitDate', node => node.textContent), 'Submit Date: 12/01/2026');
+    assert.equal(await page.$eval('#staffTnaSubmitDate dd', node => node.textContent), '12/01/2026');
     assert.deepEqual(await page.$$eval('#staffTnaApplicationDetails dt', nodes => nodes.map(node => node.textContent.trim())), [
-      'Reference #', 'Employee', 'Position', 'Submit By', 'Name', 'Training Period', 'Career Target', 'Weakness', 'Remarks', 'Approver Remarks'
+      'Submit Date', 'Reference #', 'Employee', 'Position', 'Submit By', 'Name', 'Training Period', 'Career Target', 'Weakness', 'Remarks', 'Approver Remarks'
     ]);
     assert.deepEqual(await page.$$eval('#staffTnaApplicationDetails dd', nodes => nodes.map(node => node.textContent.trim())), [
-      'TNA-2026-001', 'Farhan Binti Rahmat#EBB12', 'Group HR Manager', 'Aina Binti Salleh', 'Leadership Development Plan', '01 Jan 2026 – 31 Dec 2026', 'Build strategic leadership capability for regional HR operations.', 'Advanced change communication and workforce analytics.', 'Prioritise practical leadership and transformation programmes.', 'Pending review by the next approver.'
+      '12/01/2026', 'TNA-2026-001', 'Farhan Binti RahmatEBB12', 'Group HR Manager', 'Aina Binti Salleh', 'Leadership Development Plan', '01 Jan 2026 – 31 Dec 2026', 'Build strategic leadership capability for regional HR operations.', 'Advanced change communication and workforce analytics.', 'Prioritise practical leadership and transformation programmes.', 'Pending review by the next approver.'
     ]);
     assert.equal(await page.$eval('#staffTnaApplicationDetails', list => {
       const section = list.closest('.staff-tna-detail-section').getBoundingClientRect();
       const finalRow = list.lastElementChild.getBoundingClientRect();
       return finalRow.bottom <= section.bottom + 1;
     }), true, 'Application Details must not clip Career Target, Weakness, Remarks, or Approver Remarks');
-    assert.equal(await page.$eval('#staffTnaDetailEmployeeId', node => node.textContent.trim()), '#EBB12');
+    assert.equal(await page.$eval('#staffTnaDetailEmployeeId', node => node.textContent.trim()), 'EBB12');
     assert.equal(await page.$$('.staff-tna-detail-item-title').then(nodes => nodes.length), 0, 'Detail tables must not display Training Need labels');
     assert.deepEqual(await page.$$eval('#staffTnaDetailItems article', items => items.map(item => item.firstElementChild.tagName)), ['DL', 'DL']);
     assert.deepEqual(await page.$$eval('#staffTnaDetailItems article', items => items.map(item => ({
@@ -195,19 +193,13 @@ async function visibleCardIds(page) {
       { labels: ['Target Date', 'Course', 'Development Area', 'Justification'], values: ['30 Jun 2026', 'Leading Through Change', 'Leadership', 'Strengthen change leadership for upcoming organisation initiatives.'], leftAccent: '1px', radius: '10px' },
       { labels: ['Target Date', 'Course', 'Development Area', 'Justification'], values: ['30 Sept 2026', 'People Analytics Essentials', 'Functional', 'Improve data-led workforce planning and reporting decisions.'], leftAccent: '1px', radius: '10px' }
     ]);
-    assert.deepEqual(await page.$eval('#staffTnaDetailCancel', node => ({
-      text: node.textContent.trim(),
-      footerClass: node.parentElement.className,
-      alignedAtEnd: ['flex-end', 'flow-end'].includes(getComputedStyle(node.parentElement).justifyContent)
-    })), { text: 'Cancel', footerClass: 'history-detail-actions', alignedAtEnd: true }, 'View-only details use the History pop-out Cancel footer');
-    await page.click('#staffTnaDetailCancel');
-    assert.equal(await page.$eval('#staffTnaDetailOverlay', node => node.hidden), true);
+    await page.click('#staffTnaDetailClose');
+    await page.waitForSelector('#staffTnaDetailOverlay', { hidden: true });
     assert.equal(await page.$eval('[data-tna-id="tna-2026-001"]', node => document.activeElement === node), true);
     await page.click('[data-tna-id="tna-2026-001"]');
-    await page.keyboard.press('Tab');
-    assert.equal(await page.$eval('#staffTnaDetailOverlay', node => node.contains(document.activeElement)), true);
-    await page.keyboard.press('Escape');
-    assert.equal(await page.$eval('#staffTnaDetailOverlay', node => node.hidden), true);
+    assert.equal(await page.$eval('#staffTnaDetailTitle', node => node === document.activeElement), true);
+    await page.goBack();
+    await page.waitForSelector('#staffTnaDetailOverlay', { hidden: true });
     assert.equal(await page.$eval('[data-tna-id="tna-2026-001"]', node => document.activeElement === node), true);
 
     await page.click('#staffTnaFilterTrigger');

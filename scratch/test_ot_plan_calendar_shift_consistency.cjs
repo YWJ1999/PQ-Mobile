@@ -81,9 +81,9 @@ async function readCalendarStyles(page) {
     assert.equal(await page.$eval('#gridCalDays .selected .grid-cal-date', node => node.textContent), '5');
     await page.click('[aria-label="Next Date"]');
     assert.equal(await page.$eval('#calSummaryTitle', node => node.textContent), 'Tue, 06 Oct 2026');
-    for (const [kind, dateId] of [['approved', 'approvedOtSummaryDateFilter'], ['pending', 'pendingOtSummaryDateFilter'], ['total', 'otSummaryDateFilter']]) {
+    for (const kind of ['approved', 'pending', 'total']) {
       await page.click('#calSummaryCard .is-' + kind);
-      assert.equal(await page.$eval('#' + dateId, node => node.textContent), '06 Oct 2026');
+      assert.equal(await page.$eval('.view-container.active ot-plan-summary [data-date]', node => node.textContent), '06 Oct 2026');
       await page.click('.view-container.active [aria-label="Back"]');
     }
     assert.equal(await page.$eval('#calSummaryStaff', node => node.textContent), '287 staff');

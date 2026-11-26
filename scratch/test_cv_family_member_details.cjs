@@ -8,7 +8,7 @@ const members = [
     beneficiary: false, allocation: 0, attachments: [{ name: 'family-proof.pdf' }, { name: 'birth-certificate.png' }] },
   { name: 'Nur Aina', relation: 'DAUGHTER' }
 ];
-const labels = ['Name', 'Relation', 'Birth Date', 'Status', 'Rank', 'New NRIC', 'Birth Cert', 'Tax Status', 'Member Employee#', 'Beneficiary', 'Allocation%', 'Attachment'];
+const labels = ['Name', 'Relation', 'Birth Date', 'Status', 'Rank', 'New NRIC', 'Birth Cert', 'Tax Status', 'Member Employee No.', 'Beneficiary', 'Allocation%', 'Attachment'];
 (async () => {
   const browser = await puppeteer.launch({ headless: true, executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe', args: ['--allow-file-access-from-files', '--no-sandbox'] });
   try {
@@ -33,7 +33,7 @@ const labels = ['Name', 'Relation', 'Birth Date', 'Status', 'Rank', 'New NRIC', 
       await page.click(first);
       await page.waitForSelector('.cv-family-member-dialog[open]');
       assert.deepEqual(await page.$$eval('.cv-family-member-dialog th', rows => rows.map(row => row.textContent.trim())), labels);
-      assert.deepEqual(await page.$$eval('.cv-family-member-dialog td', rows => rows.slice(0, 11).map(row => row.textContent.trim())), ['Ahmad Rahmat', 'HUSBAND', '17 May 1980', 'Active', '1', '800517-01-1234', 'BC-001', 'Dependent', '#EBB99', 'No', '0']);
+      assert.deepEqual(await page.$$eval('.cv-family-member-dialog td', rows => rows.slice(0, 11).map(row => row.textContent.trim())), ['Ahmad Rahmat', 'HUSBAND', '17 May 1980', 'Active', '1', '800517-01-1234', 'BC-001', 'Dependent', 'EBB99', 'No', '0']);
       assert.deepEqual(await page.$$eval('.cv-family-member-dialog tr:last-child li', rows => rows.map(row => row.textContent.trim())), ['family-proof.pdf', 'birth-certificate.png']);
       assert.ok(await page.$eval('.cv-family-member-dialog', dialog => {
         const bounds = dialog.getBoundingClientRect();

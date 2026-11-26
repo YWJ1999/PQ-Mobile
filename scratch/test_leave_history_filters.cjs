@@ -46,7 +46,7 @@ async function run() {
     const rejectedCardText = await page.$eval('[data-ref="LV-2026-0032"]', card => card.textContent.replace(/\s+/g, ' ').trim());
     assert.match(rejectedCardText, /Annual Leave/);
     assert.match(rejectedCardText, /Rejected/);
-    assert.match(rejectedCardText, /03 Sep 2026/);
+    assert.match(rejectedCardText, /03\/09\/2026 To 03\/09\/2026/);
     assert.match(rejectedCardText, /1\.0 Days \/ 0\.0 Hours/);
     assert.match(rejectedCardText, /Rejection Reason: Insufficient team coverage/);
 

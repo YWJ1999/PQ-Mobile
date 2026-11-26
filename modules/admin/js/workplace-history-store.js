@@ -6,7 +6,7 @@
   const kinds = ['guest-visit', 'letter-request', 'inventory-request'];
   const statuses = ['submitted', 'resubmit', 'approved', 'rejected', 'draft', 'cancelled'];
   const referencePrefixes = { 'guest-visit': 'FGV', 'letter-request': 'DRQ', 'inventory-request': 'IRQ' };
-  const currentEmployee = { empNo: '#EBB12', name: 'Farhan binti rahmat' };
+  const currentEmployee = { empNo: 'EBB12', name: 'Farhan binti rahmat' };
   function localDate(now) {
     return [now.getFullYear(), String(now.getMonth() + 1).padStart(2, '0'), String(now.getDate()).padStart(2, '0')].join('-');
   }

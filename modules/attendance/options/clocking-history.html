@@ -130,7 +130,7 @@
       margin-top: 3px;
       color: var(--text-primary);
       font-size: 14.5px;
-      font-weight: 700;
+      font-weight: var(--record-value-weight, 700);
       font-variant-numeric: tabular-nums;
       line-height: 1.35;
       overflow-wrap: anywhere;
@@ -413,7 +413,7 @@
           </div>
           <dl class="history-card-details ot-plan-history-facts">
             <div><dt>OT Type</dt><dd>OT 1.5 BEFORE WORK</dd></div>
-            <div><dt>Submit Date</dt><dd><time datetime="2024-07-12">12 Jul 2024</time></dd></div>
+            <div class="record-date-field"><dt>Submit Date</dt><dd><time datetime="2024-07-12">12 Jul 2024</time></dd></div>
             <div><dt>Plan Hours</dt><dd>16.00 hrs</dd></div>
             <div><dt>Actual Hours</dt><dd>0.00 hrs</dd></div>
           </dl>
@@ -430,7 +430,7 @@
           </div>
           <dl class="history-card-details ot-plan-history-facts">
             <div><dt>OT Type</dt><dd>1.5 OT</dd></div>
-            <div><dt>Submit Date</dt><dd><time datetime="2023-10-24">24 Oct 2023</time></dd></div>
+            <div class="record-date-field"><dt>Submit Date</dt><dd><time datetime="2023-10-24">24 Oct 2023</time></dd></div>
             <div><dt>Plan Hours</dt><dd>3.00 hrs</dd></div>
             <div><dt>Actual Hours</dt><dd>0.00 hrs</dd></div>
           </dl>
@@ -517,7 +517,7 @@
                 <td class="detail-value" id="modalClkStatus" data-record-detail-status>Normal</td>
               </tr>
               <tr>
-                <td class="detail-label">Emp #</td>
+                <td class="detail-label">Emp No.</td>
                 <td class="detail-value" id="modalClkEmpNo">EBB12</td>
               </tr>
               <tr>
@@ -569,9 +569,9 @@
           </div>
         </header>
         <div style="padding: 16px; overflow-y: auto; flex: 1; background: var(--bg-sheet);" class="history-record-content">
-          <span id="modalOtSubmitDate" class="record-submit-date" hidden></span>
           <table class="detail-table-card">
             <tbody>
+              <tr id="modalOtSubmitDate" class="record-submit-date" hidden></tr>
               <tr>
                 <td class="detail-label">Reference #</td>
                 <td class="detail-value" id="modalOtDocRef">OTB000000001604</td>
@@ -581,7 +581,7 @@
                 <td class="detail-value" id="modalOtPlanStatus" data-record-detail-status>Approved</td>
               </tr>
               <tr>
-                <td class="detail-label">Emp #</td>
+                <td class="detail-label">Emp No.</td>
                 <td class="detail-value" id="modalOtEmpNo">SP013</td>
               </tr>
               <tr>
@@ -685,9 +685,9 @@
           </div>
         </header>
         <div style="padding: 16px; overflow-y: auto; flex: 1; background: var(--bg-sheet);" class="history-record-content">
-          <span id="modalFbkSubmitDate" class="record-submit-date" hidden></span>
           <table class="detail-table-card">
             <tbody>
+              <tr id="modalFbkSubmitDate" class="record-submit-date" hidden></tr>
               <tr>
                 <td class="detail-label">Reference #</td>
                 <td class="detail-value" id="modalFbkDocRef">ATT000000000432</td>
@@ -697,7 +697,7 @@
                 <td class="detail-value" id="modalFbkDocStatus" data-record-detail-status>Approved</td>
               </tr>
               <tr>
-                <td class="detail-label">Emp #</td>
+                <td class="detail-label">Emp No.</td>
                 <td class="detail-value" id="modalFbkEmpNo">EBB12</td>
               </tr>
               <tr>
@@ -854,7 +854,7 @@
         const [empNo, ...empName] = String(emp || '').split(' - ');
         const yesNo = value => value === true ? 'Yes' : value === false ? 'No' : value;
         const fields = {
-          DocRef: docRef, EmpNo: empNo ? '#' + empNo.replace(/^#+/, '') : '', EmpName: empName.join(' - '),
+          DocRef: docRef, EmpNo: formatEmployeeNumber(empNo), EmpName: empName.join(' - '),
           Supervisor: supervisor, Date: otDate, Shift: shift, ClockingTimes: clkTimes,
           StartTime: startTime, EndTime: endTime, BreakHours: breakHrs, PlanHours: planHrs,
           ActualHours: approvalDetails.actualHours, ApprovedHours: approvalDetails.approvedHours,
@@ -916,6 +916,7 @@
             term.textContent = label;
             const value = document.createElement('dd');
             value.append(feedbackHistoryTime(date));
+            if (label === 'Submitted Date') value.className = 'record-date-field';
             dates.append(term, value);
           }
           list.append(card);
@@ -925,7 +926,7 @@
       function renderFeedbackHistoryDetail(docRef, record, emp, branch, dept, submitter, comments) {
         if (document.getElementById('modalFbkDocRef')) document.getElementById('modalFbkDocRef').innerText = docRef || 'ATT000000000432';
         const empParts = (emp || 'EBB12 - Farhan binti rahmat').split(' - ');
-        if (document.getElementById('modalFbkEmpNo')) document.getElementById('modalFbkEmpNo').innerText = empParts[0] || 'EBB12';
+        if (document.getElementById('modalFbkEmpNo')) document.getElementById('modalFbkEmpNo').innerText = formatEmployeeNumber(empParts[0]) || 'EBB12';
         if (document.getElementById('modalFbkEmpName')) document.getElementById('modalFbkEmpName').innerText = empParts[1] || 'Farhan binti rahmat';
         if (document.getElementById('modalFbkBranch')) document.getElementById('modalFbkBranch').innerText = branch || 'TIMES SQUARE BRANCH';
         if (document.getElementById('modalFbkDepartment')) document.getElementById('modalFbkDepartment').innerText = dept || 'HUMAN RESOURCE';

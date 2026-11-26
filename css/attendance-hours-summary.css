@@ -57,7 +57,13 @@
 
 .hours-header-button:hover { background: rgba(255, 255, 255, .23); }
 .hours-header-button:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
-.hours-summary-header.showing-details :is(.hours-header-filter, .hours-summary-period) { display: none; }
+.hours-header-filter {
+  --purple-primary: #fff;
+  --filter-btn-border: currentColor;
+  --filter-btn-bg: transparent;
+  justify-self: end;
+}
+.hours-summary-header.showing-details :is(.hours-header-filter, .hours-summary-period) { display: none !important; }
 
 .hours-summary-page .main-content {
   min-height: 0;

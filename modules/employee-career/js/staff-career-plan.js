@@ -62,15 +62,14 @@
       url.searchParams.set('record', key);
       card.href = url.href;
       card.id = 'plan-' + key;
-      card.setAttribute('aria-label', `View career plan for ${row.name}, #${row.empNo}`);
+      card.setAttribute('aria-label', `View career plan for ${row.name}, ${formatEmployeeNumber(row.empNo)}`);
       card.addEventListener('click', event => {
         history.replaceState({ careerPlanList: { filters: state.filters, cardId: card.id, scroll: document.querySelector('main').scrollTop, keyboard: event.detail === 0 } }, '');
       });
 
       const header = node('span', 'staff-career-plan-card-header');
       const subtitle = node('span', 'staff-career-plan-subtitle', row.position);
-      subtitle.append(' · ', node('span', 'staff-career-plan-employee-id', `#${row.empNo}`));
-      header.append(node('strong', 'staff-career-plan-name', row.name), subtitle);
+      header.append(node('strong', 'staff-career-plan-name', employeeCardHeading.text(row.empNo, row.name)), subtitle);
 
       const details = node('dl', 'staff-career-plan-details');
       details.append(
@@ -191,8 +190,7 @@
     }
     const names = String(row.name || '').trim().split(/\s+/);
     $('staffCareerPlanInitials').textContent = (names[0].slice(0, 1) + (names.length > 1 ? names.at(-1).slice(0, 1) : '')).toUpperCase();
-    $('staffCareerPlanDetailName').textContent = row.name;
-    $('staffCareerPlanDetailEmployeeId').textContent = `#${row.empNo}`;
+    $('staffCareerPlanDetailName').textContent = employeeCardHeading.text(row.empNo, row.name);
     $('staffCareerPlanDetailPosition').textContent = row.position || '—';
     $('staffCareerPlanDetailDepartment').textContent = row.department || '—';
     $('staffCareerPlanDetailJob').textContent = row.nextPosition || '—';

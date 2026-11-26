@@ -481,25 +481,37 @@
     }
     .summary-history-card .history-time-row,
     .summary-history-card .staff-name-text {
+      overflow-wrap: anywhere;
       margin: 0 0 4px;
       color: var(--text-primary);
       font-size: 14.5px;
       font-weight: 900;
       line-height: 1.3;
     }
+    .staff-job-title {
+      margin: 0;
+      font-size: 13px;
+      font-weight: 500;
+      line-height: 1.4;
+      opacity: .9;
+      overflow-wrap: anywhere;
+    }
+    .staff-info-outline {
+      display: inline-grid;
+      place-items: center;
+      box-sizing: border-box;
+      width: 16px;
+      height: 16px;
+      border: 1.5px solid currentColor;
+      border-radius: 50%;
+      font-size: 9px;
+      opacity: .85;
+    }
     .summary-history-date,
     .summary-history-shift {
       color: var(--purple-text);
       font-size: 11px;
       font-weight: 800;
-    }
-    .summary-history-employee-id {
-      margin-bottom: 4px;
-      color: var(--text-muted);
-      font-family: monospace, sans-serif;
-      font-size: 11.5px;
-      font-weight: 700;
-      opacity: .8;
     }
     .summary-history-details {
       display: flex;
@@ -651,7 +663,7 @@
           <h1 id="headerTitle">Staff Hours Summary</h1>
           <p class="hours-summary-period" id="filterSummaryText">16 Aug – 14 Sep 2026</p>
         </div>
-        <button type="button" class="hours-header-button hours-header-filter staff-hours-filter-trigger" onclick="openFilterModal()" aria-label="Filter staff hours summary" aria-haspopup="dialog" aria-controls="filterModal" aria-describedby="filterSummaryText"><i class="fa-solid fa-sliders" aria-hidden="true"></i></button>
+        <button type="button" class="hours-header-button hours-header-filter staff-hours-filter-trigger standard-filter-summary-trigger" onclick="openFilterModal()" aria-label="Filter staff hours summary" aria-haspopup="dialog" aria-controls="filterModal" aria-describedby="filterSummaryText"><i class="fa-solid fa-sliders standard-filter-summary-trigger-glyph" aria-hidden="true"></i></button>
       </div>
     </header>
 
@@ -879,13 +891,13 @@
         <div class="sheet-content detail-popout-body" style="padding: 16px 20px 24px; overflow-y: auto; background: var(--bg-card); flex: 1;">
           <div class="attendance-day-detail-layout" style="display: flex; flex-direction: column;">
             <table id="attendance-hours-details-table" class="detail-popout-table"><tbody>
-              <tr><td class="detail-popout-label">Employee #</td><td class="detail-popout-value"><span id="ad-emp-no">#EBB01</span></td></tr>
+              <tr><td class="detail-popout-label">Employee No.</td><td class="detail-popout-value"><span id="ad-emp-no">EBB01</span></td></tr>
               <tr><td class="detail-popout-label">Name</td><td class="detail-popout-value"><span id="ad-name">John Tan</span></td></tr>
               <tr><td class="detail-popout-label">Date</td><td class="detail-popout-value"><span id="ad-date">14 Sep 2026</span></td></tr>
               <tr><td class="detail-popout-label">Shift</td><td class="detail-popout-value"><span id="ad-shift">8:30 AM - 5:30 PM (GROUP A)</span></td></tr>
               <tr><td class="detail-popout-label">Day Type</td><td class="detail-popout-value"><span id="ad-day-type">Work Day</span></td></tr>
               <tr><td class="detail-popout-label">Shift Group</td><td class="detail-popout-value"><span id="ad-shift-group">GROUP A</span></td></tr>
-              <tr><td class="detail-popout-label">Supervisor</td><td class="detail-popout-value"><span id="ad-supervisor">#EBB04</span></td></tr>
+              <tr><td class="detail-popout-label">Supervisor</td><td class="detail-popout-value"><span id="ad-supervisor">EBB04</span></td></tr>
               <tr><td class="detail-popout-label">Clock Times</td><td class="detail-popout-value"><span id="ad-clock-times">08:30 - 17:30</span></td></tr>
               <tr><td class="detail-popout-label">Normal Hours</td><td class="detail-popout-value"><span id="ad-normal-hours">08:00</span></td></tr>
               <tr><td class="detail-popout-label">Late In</td><td class="detail-popout-value"><span id="ad-late-in">-</span></td></tr>
@@ -1180,7 +1192,6 @@
       }
       if (title === "Normal Work Hours") {
         return [
-          ["Job Title", item.jobTitle],
           ["Work Days", String(item.presentDays)],
           ["Normal Work Hours", item.normalWorkHours.toFixed(2)]
         ];
@@ -1231,7 +1242,6 @@
 
       if (isDirectRecordSummary) {
         container.innerHTML = directRecords.map(function (item, index) {
-          const employeeId = item.empNo.startsWith("#") ? item.empNo : "#" + item.empNo;
           const detailRows = getDailyCardRows(item, title).map(function (row) {
             return '<div class="summary-history-detail"><span>' + row[0] + '</span> <strong>' + row[1] + '</strong></div>';
           }).join("");
@@ -1239,8 +1249,7 @@
             'aria-label="View attendance details for ' + item.name + ' on ' + item.fullDate + '" onclick="openAttendanceDetailsByIndex(' + index + ')" ' +
             'onkeydown="if(event.key === &quot;Enter&quot; || event.key === &quot; &quot;){event.preventDefault();openAttendanceDetailsByIndex(' + index + ');}">' +
               '<div class="summary-history-card-header"><div class="summary-history-card-heading">' +
-                '<h3 class="staff-name-text">' + item.name + '</h3>' +
-                '<div class="summary-history-employee-id">' + employeeId + '</div>' +
+                '<h3 class="staff-name-text">' + employeeCardHeading.html(item.empNo, item.name) + '</h3>' +
                 '<div class="summary-history-date">' + item.day + ', ' + item.fullDate + '</div>' +
               '</div>' + HoursSummaryLegend.cardInfo(title, HoursSummaryLegend.recordLabels(title, item)) + '</div>' +
               '<div class="summary-history-details">' + detailRows + '</div>' +
@@ -1249,9 +1258,19 @@
         return;
       }
 
+      const isNormalWorkHours = title === "Normal Work Hours";
       container.innerHTML = currentStaffItems.map(function (item, index) {
         const band = getStaffCardBand(item, title);
-        const employeeId = item.empNo.startsWith("#") ? item.empNo : "#" + item.empNo;
+        let subtitle = '';
+        if (isNormalWorkHours && item.jobTitle) {
+          const jobTitle = document.createElement('p');
+          jobTitle.className = 'staff-job-title';
+          jobTitle.textContent = item.jobTitle;
+          subtitle = jobTitle.outerHTML;
+        }
+        const cardInfo = isNormalWorkHours
+          ? '<span class="summary-history-card-end"><i class="fa-solid fa-info staff-info-outline" aria-hidden="true"></i></span>'
+          : HoursSummaryLegend.cardInfo(title, band.label ? [band.label] : [], 'rate');
         const detailRows = getStaffCardRows(item, title).map(function (row) {
           const rateClass = row[0] === "Attendance Rate" ? ' class="summary-history-attendance-rate"' : '';
           return '<div class="summary-history-detail"><span>' + row[0] + '</span> <strong' + rateClass + '>' + row[1] + '</strong></div>';
@@ -1260,9 +1279,8 @@
           'aria-label="View ' + item.name + ' daily records" onclick="openStaffDailyDetails(' + index + ')" ' +
           'onkeydown="if(event.key === &quot;Enter&quot; || event.key === &quot; &quot;){event.preventDefault();openStaffDailyDetails(' + index + ');}">' +
             '<div class="summary-history-card-header" data-record-key-label="' + band.label + '"><div class="summary-history-card-heading">' +
-              '<h3 class="staff-name-text">' + item.name + '</h3>' +
-              '<div class="summary-history-employee-id">' + employeeId + '</div>' +
-            '</div>' + HoursSummaryLegend.cardInfo(title, band.label ? [band.label] : [], 'rate') + '</div>' +
+              '<h3 class="staff-name-text">' + employeeCardHeading.html(item.empNo, item.name) + '</h3>' + subtitle +
+            '</div>' + cardInfo + '</div>' +
             '<div class="summary-history-details">' + detailRows + '</div>' +
           '</article>';
       }).join("");
@@ -1337,7 +1355,7 @@
           shift: staff.shift,
           shiftFull: staff.shift,
           shiftGroup: staff.shift.includes("GROUP B") ? "GROUP B" : "GROUP A",
-          supervisor: "#EBB04",
+          supervisor: "EBB04",
           dayType: isAbsent ? "Absent Day" : isLeave ? "Leave Day" : "Work Day",
           clockTimes: clockTimes,
           normalHours: isAbsent || isLeave ? "-" : "08:00",
@@ -1429,14 +1447,12 @@
       container.innerHTML = currentDailyItems.map(function (item, index) {
         const date = `${item.day}, ${item.fullDate}`;
         const isNormalPresentDay = listActiveTitle === "Normal Present Days";
-        const employeeId = item.empNo.startsWith("#") ? item.empNo : "#" + item.empNo;
         const rows = getDailyCardRows(item, listActiveTitle).map(function (row) {
           return '<div class="summary-history-detail"><span>' + row[0] + '</span> <strong>' + row[1] + '</strong></div>';
         }).join("");
         const labels = HoursSummaryLegend.recordLabels(listActiveTitle, item);
         const heading = isNormalPresentDay
-          ? '<h3 class="staff-name-text">' + item.name + '</h3>' +
-            '<div class="summary-history-employee-id">' + employeeId + '</div>' +
+          ? '<h3 class="staff-name-text">' + employeeCardHeading.html(item.empNo, item.name) + '</h3>' +
             '<div class="summary-history-date">' + date + '</div>'
           : `<h3 class="history-time-row">${date}</h3>` +
             `<div class="summary-history-shift">${item.shift}</div>`;
@@ -1462,13 +1478,13 @@
 
     function openAttendanceDetails(data) {
       if (!data) return;
-      setAttendanceDetail("ad-emp-no", data.empNo.startsWith("#") ? data.empNo : "#" + data.empNo);
+      setAttendanceDetail("ad-emp-no", formatEmployeeNumber(data.empNo));
       setAttendanceDetail("ad-name", data.name);
       setAttendanceDetail("ad-date", data.fullDate);
       setAttendanceDetail("ad-shift", data.shiftFull);
       setAttendanceDetail("ad-day-type", data.dayType);
       setAttendanceDetail("ad-shift-group", data.shiftGroup);
-      setAttendanceDetail("ad-supervisor", data.supervisor);
+      setAttendanceDetail("ad-supervisor", formatEmployeeNumber(data.supervisor));
       setAttendanceDetail("ad-clock-times", data.clockTimes);
       setAttendanceDetail("ad-normal-hours", data.normalHours);
       setAttendanceDetail("ad-late-in", data.lateIn);
@@ -1565,7 +1581,7 @@
         const row = node("div", "bar-chart-item");
         const label = node("span", "name", isStaffChart ? item.name : item.fullDate.replace(/\s+\d{4}$/, ""));
         if (isStaffChart) {
-          label.append(node("span", "summary-chart-employee-id", "#" + String(item.empNo).replace(/^#/, "")));
+          label.append(node("span", "summary-chart-employee-id", formatEmployeeNumber(item.empNo)));
         } else {
           label.append(node("span", "summary-chart-year", item.fullDate.match(/\d{4}$/)?.[0] || ""));
         }

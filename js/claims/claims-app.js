@@ -427,9 +427,7 @@
           ${staffList.map(s => `
             <div class="team-trip-record" style="background: var(--bg-input); border-radius: 14px; padding: 10px 12px; border: 1px solid var(--border-subtle); display: flex; justify-content: space-between; align-items: center;">
               <div>
-                <div style="font-size: 13px; font-weight: 800; color: var(--text-primary); line-height: 1.2;">${s.name}</div>
-                <!-- AGENTS.md Employee ID Presentation Standard: Directly below name, leading # -->
-                <div style="font-size: 11.5px; font-weight: 700; color: var(--text-muted); opacity: 0.8; font-family: monospace, sans-serif; margin-bottom: 4px;">#${s.empNo.replace(/^#/, '')}</div>
+                <div style="font-size: 13px; font-weight: 800; color: var(--text-primary); line-height: 1.2;">${employeeCardHeading.html(s.empNo, s.name)}</div>
                 <div style="font-size: 11px; font-weight: 600; color: var(--text-muted);">${s.trip}</div>
               </div>
               ${recordDetailStatus.html(s.status)}
@@ -842,7 +840,7 @@
       const card = document.createElement('pending-approval-card');
       card.id = `team-card-${item.id}`;
       
-      const empIdFormatted = `#${(item.empNo || '004177').replace(/^#+/, '')}`;
+      const empIdFormatted = formatEmployeeNumber(item.empNo || '004177');
       const claimType = item.optionName || 'Benefit Claim';
       const typeTitle = 'Benefit Type';
 
@@ -938,7 +936,7 @@
       item = {
         id: itemId || card.getAttribute('item-id') || 1,
         userName: card.getAttribute('user-name') || 'Sarah Jenkins',
-        empNo: (card.getAttribute('emp-id') || '#EBB01').replace(/^#+/, ''),
+        empNo: (card.getAttribute('emp-id') || 'EBB01').replace(/^#+/, ''),
         dept: card.getAttribute('dept') || 'Marketing Lead • Digital Team',
         optionName: claimType,
         subCatName: card.getAttribute('category') || 'General',
@@ -1058,7 +1056,11 @@
     const bodyEl = document.getElementById('claimDetailsDynamicBody');
     if (bodyEl) {
       bodyEl.innerHTML = renderClaimApproverComments();
-      bodyEl.prepend(recordSubmitDate.create(data.submitDate), optLower.includes('benefit') ? BenefitClaimForm.create(data) : ClaimReview.create(data));
+      const review = optLower.includes('benefit') ? BenefitClaimForm.create(data) : ClaimReview.create(data);
+      const heading = review.querySelector('.form-section-heading');
+      const headingRow = heading.closest('.benefit-claim-fields') ? heading.parentElement : heading;
+      headingRow.after(recordSubmitDate.create(data.submitDate));
+      bodyEl.prepend(review);
       bodyEl.closest('.phone-container').scrollTop = 0;
     }
 

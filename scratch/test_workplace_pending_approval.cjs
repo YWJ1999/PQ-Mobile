@@ -27,14 +27,15 @@ async function shot(page, name) {
         { text: 'Inventory', selected: 'false' }
       ]);
       assert.equal(await page.$$eval('#workplacePendingQueue .approval-request-card', n => n.length), 1);
-      assert.match(await page.$eval('#workplacePendingQueue', n => n.textContent), /Farhan binti rahmat.*#EBB12.*FGV0000000000013.*Pending.*16 Aug 2024/s);
-      assert.equal(await page.$eval('.employee-id', n => n.previousElementSibling.textContent), 'Farhan binti rahmat');
+      assert.match(await page.$eval('#workplacePendingQueue', n => n.textContent), /EBB12 - Farhan binti rahmat.*FGV0000000000013.*Pending/s);
+      assert.equal(await page.$eval('#workplacePendingQueue .record-submit-date dd', n => n.textContent), '16/08/2024');
+      assert.equal(await page.$eval('.employee-name', n => n.textContent), 'EBB12 - Farhan binti rahmat');
       await shot(page, `workplace-pending-list-${theme}-${width}.png`);
       await page.focus('[data-workplace-tab="guest-visit"]');
       await page.keyboard.press('ArrowRight');
       assert.equal(await page.$eval('[data-workplace-tab="inventory"]', n => n.getAttribute('aria-selected')), 'true');
       assert.equal(await page.$eval('#workplacePendingCount', n => n.textContent), '1');
-      assert.match(await page.$eval('#workplacePendingQueue', n => n.textContent), /Farhan binti rahmat.*#EBB12.*Quantity.*1.*Request Item.*LOCKER 1000.*Reason.*Inventory Request Reason 1/s);
+      assert.match(await page.$eval('#workplacePendingQueue', n => n.textContent), /EBB12 - Farhan binti rahmat.*Quantity.*1.*Request Item.*LOCKER 1000.*Reason.*Inventory Request Reason 1/s);
       await shot(page, `workplace-pending-inventory-${theme}-${width}.png`);
       await page.click('#workplacePendingQueue .workplace-approval-review');
       assert.equal(await page.$eval('#workplaceApprovalDetailsTitle', n => n.textContent), 'Inventory Request Approval');
@@ -43,7 +44,8 @@ async function shot(page, name) {
         row.querySelector('th').textContent.trim(),
         row.querySelector('td').textContent.trim()
       ])), [
-        ['Employee #', '#EBB12'],
+        ['Submit Date:', '08/09/2026'],
+        ['Employee No.', 'EBB12'],
         ['Name', 'Farhan binti rahmat'],
         ['Position', 'GROUP HR MANAGER'],
         ['Department', 'HUMAN RESOURCE'],
@@ -81,7 +83,7 @@ async function shot(page, name) {
       await page.waitForSelector('#workplaceApprovalDetails', { hidden: true });
       await page.click('#workplacePendingQueue .three-dots-btn');
       await page.click('#workplacePendingViewWorkflow');
-      assert.match(await page.$eval('#workplaceApprovalWorkflow', n => n.textContent), /Farhan binti rahmat.*#EBB12.*RequestInventory Request/s);
+      assert.match(await page.$eval('#workplaceApprovalWorkflow', n => n.textContent), /EBB12 - Farhan binti rahmat.*RequestInventory Request/s);
       await page.click('#workplaceApprovalWorkflow [data-approval-back]');
       await page.waitForSelector('#workplaceApprovalWorkflow', { hidden: true });
       await page.click('[data-workplace-tab="guest-visit"]');
@@ -97,8 +99,8 @@ async function shot(page, name) {
       assert.equal(await page.$eval('#workplacePendingCount', n => n.textContent), '1');
       await page.click('.three-dots-btn');
       await page.click('#workplacePendingViewWorkflow');
-      assert.match(await page.$eval('#workplaceApprovalWorkflow', n => n.textContent), /FGV0000000000013.*Farhan binti rahmat.*#EBB12.*Submitted.*Awaiting Approval/s);
-      assert.equal(await page.$eval('#workplaceApprovalWorkflow .employee-id', n => getComputedStyle(n).fontSize), '11.5px', 'Workflow uses the same subtle employee ID typography');
+      assert.match(await page.$eval('#workplaceApprovalWorkflow', n => n.textContent), /FGV0000000000013.*EBB12 - Farhan binti rahmat.*Submitted.*Awaiting Approval/s);
+      assert.equal(await page.$eval('#workplaceApprovalWorkflow .employee-name', n => n.textContent), 'EBB12 - Farhan binti rahmat');
       await page.click('#workplaceApprovalWorkflow [data-approval-back]');
       await page.waitForSelector('#workplaceApprovalWorkflow', { hidden: true });
       await page.click('.three-dots-btn');
@@ -119,7 +121,7 @@ async function shot(page, name) {
       await page.focus('#visitTab-guest');
       await page.keyboard.press('ArrowRight');
       await page.click('#visitAttendeeList [data-toggle-record]');
-      assert.match(await page.$eval('#visitAttendeeList', n => n.innerText.replace(/\s+/g, ' ')), /Ram chhabila.*#000001.*ACCOUNTS.*ACCOUNT EXECUTIVE/);
+      assert.match(await page.$eval('#visitAttendeeList', n => n.innerText.replace(/\s+/g, ' ')), /000001 - Ram chhabila.*ACCOUNTS.*ACCOUNT EXECUTIVE/);
       await shot(page, `workplace-pending-attendee-${theme}-${width}.png`);
       await page.click('#visitTab-other');
       assert.deepEqual(await page.$$eval('#visitPanel-other input', n => n.map(input => input.checked)), [false, false, false, true]);

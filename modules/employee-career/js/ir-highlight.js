@@ -62,7 +62,7 @@
     tbody.replaceChildren();
     state.employees.forEach(employee => {
       const row = node('tr');
-      row.append(node('td', 'ir-highlight-employee-id', `#${employee.empNo}`), node('td', 'ir-highlight-name', employee.name));
+      row.append(node('td', 'ir-highlight-employee-id', formatEmployeeNumber(employee.empNo)), node('td', 'ir-highlight-name', employee.name));
       const casesCell = node('td');
       const button = node('button', 'ir-highlight-cases-button', String(employee.cases.length));
       button.type = 'button';

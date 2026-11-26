@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PeopleHCM - Staff Attendance Details</title>
+  <script src="../../../js/components.js"></script>
+  <script src="../../../js/app.js" defer></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../../assets/vendor/fontawesome-6.7.2/css/all.min.css">
+  <link rel="stylesheet" href="../../../css/theme.css">
+  <link rel="stylesheet" href="../../../css/app.css">
+  <link rel="stylesheet" href="../../../css/attendance-highlight-report.css">
+  <link rel="stylesheet" href="../../../css/attendance-hours-highlight.css">
+  <link rel="stylesheet" href="../../../css/attendance-highlight-details.css">
+</head>
+<body class="attendance-highlight-page hours-highlight-page attendance-detail-page" data-highlight-kind="attendance">
+  <preview-top-bar active-page="attendance"></preview-top-bar>
+  <div class="phone-container">
+    <header class="cal-top-header">
+      <phone-status-bar time="9:41"></phone-status-bar>
+      <div class="hours-highlight-header">
+        <a id="attendanceDetailBack" class="header-btn-icon" href="attendance-highlight.html" aria-label="Back to Attendance Highlights">
+          <i class="fa-solid fa-chevron-left" aria-hidden="true"></i>
+        </a>
+        <div>
+          <h1 id="highlightDetailName">Staff Attendance Details</h1>
+          <p id="attendanceDetailSubtitle" class="attendance-detail-subtitle" hidden>
+            <span id="highlightDetailEmpNo" class="employee-id-standard"></span>
+            <span>Staff Attendance Details</span>
+          </p>
+        </div>
+      </div>
+    </header>
+    <main class="main-content">
+      <section id="attendanceDetailSummary" class="attendance-detail-summary record-summary-card" aria-label="Attendance summary" hidden>
+        <span id="attendanceDetailCount"></span>
+        <span class="attendance-detail-total">Total hours <strong id="highlightDetailsTotal"></strong></span>
+      </section>
+      <div id="highlightDetailsList" class="attendance-detail-list"></div>
+      <p id="attendanceDetailEmpty" class="attendance-report-empty" hidden>No detailed records are available for this employee in the selected period.</p>
+    </main>
+  </div>
+
+  <template id="attendanceDetailRecord">
+    <article class="history-card-item attendance-detail-record">
+      <header class="history-time-row">
+        <h2><time></time></h2>
+        <span class="attendance-detail-exception" hidden>
+          <i class="fa-solid fa-exclamation" aria-hidden="true"></i>
+          <span data-field="exception"></span>
+        </span>
+      </header>
+      <dl class="attendance-detail-fields">
+        <div><dt>Day Type</dt><dd data-field="dayType"></dd></div>
+        <div><dt>Shift</dt><dd data-field="shift"></dd></div>
+        <div><dt>Clock times</dt><dd data-field="clockTimes"></dd></div>
+        <div><dt>Hours</dt><dd data-field="hours"></dd></div>
+      </dl>
+    </article>
+  </template>
+  <script src="../../../js/attendance-hours-highlight-data.js"></script>
+  <script src="../../../js/attendance-hours-highlight.js"></script>
+</body>
+</html>

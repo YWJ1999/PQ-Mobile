@@ -3,10 +3,10 @@ window.WORKPLACE_HISTORY_DATA = [
   {
     id: 'sample-guest-0001', kind: 'guest-visit', title: 'Guest Visit', date: '2024-01-17', status: 'submitted', createdAt: '2026-09-10T00:00:15.000Z',
     fields: [
-      ['Reference #', 'FGV0000000000001'], ['Emp #', 'EBB12'], ['Name', 'Farhan binti rahmat'],
+      ['Reference #', 'FGV0000000000001'], ['Emp No.', 'EBB12'], ['Name', 'Farhan binti rahmat'],
       ['Visit Date', '2024-01-17'], ['Visit Time', '1111-2222'], ['Visitor', '3'], ['Submit Date', '2024-01-17'],
       ['Location', '444'], ['Request Meal?', 'No'], ['Floor Visit?', 'No'], ['Sit Arrange?', 'No'], ['Multi Room?', 'No'], ['Remarks', ''],
-      ['Guest 1', '66 • 55 • Customer • 77'], ['Attendee 1', 'Farhan binti rahmat\n#EBB12\nHUMAN RESOURCE • GROUP HR MANAGER'], ['Attachments', 'None']
+      ['Guest 1', '66 • 55 • Customer • 77'], ['Attendee 1', 'Farhan binti rahmat\nEBB12\nHUMAN RESOURCE • GROUP HR MANAGER'], ['Attachments', 'None']
     ]
   },
   {

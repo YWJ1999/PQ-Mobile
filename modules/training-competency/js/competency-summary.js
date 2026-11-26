@@ -18,7 +18,6 @@
   const files = expiryReport ? { summary: 'skill-expiry.html', levels: 'skill-expiry-levels.html', employees: 'skill-expiry-employees.html' } : { summary: 'competency-summary.html', levels: 'competency-summary-levels.html', employees: 'competency-summary-employees.html', employee: 'competency-summary-employee.html' };
   const colors = ['#7c3aed', '#f59e0b', '#10b981', '#3b82f6', '#ec4899', '#06b6d4'];
   let filtered = [], scoped = [], chartOpen = false, activeOverlay = null, returnFocus = null, inerted = [];
-  const employeeId = value => `#${String(value).replace(/^#+/, '')}`;
   const formatDate = value => new Date(`${value}T00:00:00`).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
   const validDate = value => /^\d{4}-\d{2}-\d{2}$/.test(value) && Number.isFinite(Date.parse(value)) && new Date(value).toISOString().slice(0, 10) === value;
   if (expiryReport) {
@@ -170,9 +169,9 @@
       const card = expiryReport ? node('a', 'cs-employee-card') : link('', 'cs-employee-card', 'employee', { competency, level: selectedLevel, emp: record.empNo });
       if (expiryReport) card.dataset.profileLink = 'true';
       card.dataset.emp = record.empNo;
-      card.setAttribute('aria-label', expiryReport ? 'Open My Profile' : `View competency profile for ${record.name}, ${employeeId(record.empNo)}`);
+      card.setAttribute('aria-label', expiryReport ? 'Open My Profile' : `View competency profile for ${record.name}, ${formatEmployeeNumber(record.empNo)}`);
       const heading = node('header', 'cs-employee-header');
-      heading.append(node('strong', 'cs-employee-name', record.name), node('span', 'cs-employee-id', employeeId(record.empNo)));
+      heading.append(node('strong', 'cs-employee-name', employeeCardHeading.text(record.empNo, record.name)));
       const details = node('dl', 'cs-employee-details');
       (expiryReport ? [
         ['Department', record.department, 'department'], ['Position', record.position, 'position'],
@@ -204,11 +203,11 @@
       $('csUnavailable').hidden = false;
       return;
     }
-    summaryFields('csEmployeeSummary', [[staffEmployee ? 'Employee #' : 'Emp #', employeeId(selected.empNo)], ['Name', selected.name], ['Branch', selected.branch], ['Department', selected.department], ['Position', selected.position]]);
+    summaryFields('csEmployeeSummary', [[staffEmployee ? 'Employee No.' : 'Emp No.', formatEmployeeNumber(selected.empNo)], ['Name', selected.name], ['Branch', selected.branch], ['Department', selected.department], ['Position', selected.position]]);
     if (staffEmployee) {
       summaryFields('csEmployeeSummary', [['Name', selected.name], ['Branch', selected.branch], ['Department', selected.department], ['Position', selected.position]]);
-      const id = node('span', 'cs-profile-employee-id', employeeId(selected.empNo));
-      id.setAttribute('aria-label', `Employee # ${selected.empNo}`);
+      const id = node('span', 'cs-profile-employee-id', formatEmployeeNumber(selected.empNo));
+      id.setAttribute('aria-label', `Employee No. ${formatEmployeeNumber(selected.empNo)}`);
       $('csEmployeeSummary').firstElementChild.append(id);
     }
     const rows = records.filter(record => record.empNo === empNo);
@@ -297,7 +296,7 @@
   }
 
   function openAssessment(record, trigger) {
-    const employee = detailTable([['Emp #', employeeId(record.empNo)], ['Name', record.name], ['Company', record.company], ['Branch', record.branch], ['Department', record.department], ['Job Title', record.position]], 'csEmployeeDetails');
+    const employee = detailTable([['Emp No.', formatEmployeeNumber(record.empNo)], ['Name', record.name], ['Company', record.company], ['Branch', record.branch], ['Department', record.department], ['Job Title', record.position]], 'csEmployeeDetails');
     employee.setAttribute('aria-label', 'Employee details');
     const section = node('section', 'cs-assessment-section');
     section.append(node('h3', 'cs-assessment-title', 'Assessment History Details'));

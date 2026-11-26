@@ -27,7 +27,7 @@
   function score(record, type = state.filters.scoreType) { return numeric(record[type]); }
   function numberText(value) { return value == null ? '—' : Number(value).toFixed(2); }
   function display(value) { return value === '' || value == null ? '—' : String(value); }
-  function employeeId(value) { const id = String(value ?? '').replace(/^#+/, ''); return id ? `#${id}` : '—'; }
+  const employeeId = value => formatEmployeeNumber(value) || '—';
   function average(rows) {
     const scores = rows.map(record => score(record)).filter(value => value != null);
     return scores.length ? scores.reduce((sum, value) => sum + value, 0) / scores.length : null;
@@ -235,7 +235,7 @@
   $('performanceHighlightExportPdf').addEventListener('click', () => window.print());
   $('performanceHighlightExportExcel').addEventListener('click', () => {
     window.PeopleHcmHighlightExport.downloadCsv('performance-highlight.csv', [
-      ['Emp #', 'Name', 'Score', 'Branch', 'Department', 'Position'],
+      ['Emp No.', 'Name', 'Score', 'Branch', 'Department', 'Position'],
       ...state.rows.map(record => [employeeId(record.empNo), record.name, score(record), record.branch, record.department, record.position]),
       ['Total Records', state.rows.length, '', '', '', ''],
       ['Average Score', '', average(state.rows), '', '', ''],

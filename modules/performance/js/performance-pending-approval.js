@@ -22,9 +22,10 @@
     const parsed = new Date(/^\d{4}-\d{2}-\d{2}$/.test(value) ? `${value}T00:00:00` : value);
     return Number.isFinite(parsed.getTime()) ? parsed.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : '—';
   };
-  function person(record) {
+  function person(record, cardHeading = false) {
     const copy = node('div', 'payroll-employee-copy');
-    copy.append(node('div', 'employee-name', record.name), node('div', 'employee-id', `#${record.empNo.replace(/^#+/, '')}`));
+    copy.append(node('div', 'employee-name', cardHeading ? employeeCardHeading.text(record.empNo, record.name) : record.name));
+    if (!cardHeading) copy.append(node('div', 'employee-id', formatEmployeeNumber(record.empNo)));
     return copy;
   }
   function field(label, value) {
@@ -172,7 +173,7 @@
 
   function selfReviewDetails(record, parent) {
     const card = PerformanceRequestForm.selfReviewCard();
-    const values = { ...record, empNo: '#' + record.empNo.replace(/^#+/, ''), reference: record.reference || record.id,
+    const values = { ...record, empNo: formatEmployeeNumber(record.empNo), reference: record.reference || record.id,
       category: record.employeeCategory, status: record.appraisalStatus,
       comments: record.supervisorComments ?? record.comments, assessmentFrom: record.assessmentFrom || (record.startDate && date(record.startDate)),
       assessmentTo: record.assessmentTo || (record.endDate && date(record.endDate)) };
@@ -193,7 +194,8 @@
     const request = node('div', 'performance-request-review');
     if (record.category === 'self-review') selfReviewDetails(record, request);
     else appraisalDetails(record, request);
-    body.replaceChildren(recordSubmitDate.create(record.submittedAt), request);
+    request.querySelector('.form-section-heading').after(recordSubmitDate.create(record.submittedAt));
+    body.replaceChildren(request);
     const comments = node('section', 'detail-popout-comments approval-comments-card');
     const label = node('label', '', 'Approver Remarks'); label.htmlFor = 'performanceApprovalComments';
     const input = node('textarea', 'detail-popout-comment-control'); input.id = label.htmlFor;
@@ -208,7 +210,7 @@
   }
   function renderWorkflow(record) {
     $('performanceApprovalWorkflowTitle').textContent = `${names[record.category]} Workflow`;
-    const employee = node('div', 'payroll-approval-workflow-person'); employee.append(person(record));
+    const employee = node('div', 'payroll-approval-workflow-person'); employee.append(person(record, true));
     $('performanceApprovalWorkflowRequest').replaceChildren(recordSubmitDate.create(record.submittedAt), field('Reference #', record.id), employee, field('Status', recordDetailStatus.create('Pending Approval')), field(record.category === 'goal-plan' ? 'Session' : 'Period', record.category === 'goal-plan' ? record.session || record.period : record.period));
     const submitted = node('li', 'payroll-approval-workflow-step is-complete');
     submitted.append(field('Request Submitted', recordDetailStatus.create('Completed')), field('Submitted By', record.name));
@@ -279,7 +281,7 @@
       check.value = record.id;
       check.setAttribute('aria-label', `Select ${record.name}'s ${names[record.category]}`);
       check.addEventListener('change', () => { check.checked ? selected.add(record.id) : selected.delete(record.id); syncSelection(); });
-      const employee = person(record);
+      const employee = person(record, true);
       employee.append(node('div', 'payroll-employee-dept', record.position));
       const menu = node('button', 'three-dots-btn');
       menu.type = 'button';

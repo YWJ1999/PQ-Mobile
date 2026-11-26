@@ -62,7 +62,7 @@ const pageUrl = pathToFileURL(path.join(root, 'change-request.html')).href + '?t
         ['Rank', '- Select Rank-'],
         ['New NRIC #', '880412-14-5589'],
         ['Birth Cert #', '-'],
-        ['Member Employee #', '-'],
+        ['Member Employee No.', '-'],
         ['Tax Status', 'Non-Deductible'],
         ['Allocation', '50.00%'],
         ['Beneficiary', 'Yes']
@@ -116,7 +116,7 @@ const pageUrl = pathToFileURL(path.join(root, 'change-request.html')).href + '?t
     await page.click('[data-family-index="1"] [data-edit-family]');
     assert.equal(await page.$eval('#changeRequestHeaderTitle', node => node.textContent.trim()), 'Edit Family Member');
     assert.deepEqual(await page.$$eval('#familySheetOverlay .change-field-label', labels => labels.map(label => label.textContent.trim()).slice(0, 8)), [
-      'Name', 'Relation', 'Status', 'Birth Date', 'Rank', 'New NRIC #', 'Birth Cert #', 'Member Employee #'
+      'Name', 'Relation', 'Status', 'Birth Date', 'Rank', 'New NRIC #', 'Birth Cert #', 'Member Employee No.'
     ], 'Family editor uses Name and separates NRIC from Birth Cert');
     assert.deepEqual(await page.evaluate(() => ({
       name: document.getElementById('input_fam_name').value,
@@ -167,7 +167,7 @@ const pageUrl = pathToFileURL(path.join(root, 'change-request.html')).href + '?t
     await page.click('#saveFamilyButton');
     await page.waitForFunction(() => getComputedStyle(document.getElementById('familySheetOverlay')).display === 'none');
     assert.equal(await page.$eval('[data-family-index="1"] [data-family-record-name]', node => node.textContent.trim()), 'AISYAH');
-    assert.equal(await page.$eval('[data-family-index="1"] [data-family-employee-id]', node => node.textContent.trim()), '#EBB77');
+    assert.equal(await page.$eval('[data-family-index="1"] [data-family-employee-id]', node => node.textContent.trim()), 'EBB77');
     await page.click('[data-family-index="1"] [data-edit-family]');
     assert.equal(await page.$eval('#familyAttachments .form-attachment-file-name', node => node.textContent.trim()), 'family-proof.pdf');
     await page.click('.family-editor-cancel');

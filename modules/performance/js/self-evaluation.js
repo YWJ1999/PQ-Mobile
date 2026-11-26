@@ -73,8 +73,8 @@
     $('selfEvaluationName').value = employee.name || '—';
     $('selfEvaluationPosition').value = employee.position || '—';
     $('selfEvaluationDepartment').value = employee.department || '—';
-    $('selfEvaluationSupervisor').value = (employee.supervisor?.name || '—') + (employee.supervisor?.empNo ? '  #' + String(employee.supervisor.empNo).replace(/^#/, '') : '');
-    $('selfEvaluationReportTo').value = (employee.reportingTo?.name || '—') + (employee.reportingTo?.empNo ? '  #' + String(employee.reportingTo.empNo).replace(/^#/, '') : '');
+    $('selfEvaluationSupervisor').value = (employee.supervisor?.name || '—') + (employee.supervisor?.empNo ? '  ' + formatEmployeeNumber(employee.supervisor.empNo) : '');
+    $('selfEvaluationReportTo').value = (employee.reportingTo?.name || '—') + (employee.reportingTo?.empNo ? '  ' + formatEmployeeNumber(employee.reportingTo.empNo) : '');
     $('selfEvaluationRef').value = source.evaluationRef || '—';
     $('selfEvaluationPeriod').value = source.period || '—';
     $('selfEvaluationType').value = source.type || '—';

@@ -385,7 +385,7 @@
         name.textContent = requestData.employee.name;
         const employeeId = document.createElement('span');
         employeeId.className = 'training-request-employee-id';
-        employeeId.textContent = `#${String(requestData.employee.empNo).replace(/^#/, '')}`;
+        employeeId.textContent = formatEmployeeNumber(requestData.employee.empNo);
         wrapper.append(name, employeeId);
         return wrapper;
       }),

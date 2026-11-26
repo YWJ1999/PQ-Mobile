@@ -83,7 +83,7 @@ const pageUrl = pathToFileURL(path.resolve(__dirname, '../modules/attendance/opt
     await page.waitForSelector('#reviewChangesModal', { hidden: true });
     assert.equal(await page.$eval('#listCounterText', node => node.textContent), '0', 'The dated shift change removes the employee from the W01 filter');
     await page.click('[aria-label="Next Date"]');
-    assert.equal(await page.$eval('.staff-card .emp-id-label', node => node.textContent), '#000008', 'The next day still has the original shift');
+    assert.equal(await page.$eval('.staff-card .staff-name', node => node.textContent), '000008 - Aqilah Antasha', 'The next day still has the original shift');
     assert.deepEqual(errors, []);
     console.log('PASS: Staff Change Shift and Copy to Dates use separate ordered filters and independent state.');
   } finally {

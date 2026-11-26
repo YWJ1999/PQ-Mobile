@@ -47,6 +47,7 @@ html body :is(
     max-width: 100%;
     padding-inline: 14px !important;
 
+    &.record-card-cancel,
     &:has(> .record-card-action-icon) {
       width: clamp(96px, 40%, 120px) !important;
       gap: 8px;

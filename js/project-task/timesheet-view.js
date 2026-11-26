@@ -121,6 +121,9 @@ const TimesheetView = (() => {
 
   function review(root, record) {
     root.replaceChildren(fields());
+    const submitted = recordSubmitDate.create(record.submittedAt);
+    submitted.id = 'projectApprovalSubmitDate';
+    root.querySelector('.section-header-bar').after(submitted);
     root.querySelector('#addWorkActivity').remove();
     root.querySelector('.req').remove();
     for (const [id, value] of [['timesheetDate', record.dateLabel], ['timesheetRemark', record.remark]]) {

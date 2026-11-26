@@ -50,7 +50,7 @@ async function checkChart(page, prefix, expected) {
       await Promise.all([page.waitForNavigation({ waitUntil: 'domcontentloaded' }), page.click('#projectPanel-team a[href*="timesheet-highlight.html"]')]);
       assert.equal(await page.$eval('html', node => node.dataset.theme), theme);
       assert.ok(await page.$('#timesheetHighlightTable'), 'The highlight must replace Coming soon with the employee table');
-      assert.deepEqual(await page.$$eval('#timesheetHighlightTable th', nodes => nodes.map(node => node.textContent.trim())), ['Emp#', 'Name', 'Hours']);
+      assert.deepEqual(await page.$$eval('#timesheetHighlightTable th', nodes => nodes.map(node => node.textContent.trim())), ['Emp No.', 'Name', 'Hours']);
       const base = await page.evaluate(() => ({ hours: window.TIMESHEET_HIGHLIGHT_DATA.reduce((sum, row) => sum + row.hours, 0), count: new Set(window.TIMESHEET_HIGHLIGHT_DATA.map(row => row.empNo)).size }));
       assert.equal(await total(page, '#timesheetTotalHours'), base.hours);
       assert.equal(await total(page, '#timesheetTotalRecords'), base.count);
@@ -111,7 +111,7 @@ async function checkChart(page, prefix, expected) {
       assert.equal(await total(page, '#timesheetTotalRecords'), 1);
       const filteredCsv = await downloadReport(page, theme);
       assert.equal(filteredCsv.split(/\r?\n/).length, 3, 'A one-employee filter exports one employee and its total');
-      assert.ok(filteredCsv.includes('#' + matching[0].empNo) && filteredCsv.includes('TOTAL,,' + filteredHours.toFixed(2)));
+      assert.ok(filteredCsv.includes(matching[0].empNo) && filteredCsv.includes('TOTAL,,' + filteredHours.toFixed(2)));
       await page.click('#timesheetViewChart');
       await checkChart(page, 'timesheetChart', filteredHours);
       assert.equal(await page.$('#timesheetViewTrend'), null);
@@ -155,7 +155,7 @@ async function checkChart(page, prefix, expected) {
       await page.click('#timesheetBack');
 
       const csv = await downloadReport(page, theme);
-      assert.ok(csv && csv.includes('Employee #,Name,Hours') && csv.includes('TOTAL') && csv.includes(base.hours.toFixed(2)));
+      assert.ok(csv && csv.includes('Employee No.,Name,Hours') && csv.includes('TOTAL') && csv.includes(base.hours.toFixed(2)));
       await page.evaluate(() => { window.print = () => { window.timesheetPrintCalled = true; }; });
       await page.click('#timesheetExportPdf');
       assert.equal(await page.evaluate(() => window.timesheetPrintCalled), true);

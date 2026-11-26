@@ -27,15 +27,12 @@ const pageUrl = theme => pathToFileURL(path.join(root, 'modules/employee-career/
 
       const firstEmployee = await page.$eval('#orgChartTree .org-chart-employee', card => {
         const name = card.querySelector('.org-chart-name');
-        const employeeId = card.querySelector('.org-chart-employee-id');
         return {
           name: name.textContent.trim(),
-          employeeId: employeeId.textContent.trim(),
-          idBelowName: employeeId.getBoundingClientRect().top >= name.getBoundingClientRect().bottom,
           active: card.classList.contains('is-active')
         };
       });
-      assert.deepEqual(firstEmployee, { name: 'Alex Wong', employeeId: '#EBB01', idBelowName: true, active: true });
+      assert.deepEqual(firstEmployee, { name: 'EBB01 - Alex Wong', active: true });
 
       assert.equal(await page.$eval('#orgChartVisibleCount', node => node.textContent), '11');
       assert.equal(await page.$eval('#orgChartSpacingControls', controls => controls.getClientRects().length), 0);
@@ -80,7 +77,7 @@ const pageUrl = theme => pathToFileURL(path.join(root, 'modules/employee-career/
       ], 'Dropdown lists employees alphabetically and excludes vacant positions');
       await page.select('#orgChartFilterKeyword', 'EBB19');
       await page.click('#orgChartApplyFilter');
-      assert.deepEqual(await page.$$eval('#orgChartTree .org-chart-name', nodes => nodes.map(node => node.textContent.trim())), ['Alex Wong', 'Siti Nurhaliza', 'Kavitha A/P Gopal']);
+      assert.deepEqual(await page.$$eval('#orgChartTree .org-chart-name', nodes => nodes.map(node => node.textContent.trim())), ['EBB01 - Alex Wong', 'EBB05 - Siti Nurhaliza', 'EBB19 - Kavitha A/P Gopal']);
       assert.equal(await page.$eval('#orgChartVisibleCount', node => node.textContent.trim()), '3');
       assert.equal(await page.$eval('#orgChartFilterSummary', node => node.textContent.trim()), 'Employee: Kavitha A/P Gopal');
       await page.click('#orgChartLayoutTrigger');

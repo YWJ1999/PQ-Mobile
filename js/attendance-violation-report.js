@@ -43,6 +43,9 @@ const violationRecords = [
   }
 ];
 const defaultViolationFilters = { date: '2026-01-16', branch: 'all', department: 'all' };
+const violationDepartmentNames = {
+  ACCOUNTS: 'Accounts', ADMINISTRATION: 'Administration', 'HUMAN RESOURCE': 'Human Resource'
+};
 let violationFilters = { ...defaultViolationFilters };
 let hasExplicitViolationDate = false;
 let activeTab = 'continuous';
@@ -62,9 +65,18 @@ function formatViolationDate(value) {
   const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
   return `${String(date.getDate()).padStart(2, '0')} ${months[date.getMonth()]} ${date.getFullYear()}`;
 }
-function violationTypeLabel(type) { return type === 'continuous' ? 'Continuous Work' : 'Below 30 Rest Hour'; }
-function violationPeriod(record) {
-  return record.startDate ? `${formatViolationDate(record.startDate)} – ${formatViolationDate(record.date)}` : formatViolationDate(record.date);
+function violationSummary({ type, startDate, date }) {
+  const end = AttendanceDateDisplay.parse(date);
+  const period = end ? formatViolationDate(date) : '—';
+  if (type === 'rest') return { title: 'Under 30 hours of rest', period };
+
+  const start = AttendanceDateDisplay.parse(startDate);
+  if (!start || !end || start > end) return { title: 'Continuous Work', period };
+  const days = (end - start) / 86_400_000 + 1;
+  return {
+    title: `${days} consecutive workday${days === 1 ? '' : 's'}`,
+    period: AttendanceDateDisplay.formatRange(start, end, { compactMonth: true })
+  };
 }
 function filteredViolationRecords(type = activeTab) {
   return violationRecords.filter(record => record.type === type
@@ -79,23 +91,27 @@ function createViolationCard(record) {
   card.dataset.violationDetail = record.id;
   card.dataset.department = record.department;
   card.dataset.position = record.jobTitle;
-  card.setAttribute('aria-label', `View details for ${record.name}, #${record.empNo}, ${violationTypeLabel(record.type)}, ${violationPeriod(record)}`);
-  card.innerHTML = '<span class="history-time-row"><strong class="violation-card-name"></strong><span class="attendance-report-emp"></span></span><span class="violation-card-content"><span class="violation-card-details"><span class="violation-card-period" data-period></span><span class="violation-card-fields"><span class="violation-card-field"><small>Department</small><strong data-department></strong></span><span class="violation-card-field"><small>Job Title</small><strong data-job></strong></span></span><span class="violation-card-footer"><span data-type></span></span></span></span>';
-  if (record.type === 'continuous' && record.startDate) {
-    card.querySelector('[data-period]').remove();
-    card.querySelector('[data-type]').textContent = `Continuous Work between ${formatViolationDate(record.startDate)} and ${formatViolationDate(record.date)}`;
-  } else if (record.type === 'rest') {
-    card.querySelector('[data-period]').remove();
-    const [year, month, day] = record.date.split('-');
-    card.querySelector('[data-type]').textContent = `Below 30 rest hours at ${day}/${month}/${year}`;
-  } else {
-    card.querySelector('[data-period]').textContent = violationPeriod(record);
-    card.querySelector('[data-type]').textContent = violationTypeLabel(record.type);
-  }
-  card.querySelector('.violation-card-name').textContent = record.name;
-  card.querySelector('.attendance-report-emp').textContent = `#${record.empNo}`;
-  card.querySelector('[data-department]').textContent = record.department;
-  card.querySelector('[data-job]').textContent = record.jobTitle;
+  card.setAttribute('aria-haspopup', 'dialog');
+  card.setAttribute('aria-controls', 'detailModal');
+  const { title, period } = violationSummary(record);
+  const icon = record.type === 'rest' ? 'fa-clock' : 'fa-calendar-days';
+  card.innerHTML = `
+    <span class="history-time-row">
+      <strong class="violation-card-name"></strong>
+      <span class="violation-card-role"></span>
+    </span>
+    <span class="violation-card-content">
+      <span class="violation-card-icon" aria-hidden="true"><i class="fa-regular ${icon}"></i></span>
+      <span class="violation-card-message">
+        <strong class="violation-card-reason"></strong>
+        <span class="violation-card-period"></span>
+      </span>
+    </span>`;
+  card.querySelector('.violation-card-name').textContent = employeeCardHeading.text(record.empNo, record.name);
+  const department = violationDepartmentNames[record.department] ?? record.department;
+  card.querySelector('.violation-card-role').textContent = [record.jobTitle, department].filter(Boolean).join(' • ');
+  card.querySelector('.violation-card-reason').textContent = title;
+  card.querySelector('.violation-card-period').textContent = period;
   card.addEventListener('click', () => openDetailModal(record.id));
   return card;
 }

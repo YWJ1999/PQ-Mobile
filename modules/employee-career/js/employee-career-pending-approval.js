@@ -22,7 +22,7 @@
   function identity(name, empNo, position) {
     const element = node('div', 'payroll-employee-copy');
     element.append(node('strong', 'employee-name', name || 'Employee'));
-    if (empNo) element.append(node('span', 'employee-id', '#' + String(empNo).replace(/^#+/, '')));
+    if (empNo) element.append(node('span', 'employee-id', formatEmployeeNumber(empNo)));
     if (position) element.append(node('div', 'career-pending-note', position));
     return element;
   }
@@ -74,7 +74,7 @@
     menu.setAttribute('aria-haspopup', 'dialog');
     menu.append(icon('fa-ellipsis-vertical'));
     menu.addEventListener('click', () => { currentId = item.id; openSheet('careerPendingMenu', menu); });
-    header.append(checkbox, identity(item.employeeName, item.empNo, isEngagement ? null : item.position),
+    header.append(checkbox, identity(employeeCardHeading.text(item.empNo, item.employeeName), null, isEngagement ? null : item.position),
       node('span', 'payroll-approval-status', 'Pending Approval'), menu);
     const body = node('div', 'approval-card-body payroll-approval-card-body');
     const review = PendingApprovalPage.link(item.id);
@@ -191,7 +191,7 @@
       table.classList.toggle('career-pending-engagement-table', isEngagement);
       table.classList.toggle('detail-popout-table', isEngagement);
       const detailFields = isEngagement ? [
-        ['Employee #', item.empNo ? '#' + String(item.empNo).replace(/^#+/, '') : '—'],
+        ['Employee No.', formatEmployeeNumber(item.empNo) || '—'],
         ['Name', item.employeeName],
         ['Position', item.position],
         ['Interview Date', date(item.interviewDate)],
@@ -217,8 +217,9 @@
         row.append(heading, cell);
         tbody.append(row);
       });
+      recordSubmitDate.prepend(tbody, item.submitDate);
       table.append(tbody);
-      body.append(recordSubmitDate.create(item.submitDate), table);
+      body.append(table);
       if (isEngagement) {
         const remarks = node('section', 'detail-popout-comments approval-comments-card');
         const label = node('label', '', 'Approver Remarks');
@@ -235,11 +236,11 @@
     body.querySelector('.cv-history-detail-scroll')?.scrollTo(0, 0);
   }
   function renderWorkflow(item) {
-    $('careerPendingWorkflowRequest').replaceChildren(field('Document Reference', item.reference || item.id), identity(item.employeeName, item.empNo), field('Request Type', item.type));
+    $('careerPendingWorkflowRequest').replaceChildren(field('Document Reference', item.reference || item.id), identity(employeeCardHeading.text(item.empNo, item.employeeName)), field('Request Type', item.type));
     $('careerPendingWorkflowSteps').replaceChildren(...(item.workflow || []).map(step => {
       const entry = node('li', 'payroll-approval-workflow-step');
       entry.append(field(step.title || 'Approval Step', recordDetailStatus.workflowStep(step.status || 'Pending')));
-      if (step.name) entry.append(identity(step.name, step.empNo, step.role));
+      if (step.name) entry.append(identity(employeeCardHeading.text(step.empNo, step.name), null, step.role));
       if (step.date) entry.append(field('Date', date(step.date)));
       return entry;
     }));

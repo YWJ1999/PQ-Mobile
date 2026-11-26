@@ -117,16 +117,15 @@
     header.append(heading, end);
     card.setAttribute('aria-labelledby', title.id);
     const details = element('div', 'training-feedback-card-details history-card-details');
-    details.append(
-      createDetail('Description', record.description, 'description')
-    );
+    const response = responses[record.id] || record.response;
+    details.append(createDetail('Description', record.description, 'description'));
+    recordSubmitDate.append(details, response?.submittedAt);
     const footer = element('footer', 'training-feedback-card-footer history-card-actions');
     const action = element('a', 'training-feedback-action', 'Feedback');
     action.href = responseUrl(record.id);
     action.setAttribute('aria-label', `Provide feedback for ${record.course}`);
     footer.append(action);
-    const response = responses[record.id] || record.response;
-    card.append(header, recordSubmitDate.create(response?.submittedAt), details, footer);
+    card.append(header, details, footer);
     return card;
   }
 

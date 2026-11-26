@@ -203,10 +203,13 @@
       addClass(panel, 'detail-popout-panel');
       normalizeHeader(header, title);
     }
-    addClass(body, 'detail-popout-body');
-    normalizeFields(body);
-    normalizeAttachments(body);
-    normalizeFields(body);
+    const formLayout = body.hasAttribute('data-detail-form-layout');
+    body.classList.toggle('detail-popout-body', !formLayout);
+    if (!formLayout) {
+      normalizeFields(body);
+      normalizeAttachments(body);
+      normalizeFields(body);
+    }
     normalizeActions(panel, body, closeFunction);
     normalizeComments(panel, body);
     for (const node of panel.children) if (node !== header && /handle/i.test(node.className)) addClass(node, 'detail-popout-decoration');

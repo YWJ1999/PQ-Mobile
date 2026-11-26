@@ -375,8 +375,7 @@
       entry.records.forEach(rec => {
         const card = document.createElement('article');
         card.className = 'claim-summary-record summary-colored-record staff-detail-card';
-        card.innerHTML = '<div class="staff-record-employee"><strong class="staff-record-employee-name">' + escapeHtml(rec.staff.name) + '</strong>' +
-          '<span class="staff-employee-id">#' + escapeHtml(rec.staff.empNo) + '</span></div>' +
+        card.innerHTML = '<div class="staff-record-employee"><strong class="staff-record-employee-name">' + employeeCardHeading.html(rec.staff.empNo, rec.staff.name) + '</strong></div>' +
           '<dl class="summary-record-fields staff-detail-card-body">' +
           '<div class="summary-record-field summary-record-period staff-detail-metric-card"><dt>Period</dt><dd>' + escapeHtml(rec.period) + '</dd></div>' +
           '<div class="summary-record-field summary-record-expense staff-detail-metric-card"><dt>Expense</dt><dd>' + escapeHtml(rec.expense) + '</dd></div>' +

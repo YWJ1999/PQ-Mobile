@@ -44,7 +44,7 @@
     ? { keyword: '', serviceYears: '0', branch: '', department: '', section: '', job: '', skillGroup: '' }
     : { keyword: '', asAt: dateISO, category: '', company: '', branch: '', division: '', department: '', section: '', costCenter: '', grade: '', job: '', skillGroup: '', hireDateFrom: '', hireDateTo: '', yosFrom: '', yosTo: '', type: '' };
   const filterDimensions = isRetention || isAttrition ? ['branch', 'department', 'section', 'job', 'skillGroup'] : ['company', 'branch', 'division', 'department', 'section', 'costCenter', 'grade', 'job', 'skillGroup', 'type'];
-  const columns = [['empNo', 'Emp#'], ['name', 'Name'], ...(isAttrition ? [['reason', 'Reason']] : [...(!isRetention ? [['age', 'Age']] : []), ['yos', 'YOS']]), ['branch', 'Branch'], ['department', 'Department'], ['position', 'Position']];
+  const columns = [['empNo', 'Emp No.'], ['name', 'Name'], ...(isAttrition ? [['reason', 'Reason']] : [...(!isRetention ? [['age', 'Age']] : []), ['yos', 'YOS']]), ['branch', 'Branch'], ['department', 'Department'], ['position', 'Position']];
   const state = { filters: { ...defaults }, rows: [], summaryRows: [], view: 'table', metric: 'branch', showAll: false, selectedMonth: null, analysisMetric: 'branch', analysisShowAll: false, chartScroll: 0, trendScroll: 0 };
   const hasResigned = row => row.exitDate ? row.exitDate <= state.filters.asAt : row.employmentStatus === 'Resigned';
   const overviewGroups = [
@@ -126,7 +126,7 @@
     state.rows.forEach(row => {
       const tr = node('tr');
       const numberCell = node('td');
-      numberCell.append(node('span', 'staff-list-emp-number', '#' + row.empNo));
+      numberCell.append(node('span', 'staff-list-emp-number', formatEmployeeNumber(row.empNo)));
       tr.append(numberCell, node('td', '', row.name));
       columns.slice(2).forEach(([key]) => {
         const cell = node('td');
@@ -327,7 +327,7 @@
     closeFilter();
   }
   function exportCsv() {
-    const rows = [columns.map(([, label]) => label), ...state.rows.map(row => columns.map(([key]) => key === 'empNo' ? '#' + row.empNo : key === 'yos' ? row.yos.toFixed(2) : row[key]))];
+    const rows = [columns.map(([, label]) => label), ...state.rows.map(row => columns.map(([key]) => key === 'empNo' ? formatEmployeeNumber(row.empNo) : key === 'yos' ? row.yos.toFixed(2) : row[key]))];
     const csv = rows.map(row => row.map(value => /[",\r\n]/.test(String(value)) ? '"' + String(value).replaceAll('"', '""') + '"' : value).join(',')).join('\r\n');
     const url = URL.createObjectURL(new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8' }));
     const link = node('a');

@@ -19,8 +19,7 @@
   }
 
   function employeeId(value) {
-    const normalized = String(value || '').trim().replace(/^#/, '');
-    return normalized ? `#${normalized}` : '—';
+    return formatEmployeeNumber(value) || '—';
   }
 
   function validDate(value) {
@@ -58,8 +57,8 @@
 
   function matches(record) {
     const { keyword, periodStart, periodEnd, company, branch, department, job } = state.filters;
-    const query = keyword.toLocaleLowerCase();
-    const haystack = [record.reference, record.employee, record.empNo, employeeId(record.empNo), record.position, record.company, record.branch, record.department, record.job, record.name].join(' ').toLocaleLowerCase();
+    const query = formatEmployeeNumber(keyword).toLocaleLowerCase();
+    const haystack = [record.reference, record.employee, formatEmployeeNumber(record.empNo), record.position, record.company, record.branch, record.department, record.job, record.name].join(' ').toLocaleLowerCase();
     return (!query || haystack.includes(query))
       && (!periodStart || record.periodEnd >= periodStart)
       && (!periodEnd || record.periodStart <= periodEnd)
@@ -87,21 +86,18 @@
     card.dataset.status = tone;
     const ids = {
       name: `${record.id}-employee-name`,
-      employeeId: `${record.id}-employee-id`,
       status: `${record.id}-status`,
       position: `${record.id}-position`,
       period: `${record.id}-period`
     };
     card.setAttribute('aria-labelledby', ids.name);
-    card.setAttribute('aria-describedby', `${ids.employeeId} ${ids.status} ${ids.position} ${ids.period}`);
+    card.setAttribute('aria-describedby', `${ids.status} ${ids.position} ${ids.period}`);
 
     const header = node('div', 'staff-tna-card-header record-card-header');
     const heading = node('div', 'staff-tna-card-heading');
-    const name = node('h2', 'staff-tna-employee-name', record.employee);
-    const empNo = node('span', 'staff-tna-employee-id', employeeId(record.empNo));
+    const name = node('h2', 'staff-tna-employee-name', employeeCardHeading.text(record.empNo, record.employee));
     name.id = ids.name;
-    empNo.id = ids.employeeId;
-    heading.append(name, empNo);
+    heading.append(name);
     const end = node('div', 'staff-tna-card-end');
     const status = node('span', 'card-status-badge', label);
     status.id = ids.status;
@@ -115,8 +111,12 @@
     header.append(heading, end);
 
     const details = node('div', 'card-details-box staff-tna-card-details');
-    details.append(cardDetail('Position', record.position, ids.position), cardDetail('Period', periodText(record), ids.period));
-    card.append(header, recordSubmitDate.create(record.submittedDate), details);
+    details.append(
+      cardDetail('Position', record.position, ids.position),
+      cardDetail('Period', periodText(record), ids.period)
+    );
+    recordSubmitDate.append(details, record.submittedDate);
+    card.append(header, details);
     return card;
   }
 
@@ -172,8 +172,9 @@
       ['Remarks', record.remarks],
       ['Approver Remarks', record.approverRemarks]
     ];
-    recordSubmitDate.set($('staffTnaSubmitDate'), record.submittedDate);
-    $('staffTnaApplicationDetails').replaceChildren(...rows.map(([label, value, employee]) => detailRow(label, value, employee)));
+    const application = $('staffTnaApplicationDetails');
+    application.replaceChildren(...rows.map(([label, value, employee]) => detailRow(label, value, employee)));
+    recordSubmitDate.prepend(application, record.submittedDate).id = 'staffTnaSubmitDate';
     $('staffTnaDetailItems').replaceChildren(...record.details.map(item => {
       const article = node('article', 'staff-tna-detail-item');
       const list = node('dl');

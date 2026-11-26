@@ -5,8 +5,8 @@ const {pathToFileURL}=require('node:url');
 const puppeteer=require('puppeteer');
 const directory=path.join(__dirname,'performance-highlight-exports');
 const configs=[
-  {kind:'performance',prefix:'performanceHighlight',metric:'AverageScore',filter:{keyword:'#EBB02',period:'2026',evaluationType:'Annual Appraisal',scoreType:'goalScore'},expectedCount:'1',expectedMetric:'84.00',columns:['Emp #','Name','Score','Branch','Department','Position'],names:['Daniel Wong'],numbers:['84']},
-  {kind:'incident',prefix:'incidentHighlight',metric:'TotalPoints',filter:{meritType:'demerit'},expectedCount:'3',expectedMetric:'-11',columns:['Emp #','Name','Total','Branch','Department','Position'],names:['Alex Tan','Daniel Wong','Nur Izzati'],numbers:['-6','-1','-4']}
+  {kind:'performance',prefix:'performanceHighlight',metric:'AverageScore',filter:{keyword:'#EBB02',period:'2026',evaluationType:'Annual Appraisal',scoreType:'goalScore'},expectedCount:'1',expectedMetric:'84.00',columns:['Emp No.','Name','Score','Branch','Department','Position'],names:['Daniel Wong'],numbers:['84']},
+  {kind:'incident',prefix:'incidentHighlight',metric:'TotalPoints',filter:{meritType:'demerit'},expectedCount:'3',expectedMetric:'-11',columns:['Emp No.','Name','Total','Branch','Department','Position'],names:['Alex Tan','Daniel Wong','Nur Izzati'],numbers:['-6','-1','-4']}
 ];
 function parseCsv(text){const rows=[];let row=[],cell='',quoted=false;for(let i=0;i<text.length;i++){const char=text[i];if(char==='"'){if(quoted&&text[i+1]==='"'){cell+='"';i++;}else quoted=!quoted;}else if(char===','&&!quoted){row.push(cell);cell='';}else if(char==='\n'&&!quoted){row.push(cell.replace(/\r$/,''));rows.push(row);row=[];cell='';}else cell+=char;}if(cell||row.length){row.push(cell);rows.push(row);}return rows;}
 (async()=>{

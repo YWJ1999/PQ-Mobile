@@ -61,19 +61,15 @@ async function check(name, fn) {
       assert.equal(values.taskBadge, `${values.expectedTasks} Tasks`);
     });
 
-    await check('attendance staff cards put a normalized ID directly below the name', async () => {
-      const identity = await page.evaluate(() => {
-        renderStaffList(staffDatabase.scheduled.slice(0, 1));
-        const card = document.querySelector('#staffListContent .staff-card-item');
-        const name = [...card.querySelectorAll('div')].find(node => node.textContent.trim() === staffDatabase.scheduled[0].name);
-        const id = name.nextElementSibling;
-        const css = getComputedStyle(id);
-        return { text: id.textContent.trim(), size: css.fontSize, weight: css.fontWeight, family: css.fontFamily };
+    await check('attendance staff cards show the employee number and name together', async () => {
+      const result = await page.evaluate(() => {
+        const employee = staffDatabase.scheduled[0];
+        renderStaffList([employee]);
+        const card = document.querySelector('#staffListContent > :first-child');
+        const heading = [...card.querySelectorAll('h4, div')].find(node => !node.children.length && node.textContent.includes(' - '));
+        return [heading.textContent.trim(), employee.id.replace(/^#+/, '') + ' - ' + employee.name];
       });
-      assert.match(identity.text, /^#[A-Z0-9-]+$/);
-      assert.equal(identity.size, '11.5px');
-      assert.equal(identity.weight, '700');
-      assert.match(identity.family.toLowerCase(), /mono/);
+      assert.equal(result[0], result[1]);
     });
 
     await page.goto(url('leave.html') + '?mode=team', { waitUntil: 'domcontentloaded' });
@@ -90,48 +86,26 @@ async function check(name, fn) {
       assert.equal(values.tasks, `${values.cards} Tasks`);
     });
 
-    await check('leave approval cards put a normalized employee ID directly below the name', async () => {
-      const rows = await page.$$eval('#teamApprovalsListContainer .approval-request-card', cards => cards.map(card => {
-        const id = card.querySelector('.employee-id-standard');
-        if (!id) return { text: '', size: '', weight: '', family: '' };
-        const css = getComputedStyle(id);
-        return { text: id.textContent.trim(), size: css.fontSize, weight: css.fontWeight, family: css.fontFamily };
-      }));
-      assert.ok(rows.length >= 9);
-      for (const row of rows) {
-        assert.match(row.text, /^#[A-Z0-9-]+$/);
-        assert.equal(row.size, '11.5px');
-        assert.equal(row.weight, '700');
-        assert.match(row.family.toLowerCase(), /mono/);
-      }
+    await check('leave approval headers identify each employee', async () => {
+      const headings = await page.$$eval('#teamApprovalsListContainer .approval-employee-heading', nodes => nodes.map(node => node.textContent.trim()));
+      assert.ok(headings.length >= 9);
+      assert.equal(headings[0], '004177 - Afifah Nasir');
+      headings.forEach(heading => assert.match(heading, /^[A-Z0-9-]+ - .+/));
     });
 
-    await check('leave calendar, entitlement, and workflow cards use the standard ID line', async () => {
+    await check('leave calendar, entitlement, and workflow cards use employee headings', async () => {
       const result = await page.evaluate(() => {
         openCalDateDetailsModal(5);
         openStaffEntitlementModal('004177');
-        const collect = selector => [...document.querySelectorAll(selector)].map(node => {
-          const css = getComputedStyle(node);
-          return { text: node.textContent.trim(), size: css.fontSize, weight: css.fontWeight, family: css.fontFamily };
-        });
-        return {
-          calendar: collect('#calModalStaffListContainer .employee-id-standard'),
-          entitlement: collect('#entModalStaffContentContainer .employee-id-standard'),
-          workflow: collect('#level1Approvers .employee-id-standard')
-        };
+        const headings = container => [...document.getElementById(container).querySelectorAll('div')]
+          .filter(node => !node.children.length && /^[^# ]+ - .+/.test(node.textContent.trim()));
+        return [headings('calModalStaffListContainer').length, headings('entModalStaffContentContainer').length, headings('level1Approvers').length];
       });
-      assert.equal(result.calendar.length, 1);
-      assert.equal(result.entitlement.length, 1);
-      assert.ok(result.workflow.length >= 5);
-      for (const row of [...result.calendar, ...result.entitlement, ...result.workflow]) {
-        assert.match(row.text, /^#[A-Z0-9-]+$/);
-        assert.equal(row.size, '11.5px');
-        assert.equal(row.weight, '700');
-        assert.match(row.family.toLowerCase(), /mono/);
-      }
+      assert.equal(result[0], 1);
+      assert.equal(result[1], 1);
+      assert.ok(result[2] >= 5);
     });
 
-    await page.goto(url('modules/attendance/options/hours-summary.html'), { waitUntil: 'domcontentloaded' });
     await check('hours summary cards show only the reference KPIs clearly', async () => {
       const cards = await page.$$eval('.summary-kpi-card', nodes => nodes.map(card => {
         const title = card.querySelector('.card-theme-title');

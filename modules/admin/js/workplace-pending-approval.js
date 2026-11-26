@@ -41,7 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function message(id, text) { $(id).textContent = text; $(id).hidden = !text; }
   function identity(name, empNo) {
     const copy = node('div', 'payroll-employee-copy');
-    copy.append(node('strong', 'employee-name', name), node('span', 'employee-id', '#' + empNo.replace(/^#+/, '')));
+    copy.append(node('strong', 'employee-name', employeeCardHeading.text(empNo, name)));
     return copy;
   }
   function fieldGrid(rows) {
@@ -203,7 +203,6 @@ document.addEventListener('DOMContentLoaded', () => {
     section.replaceChildren(node('h4', 'claim-detail-section-title', title));
   }
   function renderDetails(item) {
-    recordSubmitDate.set($('workplaceApprovalSubmitDate'), item.submitDate);
     guestRevision = item.guestRevision;
     const config = item.kind === 'inventory-request' ? tabConfig.inventory : tabConfig['guest-visit'];
     $('workplaceApprovalDetailsTitle').textContent = config.detailsTitle;
@@ -216,7 +215,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (inventory) {
       sectionTitle(general, 'Request Details');
       table(general, [
-        ['Employee #', '#' + item.empNo.replace(/^#+/, '')],
+        ['Employee No.', formatEmployeeNumber(item.empNo)],
         ['Name', item.employeeName],
         ['Position', item.position],
         ['Department', item.department],
@@ -232,11 +231,11 @@ document.addEventListener('DOMContentLoaded', () => {
         ['Remarks', item.remarks],
         ['Attachment', item.attachments.length ? item.attachments.join(', ') : 'None']
       ]);
+      recordSubmitDate.prepend(general.querySelector('tbody'), item.submitDate);
     } else {
       const fields = document.createElement('guest-visit-fields');
-      fields.setAttribute('readonly', '');
       visit.append(fields);
-      fields.showSubmission(item, date);
+      fields.showSubmission(item, date, visit.parentElement);
     }
     const commentLabel = node('label', 'workplace-approval-comment-label', 'Approver Action Comments');
     commentLabel.htmlFor = 'approvalComments';

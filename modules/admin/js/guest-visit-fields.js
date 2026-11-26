@@ -1,4 +1,4 @@
-/* The requesting and approval pages share the same Guest Visit sections. */
+/* Applications, approvals and history share the same Guest Visit sections. */
 (() => {
   function node(tag, className, text) {
     const element = document.createElement(tag);
@@ -31,8 +31,7 @@
   function addRecordDetails(record, title, subtitle, values, index, category, employeeId, editable) {
     const header = node('div', 'visit-record-header');
     const copy = node('div', 'visit-record-copy');
-    copy.append(node('h3', 'visit-record-name', title));
-    if (employeeId) copy.append(node('span', 'visit-employee-id', '#' + String(employeeId).replace(/^#+/, '')));
+    copy.append(node('h3', 'visit-record-name', employeeId ? employeeCardHeading.text(employeeId, title) : title));
     if (subtitle) copy.append(node('p', 'visit-record-subtitle', subtitle));
     const details = node('div', 'visit-record-details');
     details.id = 'visitRecord-' + category + '-' + index;
@@ -158,9 +157,19 @@
       }));
     }
 
-    showSubmission(item, formatDate) {
+    showSubmission(item, formatDate, scrollArea, requestDetails = []) {
+      this.setAttribute('readonly', '');
       const $ = id => this.querySelector('#' + id);
       const general = $('visitPanel-general');
+      const stack = general.querySelector('.claim-form-stack');
+      if (requestDetails.length) {
+        const metadata = detailRows(requestDetails);
+        metadata.className = 'visit-submission-meta';
+        recordSubmitDate.append(metadata, item.submitDate);
+        stack.prepend(metadata);
+      } else {
+        recordSubmitDate.prepend(stack, item.submitDate);
+      }
 
       const location = node('input', 'claim-control');
       location.id = 'visitLocation';
@@ -179,17 +188,27 @@
       $('visitRequestNone').checked = item.otherRequests.length === 0;
       this.querySelectorAll('input[type="checkbox"]').forEach(input => { input.disabled = true; });
       this.querySelectorAll('.claim-required, .visit-upload-actions, input[type="file"], .visit-add-record, .visit-empty-description').forEach(element => element.remove());
+      if (item.remarks) {
+        const field = node('label', 'claim-field');
+        const remarks = node('textarea', 'claim-control');
+        remarks.id = 'visitRemarks';
+        remarks.readOnly = true;
+        remarks.value = item.remarks;
+        field.append(node('span', 'claim-field-label', 'Remarks'), remarks);
+        this.querySelector('.visit-upload-section').before(field);
+      }
       this.querySelector('.visit-upload-heading').textContent = 'Attachments';
       const files = $('visitAttachments');
       for (const file of item.attachments) {
-        files.append(node('div', 'visit-attachment', file.name ?? file));
+        const attachment = node('div', 'visit-attachment');
+        attachment.append(node('span', 'visit-attachment-text', file.name ?? file));
+        files.append(attachment);
       }
       if (!item.attachments.length) files.textContent = 'No attachments';
       this.renderPeople('guest', item.guests);
       this.renderPeople('attendee', item.attendees);
       this.updateCounts(item.guests.length, item.attendees.length);
 
-      const scrollArea = this.closest('.payroll-approval-details-body');
       const showTab = (name, focus = false) => {
         this.selectStep(name);
         scrollArea.scrollTop = 0;

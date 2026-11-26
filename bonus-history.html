@@ -47,8 +47,7 @@
           <div class="bonus-user-left">
             <div class="bonus-user-avatar" style="background: linear-gradient(135deg, #059669 0%, #10b981 100%); color: #ffffff; font-weight: 800; font-size: 15px; display: flex; align-items: center; justify-content: center;">SJ</div>
             <div>
-              <div class="bonus-user-name">Sarah Jenkins</div>
-              <div class="employee-id-standard">#EBB01</div>
+              <div class="bonus-user-name">EBB01 - Sarah Jenkins</div>
               <div class="bonus-user-role">SENIOR PRODUCT DESIGNER</div>
             </div>
           </div>
@@ -168,7 +167,7 @@
     HistoryRecordPage.register((kind, id) => {
       if (kind !== 'audit' || id !== 'log') return;
       document.getElementById('historyAuditText').textContent = tableRows().slice(1).length
-        + ' records reviewed for Sarah Jenkins (#EBB01). Last opened ' + new Date().toLocaleString();
+        + ' records reviewed for Sarah Jenkins (EBB01). Last opened ' + new Date().toLocaleString();
       return document.getElementById('historyAuditPage');
     });
 

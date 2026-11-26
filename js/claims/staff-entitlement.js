@@ -9,7 +9,7 @@
     container.innerHTML = records.map(record => `
       <article class="card" data-entitlement-record style="background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:20px;padding:16px 18px;box-shadow:var(--shadow-card);display:flex;flex-direction:column;gap:12px;margin-bottom:0;">
         <div class="entitlement-staff-header">
-          <div><div style="font-weight:800;font-size:14.5px;color:#fff;line-height:1.2;">${escapeHtml(record.employeeName)}</div><div style="font-size:11.5px;font-weight:700;color:#ede9fe;opacity:.8;font-family:monospace,sans-serif;margin-top:3px;">#${escapeHtml(record.empNo)}</div></div>
+          <div><div style="font-weight:800;font-size:14.5px;color:#fff;line-height:1.2;">${employeeCardHeading.html(record.empNo, record.employeeName)}</div></div>
           <div class="entitlement-benefit-type"><div class="entitlement-benefit-value">${escapeHtml(record.categoryName)}</div></div>
         </div>
         <div class="entitlement-metrics">

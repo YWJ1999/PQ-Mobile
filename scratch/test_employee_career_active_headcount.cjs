@@ -16,7 +16,7 @@ const statusCounts = [
   ['on-probation', 'On Probation', 3]
 ];
 const employeeDetailLabels = [
-  'Employee #', 'Name', 'Position', 'Superior', 'Job', 'Company', 'Branch',
+  'Employee No.', 'Name', 'Position', 'Superior', 'Job', 'Company', 'Branch',
   'Base', 'Division', 'Department', 'Section', 'Cost Center', 'Line', 'Service Years'
 ];
 
@@ -125,18 +125,15 @@ async function assertNoHorizontalOverflow(page, context) {
       assert.equal(await page.$$eval('#activeHeadcountStaffList .active-headcount-employee-card', cards => cards.length), 18);
       assert.ok(await page.$$eval('#activeHeadcountStaffList .active-headcount-employee-card', cards => cards.every(card => {
         const name = card.querySelector('.employee-name');
-        const id = card.querySelector('.employee-id');
         const grade = card.querySelector('.active-headcount-employee-grade');
         const position = card.querySelector('.active-headcount-employee-position');
         const header = card.querySelector('.manpower-employee-identity');
         const details = card.querySelector('.manpower-employee-card-details');
         const style = getComputedStyle(card);
-        return Boolean(name?.textContent.trim())
-          && /^#\S+/.test(id?.textContent.trim() || '')
-          && id.getBoundingClientRect().top >= name.getBoundingClientRect().bottom - 1
+        return /^[^\s#]+ - .+/.test(name?.textContent.trim() || '')
           && Boolean(grade?.textContent.trim())
           && Boolean(position?.textContent.trim())
-          && header?.contains(name) && header.contains(id)
+          && header?.contains(name)
           && getComputedStyle(header).backgroundImage.includes('linear-gradient')
           && getComputedStyle(name).color === 'rgb(255, 255, 255)'
           && style.borderLeftWidth === style.borderRightWidth

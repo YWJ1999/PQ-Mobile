@@ -160,8 +160,8 @@
     $('goalPlanEmployeeName').value = employee.name;
     $('goalPlanPosition').value = employee.position;
     $('goalPlanDepartment').value = employee.department;
-    $('goalPlanSupervisorName').value = employee.supervisor.name + '  #' + String(employee.supervisor.empNo).replace(/^#/, '');
-    $('goalPlanReportingName').value = employee.reportingTo.name + '  #' + String(employee.reportingTo.empNo).replace(/^#/, '');
+    $('goalPlanSupervisorName').value = employee.supervisor.name + '  ' + formatEmployeeNumber(employee.supervisor.empNo);
+    $('goalPlanReportingName').value = employee.reportingTo.name + '  ' + formatEmployeeNumber(employee.reportingTo.empNo);
     $('goalPlanPeriod').value = source.period;
     $('goalPlanAppraisalType').value = source.appraisalType;
   }

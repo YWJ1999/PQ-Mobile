@@ -960,14 +960,29 @@ html[data-web-native] .payroll-approval-card-header .employee-id { color: var(--
 }
 
 html[data-web-native] .web-record-submit-date {
-  display: block;
-  margin: 10px 0;
+  margin: 0;
   color: var(--text-muted);
   font-size: 11px;
   font-weight: 700;
   line-height: 1.4;
   text-align: start;
   font-variant-numeric: tabular-nums;
+}
+html[data-web-native] :is(span, div).web-record-submit-date {
+  display: flex;
+  flex-direction: column;
+  grid-column: 1;
+  gap: 2px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+html[data-web-native] .web-record-submit-date > :is(dt, dd) { margin: 0; }
+html[data-web-native] .web-record-submit-date > :is(strong, dd) {
+  color: var(--text-primary);
+  font-size: 12px;
+}
+html[data-web-native] :is(.web-record-submit-date, .web-record-event-date) > :is(span, strong, dt, dd) {
+  font-weight: 600 !important;
 }
 html[data-web-native] [data-web-submit-source] { display: none !important; }
 html[data-web-native] .phone-container.web-showing-history > :is(header, main, .main-content, .cal-top-header, .bonus-top-header, phone-bottom-nav):not(.web-history-page) {

@@ -73,7 +73,7 @@ const PerformanceRequestForm = (() => {
           <section class="employee-career-form-section" aria-labelledby="selfReviewEmployeeHeading">
             <h2 id="selfReviewEmployeeHeading" class="form-section-heading">Employee Details</h2>
             <div class="employee-career-field"><label for="selfReviewName">Name</label><input id="selfReviewName" name="name" class="employee-career-control employee-career-readonly" type="text" value="Farhan Binti Rahmat" readonly></div>
-            <div class="employee-career-field"><label for="selfReviewEmployee">Employee#</label><input id="selfReviewEmployee" name="empNo" class="employee-career-control employee-career-readonly" type="text" value="#EBB12" readonly></div>
+            <div class="employee-career-field"><label for="selfReviewEmployee">Employee No.</label><input id="selfReviewEmployee" name="empNo" class="employee-career-control employee-career-readonly" type="text" value="EBB12" readonly></div>
             <div class="employee-career-field"><label for="selfReviewPosition">Position</label><input id="selfReviewPosition" name="position" class="employee-career-control employee-career-readonly" type="text" value="Group HR Manager" readonly></div>
             <div class="employee-career-field"><label for="selfReviewPositionTitle">Position Title</label><input id="selfReviewPositionTitle" name="positionTitle" class="employee-career-control employee-career-readonly" type="text" value="Group Human Resource Manager" readonly></div>
             <!-- Additional employee attributes are sample values for this form preview. -->

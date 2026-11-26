@@ -52,7 +52,7 @@ async function checkSubmittedForms(page) {
     assert.equal(await page.$eval('#performanceApprovalCount', el => el.textContent), '4');
     const card = await page.$('.approval-request-card');
     const id = await card.evaluate(el => el.dataset.requestId);
-    assert.equal(await card.$eval('.employee-name', el => el.textContent), 'Farhan Binti Rahmat');
+    assert.equal(await card.$eval('.employee-name', el => el.textContent), 'EBB12 - Farhan Binti Rahmat');
     await card.$eval('.approval-record-link', el => el.click());
     await page.reload();
     await page.waitForSelector('#approvalDetails:not([hidden])');
@@ -123,7 +123,7 @@ async function checkSubmittedForms(page) {
         for (const category of ['goal-plan', 'self-evaluation', 'self-review']) {
           await page.click(`[data-approval-tab="${category}"]`);
           assert.equal(await page.$$eval('.approval-request-card', els => els.length), 3);
-          assert.ok(await page.$$eval('.employee-id', els => els.every(el => /^#/.test(el.textContent) && el.previousElementSibling.classList.contains('employee-name'))));
+          assert.ok(await page.$$eval('.employee-id', els => els.every(el => /^[^#\s]+$/.test(el.textContent) && el.previousElementSibling.classList.contains('employee-name'))));
           await page.click('.three-dots-btn');
           assert.deepEqual(await page.$$eval('#performanceApprovalMenu .payroll-approval-menu-option', els => els.map(el => el.textContent.trim())), ['View Details', 'View Workflow']);
           await page.click('#performanceApprovalViewDetails');
@@ -140,7 +140,7 @@ async function checkSubmittedForms(page) {
             }
           } else {
             assert.equal(await page.$eval('#selfReviewName', el => el.textContent), 'Aina Rahman');
-            assert.equal(await page.$eval('#selfReviewEmployee', el => el.textContent), '#EBB01');
+            assert.equal(await page.$eval('#selfReviewEmployee', el => el.textContent), 'EBB01');
             assert.equal(await page.$eval('#selfReviewBand', el => el.textContent), '—');
           }
           assert.deepEqual(await page.$$eval('#approvalDetailsActions button', els => els.map(el => el.textContent)), ['Approve', 'Resubmit', 'Cancel', 'Reject']);

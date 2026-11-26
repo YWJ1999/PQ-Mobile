@@ -65,14 +65,11 @@
       if (empNo) {
         card.href = cvUrl(record);
         card.dataset.goalCv = record.id || '';
-        card.setAttribute('aria-label','Open CV for ' + display(record.name) + ', #' + empNo);
+        card.setAttribute('aria-label','Open CV for ' + display(record.name) + ', ' + empNo);
       }
       const header = node('span','history-card-header goal-summary-employee-header');
       const heading = node('span','history-card-heading goal-summary-employee-identity');
-      heading.append(
-        node('strong','history-card-title goal-summary-employee-name',display(record.name)),
-        node('span','history-card-ref goal-summary-employee-id',empNo ? '#' + empNo : '—')
-      );
+      heading.append(node('strong','history-card-title goal-summary-employee-name',employeeCardHeading.text(empNo, record.name)));
       const status = node('span','status-pill ' + statusTone + ' goal-summary-achieved-pill',percent(achieved));
       status.dataset.recordKeyLabel = achieved == null ? 'No achievement reported' : achieved === 100 ? '100% achieved' : 'Below 100% achieved';
       header.append(heading,status);

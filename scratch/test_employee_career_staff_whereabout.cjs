@@ -19,8 +19,7 @@ const url = pathToFileURL(path.resolve(__dirname, '../modules/employee-career/op
       await page.setViewport({ width: 390, height: 950 });
       await page.goto(url + '?theme=' + theme, { waitUntil: 'networkidle0' });
       assert.equal(await page.$('.employee-career-coming-card'), null);
-      assert.deepEqual(await page.$$eval('.staff-whereabout-name', nodes => nodes.map(n => n.textContent)), ['Andrew', 'Yee seong liew', 'Ewi robert', 'Ali bin ahmad', 'Juliana binti othman']);
-      assert.deepEqual(await page.$$eval('.staff-whereabout-emp-no', nodes => nodes.map(n => n.textContent)), ['#000030', '#000070', '#82828', '#A9999', '#EBB204']);
+      assert.deepEqual(await page.$$eval('.staff-whereabout-name', nodes => nodes.map(n => n.textContent)), ['000030 - Andrew', '000070 - Yee seong liew', '82828 - Ewi robert', 'A9999 - Ali bin ahmad', 'EBB204 - Juliana binti othman']);
       assert.deepEqual(await page.$$eval('#staffWhereaboutFilterForm label', nodes => nodes.map(n => n.textContent)), ['Date', 'Search Keyword', 'Branch', 'Department', 'Whereabout']);
       assert.equal(await page.$eval('#staffWhereaboutCurrentDate', n => n.textContent), '05 Oct 2026');
       assert.equal(await page.$eval('.staff-whereabout-date-switcher', n => n.nextElementSibling.classList.contains('staff-whereabout-filter-summary')), true);
@@ -42,7 +41,6 @@ const url = pathToFileURL(path.resolve(__dirname, '../modules/employee-career/op
         await page.setViewport({ width, height: 950 });
         assert.ok(await page.$eval('main', n => n.scrollWidth <= n.clientWidth + 1));
         assert.ok(await page.$$eval('.staff-whereabout-card', nodes => nodes.every(n => n.scrollWidth <= n.clientWidth + 1)));
-        assert.ok(await page.$$eval('.staff-whereabout-card', nodes => nodes.every(n => n.querySelector('.staff-whereabout-emp-no').getBoundingClientRect().top >= n.querySelector('.staff-whereabout-name').getBoundingClientRect().bottom)));
         await page.click('.staff-whereabout-card');
         assert.ok(await page.$('#staffWhereaboutDetails'), 'Staff Whereabout needs a card details popup');
         assert.equal(await page.$eval('#staffWhereaboutDetails', n => n.hidden), false, 'Clicking a staff card must open its details');
@@ -83,7 +81,7 @@ const url = pathToFileURL(path.resolve(__dirname, '../modules/employee-career/op
       await page.screenshot({ path: path.join(__dirname, `employee_career_staff_whereabout_${theme}.png`) });
       await apply({ staffWhereaboutKeyword: '#000030' });
       assert.equal(await page.$$eval('.staff-whereabout-card', nodes => nodes.length), 1);
-      assert.equal(await page.$eval('.staff-whereabout-name', n => n.textContent), 'Andrew');
+      assert.equal(await page.$eval('.staff-whereabout-name', n => n.textContent), '000030 - Andrew');
       await reset();
       await apply({ staffWhereaboutType: 'Medical Leave' });
       assert.equal(await page.$$eval('.staff-whereabout-card', nodes => nodes.length), 3);

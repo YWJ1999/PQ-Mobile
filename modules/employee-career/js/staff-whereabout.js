@@ -36,11 +36,11 @@
       const card = element('article', 'staff-whereabout-card');
       card.tabIndex = 0;
       card.setAttribute('role', 'button');
-      card.setAttribute('aria-label', `View whereabout details for ${row.name}, #${row.empNo}`);
+      card.setAttribute('aria-label', `View whereabout details for ${row.name}, ${formatEmployeeNumber(row.empNo)}`);
       card.setAttribute('aria-haspopup', 'dialog');
       card.setAttribute('aria-controls', 'staffWhereaboutDetails');
       const header = element('header', 'staff-whereabout-card-header');
-      header.append(element('h3', 'staff-whereabout-name', row.name), element('span', 'staff-whereabout-emp-no', '#' + row.empNo));
+      header.append(element('h3', 'staff-whereabout-name', employeeCardHeading.text(row.empNo, row.name)));
       const body = element('dl', 'staff-whereabout-card-body');
       body.id = `staffWhereaboutSummary${index}`;
       card.setAttribute('aria-describedby', body.id);

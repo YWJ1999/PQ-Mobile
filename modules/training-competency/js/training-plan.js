@@ -27,7 +27,7 @@
   function renderPerson(container, person) {
     container.replaceChildren(node('strong', '', display(person?.name)));
     const id = String(person?.empNo ?? '').replace(/^#+/, '');
-    if (id) container.append(node('span', 'training-plan-employee-id', `#${id}`));
+    if (id) container.append(node('span', 'training-plan-employee-id', formatEmployeeNumber(id)));
   }
 
   function detail(label, value, field) {

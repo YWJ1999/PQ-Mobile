@@ -694,6 +694,8 @@
   </style>
 <link rel="stylesheet" href="../../../css/attendance-highlight-report.css">
 <link rel="stylesheet" href="../../../css/attendance-manpower-details.css">
+<link rel="stylesheet" href="../../../css/attendance-work-shift-summary.css">
+<script src="../../../js/attendance/work-shift-summary.js" defer></script>
 <script src="../../../js/attendance-manpower-data.js"></script>
 </head>
 <body class="attendance-highlight-page manpower-page">
@@ -762,13 +764,8 @@
 
       <!-- Details View -->
       <div id="view-details" style="display: none;">
-        <div class="manpower-detail-info-card">
-          <div class="manpower-detail-date"><span>Date</span><strong id="manpowerDetailDate"></strong></div>
-          <div id="manpowerDetailOverview" class="manpower-detail-overview"></div>
-        </div>
         <p id="manpowerDetailScope" class="manpower-detail-scope" hidden></p>
         <div id="manpowerDetailList" class="manpower-detail-list"></div>
-        <p id="manpowerDetailEmpty" class="attendance-report-empty" hidden></p>
       </div>
     </div>
 
@@ -857,13 +854,13 @@
             <div style="position: relative;">
               <select id="filterCostCenterSelect" class="form-field-select">
                 <option value="all" selected>- All Cost Centers -</option>
-                <option value="CC-101 MANAGEMENT">CC-101 MANAGEMENT</option>
-                <option value="CC-501 HR & OPS">CC-501 HR & OPS</option>
-                <option value="CC-301 PRODUCTION">CC-301 PRODUCTION</option>
-                <option value="CC-100 ADMIN">CC-100 ADMIN</option>
-                <option value="MANAGEMENT">MANAGEMENT</option>
-                <option value="CC-401 LOGISTICS">CC-401 LOGISTICS</option>
-                <option value="CC-201 IT DEVELOPMENT">CC-201 IT DEVELOPMENT</option>
+                <option value="CC-101 MANAGEMENT">CC-101 Management</option>
+                <option value="CC-501 HR & OPS">CC-501 HR &amp; Ops</option>
+                <option value="CC-301 PRODUCTION">CC-301 Production</option>
+                <option value="CC-100 ADMIN">CC-100 Admin</option>
+                <option value="MANAGEMENT">Management</option>
+                <option value="CC-401 LOGISTICS">CC-401 Logistics</option>
+                <option value="CC-201 IT DEVELOPMENT">CC-201 IT Development</option>
               </select>
               <div class="select-chevron-icon"><i class="fa-solid fa-chevron-down"></i></div>
             </div>
@@ -894,10 +891,10 @@
         section: 'CORPORATE',
         costCenter: 'CC-101 MANAGEMENT',
         staff: [
-          { name: 'Lee Soon Hock', empNo: '#EBB01', status: 'Work Shift', badgeClass: 'status-badge-green', info: '08:00 AM – 05:00 PM • Morning Shift' },
-          { name: 'Siti Nurhaliza', empNo: '#004177', status: 'Work Shift', badgeClass: 'status-badge-green', info: '08:00 AM – 05:00 PM • Morning Shift' },
-          { name: 'Tan Wei Ming', empNo: '#0000101', status: 'Work Shift', badgeClass: 'status-badge-green', info: '08:30 AM – 05:30 PM • General Shift' },
-          { name: 'Michael Chen', empNo: '#EBB04', status: 'Work Shift', badgeClass: 'status-badge-green', info: '09:00 AM – 06:00 PM • Flexi Shift' }
+          { name: 'Lee Soon Hock', empNo: 'EBB01', status: 'Work Shift', badgeClass: 'status-badge-green', info: '08:00 AM – 05:00 PM • Morning Shift' },
+          { name: 'Siti Nurhaliza', empNo: '004177', status: 'Work Shift', badgeClass: 'status-badge-green', info: '08:00 AM – 05:00 PM • Morning Shift' },
+          { name: 'Tan Wei Ming', empNo: '0000101', status: 'Work Shift', badgeClass: 'status-badge-green', info: '08:30 AM – 05:30 PM • General Shift' },
+          { name: 'Michael Chen', empNo: 'EBB04', status: 'Work Shift', badgeClass: 'status-badge-green', info: '09:00 AM – 06:00 PM • Flexi Shift' }
         ]
       },
       {
@@ -907,7 +904,7 @@
         section: 'GENERAL HR',
         costCenter: 'CC-501 HR & OPS',
         staff: [
-          { name: 'Wong Kah Fai', empNo: '#EBB02', status: 'Work Shift', badgeClass: 'status-badge-green', info: '08:30 AM – 05:30 PM • HR Operations' }
+          { name: 'Wong Kah Fai', empNo: 'EBB02', status: 'Work Shift', badgeClass: 'status-badge-green', info: '08:30 AM – 05:30 PM • HR Operations' }
         ]
       },
       {
@@ -917,8 +914,8 @@
         section: 'ASSEMBLY',
         costCenter: 'CC-301 PRODUCTION',
         staff: [
-          { name: 'Chok Ching Hou', empNo: '#EBB03', status: 'No Work', badgeClass: 'status-badge-amber', info: 'Scheduled Rest Day Off' },
-          { name: 'Kavitha Raj', empNo: '#004199', status: 'No Work', badgeClass: 'status-badge-amber', info: 'Public Holiday Off' }
+          { name: 'Chok Ching Hou', empNo: 'EBB03', status: 'No Work', badgeClass: 'status-badge-amber', info: 'Scheduled Rest Day Off' },
+          { name: 'Kavitha Raj', empNo: '004199', status: 'No Work', badgeClass: 'status-badge-amber', info: 'Public Holiday Off' }
         ]
       },
       {
@@ -928,8 +925,8 @@
         section: 'EXECUTIVE',
         costCenter: 'CC-100 ADMIN',
         staff: [
-          { name: 'David Miller', empNo: '#EBB05', status: 'Work Shift', badgeClass: 'status-badge-green', info: '08:00 AM – 05:00 PM • Management' },
-          { name: 'Jessica Taylor', empNo: '#EBB06', status: 'Work Shift', badgeClass: 'status-badge-green', info: '08:00 AM – 05:00 PM • Executive' }
+          { name: 'David Miller', empNo: 'EBB05', status: 'Work Shift', badgeClass: 'status-badge-green', info: '08:00 AM – 05:00 PM • Management' },
+          { name: 'Jessica Taylor', empNo: 'EBB06', status: 'Work Shift', badgeClass: 'status-badge-green', info: '08:00 AM – 05:00 PM • Executive' }
         ]
       },
       {
@@ -939,10 +936,10 @@
         section: 'FOREX',
         costCenter: 'MANAGEMENT',
         staff: [
-          { name: 'Lee Soon Hock', empNo: '#EBB01', status: 'Work Shift', badgeClass: 'status-badge-green', info: 'FOREX Management • 08:30 – 17:30' }
+          { name: 'Lee Soon Hock', empNo: 'EBB01', status: 'Work Shift', badgeClass: 'status-badge-green', info: 'FOREX Management • 08:30 – 17:30' }
         ]
       }
-    ].map(group => ({ ...group, ...getManpowerPreviewCounts(group.id) }));
+    ];
 
     let currentDateObj = new Date(2026, 8, 20); // 20 Sep 2026
 
@@ -994,6 +991,7 @@
     }
 
     function renderManpowerList() {
+      const dateKey = formatDateISO(currentDateObj);
       const companyFilter = document.getElementById('filterCompanySelect')?.value || 'all';
       const deptFilter = document.getElementById('filterDeptSelect')?.value || 'all';
       const sectionFilter = document.getElementById('filterSectionSelect')?.value || 'all';
@@ -1005,7 +1003,7 @@
         const matchSection = (sectionFilter === 'all' || item.section === sectionFilter);
         const matchCostCenter = (costCenterFilter === 'all' || item.costCenter === costCenterFilter);
         return matchCompany && matchDept && matchSection && matchCostCenter;
-      });
+      }).map(group => ({ ...group, ...getManpowerPreviewCounts(group.id, dateKey) }));
 
       // Update Total Summary KPIs
       let totWorkShift = 0, totNoWork = 0, totOtPlan = 0, totOnLeave = 0;
@@ -1033,7 +1031,7 @@
       if (!container) return;
 
       document.getElementById('manpowerEmpty').hidden = filtered.length > 0;
-      renderManpowerCards(container, filtered);
+      renderManpowerCards(container, filtered, { company: companyFilter, section: sectionFilter, costCenter: costCenterFilter });
     }
     // Modal Operations
     function openFilterModal() {

@@ -38,7 +38,7 @@ const url = (file, query) => pathToFileURL(path.resolve(__dirname, '..', file)).
         assert.equal(await page.$eval('[data-record-id="feedback-1"] .history-card-title', el => el.textContent), 'Updated feedback');
         await page.click('[data-record-id="feedback-1"] .career-history-card-open');
         assert.ok((await page.$eval('#historyDetailBody', el => el.textContent)).includes('Updated suggestion'));
-        assert.equal(await page.$eval('.career-history-employee-id', el => el.textContent), '#EBB12', 'Editing preserves employee identity');
+        assert.equal(await page.$eval('.career-history-employee-id', el => el.textContent), 'EBB12', 'Editing preserves employee identity');
         assert.equal(await page.$eval('#historyEditFeedback', el => el.textContent.trim()), 'Edit Feedback');
         assert.ok(await page.$('#historyEditFeedback > .fa-pen[aria-hidden="true"]'));
         assert.ok(await page.$eval('#historyEditFeedback', el => {

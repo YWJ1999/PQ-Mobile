@@ -33,7 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
   };
   const fieldMap = row => Object.fromEntries(row.fields);
   const fieldValue = (fields, ...names) => names.map(name => fields[name]).find(value => String(value || '').trim()) || '';
-  const employeeNumber = value => value ? (String(value).startsWith('#') ? String(value) : '#' + value) : emptyValue;
+  const employeeNumber = value => formatEmployeeNumber(value) || emptyValue;
 
   function node(tag, className, text) {
     const element = document.createElement(tag);
@@ -110,9 +110,10 @@ document.addEventListener('DOMContentLoaded', () => {
     };
   }
 
-  function appendTable(parent, rows, className = '') {
-    const table = node('table', ('history-detail-table ' + className).trim());
+  function appendTable(parent, rows, submitDate) {
+    const table = node('table', 'history-detail-table history-detail-main-table');
     const tbody = table.createTBody();
+    recordSubmitDate.append(tbody, submitDate);
     for (const [label, value] of rows) {
       const tr = tbody.insertRow();
       const th = node('th', '', label);
@@ -124,85 +125,60 @@ document.addEventListener('DOMContentLoaded', () => {
       else cell.textContent = String(value || emptyValue);
     }
     parent.append(table);
-    return table;
-  }
-
-  function appendSection(body, title) {
-    const section = node('section', 'history-detail-section');
-    section.append(node('h3', 'history-detail-section-title', title));
-    body.append(section);
-    return section;
   }
 
   function splitDescription(value) {
     return String(value || '').split(/\s*(?:\u2022|\u00e2\u20ac\u00a2)\s*/).map(part => part.trim());
   }
 
-  function requestFlag(value, words) {
-    const request = String(value || '').toLowerCase();
-    if (!request || request === 'none') return 'No';
-    return words.some(word => request.includes(word)) ? 'Yes' : 'No';
+  function guestSubmission(row, fields) {
+    const saved = row.guestVisit || {};
+    // Earlier visits store times, people and requests as display text.
+    const [startTime, endTime] = fieldValue(fields, 'Visit Time', 'Time').split(/[-–—]/)
+      .map(time => time.trim().replace(/^(\d{2})(\d{2})$/, '$1:$2'));
+    const otherRequest = fieldValue(fields, 'Other Request');
+    const yes = value => value.trim().toLowerCase() === 'yes';
+    const people = pattern => row.fields.filter(([label]) => pattern.test(label)).map(([, value]) => value);
+    return {
+      submitDate: saved.submitDate ?? submissionDate(row),
+      visitDate: saved.visitDate ?? (fieldValue(fields, 'Visit Date') || row.date),
+      startTime: saved.startTime ?? startTime,
+      endTime: saved.endTime ?? endTime,
+      totalGuest: saved.totalGuest ?? fieldValue(fields, 'Visitor', 'Total Guest'),
+      location: saved.location ?? fieldValue(fields, 'Location'),
+      meal: saved.meal ?? yes(fieldValue(fields, 'Request Meal?', 'Meal')),
+      remarks: saved.remarks ?? fieldValue(fields, 'Remarks', 'Remark'),
+      guests: saved.guests ?? people(/^Guest \d+$/i).map(value => {
+        const [name, company, relation, position] = splitDescription(value);
+        return { name, company, relation, position };
+      }),
+      attendees: saved.attendees ?? people(/^Attendee \d+$/i).map(value => {
+        const [name, empNo, description] = value.split(/\r?\n/);
+        const [department, position] = splitDescription(description);
+        return { name, empNo, department, position };
+      }),
+      otherRequests: saved.otherRequests ?? [
+        ['floor-visit', 'Floor Visit?', /floor visit/i],
+        ['sitting-arrangement', 'Sit Arrange?', /(?:sit|sitting|seating) arrange/i],
+        ['multiple-rooms', 'Multi Room?', /multi(?:ple)? room/i]
+      ].filter(([, label, pattern]) => fields[label]?.trim() ? yes(fields[label]) : pattern.test(otherRequest))
+        .map(([request]) => request),
+      attachments: saved.attachments ?? fieldValue(fields, 'Attachments', 'Attachment', 'FileName')
+        .split(',').map(name => name.trim()).filter(name => name && name.toLowerCase() !== 'none')
+    };
   }
 
   function guestDetail(row, body) {
     const fields = fieldMap(row);
-    const otherRequest = fieldValue(fields, 'Other Request');
-    appendTable(body, [
+    const empNo = row.guestVisit?.empNo || fieldValue(fields, 'Emp No.', 'Employee No.', 'Emp #', 'Employee #') || currentEmployee.empNo;
+    const name = row.guestVisit?.employeeName || fieldValue(fields, 'Name', 'Employee Name') || currentEmployee.name;
+    const form = node('guest-visit-fields', 'guest-visit-page');
+    body.append(form);
+    form.showSubmission(guestSubmission(row, fields), date, body, [
       ['Reference #', referenceNumber(row, fields)],
       ['Status', recordDetailStatus.create(statuses[row.status]?.[0] || row.status)],
-      ['Emp #', employeeNumber(fieldValue(fields, 'Emp #', 'Employee #') || currentEmployee.empNo)],
-      ['Name', fieldValue(fields, 'Name', 'Employee Name') || currentEmployee.name],
-      ['Visit Date', date(fieldValue(fields, 'Visit Date') || row.date)],
-      ['Visit Time', fieldValue(fields, 'Visit Time', 'Time') || emptyValue],
-      ['Visitor', fieldValue(fields, 'Visitor', 'Total Guest') || emptyValue],
-      ['Location', fieldValue(fields, 'Location') || emptyValue],
-      ['Request Meal?', fieldValue(fields, 'Request Meal?', 'Meal') || 'No'],
-      ['Floor Visit?', fieldValue(fields, 'Floor Visit?') || requestFlag(otherRequest, ['floor visit'])],
-      ['Sit Arrange?', fieldValue(fields, 'Sit Arrange?') || requestFlag(otherRequest, ['sit arrange', 'sitting arrangement', 'seating arrangement'])],
-      ['Multi Room?', fieldValue(fields, 'Multi Room?') || requestFlag(otherRequest, ['multi room'])],
-      ['Remarks', fieldValue(fields, 'Remarks', 'Remark') || emptyValue]
-    ], 'history-detail-main-table');
-
-    const guestSection = appendSection(body, 'Guest Information');
-    const guests = row.fields.filter(([label]) => /^Guest \d+$/i.test(label));
-    for (const [label, value] of guests) {
-      const [name, company, relation, position] = splitDescription(value);
-      const subcard = node('div', 'history-detail-subcard');
-      subcard.setAttribute('aria-label', label);
-      appendTable(subcard, [
-        ['Company', company || emptyValue],
-        ['Relation', relation || emptyValue],
-        ['Name', name || emptyValue],
-        ['Position', position || emptyValue]
-      ], 'history-detail-nested-table');
-      guestSection.append(subcard);
-    }
-
-    const attendeeSection = appendSection(body, 'Internal Attendee');
-    const attendees = row.fields.filter(([label]) => /^Attendee \d+$/i.test(label));
-    for (const [label, value] of attendees) {
-      const [name = '', empNo = '', description = ''] = String(value || '').split('\n');
-      const [department, position] = splitDescription(description);
-      const subcard = node('div', 'history-detail-subcard');
-      subcard.setAttribute('aria-label', label);
-      appendTable(subcard, [
-        ['Emp #', employeeNumber(empNo)],
-        ['Name', name || emptyValue],
-        ['Department', department || emptyValue],
-        ['Position', position || emptyValue]
-      ], 'history-detail-nested-table');
-      attendeeSection.append(subcard);
-    }
-
-    const attachmentSection = appendSection(body, 'Attachment');
-    const attachments = fieldValue(fields, 'Attachments', 'Attachment', 'FileName').split(',').map(value => value.trim()).filter(value => value && value.toLowerCase() !== 'none');
-    for (const attachment of attachments) {
-      const item = node('div', 'history-detail-attachment');
-      const icon = node('i', 'fa-solid fa-paperclip');
-      icon.setAttribute('aria-hidden', 'true');
-      item.append(icon, node('span', '', attachment));
-      attachmentSection.append(item);
-    }
+      ['Requested by', employeeCardHeading.text(empNo, name)]
+    ]);
   }
 
   function letterDetail(row, body) {
@@ -220,7 +196,7 @@ document.addEventListener('DOMContentLoaded', () => {
       ['Remark', fieldValue(fields, 'Remark', 'Remarks') || emptyValue],
       ['FileName', fieldValue(fields, 'FileName', 'Attachment', 'Attachments') || emptyValue],
       ['Acknowledged On', date(fieldValue(fields, 'Acknowledged On'))]
-    ], 'history-detail-main-table');
+    ], submissionDate(row));
   }
 
   function inventoryDetail(row, body) {
@@ -234,14 +210,14 @@ document.addEventListener('DOMContentLoaded', () => {
       ['Quantity', fieldValue(fields, 'Quantity') || emptyValue],
       ['UOM', fieldValue(fields, 'UOM', 'Unit') || emptyValue],
       ['Reason', fieldValue(fields, 'Reason') || emptyValue],
-      ['Submitter', employeeNumber(fieldValue(fields, 'Submitter', 'Emp #') || currentEmployee.empNo)],
+      ['Submitter', employeeNumber(fieldValue(fields, 'Submitter', 'Emp No.', 'Emp #') || currentEmployee.empNo)],
       ['Remark', fieldValue(fields, 'Remark', 'Remarks') || emptyValue],
       ['Approver Remark', fieldValue(fields, 'Approver Remark') || emptyValue],
       ['Is Assigned?', fieldValue(fields, 'Is Assigned?') || 'No']
     ];
     const attachment = fieldValue(fields, 'Attachment', 'Attachments', 'FileName');
     if (attachment && attachment.toLowerCase() !== 'none') detailRows.push(['Attachments', attachment]);
-    appendTable(body, detailRows, 'history-detail-main-table');
+    appendTable(body, detailRows, submissionDate(row));
   }
 
   function recordType(row) {
@@ -346,10 +322,12 @@ document.addEventListener('DOMContentLoaded', () => {
       const details = node('span', 'history-card-details');
       for (const [label, value] of content.rows) {
         const line = node('span', 'history-card-row');
+        if (label === 'Reason') line.classList.add('record-reason-field');
         line.append(node('span', '', label), node('strong', '', value || emptyValue));
         details.append(line);
       }
-      main.append(header, recordSubmitDate.create(submissionDate(row)), details);
+      recordSubmitDate.append(details, submissionDate(row));
+      main.append(header, details);
       card.append(main);
       const actions = node('div', 'history-card-actions');
       if (appendHistoryActions(actions, row, 'card')) card.append(actions);
@@ -396,7 +374,8 @@ document.addEventListener('DOMContentLoaded', () => {
   function renderDetails(row) {
     $('historyDetailTitle').textContent = row.kind === 'inventory-request' ? 'Inventory Details' : labels[row.kind] + ' Details';
     const body = $('historyDetailBody');
-    body.replaceChildren(recordSubmitDate.create(submissionDate(row)));
+    body.toggleAttribute('data-detail-form-layout', row.kind === 'guest-visit');
+    body.replaceChildren();
     if (row.kind === 'guest-visit') guestDetail(row, body);
     else if (row.kind === 'letter-request') letterDetail(row, body);
     else inventoryDetail(row, body);

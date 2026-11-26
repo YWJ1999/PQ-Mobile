@@ -17,7 +17,7 @@ const labels = ['Reference #', 'Status', 'Request', 'Period', 'Type', 'Manpower 
       await page.goto(url+'?category=staff-request&theme='+theme,{waitUntil:'load'});
       assert.ok(await page.$('#teamRequestFilterTrigger'), 'Staff Request has its own filter');
       assert.equal(await page.$eval('#teamRequestFilterBar',node=>node.hidden),false);
-      assert.deepEqual(await page.$$eval('#teamHistoryList .team-history-employee-identity .history-employee-name',nodes=>nodes.map(node=>node.textContent.trim())),['Aina Rahman','Daniel Wong'],'The initial preview cards show employee names before test fixtures are injected');
+      assert.deepEqual(await page.$$eval('#teamHistoryList .team-history-employee-identity .history-employee-name',nodes=>nodes.map(node=>node.textContent.trim())),['EBB01 - Aina Rahman','EBB02 - Daniel Wong'],'The initial preview cards show employee names before test fixtures are injected');
       assert.deepEqual(await page.$$eval('#teamHistoryList .team-history-employee-position',nodes=>nodes.map(node=>node.textContent.trim())),['People Operations Executive','Product Designer']);
       assert.deepEqual(await page.$$eval('#teamHistoryList .history-card-row',nodes=>nodes.slice(0,3).map(node=>node.firstElementChild.textContent.trim())),['Request Date','Require Date','Reason']);
       assert.deepEqual(await page.$$eval('#teamHistoryList .status-pill',nodes=>nodes.map(node=>node.textContent.trim())),['Approved','Approved']);
@@ -31,7 +31,7 @@ const labels = ['Reference #', 'Status', 'Request', 'Period', 'Type', 'Manpower 
       await page.click('[data-team-history-kind="staff-request"]');
       const original=await page.evaluate(()=>JSON.stringify(window.EMPLOYEE_CAREER_TEAM_HISTORY_DATA['staff-request']));
       const names=()=>page.$$eval('#teamHistoryList .team-history-employee-identity .history-employee-name',nodes=>nodes.map(node=>node.textContent.trim()));
-      assert.deepEqual(await names(),['Request Owner A','Request Owner B']);
+      assert.deepEqual(await names(),['0077 - Request Owner A','Request Owner B']);
       assert.deepEqual(await page.$$eval('#teamHistoryList .history-card-row:last-child strong',nodes=>nodes.map(node=>node.textContent.trim())),['SR-2026-0012','SR-2026-0011']);
       assert.deepEqual(await page.$$eval('#teamHistoryList .history-card-row',nodes=>nodes.slice(0,3).map(node=>node.lastElementChild.textContent.trim())),['4 Oct 2026','1 Dec 2026','Expansion']);
       const first='[data-request-id="SR-2026-0012"]';
@@ -71,13 +71,13 @@ const labels = ['Reference #', 'Status', 'Request', 'Period', 'Type', 'Manpower 
       await page.screenshot({path:path.join(__dirname,`staff-request-filter-${theme}-${width}.png`)});
       await page.keyboard.press('Escape');
       for(const [values,expected] of [
-        [{periodFrom:'2026-10',periodTo:'2026-10'},['Request Owner A']],
+        [{periodFrom:'2026-10',periodTo:'2026-10'},['0077 - Request Owner A']],
         [{company:'PeopleHCM Services'},['Request Owner B']],
         [{department:'Customer Experience'},['Request Owner B']],
-        [{branch:'Kuala Lumpur'},['Request Owner A']],
+        [{branch:'Kuala Lumpur'},['0077 - Request Owner A']],
         [{job:'Product Support Specialist'},['Request Owner B']],
-        [{requestType:'Budgeted'},['Request Owner A']],
-        [{periodFrom:'2026-09',periodTo:'2026-10',company:'PeopleHCM Malaysia',department:'People Operations',branch:'Kuala Lumpur',job:'Senior Executive',requestType:'Budgeted'},['Request Owner A']],
+        [{requestType:'Budgeted'},['0077 - Request Owner A']],
+        [{periodFrom:'2026-09',periodTo:'2026-10',company:'PeopleHCM Malaysia',department:'People Operations',branch:'Kuala Lumpur',job:'Senior Executive',requestType:'Budgeted'},['0077 - Request Owner A']],
         [{company:'PeopleHCM Services',requestType:'Budgeted'},[]]
       ]) {await apply(values);assert.deepEqual(await names(),expected,JSON.stringify(values));}
       assert.equal(await page.$eval('#teamHistoryRecordCount',node=>node.textContent.trim()),'0');
@@ -93,12 +93,12 @@ const labels = ['Reference #', 'Status', 'Request', 'Period', 'Type', 'Manpower 
       await page.click('#teamRequestFilterTrigger');
       await page.select('#teamRequestCompany','PeopleHCM Services');
       await page.keyboard.press('Escape');
-      assert.deepEqual(await names(),['Request Owner A'],'Closing discards draft changes');
+      assert.deepEqual(await names(),['0077 - Request Owner A'],'Closing discards draft changes');
       await page.click('[data-team-history-kind="staff-confirmation"]');
       assert.equal(await page.$eval('#teamRequestFilterBar',node=>node.hidden),true);
       assert.equal(await page.$eval('#teamHistoryRecordCount',node=>node.textContent.trim()),'2');
       await page.click('[data-team-history-kind="staff-request"]');
-      assert.deepEqual(await names(),['Request Owner A'],'Request filters survive tab switches independently');
+      assert.deepEqual(await names(),['0077 - Request Owner A'],'Request filters survive tab switches independently');
       await page.click('#teamRequestFilterTrigger');
       await page.setViewport({width,height:568});
       await page.$eval('#teamRequestFilterForm .team-history-filter-fields',node=>{node.scrollTop=node.scrollHeight;});

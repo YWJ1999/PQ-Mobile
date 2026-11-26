@@ -26,16 +26,14 @@ const pageUrl = pathToFileURL(path.resolve(__dirname, '../modules/attendance/opt
 
     const firstCard = await page.$eval('.staff-card', card => ({
       radius: getComputedStyle(card).borderRadius,
-      idFollowsName: card.querySelector('.staff-name')?.nextElementSibling?.classList.contains('emp-id-label') || false,
-      id: card.querySelector('.emp-id-label')?.textContent.trim(),
+      heading: card.querySelector('.staff-name').textContent.trim(),
       labels: [...card.querySelectorAll('.staff-card-detail > span')].map(node => node.textContent.trim()),
       values: [...card.querySelectorAll('.staff-card-detail > strong')].map(node => node.textContent.trim()),
       checkboxOnLeft: card.querySelector('.staff-select-control').getBoundingClientRect().right < card.querySelector('.staff-name').getBoundingClientRect().left,
       columns: getComputedStyle(card.querySelector('.staff-card-summary-panel')).gridTemplateColumns.split(' ').length
     }));
     assert.equal(firstCard.radius, '18px');
-    assert.equal(firstCard.idFollowsName, true);
-    assert.equal(firstCard.id, '#000008');
+    assert.equal(firstCard.heading, '000008 - Aqilah Antasha');
     assert.deepEqual(firstCard.labels, ['Job Title', 'Shift Group', 'Current Shift', 'Day Type']);
     assert.deepEqual(firstCard.values, ['Admin Executive', 'Group G', 'W01', 'Workday']);
     assert.ok(firstCard.checkboxOnLeft);

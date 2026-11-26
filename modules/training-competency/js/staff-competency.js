@@ -17,7 +17,7 @@
     return element;
   };
   const display = value => value === '' || value == null ? '—' : String(value);
-  const employeeId = value => value ? `#${String(value).replace(/^#+/, '')}` : '—';
+  const employeeId = value => formatEmployeeNumber(value) || '—';
   const percent = value => value == null ? '—' : `${value.toFixed(2)}%`;
 
   function match(record) {
@@ -183,7 +183,7 @@
 
   function exportExcel() {
     window.PeopleHcmHighlightExport.downloadCsv('staff-competency.csv', [
-      ['Emp #', 'Name', 'Match %', 'Branch', 'Department', 'Position'],
+      ['Emp No.', 'Name', 'Match %', 'Branch', 'Department', 'Position'],
       ...state.rows.map(record => [employeeId(record.empNo), display(record.name), match(record) ?? '', display(record.branch), display(record.department), display(record.position)]),
       [], ['Total Records', state.rows.length], ['Average Match %', average(state.rows) ?? ''], ['Current Filter', $('staffCompetencyFilterSummary').textContent]
     ]);
