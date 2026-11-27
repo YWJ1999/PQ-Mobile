@@ -17,8 +17,8 @@ const file = pathToFileURL(path.resolve(__dirname, '../modules/employee-career/o
     assert.deepEqual(await page.$$eval('#careerPendingTabs [role="tab"]', nodes => nodes.map(node => node.textContent)), ['CV Change Request', 'Staff Engagement'], 'Pending Approval exposes the new Staff Engagement tab');
     await page.click('[data-career-pending-type="Staff Engagement"]');
     assert.equal(await page.$eval('#careerPendingCount', node => node.textContent), '1', 'The sample engagement is visible without test injection');
-    assert.equal(await page.$eval('#careerPendingQueue .approval-card-submitted dd', node => node.textContent), '12/10/2026');
-    assert.equal(await page.$eval('#careerPendingQueue .approval-card-details > div:not(.record-submit-date) dd', node => node.textContent), '08/10/2026');
+    assert.equal(await page.$eval('#careerPendingQueue .card-submit-date > strong', node => node.textContent), '12/10/2026');
+    assert.equal(await page.$eval('#careerPendingQueue .approval-card-details > div dd', node => node.textContent), '08/10/2026');
     await page.click('.career-pending-review');
     await page.waitForSelector('#careerPendingDetailsTable .record-submit-date', { visible: true });
     assert.equal(await page.$eval('#careerPendingDetailsTable tr:last-child td', node => node.textContent), 'No attachments');
@@ -52,7 +52,8 @@ const file = pathToFileURL(path.resolve(__dirname, '../modules/employee-career/o
       assert.equal(await page.$eval('#careerPendingSelectedCount', node => node.textContent), '0', 'Switching types clears previous selections');
       assert.equal(await page.$eval('#careerPendingCount', node => node.textContent), '1');
       assert.deepEqual(await page.$$eval('#careerPendingQueue .employee-name', nodes => nodes.map(node => node.textContent)), ['EBB01 - Aina Rahman']);
-      assert.deepEqual(await page.$$eval('#careerPendingQueue .approval-card-details > div', nodes => nodes.map(node => [node.querySelector('dt').textContent, node.querySelector('dd').textContent])), [['Interview Date', '12/10/2026'], ['Position', 'People Operations Executive'], ['Submit Date', '12/10/2026']], 'Submit Date follows the interview date and position');
+      assert.deepEqual(await page.$$eval('#careerPendingQueue .approval-card-details > div', nodes => nodes.map(node => [node.querySelector('dt').textContent, node.querySelector('dd').textContent])), [['Interview Date', '12/10/2026'], ['Position', 'People Operations Executive']]);
+      assert.equal(await page.$eval('#careerPendingQueue .card-submit-date', node => node.textContent), 'Submit Date: 12/10/2026');
       assert.equal(await page.$('#careerPendingQueue .payroll-approval-card-header .career-pending-note'), null, 'Position appears once in the card body');
       assert.ok(await page.$eval('#careerPendingPanel', node => node.getAttribute('aria-labelledby') === document.querySelector('#careerPendingTabs [aria-selected="true"]').id));
       await page.screenshot({ path: path.join(__dirname, `employee-career-pending-engagement-${theme}-${width}.png`) });

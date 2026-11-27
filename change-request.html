@@ -422,7 +422,7 @@ DAMANSARA KOTA</textarea>
 
       <div class="change-form-actions form-action-row">
         <button class="change-cancel-btn" id="btnPreviousCategory" type="button" onclick="goToPreviousCategory()">
-          <i class="fa-solid fa-xmark" aria-hidden="true"></i><span>Cancel</span>
+          <span>Cancel</span>
         </button>
         <button class="change-next-btn" id="btnNextCategory" type="button" onclick="goToNextCategory()">
           <span>Next</span><i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
@@ -555,7 +555,6 @@ DAMANSARA KOTA</textarea>
 
           <div class="qualification-editor-actions form-action-row">
             <button class="qualification-editor-cancel" type="button" onclick="toggleQualificationForm(false)">
-              <i class="fa-solid fa-xmark" aria-hidden="true"></i>
               <span>Cancel</span>
             </button>
             <button id="saveQualificationButton" class="qualification-editor-save" type="button" onclick="saveQualificationRecord()">
@@ -699,7 +698,6 @@ DAMANSARA KOTA</textarea>
 
           <div class="family-editor-actions form-action-row">
             <button class="family-editor-cancel" type="button" onclick="toggleFamilyForm(false)">
-              <i class="fa-solid fa-xmark" aria-hidden="true"></i>
               <span>Cancel</span>
             </button>
             <button id="saveFamilyButton" class="family-editor-save" type="button" onclick="saveFamilyMember()">
@@ -780,7 +778,8 @@ DAMANSARA KOTA</textarea>
               <span class="change-history-status pending">⏳ Pending HR Approval</span>
             </div>
             <div class="change-history-title">Personal Email &amp; Passport Renewal</div>
-            <div class="change-history-date"><span>Route: HR Operations</span><span class="record-submit-date"><span>Submit Date</span> <strong>05/09/2026</strong></span></div>
+            <span class="record-submit-date card-submit-date"><span>Submit Date:</span> <strong>05/09/2026</strong></span>
+            <div class="change-history-date">Route: HR Operations</div>
 
             <!-- Expandable Detail Breakdown -->
           </a>
@@ -792,6 +791,7 @@ DAMANSARA KOTA</textarea>
               <span class="change-history-status approved">✓ Approved by HR</span>
             </div>
             <div class="change-history-title">Residential Address &amp; Mobile Update</div>
+            <span class="record-submit-date card-submit-date"><span>Submit Date:</span> <strong>—</strong></span>
             <div class="change-history-date">Approved on 15 Jan 2025 by Admin</div>
 
             <!-- Expandable Detail Breakdown -->
@@ -804,6 +804,7 @@ DAMANSARA KOTA</textarea>
               <span class="change-history-status approved">✓ Approved by HR</span>
             </div>
             <div class="change-history-title">Marital Status &amp; Degree Certification</div>
+            <span class="record-submit-date card-submit-date"><span>Submit Date:</span> <strong>—</strong></span>
             <div class="change-history-date">Approved on 12 Jun 2024 by HR Operations (Click for 2 modified items)</div>
             
             <!-- Expandable Detail Breakdown -->
@@ -986,8 +987,9 @@ DAMANSARA KOTA</textarea>
       document.getElementById('btnNextCategory').hidden = isFinalCategory;
       document.getElementById('btnReviewSubmit').hidden = !isFinalCategory;
       const previous = document.getElementById('btnPreviousCategory');
-      previous.querySelector('span').textContent = index === 0 ? 'Cancel' : 'Back';
-      previous.querySelector('i').className = 'fa-solid ' + (index === 0 ? 'fa-xmark' : 'fa-chevron-left');
+      previous.innerHTML = index === 0
+        ? '<span>Cancel</span>'
+        : '<i class="fa-solid fa-chevron-left" aria-hidden="true"></i><span>Back</span>';
       document.getElementById('cvStepTrack').style.setProperty('--cv-step-index', index);
     }
 
@@ -1772,7 +1774,8 @@ DAMANSARA KOTA</textarea>
         row.querySelector('.change-history-id').textContent = request.id;
         row.querySelector('.change-history-title').textContent = changes.map(item => item.label).join(', ');
         const detail = row.querySelector('.change-history-date');
-        detail.append(document.createTextNode(changes.length + ' modified fields'), recordSubmitDate.create(request.submittedAt));
+        detail.before(recordSubmitDate.cardLine(request.submittedAt));
+        detail.textContent = changes.length + ' modified fields';
         list.prepend(row);
       }
       modifiedFields.forEach(item => {

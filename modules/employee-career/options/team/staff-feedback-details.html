@@ -9,12 +9,13 @@
   <link rel="stylesheet" href="../../../../css/theme.css">
   <link rel="stylesheet" href="../../../../css/app.css">
   <link rel="stylesheet" href="../../css/employee-career.css">
+  <link rel="stylesheet" href="../../css/employee-career-forms.css">
   <link rel="stylesheet" href="../../css/staff-feedback.css">
   <script src="../../../../js/components.js"></script>
   <script src="../../../../js/app.js" defer></script>
   <script src="../../js/employee-career-feedback-store.js" defer></script><script src="../../js/staff-feedback.js" defer></script>
 </head>
-<body class="employee-career-option-page staff-feedback-page">
+<body class="employee-career-option-page employee-career-form-page staff-feedback-page">
   <preview-top-bar active-page="v2"></preview-top-bar>
   <div class="phone-container">
     <header class="employee-career-header">
@@ -25,12 +26,7 @@
         <span class="employee-career-header-spacer" aria-hidden="true"></span>
       </div>
     </header>
-    <main class="main-content employee-career-content">
-      <table id="staffFeedbackDetailsTable" class="record-detail-table" aria-labelledby="staffFeedbackDetailsTitle">
-        <tbody><tr id="staffFeedbackDetailsSubmitDate" class="record-submit-date" hidden></tr></tbody>
-        <tbody id="staffFeedbackDetailsRows"></tbody>
-      </table>
-    </main>
+    <main id="staffFeedbackDetailsForm" class="main-content employee-career-content"></main>
     <phone-bottom-nav active="apps"></phone-bottom-nav>
     <notification-sheet></notification-sheet>
     <favourite-sheet></favourite-sheet>

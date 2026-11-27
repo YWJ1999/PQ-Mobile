@@ -124,10 +124,11 @@
       const feedbackLabel = kind === 'feedback' ? feedback.statusLabel(row) : '';
       const badge = isRequestKind() ? cvStatus(row) : kind === 'whereabout' ? whereaboutStatus
         : statusPill(feedbackLabel.toLowerCase(), feedbackLabel, feedbackLabel === 'Pending' ? 'fa-paper-plane' : 'fa-reply');
-      const submitted = recordSubmitDate.html(kind === 'cv-change-request' ? recordDate(row) : row.submitDate);
+      const submitDate = kind === 'cv-change-request' ? recordDate(row) : row.submitDate;
       const content = `
         <span class="history-card-header"><span class="history-card-heading">${heading}${reference ? `<span class="history-card-ref">Ref: ${escape(reference)}</span>` : ''}</span>${badge}</span>
-        ${submitted || details ? `<span class="history-card-details career-history-card-rows">${details}${submitted}</span>` : ''}`;
+        ${kind === 'whereabout' ? '' : recordSubmitDate.cardHTML(submitDate)}
+        ${details ? `<span class="history-card-details career-history-card-rows">${details}</span>` : ''}`;
       if (kind === 'feedback') {
         return `<article class="history-card-item career-history-feedback-card" data-status="${feedback.statusTones[feedbackLabel]}" data-record-id="${escape(row.id)}">
           <a class="career-history-card-open" aria-label="View ${escape(title)} feedback details" data-history-link href="${escape(HistoryRecordPage.href(kind, row.id))}">${content}</a>
@@ -246,6 +247,96 @@
     }
   }
 
+  function formField(label, value) {
+    const field = document.createElement('div');
+    field.className = 'employee-career-field';
+    const caption = document.createElement('span');
+    caption.className = 'employee-career-label';
+    caption.textContent = label;
+    const control = document.createElement('div');
+    control.className = 'employee-career-control';
+    control.textContent = value == null || value === '' ? '—' : String(value);
+    field.append(caption, control);
+    return field;
+  }
+
+  function formGrid(...fields) {
+    const grid = document.createElement('div');
+    grid.className = 'employee-career-form-grid';
+    grid.append(...fields);
+    return grid;
+  }
+
+  function formCard(title) {
+    const card = document.createElement('section');
+    card.className = 'employee-career-form-card';
+    const heading = document.createElement('div');
+    heading.className = 'employee-career-form-heading';
+    const accent = document.createElement('span');
+    accent.setAttribute('aria-hidden', 'true');
+    const caption = document.createElement('h2');
+    caption.textContent = title;
+    heading.append(accent, caption);
+    card.append(heading);
+    return card;
+  }
+
+  function renderRequestForm(row, isFeedback) {
+    const view = document.createElement('div');
+    view.className = 'employee-career-form-page career-history-request-form';
+    const header = document.createElement('header');
+    header.className = 'career-history-form-identity';
+    const employee = employeeCardHeading.text(row.empNo, row.name ?? row.employeeName);
+    if (employee) {
+      const heading = document.createElement('h2');
+      heading.textContent = employee;
+      header.append(heading);
+    }
+    header.append(recordDetailStatus.create(isFeedback ? feedback.statusLabel(row) : row.status || 'Pass'));
+
+    const form = formCard(isFeedback ? 'Feedback Details' : 'Whereabout Details');
+    const submitDate = recordSubmitDate.form(row.submitDate || row.submittedDate);
+    submitDate.classList.add('employee-career-field');
+    form.append(submitDate);
+    const reference = row.referenceNo || row.reference || row.docRef;
+    if (reference) form.append(formField('Reference No.', reference));
+    view.append(header, form);
+
+    if (isFeedback) {
+      const attachments = [].concat(row.attachments || [])
+        .map(file => typeof file === 'string' ? file : file?.name).filter(Boolean);
+      form.append(
+        formGrid(formField('Feedback Type', row.type), formField('Category', row.category)),
+        formField('Title', row.title),
+        formGrid(formField('Feedback Date 1', date(row.feedbackDate1)), formField('Feedback Date 2', date(row.feedbackDate2))),
+        formGrid(formField('Reference 1', row.reference1), formField('Reference 2', row.reference2)),
+        formField('Your Feedback', row.note ?? row.feedbackNote ?? row.feedback),
+        formField('Remarks', row.remarks ?? row.feedbackRemarks),
+        formField('Attachments', attachments.join('\n') || 'No attachments')
+      );
+      const reviewFields = [
+        ['Reviewer Comment', row.reviewerComment], ['Reviewed By', row.reviewedBy],
+        ['Reviewed Date', row.reviewedDate && date(row.reviewedDate)], ['Rating', row.rating], ['Reward', row.reward]
+      ].filter(([, value]) => value != null && value !== '');
+      if (reviewFields.length) {
+        const review = formCard('Review Information');
+        review.append(...reviewFields.map(([label, value]) => formField(label, value)));
+        view.append(review);
+      }
+    } else {
+      form.append(
+        formGrid(formField('Start Date', date(row.startDate || row.fromDate || row.date)), formField('End Date', date(row.endDate || row.toDate || row.date))),
+        formGrid(formField('Start Time', row.startTime), formField('End Time', row.endTime)),
+        formField('Location', row.location || row.description),
+        formField('State', row.state),
+        formGrid(formField('Project', row.project), formField('Task', row.task)),
+        formField('Remarks', row.remarks)
+      );
+      if (row.location && row.description && row.location !== row.description) form.append(formField('Description', row.description));
+    }
+    return view;
+  }
+
   function renderDetails() {
     const row = activeRecord;
     $('historyDetailActions').hidden = isRequestKind();
@@ -259,14 +350,11 @@
       $('historyDetailBody').innerHTML = window.EmployeeCareerCVHistoryDetails.render(row, recordDetailStatus.html(row.status || 'Submitted'), date(recordDate(row)), {qualificationLayout: 'numbered-cards'});
       return;
     }
-    let fields;
-    if (kind === 'feedback') {
-      fields = [['Name',row.name],['Status',feedback.statusLabel(row)],['Emp No.',row.empNo],['Type',row.type],['Category',row.category],['Title',row.title],['Feedback Date 1',date(row.feedbackDate1)],['Feedback Date 2',date(row.feedbackDate2)],['Feedback Note',row.note],['Feedback Remarks',row.remarks],['Reviewer Comment',row.reviewerComment],['Reviewed By',row.reviewedBy],['Reviewed Date',date(row.reviewedDate)],['Rating',row.rating],['Reward',row.reward],['Attachments',row.attachments?.length ? row.attachments.map(file=>file.name).join(', ') : 'No Data of Attachments']];
-    } else if (kind === 'career-plan') {
-      fields = [['Name',row.name],['Status',row.status || 'Submitted'],['Emp No.',row.empNo],['Position',row.position],['Department',row.department],['Career Path',row.careerPath],['Next Position',row.nextPosition],['Target Date',date(row.targetDate)],['Justification',row.justification],['Action Plan',row.actionPlan],['Development Needs',row.developmentNeeds],['Remarks',row.remarks],['Attachments',row.attachments?.length ? row.attachments.map(file=>file.name).join(', ') : 'No Data of Attachments']];
-    } else {
-      fields = [['Description',row.description],['Status','Pass'],['Date',date(row.date)],['Time',`${row.startTime}-${row.endTime}`],['Project',row.project],['Task',row.task],['State',row.state],['Remarks',row.remarks]];
+    if (kind === 'feedback' || kind === 'whereabout') {
+      $('historyDetailBody').replaceChildren(renderRequestForm(row, kind === 'feedback'));
+      return;
     }
+    const fields = [['Name',row.name],['Status',row.status || 'Submitted'],['Emp No.',row.empNo],['Position',row.position],['Department',row.department],['Career Path',row.careerPath],['Next Position',row.nextPosition],['Target Date',date(row.targetDate)],['Justification',row.justification],['Action Plan',row.actionPlan],['Development Needs',row.developmentNeeds],['Remarks',row.remarks],['Attachments',row.attachments?.length ? row.attachments.map(file=>file.name).join(', ') : 'No Data of Attachments']];
     $('historyDetailBody').innerHTML = `<table class="history-detail-table"><tbody>${recordSubmitDate.html(row.submitDate, 'tr')}${fields.map(([key,value]) => {
       if (key === 'Emp No.') return detailRow(key,`<span class="career-history-employee-id">${escape(formatEmployeeNumber(value))}</span>`,true);
       return detailRow(key,key === 'Status' ? recordDetailStatus.html(value) : value,key === 'Status');

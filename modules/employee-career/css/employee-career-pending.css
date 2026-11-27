@@ -62,12 +62,38 @@
   overflow-y: auto;
 }
 
-.career-pending-engagement-table td {
-  white-space: pre-wrap;
+.career-pending-engagement-header {
+  margin: 0 2px 14px;
 }
 
-.career-pending-engagement-details .detail-popout-table .detail-popout-label {
-  padding-inline: 8px !important;
+.career-pending-engagement-header h2 {
+  margin: 0 0 6px;
+  font-size: 16px;
+  overflow-wrap: anywhere;
+}
+
+.career-pending-engagement-form {
+  margin-bottom: 14px;
+}
+
+.career-pending-engagement-form .employee-career-form-section > .employee-career-field:last-child {
+  margin-bottom: 0;
+}
+
+.career-pending-engagement-form .employee-career-label {
+  margin-bottom: 6px;
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.career-pending-engagement-form .employee-career-control {
+  min-height: 0;
+  padding: 12px 14px;
+  font-weight: 700;
+  line-height: 1.45;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
 }
 
 .career-pending-page #careerPendingDetailsActions {

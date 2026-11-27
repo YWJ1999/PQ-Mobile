@@ -307,7 +307,7 @@
         card.querySelector('[data-project-approval-menu]').setAttribute('aria-label', 'Options for ' + record.id);
         const link = card.querySelector('.approval-record-link');
         link.href = PendingApprovalPage.href('details', record.id);
-        recordSubmitDate.append(link.querySelector('.approval-card-details'), record.submittedAt);
+        link.prepend(recordSubmitDate.cardLine(record.submittedAt));
         card.querySelector('[data-field="date"] dd').textContent = record.dateLabel;
         card.querySelector('[data-field="normal-hours"] dd').textContent = (record.normalMinutes / 60).toFixed(2) + ' hrs';
         card.querySelector('[data-field="ot-hours"] dd').textContent = (record.overtimeMinutes / 60).toFixed(2) + ' hrs';

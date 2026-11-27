@@ -195,9 +195,9 @@
         </span>
         ${status.html}
       </span>
+      ${recordSubmitDate.cardHTML(record.submittedDate ?? record.submitDate)}
       <span class="history-card-details team-history-card-details">
         ${fieldMarkup(fields)}
-        ${recordSubmitDate.html(record.submittedDate ?? record.submitDate)}
       </span>
     </${tag}>`;
   }
@@ -273,127 +273,204 @@
     returnFocus = null;
   }
 
-  function renderRecordDetails(record, category) {
-    const prefix = category === 'staff-engagement' ? 'teamEngagement' : category === 'staff-request' ? 'teamRequest' : category === 'staff-exit' ? 'teamExit' : 'teamConfirmation';
-    const overlay = $(`${prefix}DetailsOverlay`);
-    const display = value => value === '' || value == null ? '—' : String(value);
+  function formValue(value) {
+    const control = document.createElement('div');
+    control.className = 'employee-career-control';
+    const text = value == null || value === '' ? '—' : String(value);
+    control.append(value instanceof Node ? value : text);
+    return control;
+  }
+
+  function formField(label, value) {
+    const field = document.createElement('div');
+    field.className = 'employee-career-field';
+    const caption = document.createElement('span');
+    caption.className = 'employee-career-label';
+    caption.textContent = label;
+    field.append(caption, formValue(value));
+    return field;
+  }
+
+  function formGrid(...fields) {
+    const grid = document.createElement('div');
+    grid.className = 'employee-career-form-grid';
+    grid.append(...fields);
+    return grid;
+  }
+
+  function formSection(title, ...fields) {
+    const section = document.createElement('section');
+    section.className = 'employee-career-form-section';
+    const heading = document.createElement('h2');
+    heading.className = 'form-section-heading';
+    heading.textContent = title;
+    section.append(heading, ...fields);
+    return section;
+  }
+
+  function optionalFields(fields) {
+    return fields.filter(([, value]) => value != null && value !== '').map(([label, value]) => formField(label, value));
+  }
+
+  function confirmationDetails(record) {
+    const score = record.score ?? record.assessmentScore;
+    return formSection('Confirmation Detail',
+      formField('Assessment Score', score == null || score === '' ? null : score + ' / 100'),
+      formField('Recommendation', record.recommendation),
+      formGrid(
+        formField('Effective Date', formatDate(record.effectiveDate)),
+        formField('Extension Months', record.extensionMonths)
+      ),
+      formField('Adjustment', record.adjustment),
+      formField('Remarks', record.remarks ?? record.remark)
+    );
+  }
+
+  function exitDetails(record) {
     const blacklist = record.isBlacklist ?? record.blacklist;
-    const empNo = formatEmployeeNumber(record.empNo);
-    const categoryFields = category === 'staff-engagement' ? [
-      ['Emp No.', formatEmployeeNumber(record.empNo)],
-      ['Name', record.employeeName],
-      ['Position', record.position],
-      ['Interviewee No.', formatEmployeeNumber(record.intervieweeNo)],
-      ['Interviewee Position', record.intervieweePosition],
-      ['Submitter No.', formatEmployeeNumber(record.submitterNo)],
-      ['Interview Date', formatDate(record.interviewDate)],
-      ['Flight Risk', record.flightRisk],
-      ['Recommendation', record.recommendation],
-      ['Notes', record.notes],
-      ['Positive Feedback', record.positiveFeedback],
-      ['Negative Feedback', record.negativeFeedback],
-      ['Mitigation Action', record.mitigationAction],
-      ['Approver Remark', record.approverRemark],
-      ['Applicant Remark', record.applicantRemark]
-    ] : category === 'staff-request' ? [
-      ['Request', record.request ?? record.title],
-      ['Period', formatPeriod(record.period)],
-      ['Type', record.requestType ?? record.type],
-      ['Manpower Plan #', record.manpowerPlanNo],
-      ['Description', record.description],
-      ['Company', record.company],
-      ['Branch', record.branch],
-      ['Department', record.department],
-      ['Section', record.section],
-      ['Location', record.location],
-      ['Job', record.job],
-      ['Access', record.access],
-      ['Employment Type', record.employmentType],
-      ['Count', record.count],
-      ['Required By', formatDate(record.requiredBy)],
-      ['Reason', record.reason],
-      ['Remarks', record.remarks]
-    ] : category === 'staff-exit' ? [
-      ['Emp No.', empNo || null],
-      ['Name', record.employeeName],
-      ['Position', record.position],
-      ['Notice Date', formatDate(record.noticeDate)],
-      ['Last Service Date', formatDate(record.lastServiceDate)],
-      ['Replacement Deadline', formatDate(record.replacementDeadline ?? record.replaceDeadline)],
-      ['Recommended Action', record.recommendedAction ?? record.recommendation],
-      ['Is Blacklist', typeof blacklist === 'boolean' ? (blacklist ? 'Yes' : 'No') : blacklist],
-      ['Exit Type', record.exitType],
-      ['Reason', record.reason],
-      ['Remarks', record.remarks],
-      ['HR Remarks', record.hrRemarks ?? record.hrRemark]
-    ] : [
-      ['Emp No.', formatEmployeeNumber(record.empNo)],
-      ['Name', record.employeeName],
-      ['Position', record.position],
-      ['Hire Date', formatDate(record.hireDate)],
-      ['Employment Type', record.employmentType],
-      ['Confirm Due', formatDate(record.confirmDue)],
-      ['Recommendation', record.recommendation],
-      ['Effective Date', formatDate(record.effectiveDate)],
-      ['Extension Months', record.extensionMonths],
-      ['Adjustment', record.adjustment],
-      ['Score', record.score == null ? null : `${record.score} / 100`],
-      ['Remark', record.remark]
-    ];
-    const fields = [
-      ['Reference #', record.reference || record.id],
-      ['Status', record.status],
-      ...categoryFields
-    ];
-    const rows = fields.map(([label, value]) => {
-      const row = document.createElement('tr');
-      const labelCell = document.createElement('th');
-      const valueCell = document.createElement('td');
-      labelCell.scope = 'row';
-      labelCell.className = 'detail-popout-label';
-      labelCell.textContent = label;
-      valueCell.className = 'detail-popout-value';
-      valueCell.append(label === 'Status' ? recordDetailStatus.create(value) : display(value));
-      row.append(labelCell, valueCell);
-      return row;
-    });
-    const attachmentRow = document.createElement('tr');
-    const attachmentLabel = document.createElement('th');
-    const attachmentValue = document.createElement('td');
-    attachmentLabel.scope = 'row';
-    attachmentLabel.className = 'detail-popout-label';
-    attachmentLabel.textContent = 'Attachment';
-    attachmentValue.className = 'detail-popout-value';
-    if (!record.attachments?.length) attachmentValue.textContent = 'No attachments';
-    else {
-      const attachmentList = document.createElement('span');
-      attachmentList.className = 'team-history-detail-attachments';
-      record.attachments.forEach(attachment => {
-        const url = attachmentUrl(attachment.url);
-        const item = document.createElement(url ? 'a' : 'span');
-        const icon = document.createElement('i');
-        const name = document.createElement('span');
-        item.className = 'team-history-detail-attachment';
-        if (url) {
-          item.href = url;
-          item.target = '_blank';
-          item.rel = 'noopener noreferrer';
-          item.download = attachment.name || 'attachment';
-          item.setAttribute('aria-label', `Download attachment ${attachment.name || 'Attachment'}`);
-        }
-        icon.className = 'fa-solid fa-paperclip';
-        icon.setAttribute('aria-hidden', 'true');
-        name.textContent = attachment.name || 'Attachment';
-        item.append(icon, name);
-        attachmentList.append(item);
-      });
-      attachmentValue.append(attachmentList);
+    return formSection('Termination Detail',
+      formGrid(
+        formField('Notice Date', formatDate(record.noticeDate)),
+        formField('Last Paid Day', formatDate(record.lastPaidDate ?? record.lastPaidDay ?? record.lastServiceDate))
+      ),
+      formField('Exit Type', record.exitType),
+      formField('Reason', record.reason),
+      formField('Recommendation', record.recommendedAction ?? record.recommendation),
+      formField('Replace Deadline', formatDate(record.replacementDeadline ?? record.replaceDeadline)),
+      formField('Blacklist?', typeof blacklist === 'boolean' ? (blacklist ? 'Yes' : 'No') : blacklist),
+      formField('Remarks', record.remarks),
+      ...optionalFields([['HR Remarks', record.hrRemarks ?? record.hrRemark]])
+    );
+  }
+
+  function requestDetails(record, metadata) {
+    const request = record.request ?? record.title;
+    return formSection('Request Detail',
+      ...metadata,
+      formGrid(
+        formField('Request Period', formatPeriod(record.period)),
+        formField('Type', record.requestType ?? record.type)
+      ),
+      formField('Manpower Plan #', record.manpowerPlanNo),
+      ...optionalFields([['Request', request === record.job ? '' : request]]),
+      formField('Description', record.description),
+      formField('Company', record.company),
+      formField('Branch', record.branch),
+      formField('Department', record.department),
+      ...optionalFields([['Section', record.section]]),
+      formField('Location', record.location),
+      formField('Job', record.job),
+      formField('Access', record.access),
+      formGrid(
+        formField('Employment Type', record.employmentType),
+        formField('Count', record.count)
+      ),
+      formField('Required By', formatDate(record.requiredBy)),
+      formField('Reason', record.reason),
+      formField('Remarks', record.remarks)
+    );
+  }
+
+  function engagementDetails(record) {
+    return formSection('Engagement Details',
+      formField('Interviewee No.', formatEmployeeNumber(record.intervieweeNo)),
+      formField('Interviewee Position', record.intervieweePosition),
+      ...optionalFields([
+        ['Interviewer', record.interviewerName],
+        ['Interviewer Position', record.interviewerPosition]
+      ]),
+      formField('Interview Date', formatDate(record.interviewDate)),
+      formField('Positive Feedback', record.positiveFeedback),
+      formField('Negative Feedback', record.negativeFeedback),
+      formField('Flight Risk', record.flightRisk),
+      formField('Recommendation', record.recommendation),
+      formField('Mitigation Action', record.mitigationAction),
+      formField('Remarks', record.remarks ?? record.applicantRemark),
+      ...optionalFields([
+        ['Notes', record.notes],
+        ['Applicant Remark', record.remarks && record.remarks !== record.applicantRemark ? record.applicantRemark : ''],
+        ['Approver Remark', record.approverRemark]
+      ])
+    );
+  }
+
+  function historyAttachments(attachments) {
+    const files = [].concat(attachments || []);
+    if (!files.length) return 'No attachments';
+    const list = document.createElement('span');
+    list.className = 'team-history-detail-attachments';
+    for (const attachment of files) {
+      const filename = typeof attachment === 'string' ? attachment : attachment?.name || 'Attachment';
+      const url = attachmentUrl(attachment?.url);
+      const item = document.createElement(url ? 'a' : 'span');
+      const icon = document.createElement('i');
+      const name = document.createElement('span');
+      item.className = 'team-history-detail-attachment';
+      if (url) {
+        item.href = url;
+        item.target = '_blank';
+        item.rel = 'noopener noreferrer';
+        item.download = filename;
+        item.setAttribute('aria-label', 'Download attachment ' + filename);
+      }
+      icon.className = 'fa-solid fa-paperclip';
+      icon.setAttribute('aria-hidden', 'true');
+      name.textContent = filename;
+      item.append(icon, name);
+      list.append(item);
     }
-    attachmentRow.append(attachmentLabel, attachmentValue);
-    rows.push(attachmentRow);
-    recordSubmitDate.set($(`${prefix}SubmitDate`), record.submittedDate ?? record.submitDate);
-    $(`${prefix}DetailsRows`).replaceChildren(...rows);
-    overlay.querySelector('.detail-popout-body').scrollTop = 0;
+    return list;
+  }
+
+  const historyDetailViews = {
+    'staff-confirmation': { id: 'teamConfirmationDetailsOverlay', details: confirmationDetails },
+    'staff-exit': { id: 'teamExitDetailsOverlay', details: exitDetails },
+    'staff-request': { id: 'teamRequestDetailsOverlay', details: requestDetails },
+    'staff-engagement': { id: 'teamEngagementDetailsOverlay', details: engagementDetails }
+  };
+
+  function renderRecordDetails(record, category) {
+    const view = historyDetailViews[category];
+    const overlay = $(view.id);
+    const body = overlay.querySelector('.history-record-content');
+    const header = document.createElement('header');
+    header.className = 'team-history-form-header';
+    const employeeName = employeeCardHeading.text(record.empNo, record.employeeName);
+    if (employeeName) {
+      const heading = document.createElement('h2');
+      heading.textContent = employeeName;
+      header.append(heading);
+    }
+    if (record.status) header.append(recordDetailStatus.create(record.status));
+
+    const form = document.createElement('div');
+    form.className = 'employee-career-form-card team-history-form';
+    const submitDate = recordSubmitDate.form(record.submittedDate || record.submitDate);
+    submitDate.classList.add('employee-career-field');
+    const metadata = [submitDate, formField('Reference No.', record.reference || record.id)];
+    if (category === 'staff-request') {
+      form.append(view.details(record, metadata));
+    } else {
+      const employee = formSection('Employee Details',
+        ...metadata,
+        formField('Employee No.', formatEmployeeNumber(record.empNo)),
+        formField('Name', record.employeeName),
+        formField('Position', record.position)
+      );
+      if (category === 'staff-confirmation') {
+        employee.append(
+          formGrid(
+            formField('Hire Date', formatDate(record.hireDate)),
+            formField('Employment Type', record.employmentType)
+          ),
+          formField('Confirmation Due', formatDate(record.confirmDue))
+        );
+      }
+      form.append(employee, view.details(record));
+    }
+    form.append(formSection('Attachments', formValue(historyAttachments(record.attachments))));
+    body.replaceChildren(form);
+    if (header.childElementCount) body.prepend(header);
     return overlay;
   }
 

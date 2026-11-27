@@ -73,14 +73,15 @@
   function detailActionButtons(category) {
     const grid = node('div', 'pending-action-grid');
     const available = actions.filter(([action]) => category !== 'deduction' || action !== 'resubmit');
-    if (category === 'tax') available.splice(2, 0, ['cancel', 'Cancel', 'fa-ban']);
+    if (category === 'tax') available.splice(2, 0, ['cancel', 'Cancel']);
     grid.dataset.actionCount = available.length;
     for (const [action, label, symbol] of available) {
       const button = node('button', 'action-btn-' + action);
       button.type = 'button';
       if (action === 'cancel') button.dataset.approvalBack = '';
       else button.dataset.payrollAction = action;
-      button.append(icon(symbol), node('span', '', label));
+      if (symbol) button.append(icon(symbol));
+      button.append(node('span', '', label));
       grid.append(button);
     }
     return grid;
@@ -208,7 +209,7 @@
     byId('payrollPendingDetailsTitle').textContent = tabNames[item.category] + ' Approval';
     releaseFiles();
     const card = PayrollRequestFields.create(item.category, item, fileUrls);
-    recordSubmitDate.prepend(card.querySelector('.claim-form-stack'), item.submitDate || item.requestDate);
+    card.querySelector('.claim-form-stack').prepend(recordSubmitDate.form(item.submitDate || item.requestDate));
     byId('payrollPendingForm').replaceChildren(card);
     byId('payrollPendingApproverComments').value = item.approverActionComments || '';
     const footer = document.querySelector('.payroll-approval-details-footer');

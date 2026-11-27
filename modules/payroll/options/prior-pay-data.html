@@ -8,7 +8,7 @@
   <script src="../../../js/history-record-page.js"></script>
   <script src="../../../js/components.js"></script>
   <script src="../../../js/app.js" defer></script>
-  <script src="../../../js/payroll/prior-pay-data.js?v=20261002-tax-year" defer></script>
+  <script src="../../../js/payroll/prior-pay-data.js?v=20261127-readonly-form" defer></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -16,7 +16,7 @@
   <link rel="stylesheet" href="../../../css/theme.css">
   <link rel="stylesheet" href="../../../css/app.css">
   <link rel="stylesheet" href="../../../css/claim-summary-cards.css">
-  <link rel="stylesheet" href="../../../css/prior-pay-data.css?v=20261002-attachment-row">
+  <link rel="stylesheet" href="../../../css/prior-pay-data.css?v=20261127-readonly-form">
   <link rel="stylesheet" href="../../../css/form-section-headings.css">
 </head>
 <body>
@@ -103,7 +103,7 @@
         <div class="prior-save-bar" id="priorSaveBar" hidden>
           <div class="prior-step-actions form-action-row">
             <button type="button" class="btn-submit-primary" id="priorPrevious" hidden><i class="fa-solid fa-arrow-left" aria-hidden="true"></i><span>Back</span></button>
-            <button type="button" class="btn-submit-primary" id="priorCancel" data-page-form-cancel><i class="fa-solid fa-xmark" aria-hidden="true"></i><span>Cancel</span></button>
+            <button type="button" class="btn-submit-primary" id="priorCancel" data-page-form-cancel><span>Cancel</span></button>
             <button type="button" class="btn-submit-primary" id="priorDraft"><i class="fa-solid fa-floppy-disk" aria-hidden="true"></i><span>Save Draft</span></button>
             <button type="button" class="btn-submit-primary" id="priorNext"><span>Next</span><i class="fa-solid fa-arrow-right" aria-hidden="true"></i></button>
             <button type="button" class="btn-submit-primary" id="priorUpdate" hidden><i class="fa-solid fa-floppy-disk" aria-hidden="true"></i><span>Save pay data</span></button>
@@ -122,7 +122,7 @@
             <h1 id="priorRecordDetailsTitle" tabindex="-1">Prior Pay Data</h1>
           </div>
         </header>
-        <div class="history-record-content prior-record-modal-body"><dl class="prior-record-details" id="priorRecordDetailsFields"></dl></div>
+        <div class="history-record-content prior-record-modal-body"><section class="prior-form" id="priorRecordDetailsFields"></section></div>
       </section>
     </main>
     <div class="prior-overlay" id="priorDialog" aria-hidden="true">

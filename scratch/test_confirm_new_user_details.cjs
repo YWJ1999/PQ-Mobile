@@ -115,7 +115,7 @@ async function inspectScenario(browser, theme, width) {
     icon: button.querySelector('i')?.className || '',
     pill: Number.parseFloat(getComputedStyle(button).borderRadius) >= button.getBoundingClientRect().height / 2
   }))), [
-    { id: 'newUserCancel', text: 'Cancel', icon: 'fa-solid fa-xmark', pill: true },
+    { id: 'newUserCancel', text: 'Cancel', icon: '', pill: true },
     { id: 'newUserSubmit', text: 'Submit', icon: 'fa-solid fa-paper-plane', pill: true }
   ]);
   const [cancel, submit] = await page.$$eval('#newUserCancel, #newUserSubmit', buttons => buttons.map(button => {

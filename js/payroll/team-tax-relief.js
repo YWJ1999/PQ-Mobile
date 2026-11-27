@@ -26,7 +26,7 @@
       name: 'Farhan binti rahmat',
       position: 'GROUP HR MANAGER',
       status: 'submitted',
-      submitDate: '',
+      submitDate: '2026-03-19',
       rebateCode: 'TXR02',
       rebateItem: 'BASIC SUPPORTING EQUIPMENT',
       transactionDate: '2026-03-19',
@@ -46,7 +46,7 @@
       name: 'Farhan binti rahmat',
       position: 'GROUP HR MANAGER',
       status: 'submitted',
-      submitDate: '',
+      submitDate: '2026-03-19',
       rebateCode: 'TXR05',
       rebateItem: 'COMPLETE MEDICAL EXAMINATION',
       transactionDate: '2026-03-19',
@@ -114,6 +114,7 @@
           <span class="card-status-badge tax-relief-status ${escapeHtml(record.status)}">${escapeHtml(formatStatus(record.status))}</span>
           <i class="fa-solid fa-chevron-right tax-relief-card-chevron" aria-hidden="true"></i>
         </span>
+        ${recordSubmitDate.cardHTML(record.submitDate)}
         <span class="tax-relief-card-body history-card-details">
           <span class="tax-relief-stat-grid">
             <span class="tax-relief-stat tax-relief-stat-amount"><span class="tax-relief-stat-label">Amount</span><strong class="tax-relief-stat-value">${escapeHtml(formatMoney(record.amount))}</strong></span>
@@ -122,7 +123,6 @@
             <span class="tax-relief-stat"><span class="tax-relief-stat-label">Position</span><strong class="tax-relief-stat-value">${escapeHtml(record.position)}</strong></span>
             <span class="tax-relief-stat"><span class="tax-relief-stat-label">Period / Cycle</span><strong class="tax-relief-stat-value">${escapeHtml(periodCycle(record))}</strong></span>
           </span>
-          ${recordSubmitDate.html(record.submitDate)}
         </span>
       </button>`;
   }
@@ -194,35 +194,38 @@
     closeFilter();
   }
 
-  function detailRow(key, value, html = false) {
-    return `<div class="tax-relief-detail-row" data-detail-key="${escapeHtml(key)}"><span>${escapeHtml(key)}</span><strong>${html ? value : escapeHtml(value || '—')}</strong></div>`;
+  function detailField(label, value) {
+    if (value == null || value === '') return '';
+    return `<div class="claim-field"><span class="claim-field-label">${escapeHtml(label)}</span><div class="claim-control payroll-review-value">${escapeHtml(value)}</div></div>`;
   }
 
   function renderDetail(reference) {
     const record = records.find(item => item.reference === reference);
     if (!record) return;
-    const attachments = record.attachments.length
-      ? record.attachments.map(file => `<span class="tax-relief-file"><i class="fa-solid fa-file-word" aria-hidden="true"></i>${escapeHtml(file)}</span>`).join('')
-      : '—';
-    const submitted = recordSubmitDate.format(record.submitDate);
-    byId('taxReliefDetailTable').innerHTML = [
-      submitted ? detailRow('Submit Date', submitted) : '',
-      detailRow('Reference #', record.reference),
-      detailRow('Status', recordDetailStatus.html(formatStatus(record.status)), true),
-      detailRow('Emp No.', formatEmployeeNumber(record.empNo)),
-      detailRow('Name', record.name),
-      detailRow('Rebate Item', record.rebateItem),
-      detailRow('Transaction Date', formatDate(record.transactionDate)),
-      detailRow('Description', record.description),
-      detailRow('Receipt #', record.receiptNo),
-      detailRow('Amount', formatMoney(record.amount)),
-      detailRow('Attachments', attachments, true),
-      detailRow('Process', record.process ? 'Yes' : 'No'),
-      detailRow('Period', record.period),
-      detailRow('Cycle', record.cycle),
-      detailRow('Approval Date', record.approvalDateLabel),
-      detailRow('Approver Remarks', record.approverRemarks)
-    ].join('');
+
+    const summary = document.createElement('div');
+    summary.className = 'tax-relief-detail-person';
+    summary.innerHTML = `<h2 class="tax-relief-detail-name">${employeeCardHeading.html(record.empNo, record.name)}</h2>${recordDetailStatus.html(formatStatus(record.status))}`;
+
+    const card = PayrollRequestFields.create('tax', {
+      ...record,
+      attachments: record.attachments.map(name => ({ name }))
+    }, []);
+    card.querySelector('.claim-form-stack').insertAdjacentHTML('afterbegin', [
+      detailField('Submit Date', recordSubmitDate.format(record.submitDate, true)),
+      detailField('Reference No.', record.reference)
+    ].join(''));
+    card.querySelector('.payroll-upload').insertAdjacentHTML('beforebegin', [
+      detailField('Process', record.process ? 'Yes' : 'No'),
+      detailField('Period', record.period),
+      detailField('Cycle', record.cycle),
+      detailField('Approval Date', record.approvalDateLabel),
+      detailField('Approver Remarks', record.approverRemarks)
+    ].join(''));
+
+    const body = byId('taxReliefDetailBody');
+    body.replaceChildren(summary, card);
+    body.scrollTop = 0;
     return byId('taxReliefDetailModal');
   }
 

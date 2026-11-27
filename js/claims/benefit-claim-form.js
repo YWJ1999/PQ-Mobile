@@ -136,7 +136,7 @@ const BenefitClaimForm = (() => {
     return new Date(value + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
   }
 
-  function create(record) {
+  function create(record, { reference } = {}) {
     const card = template.content.firstElementChild.cloneNode(true);
     if (!record) return card;
     const period = /^(\d{4})-?(0[1-9]|1[0-2])$/.exec(record.period || '');
@@ -161,6 +161,19 @@ const BenefitClaimForm = (() => {
       output.removeAttribute('id');
       output.dataset.benefitField = name;
       output.textContent = value == null || value === '' ? '—' : value;
+    }
+    const firstField = card.querySelector('[data-benefit-field="benefitType"]').parentElement;
+    firstField.before(recordSubmitDate.form(record.submitDate || record.submittedDate));
+    if (reference) {
+      const field = document.createElement('div');
+      const label = document.createElement('span');
+      label.className = 'field-label';
+      label.textContent = 'Reference No.';
+      const value = document.createElement('div');
+      value.className = 'form-input-ctrl benefit-readonly-value';
+      value.textContent = reference;
+      field.append(label, value);
+      firstField.before(field);
     }
     card.querySelectorAll('.req').forEach(el => el.remove());
     const attachments = card.querySelector('[data-benefit-attachments]');

@@ -115,8 +115,7 @@
       cardDetail('Position', record.position, ids.position),
       cardDetail('Period', periodText(record), ids.period)
     );
-    recordSubmitDate.append(details, record.submittedDate);
-    card.append(header, details);
+    card.append(header, recordSubmitDate.cardLine(record.submittedDate), details);
     return card;
   }
 
@@ -143,50 +142,75 @@
     syncUrl();
   }
 
-  function detailRow(label, value, employee = false) {
-    const row = node('div');
-    const term = node('dt', '', label);
-    const description = node('dd');
-    if (employee) {
-      description.append(node('span', 'staff-tna-detail-employee-name', value.employee));
-      const id = node('span', 'staff-tna-detail-employee-id', employeeId(value.empNo));
-      id.id = 'staffTnaDetailEmployeeId';
-      description.append(id);
-    } else {
-      description.textContent = value || '—';
+  function detailField(label, value) {
+    const field = node('div', 'field-group');
+    field.append(node('span', 'field-label', label), node('div', 'form-ctrl', value || '—'));
+    return field;
+  }
+
+  function detailItem(item) {
+    const card = node('details', 'need-item');
+    const header = node('summary', 'need-item-header');
+    const toggle = node('span', 'need-item-toggle');
+    const copy = node('span', 'need-item-copy');
+    const targetDate = dateText(item.targetDate);
+    copy.append(node('strong', '', item.course || '—'), node('small', '', `Target Date: ${targetDate}`));
+    const arrow = node('i', 'fa-solid fa-chevron-down');
+    arrow.setAttribute('aria-hidden', 'true');
+    toggle.append(copy, arrow);
+    header.append(toggle);
+
+    const body = node('dl', 'need-item-body');
+    for (const [label, value] of [
+      ['Development Area', item.developmentArea],
+      ['Course', item.course],
+      ['Target Date', targetDate],
+      ['Justification', item.justification]
+    ]) {
+      const row = node('div', 'need-data-row');
+      row.append(node('dt', '', label), node('dd', '', value || '—'));
+      body.append(row);
     }
-    row.append(term, description);
-    return row;
+    card.append(header, body);
+    return card;
   }
 
   function renderDetails(record) {
-    const rows = [
-      ['Reference #', record.reference],
-      ['Employee', record, true],
-      ['Position', record.position],
-      ['Submit By', record.submittedBy],
-      ['Name', record.name],
-      ['Training Period', periodText(record)],
-      ['Career Target', record.careerTarget],
-      ['Weakness', record.weakness],
-      ['Remarks', record.remarks],
-      ['Approver Remarks', record.approverRemarks]
-    ];
+    $('staffTnaDetailSummary').replaceChildren(
+      node('h2', '', employeeCardHeading.text(record.empNo, record.employee)),
+      recordDetailStatus.create(record.status)
+    );
+
+    const period = node('div', 'field-group');
+    const periodDates = node('div', 'need-period-fields');
+    periodDates.append(
+      node('div', 'form-ctrl', dateText(record.periodStart)),
+      node('div', 'form-ctrl', dateText(record.periodEnd))
+    );
+    period.append(node('span', 'field-label', 'Training Period'), periodDates);
+
+    const fields = [];
+    const submitted = recordSubmitDate.format(record.submittedDate, true);
+    if (submitted) fields.push(detailField('Submit Date', submitted));
+    if (record.reference) fields.push(detailField('Reference No.', record.reference));
+    fields.push(
+      detailField('Name', record.employee),
+      detailField('Position', record.position),
+      detailField('Department', record.department),
+      detailField('Plan Name', record.name),
+      period,
+      detailField('Career Target', record.careerTarget),
+      detailField('Weakness', record.weakness),
+      detailField('Remarks', record.remarks)
+    );
+    if (record.approverRemarks) fields.push(detailField('Approver Remarks', record.approverRemarks));
+
     const application = $('staffTnaApplicationDetails');
-    application.replaceChildren(...rows.map(([label, value, employee]) => detailRow(label, value, employee)));
-    recordSubmitDate.prepend(application, record.submittedDate).id = 'staffTnaSubmitDate';
-    $('staffTnaDetailItems').replaceChildren(...record.details.map(item => {
-      const article = node('article', 'staff-tna-detail-item');
-      const list = node('dl');
-      list.append(
-        detailRow('Target Date', dateText(item.targetDate)),
-        detailRow('Course', item.course),
-        detailRow('Development Area', item.developmentArea),
-        detailRow('Justification', item.justification)
-      );
-      article.append(list);
-      return article;
-    }));
+    application.replaceChildren(...fields);
+    const items = record.details || [];
+    $('needItemCount').textContent = `Total Items: ${items.length}`;
+    $('staffTnaDetailItems').replaceChildren(...items.map(detailItem));
+    application.closest('.history-record-content').scrollTop = 0;
   }
 
   function backgroundElements() {

@@ -1,5 +1,13 @@
-:is(#leaveApprovalForm, #teamCalendarLeaveForm) > [data-leave-form] { margin-bottom: 0 !important; }
+:is(#leaveApprovalForm, #teamCalendarLeaveForm, #leaveHistoryForm) > [data-leave-form] { margin-bottom: 0 !important; }
 [data-leave-form] .record-submit-date { margin-bottom: 14px; }
+.leave-review-reference { margin-bottom: 16px; }
+.leave-review-field > span {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 700;
+}
 .team-leave-record-header {
   margin: 0 2px 14px;
   color: var(--text-primary);

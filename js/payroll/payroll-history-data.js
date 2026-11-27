@@ -12,14 +12,14 @@ window.PAYROLL_HISTORY_DATA = {
     {
       id: 'RBT000000000049', employeeName: 'Farhan binti rahmat', empNo: 'EBB12',
       rebateCode: 'TXR02', rebateItem: 'BASIC SUPPORTING EQUIPMENT',
-      transactionDate: '2026-03-19', submitDate: '', description: '', receiptNo: '',
+      transactionDate: '2026-03-19', submitDate: '2026-03-19', description: '', receiptNo: '',
       amount: 12, status: 'submitted', attachments: [],
       process: false, period: '', cycle: '', approvalDate: '', approverRemarks: ''
     },
     {
       id: 'RBT000000000050', employeeName: 'Farhan binti rahmat', empNo: 'EBB12',
       rebateCode: 'TXR05', rebateItem: 'COMPLETE MEDICAL EXAMINATION',
-      transactionDate: '2026-03-19', submitDate: '', description: '', receiptNo: '',
+      transactionDate: '2026-03-19', submitDate: '2026-03-19', description: '', receiptNo: '',
       amount: 14, status: 'submitted', attachments: [],
       process: false, period: '', cycle: '', approvalDate: '', approverRemarks: ''
     }

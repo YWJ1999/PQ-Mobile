@@ -8,7 +8,7 @@
   <title>PeopleHCM - Leave Apply</title>
   <link rel="stylesheet" href="css/pending-approval-page.css">
   <script src="js/pending-approval-page.js"></script>
-  <script src="js/leave-request.js"></script>
+  <script src="js/leave-request.js?v=leave-history-forms"></script>
   <link rel="stylesheet" href="css/leave-request-review.css">
   <link rel="stylesheet" href="css/history-record-page.css">
   <script src="js/history-record-page.js"></script>
@@ -22,6 +22,10 @@
   <link rel="stylesheet" href="css/app.css">
   <link rel="stylesheet" href="css/work-status.css">
   <style>
+    #teamApprovalsListContainer .approval-card-details > .leave-approval-remark {
+      grid-column: 1 / -1;
+    }
+
     /* Staff Leave Entitlement follows the Staff Benefit Entitlement reference. */
     #viewStaffEntitlement .entitlement-staff-header {
       display: flex;
@@ -1102,7 +1106,7 @@
         color: var(--purple-text);
       }
 
-      #indivCalEventDetail .cal-detail-icon {
+      :is(#indivCalEventDetail, #myPersonalCalEventDetail) .cal-detail-icon {
         width: 38px;
         height: 38px;
         border: 1px solid var(--purple-border);
@@ -2551,6 +2555,7 @@
                 <div class="leave-day-description">
                   <p id="indivCalSelectedDateName" class="cal-detail-name"></p>
                   <p id="indivCalSelectedDateSub" class="cal-detail-time"></p>
+                  <div class="leave-day-record"></div>
                 </div>
               </div>
             </section>
@@ -2590,37 +2595,6 @@
         <!-- 2. TEAM SECTION (MANAGER LEAVE DASHBOARD) -->
         <div id="hubSectionTeam" class="leave-hub-section" style="display: none; margin-top: 4px;">
 
-          <!-- QUICK OPTIONS GRID (MATCHING INDIVIDUAL SECTION EXACTLY) -->
-          <div style="margin-bottom: 16px;">
-            <div
-              style="font-size: 11.5px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; display: flex; align-items: center; gap: 6px;">
-              Quick Options
-            </div>
-
-            <div class="leave-dashboard-quick-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
-              <!-- 1. Leave Highlight -->
-              <div class="leave-dashboard-quick-card" onclick="showLeaveSection('viewLeaveHighlight')"
-                style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 16px; padding: 14px 4px; text-align: center; cursor: pointer; box-shadow: var(--shadow-sm); transition: transform 0.2s; display: flex; flex-direction: column; align-items: center; gap: 6px;"
-                onmousedown="this.style.transform='scale(0.95)'" onmouseup="this.style.transform='scale(1)'">
-                <div class="leave-dashboard-quick-icon">
-                  <i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i>
-                </div>
-                <div class="leave-dashboard-quick-label" style="font-size: 11.5px; font-weight: 800; color: var(--text-primary);">Leave Highlight</div>
-              </div>
-
-              <!-- 2. Staff Leave Entitlement -->
-              <div class="leave-dashboard-quick-card" onclick="showLeaveSection('viewStaffEntitlement')"
-                style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 16px; padding: 14px 4px; text-align: center; cursor: pointer; box-shadow: var(--shadow-sm); transition: transform 0.2s; display: flex; flex-direction: column; align-items: center; gap: 6px;"
-                onmousedown="this.style.transform='scale(0.95)'" onmouseup="this.style.transform='scale(1)'">
-                <div class="leave-dashboard-quick-icon">
-                  <i class="fa-solid fa-users" aria-hidden="true"></i>
-                </div>
-                <div class="leave-dashboard-quick-label" style="font-size: 11.5px; font-weight: 800; color: var(--text-primary);">Staff Leave Entitlement</div>
-              </div>
-            </div>
-          </div>
-
-
           <section class="team-action-required-card" aria-labelledby="leaveTeamActionRequiredTitle">
             <div class="team-action-required-header">
               <div class="team-action-required-heading">
@@ -2652,6 +2626,36 @@
               </div>
             </div>
           </section>
+
+          <!-- QUICK OPTIONS GRID (MATCHING INDIVIDUAL SECTION EXACTLY) -->
+          <div style="margin-bottom: 16px;">
+            <div
+              style="font-size: 11.5px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; display: flex; align-items: center; gap: 6px;">
+              Quick Options
+            </div>
+
+            <div class="leave-dashboard-quick-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+              <!-- 1. Leave Highlight -->
+              <div class="leave-dashboard-quick-card" onclick="showLeaveSection('viewLeaveHighlight')"
+                style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 16px; padding: 14px 4px; text-align: center; cursor: pointer; box-shadow: var(--shadow-sm); transition: transform 0.2s; display: flex; flex-direction: column; align-items: center; gap: 6px;"
+                onmousedown="this.style.transform='scale(0.95)'" onmouseup="this.style.transform='scale(1)'">
+                <div class="leave-dashboard-quick-icon">
+                  <i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i>
+                </div>
+                <div class="leave-dashboard-quick-label" style="font-size: 11.5px; font-weight: 800; color: var(--text-primary);">Leave Highlight</div>
+              </div>
+
+              <!-- 2. Staff Leave Entitlement -->
+              <div class="leave-dashboard-quick-card" onclick="showLeaveSection('viewStaffEntitlement')"
+                style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 16px; padding: 14px 4px; text-align: center; cursor: pointer; box-shadow: var(--shadow-sm); transition: transform 0.2s; display: flex; flex-direction: column; align-items: center; gap: 6px;"
+                onmousedown="this.style.transform='scale(0.95)'" onmouseup="this.style.transform='scale(1)'">
+                <div class="leave-dashboard-quick-icon">
+                  <i class="fa-solid fa-users" aria-hidden="true"></i>
+                </div>
+                <div class="leave-dashboard-quick-label" style="font-size: 11.5px; font-weight: 800; color: var(--text-primary);">Staff Leave Entitlement</div>
+              </div>
+            </div>
+          </div>
 
           <h3 id="leaveTeamCalendarSectionTitle" class="leave-team-calendar-section-title">Team Leave Calendar</h3>
           <div id="leaveTeamCalendarCard" class="calendar-card">
@@ -3273,7 +3277,6 @@
 
           <button type="button" class="form-cancel-btn" data-page-form-cancel
             onclick="showLeaveSection('viewApplyLeave')">
-            <i class="fa-solid fa-xmark"></i>
             <span>Cancel</span>
           </button>
 
@@ -3303,9 +3306,9 @@
       <div id="viewCreditLeaveForm" style="display: none; margin-top: 14px; padding-bottom: 30px;">
 
         <!-- FORM CONTAINER CARD -->
-        <div
+        <div data-leave-form
           style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 20px; padding: 20px; box-shadow: var(--shadow-sm); margin-bottom: 16px;">
-          <h2 class="form-section-heading form-section-heading--new">Credit Leave Details</h2>
+          <h2 data-leave-heading class="form-section-heading form-section-heading--new">Credit Leave Details</h2>
 
           <div style="display: flex; flex-direction: column; gap: 16px;">
 
@@ -3314,7 +3317,7 @@
               <label
                 style="display: block; font-size: 13px; font-weight: 700; color: var(--text-muted); margin-bottom: 6px;">Credit
                 Leave</label>
-              <div style="position: relative;">
+              <div data-leave-field="creditLeave" style="position: relative;">
                 <select
                   style="width: 100%; background: var(--bg-input); border: 1px solid var(--border-subtle); border-radius: 14px; padding: 12px 14px; font-size: 13px; font-weight: 800; color: var(--text-primary); outline: none; cursor: pointer; appearance: none; -webkit-appearance: none;">
                   <option value="replacement" selected>REPLACEMENT LEAVE (28.000)</option>
@@ -3331,7 +3334,7 @@
               <label
                 style="display: block; font-size: 13px; font-weight: 700; color: var(--text-muted); margin-bottom: 6px;">Offset
                 Leave</label>
-              <div style="position: relative;">
+              <div data-leave-field="offsetLeave" style="position: relative;">
                 <select
                   style="width: 100%; background: var(--bg-input); border: 1px solid var(--border-subtle); border-radius: 14px; padding: 12px 14px; font-size: 13px; font-weight: 600; color: var(--text-muted); outline: none; cursor: pointer; appearance: none; -webkit-appearance: none;">
                   <option value="" selected>- Select Offset Leave -</option>
@@ -3348,7 +3351,7 @@
               <label
                 style="display: block; font-size: 13px; font-weight: 700; color: var(--text-muted); margin-bottom: 6px;">Credit
                 Type</label>
-              <div style="position: relative;">
+              <div data-leave-field="creditType" style="position: relative;">
                 <select
                   style="width: 100%; background: var(--bg-input); border: 1px solid var(--border-subtle); border-radius: 14px; padding: 12px 14px; font-size: 13px; font-weight: 600; color: var(--text-muted); outline: none; cursor: pointer; appearance: none; -webkit-appearance: none;">
                   <option value="" selected>- Select Credit Type -</option>
@@ -3366,7 +3369,7 @@
               <label
                 style="display: block; font-size: 13px; font-weight: 700; color: var(--text-muted); margin-bottom: 6px;">Start
                 Date</label>
-              <div style="position: relative;">
+              <div data-leave-field="fromDate" style="position: relative;">
                 <input type="text" id="creditFormFromDateText" value="11/09/2026"
                   style="width: 100%; background: var(--bg-input); border: 1px solid var(--border-subtle); border-radius: 14px; padding: 12px 14px; font-size: 13px; font-weight: 700; color: var(--text-primary); outline: none;" />
                 <span
@@ -3379,7 +3382,7 @@
               <label
                 style="display: block; font-size: 13px; font-weight: 700; color: var(--text-muted); margin-bottom: 6px;">End
                 Date</label>
-              <div style="position: relative;">
+              <div data-leave-field="toDate" style="position: relative;">
                 <input type="text" id="creditFormToDateText" value="11/09/2026"
                   style="width: 100%; background: var(--bg-input); border: 1px solid var(--border-subtle); border-radius: 14px; padding: 12px 14px; font-size: 13px; font-weight: 700; color: var(--text-primary); outline: none;" />
                 <span
@@ -3392,7 +3395,7 @@
               <label
                 style="display: block; font-size: 13px; font-weight: 700; color: var(--text-muted); margin-bottom: 6px;">Credit
                 Days</label>
-              <input type="text" value="1"
+              <input type="text" data-leave-field="creditDays" value="1"
                 style="width: 100%; background: var(--bg-input); border: 1px solid var(--border-subtle); border-radius: 14px; padding: 12px 14px; font-size: 13px; font-weight: 700; color: var(--text-primary); outline: none;" />
             </div>
 
@@ -3401,7 +3404,7 @@
               <label
                 style="display: block; font-size: 13px; font-weight: 700; color: var(--text-muted); margin-bottom: 6px;">Effective
                 Date</label>
-              <div style="position: relative;">
+              <div data-leave-field="effectiveDate" style="position: relative;">
                 <input type="text" id="creditFormEffectiveDateText" value="12/09/2026"
                   style="width: 100%; background: var(--bg-input); border: 1px solid var(--border-subtle); border-radius: 14px; padding: 12px 14px; font-size: 13px; font-weight: 700; color: var(--text-primary); outline: none;" />
                 <span
@@ -3413,7 +3416,7 @@
             <div>
               <label
                 style="display: block; font-size: 13px; font-weight: 700; color: var(--text-muted); margin-bottom: 6px;">Reason</label>
-              <div style="position: relative;">
+              <div data-leave-field="reason" style="position: relative;">
                 <select
                   style="width: 100%; background: var(--bg-input); border: 1px solid var(--border-subtle); border-radius: 14px; padding: 12px 14px; font-size: 13px; font-weight: 600; color: var(--text-muted); outline: none; cursor: pointer; appearance: none; -webkit-appearance: none;">
                   <option value="" selected>- Select Reason -</option>
@@ -3431,12 +3434,12 @@
             <div>
               <label
                 style="display: block; font-size: 13px; font-weight: 700; color: var(--text-muted); margin-bottom: 6px;">Remarks</label>
-              <textarea rows="3" placeholder="Enter optional remarks..."
+              <textarea data-leave-field="remark" rows="3" placeholder="Enter optional remarks..."
                 style="width: 100%; background: var(--bg-input); border: 1px solid var(--border-subtle); border-radius: 14px; padding: 12px 14px; font-size: 13px; font-weight: 600; color: var(--text-primary); outline: none; font-family: inherit; resize: vertical;"></textarea>
             </div>
 
             <!-- 10. Upload Attachment -->
-            <div>
+            <div data-leave-attachments>
               <label class="form-section-heading"
                 style="display: block; font-size: 13px; font-weight: 700; color: var(--text-muted); margin-bottom: 12px;">Upload
                 Attachment</label>
@@ -3482,7 +3485,6 @@
 
           <button type="button" class="form-cancel-btn" data-page-form-cancel
             onclick="showLeaveSection('viewLeaveHub')">
-            <i class="fa-solid fa-xmark"></i>
             <span>Cancel</span>
           </button>
 
@@ -3977,14 +3979,14 @@
       <div id="viewApplyOffTimeForm" style="display: none; margin-top: 14px; padding-bottom: 30px;">
 
         <!-- FORM CARD -->
-        <div style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 20px; padding: 20px; box-shadow: var(--shadow-sm); margin-bottom: 16px;">
-          <h2 class="form-section-heading form-section-heading--new">Time Off Details</h2>
+        <div data-leave-form style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 20px; padding: 20px; box-shadow: var(--shadow-sm); margin-bottom: 16px;">
+          <h2 data-leave-heading class="form-section-heading form-section-heading--new">Time Off Details</h2>
           <div style="display: flex; flex-direction: column; gap: 16px;">
 
             <!-- Date -->
             <div>
               <label style="display: block; font-size: 13px; font-weight: 700; color: var(--text-muted); margin-bottom: 6px;">Date</label>
-              <input type="date" id="timeOffDateInput" value="2026-09-11"
+              <input type="date" id="timeOffDateInput" data-leave-field="date" value="2026-09-11"
                 style="width: 100%; background: var(--bg-input); border: 1px solid var(--border-subtle); border-radius: 14px; padding: 12px 14px; font-size: 13px; font-weight: 700; color: var(--text-primary); outline: none;" />
             </div>
 
@@ -3992,12 +3994,12 @@
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
               <div>
                 <label style="display: block; font-size: 13px; font-weight: 700; color: var(--text-muted); margin-bottom: 6px;">Start Time</label>
-                <input type="time" id="timeOffStartTime" value="09:00" onchange="updateTimeOffHours()"
+                <input type="time" id="timeOffStartTime" data-leave-field="startTime" value="09:00" onchange="updateTimeOffHours()"
                   style="width: 100%; background: var(--bg-input); border: 1px solid var(--border-subtle); border-radius: 14px; padding: 12px 14px; font-size: 13px; font-weight: 700; color: var(--text-primary); outline: none;" />
               </div>
               <div>
                 <label style="display: block; font-size: 13px; font-weight: 700; color: var(--text-muted); margin-bottom: 6px;">End Time</label>
-                <input type="time" id="timeOffEndTime" value="10:00" onchange="updateTimeOffHours()"
+                <input type="time" id="timeOffEndTime" data-leave-field="endTime" value="10:00" onchange="updateTimeOffHours()"
                   style="width: 100%; background: var(--bg-input); border: 1px solid var(--border-subtle); border-radius: 14px; padding: 12px 14px; font-size: 13px; font-weight: 700; color: var(--text-primary); outline: none;" />
               </div>
             </div>
@@ -4005,14 +4007,14 @@
             <!-- Hours -->
             <div>
               <label style="display: block; font-size: 13px; font-weight: 700; color: var(--text-muted); margin-bottom: 6px;">Hours</label>
-              <input type="text" id="timeOffHoursInput" value="1.00" readonly
+              <input type="text" id="timeOffHoursInput" data-leave-field="hours" value="1.00" readonly
                 style="width: 100%; background: var(--bg-input); border: 1px solid var(--border-subtle); border-radius: 14px; padding: 12px 14px; font-size: 13px; font-weight: 700; color: var(--text-primary); outline: none;" />
             </div>
 
             <!-- Reason -->
             <div>
               <label style="display: block; font-size: 13px; font-weight: 700; color: var(--text-muted); margin-bottom: 6px;">Reason</label>
-              <div style="position: relative;">
+              <div data-leave-field="reason" style="position: relative;">
                 <select id="timeOffReasonSelect"
                   style="width: 100%; background: var(--bg-input); border: 1px solid var(--border-subtle); border-radius: 14px; padding: 12px 38px 12px 14px; font-size: 13px; font-weight: 700; color: var(--text-primary); outline: none; cursor: pointer; appearance: none; -webkit-appearance: none;">
                   <option value="" selected>- Select Reason -</option>
@@ -4031,12 +4033,12 @@
             <!-- Remarks -->
             <div>
               <label style="display: block; font-size: 13px; font-weight: 700; color: var(--text-muted); margin-bottom: 6px;">Remarks</label>
-              <textarea id="timeOffRemarksTextarea" rows="3" placeholder="Add optional remarks..."
+              <textarea id="timeOffRemarksTextarea" data-leave-field="remark" rows="3" placeholder="Add optional remarks..."
                 style="width: 100%; background: var(--bg-input); border: 1px solid var(--border-subtle); border-radius: 14px; padding: 12px 14px; font-size: 13px; font-weight: 600; color: var(--text-primary); outline: none; resize: none; font-family: inherit;"></textarea>
             </div>
 
             <!-- Upload Attachment Section -->
-            <div>
+            <div data-leave-attachments>
               <label class="form-section-heading" style="display: block; font-size: 13px; font-weight: 700; color: var(--text-muted); margin-bottom: 12px;">Upload Attachments</label>
               <div style="display: flex; align-items: center; justify-content: center; gap: 32px; padding: 12px 0;">
                 <!-- Circular Option 1: Select File(s) -->
@@ -4074,7 +4076,6 @@
         <div class="form-action-row" style="justify-content: flex-end; margin-top: 10px;">
           <button type="button" class="form-cancel-btn" data-page-form-cancel
             onclick="showLeaveSection('viewLeaveHub')">
-            <i class="fa-solid fa-xmark"></i>
             <span>Cancel</span>
           </button>
           <!-- Submit Button -->
@@ -4122,11 +4123,20 @@
             style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; text-align: center; font-size: 12px; font-weight: 700;">
             <!-- Populated dynamically by renderMyPersonalCalendar() -->
           </div>
-
-
         </div>
 
-
+        <section id="myPersonalCalEventDetail" class="cal-detail-card leave-calendar-summary"
+          aria-labelledby="myPersonalSelectedDateTitle" aria-live="polite" aria-atomic="true">
+          <h3 id="myPersonalSelectedDateTitle" class="cal-agenda-date-title"></h3>
+          <div class="cal-detail-icon-title">
+            <span class="cal-detail-icon" aria-hidden="true"><i class="fa-regular fa-calendar-days"></i></span>
+            <div class="leave-day-description">
+              <p class="cal-detail-name"></p>
+              <p class="cal-detail-time"></p>
+              <div class="leave-day-record"></div>
+            </div>
+          </div>
+        </section>
       </div>
 
       <!-- ==========================================
@@ -5095,10 +5105,9 @@
               <a class="approval-record-link" href="#approval/details/VLV000000000790"><dl class="approval-card-details">
                 <div><dt>Type</dt> <dd>Annual Leave (Unplanned)</dd></div>
                 <div class="record-reason-field"><dt>Reason</dt> <dd>Personnel Issues</dd></div>
-                <div><dt>Date Start</dt> <dd><time datetime="2026-02-23">Tue, 23/02/2026</time></dd></div>
-                <div><dt>Date End</dt> <dd><time datetime="2026-02-25">Thu, 25/02/2026</time></dd></div>
+                <div><dt>Dates</dt> <dd><time datetime="2026-02-23">Tue,&nbsp;23/02/2026</time> –&nbsp;<time datetime="2026-02-25">Thu,&nbsp;25/02/2026</time></dd></div>
                 <div><dt>Duration</dt> <dd>3 Days</dd></div>
-                <div><dt>Remark</dt> <dd>Urgent personnel emergency leave for home repair &amp; family assistance.</dd></div>
+                <div class="leave-approval-remark"><dt>Remark</dt> <dd>Urgent personnel emergency leave for home repair &amp; family assistance.</dd></div>
               </dl></a>
               <div class="pending-action-grid">
                 <button type="button" class="action-btn-resubmit" onclick="singleResubmitCard('approvalCard1', 'Afifah Nasir')">
@@ -5149,10 +5158,9 @@
               <a class="approval-record-link" href="#approval/details/VLV000000000791"><dl class="approval-card-details">
                 <div><dt>Type</dt> <dd>Medical Leave (MC Verified)</dd></div>
                 <div class="record-reason-field"><dt>Reason</dt> <dd>Medical Checkup</dd></div>
-                <div><dt>Date Start</dt> <dd><time datetime="2026-09-12">Sat, 12/09/2026</time></dd></div>
-                <div><dt>Date End</dt> <dd><time datetime="2026-09-12">Sat, 12/09/2026</time></dd></div>
+                <div><dt>Dates</dt> <dd><time datetime="2026-09-12">Sat, 12/09/2026</time></dd></div>
                 <div><dt>Duration</dt> <dd>1 Day</dd></div>
-                <div><dt>Remark</dt> <dd>Routine hospital specialist appointment &amp; panel clinic receipt attached.</dd></div>
+                <div class="leave-approval-remark"><dt>Remark</dt> <dd>Routine hospital specialist appointment &amp; panel clinic receipt attached.</dd></div>
               </dl></a>
               <div class="pending-action-grid">
                 <button type="button" class="action-btn-resubmit" onclick="singleResubmitCard('approvalCard2', 'Hailizam')">
@@ -5196,10 +5204,9 @@
               <a class="approval-record-link" href="#approval/details/VLV000000000792"><dl class="approval-card-details">
                 <div><dt>Type</dt> <dd>Annual Leave (Planned)</dd></div>
                 <div class="record-reason-field"><dt>Reason</dt> <dd>Family Vacation</dd></div>
-                <div><dt>Date Start</dt> <dd><time datetime="2026-09-15">Tue, 15/09/2026</time></dd></div>
-                <div><dt>Date End</dt> <dd><time datetime="2026-09-16">Wed, 16/09/2026</time></dd></div>
+                <div><dt>Dates</dt> <dd><time datetime="2026-09-15">Tue,&nbsp;15/09/2026</time> –&nbsp;<time datetime="2026-09-16">Wed,&nbsp;16/09/2026</time></dd></div>
                 <div><dt>Duration</dt> <dd>2 Days</dd></div>
-                <div><dt>Remark</dt> <dd>Scheduled family vacation trip to Penang with flight tickets attached.</dd></div>
+                <div class="leave-approval-remark"><dt>Remark</dt> <dd>Scheduled family vacation trip to Penang with flight tickets attached.</dd></div>
               </dl></a>
               <div class="pending-action-grid">
                 <button type="button" class="action-btn-resubmit" onclick="singleResubmitCard('approvalCard3', 'Nurfarhana')">
@@ -5242,10 +5249,9 @@
               <a class="approval-record-link" href="#approval/details/VLV000000000793"><dl class="approval-card-details">
                 <div><dt>Type</dt> <dd>Emergency Leave (Urgent)</dd></div>
                 <div class="record-reason-field"><dt>Reason</dt> <dd>Urgent Home Repair</dd></div>
-                <div><dt>Date Start</dt> <dd><time datetime="2026-09-29">Tue, 29/09/2026</time></dd></div>
-                <div><dt>Date End</dt> <dd><time datetime="2026-09-29">Tue, 29/09/2026</time></dd></div>
+                <div><dt>Dates</dt> <dd><time datetime="2026-09-29">Tue, 29/09/2026</time></dd></div>
                 <div><dt>Duration</dt> <dd>1 Day</dd></div>
-                <div><dt>Remark</dt> <dd>Sudden water pipe burst at apartment requiring urgent repair.</dd></div>
+                <div class="leave-approval-remark"><dt>Remark</dt> <dd>Sudden water pipe burst at apartment requiring urgent repair.</dd></div>
               </dl></a>
               <div class="pending-action-grid">
                 <button type="button" class="action-btn-resubmit" onclick="singleResubmitCard('approvalCard4', 'Alex Tan')">
@@ -5389,7 +5395,7 @@
                 <div><dt>Type</dt> <dd>Personal Time Off</dd></div>
                 <div class="record-reason-field"><dt>Reason</dt> <dd>Urgent Family Care</dd></div>
                 <div><dt>Date</dt> <dd>Wed, 23/09/2026</dd></div>
-                <div><dt>Time Off</dt> <dd>14:30 – 17:00</dd></div>
+                <div><dt>Time Off</dt> <dd data-time-off-range><time datetime="14:30">14:30</time> – <time datetime="17:00">17:00</time></dd></div>
                 <div><dt>Duration</dt> <dd>2.5 Hours</dd></div>
                 <div><dt>Remark</dt> <dd>Emergency visit to school clinic for child health concern.</dd></div>
               </dl></a>
@@ -5435,7 +5441,7 @@
                 <div><dt>Type</dt> <dd>Medical Time Off</dd></div>
                 <div class="record-reason-field"><dt>Reason</dt> <dd>Dental Checkup</dd></div>
                 <div><dt>Date</dt> <dd>Thu, 24/09/2026</dd></div>
-                <div><dt>Time Off</dt> <dd>10:00 – 12:00</dd></div>
+                <div><dt>Time Off</dt> <dd data-time-off-range><time datetime="10:00">10:00</time> – <time datetime="12:00">12:00</time></dd></div>
                 <div><dt>Duration</dt> <dd>2.0 Hours</dd></div>
                 <div><dt>Remark</dt> <dd>Scheduled orthodontic checkup at specialist dental clinic.</dd></div>
               </dl></a>
@@ -5481,7 +5487,7 @@
                 <div><dt>Type</dt> <dd>Official Affairs</dd></div>
                 <div class="record-reason-field"><dt>Reason</dt> <dd>SSM Submission</dd></div>
                 <div><dt>Date</dt> <dd>Fri, 25/09/2026</dd></div>
-                <div><dt>Time Off</dt> <dd>15:30 – 17:00</dd></div>
+                <div><dt>Time Off</dt> <dd data-time-off-range><time datetime="15:30">15:30</time> – <time datetime="17:00">17:00</time></dd></div>
                 <div><dt>Duration</dt> <dd>1.5 Hours</dd></div>
                 <div><dt>Remark</dt> <dd>Urgent physical submission of statutory compliance documents at SSM office.</dd></div>
               </dl></a>
@@ -5892,7 +5898,6 @@
           <h2 id="teamCalendarLeaveEmployee"></h2>
           <div class="team-leave-record-meta">
             <span id="teamCalendarLeaveStatus"></span>
-            <span id="teamCalendarLeaveReference"></span>
           </div>
         </header>
         <div id="teamCalendarLeaveForm"></div>
@@ -5906,8 +5911,25 @@
         background: var(--bg-card) !important;
       }
       #historyDetailsModalOverlay .history-details-body {
-        background: var(--bg-card);
         scrollbar-color: rgba(148, 163, 184, 0.9) transparent;
+      }
+      #historyDetailsModalOverlay .history-details-body:has(> .history-details-table:not([hidden])) {
+        background: var(--bg-card);
+      }
+      .leave-history-form-heading {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        margin-bottom: 16px;
+      }
+      .leave-history-form-heading > [data-leave-heading] {
+        min-width: 0;
+        margin-bottom: 0 !important;
+        overflow-wrap: anywhere;
+      }
+      .leave-history-form-heading > .record-detail-status {
+        flex-shrink: 0;
       }
       #historyDetailsModalOverlay .history-details-table {
         table-layout: fixed;
@@ -5942,7 +5964,13 @@
           </div>
         </header>
         <div class="history-record-content history-details-body" style="flex: 1 1 auto; min-height: 0; overflow-y: auto; padding: 12px 12px 24px;">
-        <table class="history-details-table" style="width: 100%; border-collapse: collapse; font-size: 11.5px; text-align: left;">
+        <div id="leaveHistoryFormView" hidden>
+          <header class="team-leave-record-header">
+            <h2 id="leaveHistoryEmployee"></h2>
+          </header>
+          <div id="leaveHistoryForm"></div>
+        </div>
+        <table id="leaveHistoryDetailsTable" class="history-details-table" style="width: 100%; border-collapse: collapse; font-size: 11.5px; text-align: left;">
           <tbody><tr id="leaveHistorySubmitDate" class="record-submit-date" hidden></tr></tbody>
           <tbody id="historyDetailsTableBody">
             <!-- Populated by JS -->
@@ -5991,99 +6019,20 @@
           display: inline-flex;
           align-items: center;
         }
-        #approvalDetailsModalOverlay .leave-approval-section {
-          display: flex;
-          flex-direction: column;
-          gap: 8px;
-        }
-        #approvalDetailsModalOverlay .leave-approval-section-title {
-          display: flex;
-          align-items: center;
-          gap: 8px;
-          margin: 0 2px;
-          color: var(--text-primary);
-          font-size: 13px;
-          font-weight: 800;
-        }
-        #approvalDetailsModalOverlay .leave-approval-section-title::before {
-          width: 3px;
-          height: 16px;
-          border-radius: 999px;
-          background: var(--purple-primary);
-          content: '';
-        }
-        #approvalDetailsModalOverlay .leave-approval-table-card,
-        #approvalDetailsModalOverlay .leave-approval-attachment-card,
         #approvalDetailsModalOverlay .leave-approval-comments {
           overflow: hidden;
+          padding: 13px 14px 14px;
           border: 1px solid var(--border-subtle);
           border-radius: 18px;
           background: var(--bg-card);
           box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
         }
-        #approvalDetailsModalOverlay .leave-approval-details-table {
-          width: 100%;
-          border-collapse: collapse;
-          table-layout: fixed;
+        #leaveApprovalPreviousRemarks {
+          margin: 0 0 10px;
+          color: var(--text-secondary);
           font-size: 12px;
-          text-align: left;
-        }
-        #approvalDetailsModalOverlay .leave-approval-details-table td {
-          padding: 10px 12px;
-          border-bottom: 1px solid var(--border-subtle);
-          color: var(--text-primary);
-          vertical-align: middle;
           overflow-wrap: anywhere;
         }
-        #approvalDetailsModalOverlay .leave-approval-details-table tr:last-child td { border-bottom: 0; }
-        #approvalDetailsModalOverlay .leave-approval-details-table td:first-child {
-          width: 39%;
-          border-right: 1px solid var(--border-subtle);
-          background: var(--bg-input);
-          color: var(--text-muted);
-          font-weight: 700;
-        }
-        #approvalDetailsModalOverlay .leave-approval-details-table td:last-child { width: 61%; font-weight: 700; }
-        #approvalDetailsModalOverlay .leave-approval-attachment-card {
-          width: 100%;
-          display: flex;
-          align-items: center;
-          gap: 10px;
-          padding: 13px 14px;
-          color: var(--text-primary);
-          text-align: left;
-          cursor: pointer;
-        }
-        #approvalDetailsModalOverlay .leave-approval-attachment-card i:first-child { color: var(--purple-primary); font-size: 17px; }
-        #approvalDetailsModalOverlay .leave-approval-attachment-card span {
-          min-width: 0;
-          flex: 1;
-          overflow: hidden;
-          font-size: 12px;
-          font-weight: 700;
-          text-overflow: ellipsis;
-          white-space: nowrap;
-        }
-        #approvalDetailsModalOverlay .leave-approval-attachment-card i:last-child { color: var(--text-muted); font-size: 11px; }
-        #approvalDetailsModalOverlay .leave-approval-file-inline {
-          display: flex;
-          align-items: center;
-          gap: 7px;
-          min-width: 0;
-          color: var(--text-primary);
-          font-size: 11.5px;
-          font-weight: 700;
-        }
-        #approvalDetailsModalOverlay .leave-approval-file-inline i {
-          flex-shrink: 0;
-          color: var(--purple-primary);
-          font-size: 14px;
-        }
-        #approvalDetailsModalOverlay .leave-approval-file-inline span {
-          min-width: 0;
-          overflow-wrap: anywhere;
-        }
-        #approvalDetailsModalOverlay .leave-approval-comments { padding: 13px 14px 14px; }
         #approvalDetailsModalOverlay .leave-approval-comments label {
           display: block;
           margin-bottom: 9px;
@@ -6116,154 +6065,18 @@
         <!-- Scrollable Form Body -->
         <div class="details-modal-body" style="flex: 1 1 auto; overflow-y: auto; padding: 14px 16px 24px 16px; display: flex; flex-direction: column; gap: 14px; min-height: 0;">
           
-          <div id="standardLeaveDetailsView" style="display: flex; flex-direction: column; gap: 14px;">
-            <div id="leaveApprovalForm"></div>
-            <section class="leave-approval-comments claim-detail-approver-comments">
-              <label for="approvalActionCommentsInput">Approver Action Comments</label>
-              <input type="text" id="approvalActionCommentsInput" placeholder="Add approver action comments (optional)...">
-            </section>
-          </div>
-
-          <div id="timeOffDetailsView" style="display: none; flex-direction: column; gap: 14px;">
-            <section class="leave-approval-section" aria-labelledby="timeOffApprovalGeneralTitle">
-              <h4 class="leave-approval-section-title" id="timeOffApprovalGeneralTitle">General</h4>
-              <div class="leave-approval-table-card">
-                <table class="leave-approval-details-table" data-time-off-approval-general>
-                  <tbody>
-                    <tr id="timeOffApprovalSubmitDate" class="record-submit-date" hidden></tr>
-                    <tr><td>Date</td><td><span id="timeOffDetailsDate">23 Sep 2026</span></td></tr>
-                    <tr><td>Start Time</td><td><span id="timeOffDetailsStartTime">14:30</span></td></tr>
-                    <tr><td>End Time</td><td><span id="timeOffDetailsEndTime">17:00</span></td></tr>
-                    <tr><td>Hours</td><td><span id="timeOffDetailsHours">2.5 Hours</span></td></tr>
-                    <tr><td>Reason</td><td><span id="timeOffDetailsReason">Urgent Family Care</span></td></tr>
-                    <tr><td>Remarks</td><td><span id="timeOffDetailsRemarks">Emergency visit to school clinic for child health concern.</span></td></tr>
-                    <tr><td>Approver Remarks</td><td><span id="timeOffDetailsApproverRemarks">&#8212;</span></td></tr>
-                  </tbody>
-                </table>
-              </div>
-            </section>
-          </div>
-
-          <!-- LEAVE CREDIT APPROVAL VIEW (ONE SINGLE UNIFIED CONTINUOUS TABLE) -->
-          <div id="leaveCreditDetailsView" style="display: none; flex-direction: column;">
-            <div style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 18px; overflow: hidden; box-shadow: 0 4px 16px rgba(0,0,0,0.06); flex-shrink: 0;">
-              <table style="width: 100%; border-collapse: collapse; font-size: 12px; text-align: left;">
-                <tbody>
-                  <tr id="creditApprovalSubmitDate" class="record-submit-date" hidden></tr>
-                  <!-- 3. Employee -->
-                  <tr>
-                    <td style="padding: 10px 14px; border-bottom: 1px solid var(--border-subtle); border-right: 1px solid var(--border-subtle); font-weight: 700; color: var(--text-muted); background: var(--bg-input); width: 38%;">Employee:</td>
-                    <td style="padding: 10px 14px; border-bottom: 1px solid var(--border-subtle); color: var(--text-primary); width: 62%; font-weight: 800;">
-                      <span id="lcDetailsEmployee">EBB12 - Farhan binti rahmat</span>
-                    </td>
-                  </tr>
-
-                  <!-- 4. Credit Leave -->
-                  <tr>
-                    <td style="padding: 10px 14px; border-bottom: 1px solid var(--border-subtle); border-right: 1px solid var(--border-subtle); font-weight: 700; color: var(--text-muted); background: var(--bg-input); width: 38%;">Credit Leave:</td>
-                    <td style="padding: 10px 14px; border-bottom: 1px solid var(--border-subtle); color: var(--text-primary); width: 62%; font-weight: 800;">
-                      <span id="lcDetailsCreditLeave" style="color: var(--purple-primary); font-size: 13px;">REPLACEMENT LEAVE</span>
-                    </td>
-                  </tr>
-
-                  <!-- 5. Offset Leave -->
-                  <tr>
-                    <td style="padding: 10px 14px; border-bottom: 1px solid var(--border-subtle); border-right: 1px solid var(--border-subtle); font-weight: 700; color: var(--text-muted); background: var(--bg-input); width: 38%;">Offset Leave:</td>
-                    <td style="padding: 10px 14px; border-bottom: 1px solid var(--border-subtle); color: var(--text-primary); width: 62%; font-weight: 600;">
-                      <span id="lcDetailsOffsetLeave"></span>
-                    </td>
-                  </tr>
-
-                  <!-- 6. Credit Type -->
-                  <tr>
-                    <td style="padding: 10px 14px; border-bottom: 1px solid var(--border-subtle); border-right: 1px solid var(--border-subtle); font-weight: 700; color: var(--text-muted); background: var(--bg-input); width: 38%;">Credit Type:</td>
-                    <td style="padding: 10px 14px; border-bottom: 1px solid var(--border-subtle); color: var(--text-primary); width: 62%; font-weight: 700;">
-                      <span id="lcDetailsCreditType">Working on Public Holiday</span>
-                    </td>
-                  </tr>
-
-                  <!-- 7. Submitter -->
-                  <tr>
-                    <td style="padding: 10px 14px; border-bottom: 1px solid var(--border-subtle); border-right: 1px solid var(--border-subtle); font-weight: 700; color: var(--text-muted); background: var(--bg-input); width: 38%;">Submitter:</td>
-                    <td style="padding: 10px 14px; border-bottom: 1px solid var(--border-subtle); color: var(--text-primary); width: 62%; font-weight: 600;">
-                      <span id="lcDetailsSubmitter">EBB12 - Farhan binti rahmat</span>
-                    </td>
-                  </tr>
-
-                  <!-- 9. Start Date -->
-                  <tr>
-                    <td style="padding: 10px 14px; border-bottom: 1px solid var(--border-subtle); border-right: 1px solid var(--border-subtle); font-weight: 700; color: var(--text-muted); background: var(--bg-input); width: 38%;">Start Date:</td>
-                    <td style="padding: 10px 14px; border-bottom: 1px solid var(--border-subtle); color: var(--text-primary); width: 62%; font-weight: 600;">
-                      <span id="lcDetailsFromDate" style="font-weight: 700;">3 Jul 2024</span>
-                    </td>
-                  </tr>
-
-                  <!-- 10. End Date -->
-                  <tr>
-                    <td style="padding: 10px 14px; border-bottom: 1px solid var(--border-subtle); border-right: 1px solid var(--border-subtle); font-weight: 700; color: var(--text-muted); background: var(--bg-input); width: 38%;">End Date:</td>
-                    <td style="padding: 10px 14px; border-bottom: 1px solid var(--border-subtle); color: var(--text-primary); width: 62%; font-weight: 600;">
-                      <span id="lcDetailsToDate" style="font-weight: 700;">3 Jul 2024</span>
-                    </td>
-                  </tr>
-
-                  <!-- 11. Credit Days -->
-                  <tr>
-                    <td style="padding: 10px 14px; border-bottom: 1px solid var(--border-subtle); border-right: 1px solid var(--border-subtle); font-weight: 700; color: var(--text-muted); background: var(--bg-input); width: 38%;">Credit Days:</td>
-                    <td style="padding: 10px 14px; border-bottom: 1px solid var(--border-subtle); color: var(--text-primary); width: 62%; font-weight: 800;">
-                      <span id="lcDetailsCreditDays" style="font-size: 13px;">1.000</span>
-                    </td>
-                  </tr>
-
-                  <!-- 12. Effective Date -->
-                  <tr>
-                    <td id="lcDetailsEffectiveDateLabel" style="padding: 10px 14px; border-bottom: 1px solid var(--border-subtle); border-right: 1px solid var(--border-subtle); font-weight: 700; color: var(--text-muted); background: var(--bg-input); width: 38%;">Effective Date:</td>
-                    <td style="padding: 10px 14px; border-bottom: 1px solid var(--border-subtle); color: var(--text-primary); width: 62%; font-weight: 700;">
-                      <span id="lcDetailsEffectiveDate">4 Jul 2024</span>
-                    </td>
-                  </tr>
-
-                  <!-- 13. Reason -->
-                  <tr>
-                    <td style="padding: 10px 14px; border-bottom: 1px solid var(--border-subtle); border-right: 1px solid var(--border-subtle); font-weight: 700; color: var(--text-muted); background: var(--bg-input); width: 38%;">Reason:</td>
-                    <td style="padding: 10px 14px; border-bottom: 1px solid var(--border-subtle); color: var(--text-primary); width: 62%; font-weight: 700;">
-                      <span id="lcDetailsReason">OTHERS</span>
-                    </td>
-                  </tr>
-
-                  <!-- 14. Remark -->
-                  <tr>
-                    <td style="padding: 10px 14px; border-bottom: 1px solid var(--border-subtle); border-right: 1px solid var(--border-subtle); font-weight: 700; color: var(--text-muted); background: var(--bg-input); width: 38%; vertical-align: top;">Remark</td>
-                    <td style="padding: 10px 14px; border-bottom: 1px solid var(--border-subtle); color: var(--text-primary); width: 62%; font-weight: 500; line-height: 1.4;">
-                      <div id="lcDetailsRemark" style="background: var(--bg-input); border: 1px solid var(--border-subtle); border-radius: 8px; padding: 8px 10px; font-size: 12px;">
-                        Worked Overtime for adhoc request
-                      </div>
-                    </td>
-                  </tr>
-
-                  <!-- 15. Attachment -->
-                  <tr>
-                    <td style="padding: 10px 14px; border-bottom: 1px solid var(--border-subtle); border-right: 1px solid var(--border-subtle); font-weight: 700; color: var(--text-muted); background: var(--bg-input); width: 38%;">Attachment:</td>
-                    <td style="padding: 10px 14px; border-bottom: 1px solid var(--border-subtle); color: var(--text-primary); width: 62%;">
-                      <div class="leave-approval-file-inline">
-                        <i class="fa-solid fa-file-image" aria-hidden="true"></i>
-                        <span id="lcDetailsAttachment">5fae9b25c05f463990e88cb6dc4c96b0.jpg</span>
-                      </div>
-                    </td>
-                  </tr>
-
-                  <!-- 16. Approver Action Comments -->
-                  <tr>
-                    <td style="padding: 10px 14px; border-bottom: none; border-right: 1px solid var(--border-subtle); font-weight: 700; color: var(--text-muted); background: var(--bg-input); width: 38%; vertical-align: middle;">
-                      Approver Action Comments:
-                    </td>
-                    <td style="padding: 8px 12px; border-bottom: none; width: 62%;">
-                      <input type="text" id="lcApproverComments" placeholder="Add approver action comments..." style="width: 100%; padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border-subtle); background: var(--bg-input); color: var(--text-primary); font-size: 12px; font-weight: 500; outline: none; box-sizing: border-box;">
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+          <header id="leaveApprovalRecordHeader" class="team-leave-record-header" hidden>
+            <h2 id="leaveApprovalEmployee"></h2>
+            <div class="team-leave-record-meta">
+              <span id="leaveApprovalRecordStatus"></span>
             </div>
-          </div>
+          </header>
+          <div id="leaveApprovalForm"></div>
+          <section class="leave-approval-comments claim-detail-approver-comments">
+            <p id="leaveApprovalPreviousRemarks" hidden></p>
+            <label for="approvalActionCommentsInput">Approver Action Comments</label>
+            <input type="text" id="approvalActionCommentsInput" placeholder="Add approver action comments (optional)...">
+          </section>
 
         </div>
 
@@ -7038,42 +6851,6 @@
     <!-- All Indicators Drawer -->
     <indicators-sheet></indicators-sheet>
 
-    <!-- CALENDAR EVENT DETAIL BOTTOM SHEET MODAL -->
-    <div id="calEventSheetOverlay" class="cal-event-sheet-overlay" onclick="closeCalEventSheet(event)"
-      style="display: none;">
-      <div class="cal-event-sheet" onclick="event.stopPropagation()">
-        <div class="cal-sheet-drag-handle"></div>
-
-        <!-- Date Header -->
-        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
-          <div>
-            <h3 id="calSheetDateTitle"
-              style="font-size: 18px; font-weight: 800; color: var(--text-primary); margin: 0;">11 Sep 2026</h3>
-            <p id="calSheetDateSub"
-              style="font-size: 12px; color: var(--text-muted); margin: 2px 0 0 0; font-weight: 600;">Friday · Event
-              &amp; Shift Details</p>
-          </div>
-          <button type="button" onclick="closeCalEventSheet(null, true)"
-            style="width: 32px; height: 32px; border-radius: 50%; background: var(--bg-input); border: 1px solid var(--border-subtle); color: var(--text-primary); font-size: 16px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center;">
-            ✕
-          </button>
-        </div>
-
-        <!-- Event Items Container -->
-        <div id="calSheetEventsList"
-          style="display: flex; flex-direction: column; gap: 12px; max-height: 340px; overflow-y: auto; padding-right: 4px;">
-          <!-- Dynamic content rendered by openCalEventSheet() -->
-        </div>
-
-        <!-- Action Footer -->
-        <div class="cal-event-sheet-actions">
-          <button type="button" class="cal-event-sheet-cancel" onclick="closeCalEventSheet(null, true)">
-            <i class="fa-solid fa-ban" aria-hidden="true"></i> <span>Cancel</span>
-          </button>
-        </div>
-      </div>
-    </div>
-
     <!-- STAFF ON LEAVE BOTTOM SHEET -->
     <div id="staffOnLeaveSheetOverlay" class="cal-event-sheet-overlay" onclick="closeStaffOnLeaveSheet(event)"
       style="display: none;">
@@ -7156,7 +6933,7 @@
         </div>
 
         <div class="cal-event-sheet-actions">
-          <button type="button" class="cal-event-sheet-cancel" onclick="closeStaffOnLeaveSheet(null, true)"><i class="fa-solid fa-ban" aria-hidden="true"></i> <span>Cancel</span></button>
+          <button type="button" class="cal-event-sheet-cancel" onclick="closeStaffOnLeaveSheet(null, true)"><span>Cancel</span></button>
         </div>
       </div>
     </div>
@@ -7182,7 +6959,7 @@
 
         <div class="cal-event-sheet-actions">
           <button type="button" class="cal-event-sheet-cancel"
-            onclick="closeTeamUpcomingLeaveSheet(null, true)"><i class="fa-solid fa-ban" aria-hidden="true"></i> <span>Cancel</span></button>
+            onclick="closeTeamUpcomingLeaveSheet(null, true)"><span>Cancel</span></button>
         </div>
       </div>
     </div>
@@ -7840,7 +7617,7 @@
       if (mainEl) mainEl.scrollTop = 0;
     }
 
-    // --- MY PERSONAL LEAVE CALENDAR & EVENT SHEET ---
+    // --- MY PERSONAL LEAVE CALENDAR ---
     let myCalState = {
       month: calendarMonth(2026, 8),
       subCalendar: 'all',
@@ -7911,12 +7688,13 @@
     }
 
     function shiftMyPersonalPeriod(dir) {
+      const day = Number(myCalState.selectedDateStr.slice(-2));
       myCalState.month = dir === 0 ? calendarMonth(2026, 8) : myCalState.month.move(dir);
+      myCalState.selectedDateStr = calendarDateKey(myCalState.month.date(Math.min(day, myCalState.month.days)));
       renderMyPersonalCalendar();
     }
 
     function applyLeaveForDate(dateStr) {
-      closeCalEventSheet(null, true);
       showLeaveSection('viewApplyLeaveForm');
       if (dateStr) {
         const parts = dateStr.split('-');
@@ -7950,15 +7728,26 @@
       renderLeaveDays('indivCalDaysGrid', 'indivCalMonthTitle', individualMonth, selectedDate);
     }
 
-    function renderIndividualDaySummary(date, item) {
+    function renderIndividualDaySummary(summary, date, item) {
       const weekday = date.toLocaleDateString('en-GB', { weekday: 'short' });
-      document.getElementById('indivCalSelectedDateTitle').textContent = weekday + ', ' + formatDateShort(date);
-      document.getElementById('indivCalSelectedDateName').textContent =
+      summary.querySelector('h3').textContent = weekday + ', ' + formatDateShort(date);
+      summary.querySelector('.cal-detail-name').textContent =
         item?.phName || item?.leaveType?.replace(/ Leave$/, ' leave') || 'No leave scheduled';
+      const isLeave = item?.type === 'al' || item?.type === 'mc';
       const duration = item?.duration?.replace(/ Day$/, ' day');
-      const subtitle = document.getElementById('indivCalSelectedDateSub');
-      subtitle.textContent = [duration, item?.durationHours].filter(Boolean).join(' · ');
+      const status = isLeave ? recordReviewStatusLabel(item.status || 'Approved') : '';
+      const subtitle = summary.querySelector('.cal-detail-time');
+      subtitle.textContent = [duration, item?.durationHours, status].filter(Boolean).join(' · ');
       subtitle.hidden = !subtitle.textContent;
+      const record = summary.querySelector('.leave-day-record');
+      record.replaceChildren();
+      if (item?.ref) {
+        const reference = document.createElement('p');
+        reference.className = 'cal-detail-time';
+        reference.textContent = 'Ref: ' + item.ref;
+        record.append(reference);
+      }
+      if (isLeave) record.append(recordSubmitDate.cardLine(item.submittedDate));
     }
 
     function renderMyPersonalCalendar() {
@@ -7968,6 +7757,7 @@
     function renderLeaveDays(gridId, titleId, month, selectedDate) {
       const grid = document.getElementById(gridId);
       const isIndividual = gridId === 'indivCalDaysGrid';
+      const summary = document.getElementById(isIndividual ? 'indivCalEventDetail' : 'myPersonalCalEventDetail');
       document.getElementById(titleId).textContent = month.label;
       grid.replaceChildren();
       for (let i = 0; i < month.mondayOffset; i++) {
@@ -7980,7 +7770,7 @@
         const dayDate = month.date(day);
         const date = calendarDateKey(dayDate);
         const item = month.key === '2026-09' ? MY_SEPTEMBER_2026_DAYS[day - 1] : null;
-        if (isIndividual && date === selectedDate) renderIndividualDaySummary(dayDate, item);
+        if (date === selectedDate) renderIndividualDaySummary(summary, dayDate, item);
         const isEvent = item && ['al', 'mc', 'ph'].includes(item.type);
         const cell = document.createElement('button');
         cell.type = 'button';
@@ -7988,6 +7778,7 @@
         cell.dataset.date = date;
         cell.classList.toggle('selected', date === selectedDate);
         cell.setAttribute('aria-pressed', String(date === selectedDate));
+        cell.setAttribute('aria-controls', summary.id);
         const number = document.createElement('span');
         number.className = 'cal-date-num';
         number.textContent = day;
@@ -8004,13 +7795,9 @@
           previous?.setAttribute('aria-pressed', 'false');
           cell.classList.add('selected');
           cell.setAttribute('aria-pressed', 'true');
-          if (isIndividual) {
-            individualSelectedDay = day;
-            renderIndividualDaySummary(dayDate, item);
-          } else {
-            myCalState.selectedDateStr = date;
-          }
-          if (isEvent) openCalEventSheet(date, item);
+          if (isIndividual) individualSelectedDay = day;
+          else myCalState.selectedDateStr = date;
+          renderIndividualDaySummary(summary, dayDate, item);
         });
         grid.append(cell);
       }
@@ -8124,8 +7911,8 @@
 
       document.getElementById('teamCalendarLeaveEmployee').textContent = employeeCardHeading.text(empNo, person.name);
       document.getElementById('teamCalendarLeaveStatus').replaceChildren(recordDetailStatus.create(person.status));
-      document.getElementById('teamCalendarLeaveReference').textContent = request ? 'Ref: ' + request.ref : '';
       document.getElementById('teamCalendarLeaveForm').replaceChildren(LeaveRequest.review({
+        reference: request?.ref,
         type: teamCalendarLeaveType(person),
         leaveYear: from.getFullYear(),
         fromDate: formatDateShort(from),
@@ -8243,110 +8030,6 @@
         grid.appendChild(cellEl);
       }
       document.getElementById('teamCalendarLeaveDays').textContent = staffLeaveDays + ' Total Staff Leave Days Scheduled';
-    }
-
-    // Open Event Detail Bottom Sheet (Sliding up from bottom of phone)
-    function openCalEventSheet(dateStr, itemData) {
-      const overlay = document.getElementById('calEventSheetOverlay');
-      const titleEl = document.getElementById('calSheetDateTitle');
-      const subEl = document.getElementById('calSheetDateSub');
-      const contentEl = document.getElementById('calSheetEventsList');
-
-      if (!overlay) return;
-
-      const d = new Date(dateStr);
-      const options = { weekday: 'long', day: 'numeric', month: 'short', year: 'numeric' };
-      const formattedDate = isNaN(d.getTime()) ? dateStr : d.toLocaleDateString('en-US', options);
-
-      if (titleEl) titleEl.innerText = formattedDate;
-
-      const st = itemData ? (itemData.status || 'Approved') : 'Approved';
-      if (subEl) subEl.innerText = `${recordReviewStatusLabel(st)} • Leave & Shift Event Details`;
-
-      const statusBadge = recordDetailStatus.html(st === 'Pending' ? 'Pending Approval' : st);
-
-      const type = itemData ? itemData.type : 'work';
-
-      if (contentEl) {
-        if (type === 'al' || type === 'mc' || type === 'ph') {
-          const durText = itemData.duration === 'Half Day'
-            ? `Half Day (${itemData.durationHours || '4.0 Hours'})`
-            : 'Full Day';
-          const leaveTypeName = itemData.leaveType || (type === 'ph' ? (itemData.phName || 'Public Holiday') : 'Annual Leave');
-
-          contentEl.innerHTML = `
-            <article class="cal-leave-detail-card cal-calendar-highlight-card leave-highlight-detail-record">
-              <div class="leave-highlight-detail-date cal-leave-detail-header">
-                <div class="cal-leave-detail-header-copy">
-                  <span class="cal-leave-detail-header-title">${leaveTypeName}</span>
-                  <span class="cal-leave-detail-reference">Ref: ${itemData.ref || '-'}</span>
-                </div>
-              </div>
-              <div class="cal-calendar-highlight-content">
-                <div class="leave-highlight-detail-body">
-                  <div class="leave-highlight-detail-field">
-                    <div class="leave-highlight-detail-label cal-leave-detail-label">Duration</div>
-                    <div class="leave-highlight-detail-days cal-leave-detail-value">${durText}</div>
-                  </div>
-                  ${recordSubmitDate.html(itemData.submittedDate)}
-                </div>
-              </div>
-            </article>
-          `;
-        } else if (type === 'event' || type === 'meeting') {
-          contentEl.innerHTML = `
-            <div style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-left: 4.5px solid #7c3aed; border-radius: 18px; padding: 16px; box-shadow: var(--shadow-sm);">
-              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
-                <div style="display: flex; align-items: center; gap: 10px;">
-                  <div style="width: 40px; height: 40px; border-radius: 12px; background: rgba(124, 58, 237, 0.15); color: #7c3aed; display: flex; align-items: center; justify-content: center; font-size: 20px;">🎓</div>
-                  <div>
-                    <div style="font-size: 14px; font-weight: 800; color: var(--text-primary);">${itemData.full || 'Company Event'}</div>
-                    <div style="font-size: 11.5px; color: var(--text-muted); font-weight: 600;">Scheduled Corporate Event</div>
-                  </div>
-                </div>
-                ${statusBadge}
-              </div>
-              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 11.5px; background: var(--bg-input); padding: 12px; border-radius: 14px; border: 1px solid var(--border-subtle);">
-                <div><span style="color: var(--text-muted); font-weight: 600; display: block; margin-bottom: 2px;">Organizer</span><strong style="color: var(--text-primary);">HR &amp; L&amp;D Team</strong></div>
-                <div><span style="color: var(--text-muted); font-weight: 600; display: block; margin-bottom: 2px;">Venue</span><strong style="color: var(--text-primary);">HQ Auditorium 3B</strong></div>
-              </div>
-            </div>
-          `;
-        } else {
-          contentEl.innerHTML = `
-            <div style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-left: 4.5px solid var(--purple-primary); border-radius: 18px; padding: 16px; box-shadow: var(--shadow-sm);">
-              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
-                <div style="display: flex; align-items: center; gap: 10px;">
-                  <div style="width: 40px; height: 40px; border-radius: 12px; background: rgba(124, 58, 237, 0.15); color: var(--purple-primary); display: flex; align-items: center; justify-content: center; font-size: 20px;">⏰</div>
-                  <div>
-                    <div style="font-size: 14px; font-weight: 800; color: var(--text-primary);">${itemData.full || 'Regular Work Shift'}</div>
-                    <div style="font-size: 11.5px; color: var(--text-muted); font-weight: 600;">09:00 AM – 06:00 PM (8.0 Hours)</div>
-                  </div>
-                </div>
-                ${statusBadge}
-              </div>
-              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 11.5px; background: var(--bg-input); padding: 12px; border-radius: 14px; border: 1px solid var(--border-subtle);">
-                <div><span style="color: var(--text-muted); font-weight: 600; display: block; margin-bottom: 2px;">Shift Policy</span><strong style="color: var(--text-primary);">Standard Day Shift</strong></div>
-                <div><span style="color: var(--text-muted); font-weight: 600; display: block; margin-bottom: 2px;">Location</span><strong style="color: var(--text-primary);">Mid Valley Office</strong></div>
-              </div>
-            </div>
-          `;
-        }
-      }
-
-      overlay.style.display = 'flex';
-      setTimeout(() => {
-        overlay.classList.add('open');
-      }, 10);
-    }
-
-    function closeCalEventSheet(event, force) {
-      if (event && event.target && event.target.id !== 'calEventSheetOverlay' && !force) return;
-      const overlay = document.getElementById('calEventSheetOverlay');
-      if (overlay) {
-        overlay.classList.remove('open');
-        setTimeout(() => { overlay.style.display = 'none'; }, 250);
-      }
     }
 
     const TEAM_STAFF_ON_LEAVE_DATA = [
@@ -8668,10 +8351,10 @@
             </div>
             ${getStatusBadgeHTML(item.status)}
           </div>
+          ${recordSubmitDate.cardHTML(item.submittedDate)}
           <div class="card-details-box leave-history-details">
             <div><span>Dates</span>${historyCardValueHTML(dates)}</div>
             <div><span>Days / Hours</span>${historyCardValueHTML(item.daysHours)}</div>
-            ${recordSubmitDate.html(item.submittedDate)}
             <div><span>Duration</span>${historyCardValueHTML(item.duration)}</div>
             <div class="record-reason-field"><span>Reason</span>${historyCardValueHTML(item.reason)}</div>
             ${rejectHTML}
@@ -8691,11 +8374,12 @@
             </div>
             ${getStatusBadgeHTML(item.status)}
           </div>
+          ${recordSubmitDate.cardHTML(item.submittedDate)}
           <div class="card-details-box leave-credit-history-details" style="border-radius: 14px; padding: 12px; font-size: 11.5px; margin-top: 10px; display: flex; flex-direction: column; gap: 7px;">
             <div style="display: flex; justify-content: space-between; align-items: center;"><span style="color: var(--text-muted); font-weight: 600;">Effective Date</span><strong style="color: var(--text-primary);">${item.effectiveDate}</strong></div>
             <div style="display: flex; justify-content: space-between; align-items: center;"><span style="color: var(--text-muted); font-weight: 600;">Expiry Date</span><strong style="color: var(--text-primary);">${item.expiryDate}</strong></div>
-            ${recordSubmitDate.html(item.submittedDate)}
             <div style="display: flex; justify-content: space-between; align-items: center;"><span style="color: var(--text-muted); font-weight: 600;">Days / Hours</span><strong style="color: var(--text-primary); font-weight: 800;">${item.daysHours}</strong></div>
+            <div class="record-reason-field"><span>Reason</span>${historyCardValueHTML(item.reason)}</div>
           </div>
           ${actionHTML}
         </div>`;
@@ -8737,10 +8421,10 @@
             </div>
             ${getStatusBadgeHTML(item.status)}
           </div>
+          ${recordSubmitDate.cardHTML(item.submittedDate)}
           <div class="card-details-box time-off-history-details">
             <div><span>Event Date</span>${historyCardValueHTML(item.date)}</div>
             <div class="record-reason-field"><span>Reason</span>${historyCardValueHTML(item.reason)}</div>
-            ${recordSubmitDate.html(item.submittedDate)}
             <div><span>Time</span>${historyCardValueHTML(timeRange)}</div>
             <div><span>Hours</span>${historyCardValueHTML(hours)}</div>
           </div>
@@ -8957,6 +8641,36 @@
       }, 400);
     }
 
+    function leaveHistoryFormData(item, kind) {
+      const data = { ...item, ...item.request, reference: item.ref };
+      data.submitDate = data.submitDate || data.submittedDate;
+      data.remark = data.remark ?? data.remarks;
+      const days = String(data.amount || data.daysHours || '').match(/^\s*(\d+(?:\.\d+)?)\s*days?\b/i)?.[1];
+
+      if (kind === 'credit') {
+        return {
+          ...data,
+          creditLeave: data.creditLeave || data.title,
+          creditDays: data.creditDays ?? days,
+          fromDate: data.fromDate ?? data.eventStart,
+          toDate: data.toDate ?? data.eventEnd
+        };
+      }
+      if (kind === 'offtime') {
+        return { ...data, date: data.date || data.fromDate, ...getTimeOffHistoryPeriod(data) };
+      }
+
+      const { start, end } = getHistoryItemDateRange(item, 'leave');
+      return {
+        ...data,
+        type: item.request?.type || getLeaveTypeLabel(item.type),
+        leaveYear: data.leaveYear || start.slice(0, 4),
+        fromDate: data.fromDate || recordSubmitDate.format(start, true),
+        toDate: data.toDate || recordSubmitDate.format(end, true),
+        leaveDays: data.leaveDays ?? days
+      };
+    }
+
     function renderLeaveHistoryDetail(kind, ref) {
       if (kind === 'team-leave') return renderTeamCalendarLeaveForm(ref);
       if (kind === 'calendar') return renderCalendarLeaveDetail(ref);
@@ -8966,137 +8680,49 @@
       if (document.getElementById('viewMyLeaveHistory').style.display === 'none') showLeaveSection('viewMyLeaveHistory');
       if (currentHistoryTab !== kind) switchHistoryTab(kind);
 
-      const tbody = document.getElementById('historyDetailsTableBody');
-      if (!tbody) return;
+      const titles = { leave: 'Leave Detail', credit: 'Leave Credit History', offtime: 'Time Off Detail' };
+      document.getElementById('historyDetailsModalTitle').textContent = titles[kind];
+      const data = leaveHistoryFormData(item, kind);
+      const employee = document.getElementById('leaveHistoryEmployee');
+      const employeeHeading = employeeCardHeading.text(data.empNo, data.applicant ?? data.employeeName ?? data.name);
+      employee.textContent = employeeHeading === '—' ? '' : employeeHeading;
+      employee.parentElement.hidden = !employee.textContent;
+      const status = leaveHistoryStatuses[item.status]?.label || item.status;
 
-      recordSubmitDate.set(document.getElementById('leaveHistorySubmitDate'), item.request?.submitDate || item.submittedDate);
-      const statusBadge = recordDetailStatus.html(item.status.charAt(0).toUpperCase() + item.status.slice(1));
-      const titleEl = document.getElementById('historyDetailsModalTitle');
-      let rows = [];
-
-      const isCredit = kind === 'credit';
-      const isOffTime = kind === 'offtime';
-
-      if (item.request) {
-        const data = item.request;
-        titleEl.textContent = 'Leave Detail';
-        const values = [
-          ['Reference #', data.docRef], ['Leave Status', item.status], ['Submitter', data.submitter],
-          ['Name', data.applicant], ['Leave Year', data.leaveYear],
-          ['Leave Type', data.type], ['Cutoff Period', data.cutoffPeriod], ['Block Leave', data.blockLeave],
-          ['Start Date', data.fromDate], ['End Date', data.toDate], ['Duration', data.duration], ['Days', data.leaveDays]
-        ];
-        if (LeaveRequest.medical(data.type)) values.push(['Nature Illness', data.natureIllness], ['Sickness', data.sickness],
-          ['Clinic/Hospital Location', data.clinicLocation], ['Clinic/Hospital', data.clinic], ['Non Panel Clinic', data.nonPanelClinic], ['MC Chit No', data.mcChitNo]);
-        values.push(['Reason', data.reason], ['Advance Leave', data.advanceLeave], ['Short Notice Leave', data.shortNotice],
-          ['Reliever', data.reliever], ['Remarks', data.remark], ['Attachments', LeaveRequest.files(data).join(', ')], ['Approver Comment', item.comment]);
-        rows = values.map(([label, text]) => {
-          const value = document.createElement('span');
-          value.textContent = text || '—';
-          return { label, value: label === 'Leave Status' ? statusBadge : value.innerHTML };
-        });
-      } else if (isOffTime) {
-        if (titleEl) titleEl.innerText = 'Time Off Detail';
-        const { startTime, endTime, hours } = getTimeOffHistoryPeriod(item);
-        rows = [
-          { label: 'Reference #', value: item.ref },
-          { label: 'Status', value: statusBadge },
-          { label: 'Emp No.', value: 'EBB12' },
-          { label: 'Name', value: 'Farhan binti rahmat' },
-          { label: 'Date', value: item.date || (item.dates ? item.dates.split(' - ')[0] : '12 Aug 2023') },
-          { label: 'Start Time', value: startTime || '—' },
-          { label: 'End Time', value: endTime || '—' },
-          { label: 'Hours', value: hours || '—' },
-          { label: 'Reason', value: item.reason || '' },
-          { label: 'Remarks', value: item.reason || 'test' },
-          { label: 'Attachments', value: '<div style="display:flex; align-items:center; gap:8px; color:var(--text-primary); font-weight:600;"><i class="fa-solid fa-paperclip" style="color:var(--purple-primary);"></i><span style="overflow-wrap:anywhere;">1302f11d5a254abbb2b9a10cb3b8f00f.jpg</span></div>' }
-        ];
-      } else if (isCredit) {
-        if (titleEl) titleEl.innerText = 'Leave Credit History';
-        rows = [
-          { label: 'Reference #', value: item.ref },
-          { label: 'Leave Credit Status', value: statusBadge },
-          { label: 'Submitter', value: 'EBB12 - Farhan binti rahmat' },
-          { label: 'Emp No.', value: 'EBB12' },
-          { label: 'Name', value: 'Farhan binti rahmat' },
-          { label: 'Leave Year', value: item.creditYear || '2026' },
-          { label: 'Leave Type', value: item.title ? item.title.toUpperCase() : 'REPLACEMENT LEAVE' },
-          { label: 'Credit Type', value: '' },
-          { label: 'Offset Type', value: '' },
-          { label: 'Event Start', value: item.effectiveDate || '8 Sep 2026' },
-          { label: 'Event End', value: item.expiryDate || '18 Sep 2026' },
-          { label: 'Effective Date', value: item.effectiveDate || '19 Sep 2026' },
-          { label: 'Expiry Date', value: item.expiryDate || '18 Dec 2026' },
-          { label: 'Days/Hours', value: item.amount || '11.0 Days / 0.0 Hours' },
-          { label: 'Leave Reason', value: item.reason || 'OTHERS' },
-          { label: 'Note', value: '<div style="background: var(--bg-input); height: 14px; width: 100%; border-radius: 4px; opacity: 0.6;"></div>' },
-          { label: 'Approver Comment', value: '<div style="background: var(--bg-input); height: 14px; width: 100%; border-radius: 4px; opacity: 0.6;"></div>' },
-          { label: 'Attachments', value: '<div style="display:flex; align-items:center; gap:8px; color:var(--text-primary); font-weight:600;"><i class="fa-solid fa-paperclip" style="color:var(--purple-primary);"></i><span style="overflow-wrap:anywhere;">1000037175.jpg</span></div>' }
-        ];
-      } else {
-        if (titleEl) titleEl.innerText = 'Leave Detail';
-        rows = [
-          { label: 'Reference #', value: item.ref },
-          { label: 'Leave Status', value: statusBadge },
-          { label: 'Backdated', value: 'No' },
-          { label: 'Submitter', value: 'EBB12 - Farhan binti rahmat' },
-          { label: 'Branch', value: 'TIMES SQUARE BRANCH' },
-          { label: 'Department', value: 'HUMAN RESOURCE' },
-          { label: 'Emp No.', value: 'EBB12' },
-          { label: 'Name', value: 'Farhan binti rahmat' },
-          { label: 'Leave Year', value: '2026' },
-          { label: 'Leave Type', value: item.title ? item.title.toUpperCase() : 'ANNUAL LEAVE' },
-          { label: 'Start Date', value: item.dates ? item.dates.split(' - ')[0] : '12 Sep 2026' },
-          { label: 'End Date', value: item.dates ? (item.dates.split(' - ')[1] || item.dates.split(' - ')[0]) : '12 Sep 2026' },
-          { label: 'Days/Hours', value: item.duration || '1.0 Day' },
-          { label: 'Nature Illness', value: '' },
-          { label: 'Sickness', value: '' },
-          { label: 'Location', value: '' },
-          { label: 'Clinic/Hospital', value: '' },
-          { label: 'Non Panel Clinic', value: '' },
-          { label: 'MC Chit No', value: '' },
-          { label: 'Short Notice Leave', value: 'No' },
-          { label: 'Advance Leave', value: 'No' },
-          { label: 'Leave Reason', value: item.reason || '' },
-          { label: 'Reliever', value: '' },
-          { label: 'Duration', value: item.duration || 'Full Day' },
-          { label: 'Note', value: '<div style="background: var(--bg-input); height: 14px; width: 100%; border-radius: 4px; opacity: 0.6;"></div>' },
-          { label: 'Approver Comment', value: '<div style="background: var(--bg-input); height: 14px; width: 100%; border-radius: 4px; opacity: 0.6;"></div>' },
-          { label: 'Cancel Remark', value: '<div style="background: var(--bg-input); height: 14px; width: 100%; border-radius: 4px; opacity: 0.6;"></div>' },
-          { label: 'Attachments', value: '<div style="display:flex; align-items:center; gap:8px; color:var(--text-primary); font-weight:600;"><i class="fa-solid fa-paperclip" style="color:var(--purple-primary);"></i><span style="overflow-wrap:anywhere;">1302f11d5a254abbb2b9a10cb3b8f00f.jpg</span></div>' }
-        ];
+      const form = LeaveRequest.review(data, kind);
+      const heading = form.querySelector('[data-leave-heading]');
+      const headingRow = document.createElement('div');
+      headingRow.className = 'leave-history-form-heading';
+      heading.before(headingRow);
+      headingRow.append(heading, recordDetailStatus.create(status));
+      if (kind === 'credit' && data.expiryDate) {
+        const effectiveDate = form.querySelector('[data-review-field="effectiveDate"]');
+        effectiveDate.parentElement.after(LeaveRequest.reviewField('Expiry Date', data.expiryDate, 'expiryDate'));
       }
 
-      let html = '';
-      rows.forEach(r => {
-        if (r.fullBox) {
-          html += `
-            <tr>
-              <td colspan="2" style="padding: 10px 12px; border-bottom: 1px solid var(--border-subtle); color: var(--text-secondary); font-weight: 700;">${r.label}</td>
-            </tr>
-            <tr>
-              <td colspan="2" style="padding: 10px 12px; border-bottom: 1px solid var(--border-subtle);">${r.value}</td>
-            </tr>
-          `;
-        } else if (r.colspan) {
-          html += `<tr><td colspan="2" style="padding: 10px 12px; border-bottom: 1px solid var(--border-subtle); color: var(--text-secondary); font-weight: 600;">${r.label}</td></tr>`;
-        } else {
-          html += `<tr>
-            <td style="padding: 10px 12px; border-bottom: 1px solid var(--border-subtle); border-right: 1px solid var(--border-subtle); font-weight: 700; color: var(--text-secondary); width: 38%;">${r.label}</td>
-            <td style="padding: 10px 12px; border-bottom: 1px solid var(--border-subtle); color: var(--text-primary); width: 62%; font-weight: 600;">${r.value}</td>
-          </tr>`;
-        }
-      });
-      tbody.innerHTML = html;
+      const attachment = form.querySelector('[data-leave-attachments]');
+      const leaveHours = kind === 'leave' ? String(item.daysHours || '').match(/(\d+(?:\.\d+)?)\s*hours?\b/i)?.[1] : null;
+      const extraFields = [
+        ['Leave Hours', Number(leaveHours) > 0 ? leaveHours : null],
+        ['Credit Year', kind === 'credit' ? data.creditYear : null],
+        ['Time Off Type', kind === 'offtime' ? data.offType : null],
+        ['Approver Comment', item.comment || data.approverComment],
+        ['Rejection Reason', data.rejectReason],
+        ['Cancellation Remark', data.cancellationRemark ?? data.cancelRemark]
+      ];
+      for (const [label, value] of extraFields) {
+        if (value != null && value !== '') attachment.before(LeaveRequest.reviewField(label, value));
+      }
+
+      document.getElementById('leaveHistoryForm').replaceChildren(form);
+      document.getElementById('leaveHistoryDetailsTable').hidden = true;
+      document.getElementById('leaveHistoryFormView').hidden = false;
 
       const actions = document.getElementById('historyDetailsActions');
-      if (actions) {
-        actions.innerHTML = isOffTime ? '' : buildHistoryActionsHTML(item, kind, 'detail');
-        actions.hidden = !actions.innerHTML;
-      }
+      actions.innerHTML = kind === 'offtime' ? '' : buildHistoryActionsHTML(item, kind, 'detail');
+      actions.hidden = !actions.innerHTML;
       const overlay = document.getElementById('historyDetailsModalOverlay');
-      if (overlay) overlay.dataset.ref = ref;
-
+      overlay.dataset.ref = ref;
       return overlay;
     }
 
@@ -9450,6 +9076,8 @@
 
       const titleEl = document.getElementById('historyDetailsModalTitle');
       if (titleEl) titleEl.innerText = 'Leave Detail';
+      document.getElementById('leaveHistoryFormView').hidden = true;
+      document.getElementById('leaveHistoryDetailsTable').hidden = false;
       recordSubmitDate.set(document.getElementById('leaveHistorySubmitDate'), data.submittedDate);
 
       const rows = [
@@ -10484,7 +10112,15 @@
     }
 
     function leaveApprovalCardData(card) {
-      return { ...JSON.parse(card.dataset.request), submitDate: card.dataset.submitDate };
+      const request = JSON.parse(card.dataset.request);
+      const [start, end] = card.querySelectorAll('[data-time-off-range] time');
+      return {
+        ...request,
+        empNo: request.empNo ?? card.dataset.empno,
+        submitDate: card.dataset.submitDate,
+        startTime: request.startTime ?? start?.dateTime,
+        endTime: request.endTime ?? end?.dateTime
+      };
     }
 
     function openLeaveApprovalOptions(button) {
@@ -10540,72 +10176,24 @@
     }
 
     function renderLeaveApprovalDetails(data) {
-      const setElText = (id, val) => {
-        const el = document.getElementById(id);
-        if (el) el.innerText = (val !== undefined && val !== null) ? val : '';
-      };
+      const category = data.isOffTime ? 'offtime' : data.isCredit ? 'credit' : 'leave';
+      const titles = { leave: 'Leave Approval', credit: 'Leave Credit Approval', offtime: 'Time Off Approval' };
+      document.getElementById('approvalDetailsModalHeaderTitle').textContent = titles[category];
+      const reference = category === 'leave' ? undefined : data.docRef;
+      document.getElementById('leaveApprovalForm').replaceChildren(LeaveRequest.review({ ...data, reference }, category));
 
-      const isCredit = data.isCredit || (typeof currentApprovalCategory !== 'undefined' && currentApprovalCategory === 'credit') || (data.docRef && data.docRef.startsWith('LVR')) || (data.type && data.type.toLowerCase().includes('credit'));
-      const isOffTime = !isCredit && (data.isOffTime || (data.docRef && data.docRef.startsWith('VOT')) || (data.type && data.type.toLowerCase().includes('time off')));
-
-      const titleEl = document.getElementById('approvalDetailsModalHeaderTitle');
-      const stdView = document.getElementById('standardLeaveDetailsView');
-      const timeOffView = document.getElementById('timeOffDetailsView');
-      const lcView = document.getElementById('leaveCreditDetailsView');
-      const actionFooter = document.getElementById('approvalDetailsFooter');
-
-      if (isCredit) {
-        if (titleEl) titleEl.innerText = 'Leave Credit Approval';
-        if (stdView) stdView.style.display = 'none';
-        if (timeOffView) timeOffView.style.display = 'none';
-        if (lcView) lcView.style.display = 'flex';
-        if (actionFooter) actionFooter.style.display = 'block';
-
-        recordSubmitDate.set(document.getElementById('creditApprovalSubmitDate'), data.submitDate);
-        // Populate Leave Credit fields according to user screenshot
-        const employeeText = formatEmployeeNumber(data.employee).replace(/(\bEmp\s+)#+(?=\w)/i, '$1');
-        setElText('lcDetailsEmployee', employeeText || 'EBB12 - Farhan binti rahmat');
-        setElText('lcDetailsCreditLeave', data.creditLeave || 'REPLACEMENT LEAVE');
-        setElText('lcDetailsOffsetLeave', data.offsetLeave || '');
-        setElText('lcDetailsCreditType', data.creditType || 'Working on Public Holiday');
-        setElText('lcDetailsSubmitter', formatEmployeeNumber(data.submitter) || 'EBB12 - Farhan binti rahmat');
-        setElText('lcDetailsFromDate', data.fromDate || '3 Jul 2024');
-        setElText('lcDetailsToDate', data.toDate || '3 Jul 2024');
-        setElText('lcDetailsCreditDays', data.creditDays || data.leaveDays || '1.000');
-        setElText('lcDetailsEffectiveDateLabel', `${data.effectiveDateLabel || 'Effective Date'}:`);
-        setElText('lcDetailsEffectiveDate', data.effectiveDate || '4 Jul 2024');
-        setElText('lcDetailsReason', data.reason || 'OTHERS');
-        setElText('lcDetailsRemark', data.remark || 'Worked Overtime for adhoc request');
-        setElText('lcDetailsAttachment', data.attachment || '5fae9b25c05f463990e88cb6dc4c96b0.jpg');
-
-        const commentInput = document.getElementById('lcApproverComments');
-        if (commentInput) commentInput.value = '';
-      } else if (isOffTime) {
-        if (titleEl) titleEl.innerText = 'Time Off Approval';
-        if (stdView) stdView.style.display = 'none';
-        if (timeOffView) timeOffView.style.display = 'flex';
-        if (lcView) lcView.style.display = 'none';
-        if (actionFooter) actionFooter.style.display = 'block';
-
-        recordSubmitDate.set(document.getElementById('timeOffApprovalSubmitDate'), data.submitDate);
-        setElText('timeOffDetailsDate', data.date || data.fromDate || data.dates || '\u2014');
-        setElText('timeOffDetailsStartTime', data.startTime || '\u2014');
-        setElText('timeOffDetailsEndTime', data.endTime || '\u2014');
-        setElText('timeOffDetailsHours', data.hours || data.duration || '\u2014');
-        setElText('timeOffDetailsReason', data.reason && data.reason.trim() ? data.reason : '\u2014');
-        setElText('timeOffDetailsRemarks', data.remark && data.remark.trim() ? data.remark : '\u2014');
-        setElText('timeOffDetailsApproverRemarks', data.approverRemarks && data.approverRemarks.trim() ? data.approverRemarks : '\u2014');
-      } else {
-        if (titleEl) titleEl.innerText = 'Leave Approval';
-        if (stdView) stdView.style.display = 'flex';
-        if (timeOffView) timeOffView.style.display = 'none';
-        if (lcView) lcView.style.display = 'none';
-        if (actionFooter) actionFooter.style.display = 'block';
-
-        document.getElementById('leaveApprovalForm').replaceChildren(LeaveRequest.review(data));
-        document.getElementById('approvalActionCommentsInput').value = '';
-        stdView.closest('.phone-container').scrollTop = 0;
+      const header = document.getElementById('leaveApprovalRecordHeader');
+      header.hidden = category === 'leave';
+      if (!header.hidden) {
+        document.getElementById('leaveApprovalEmployee').textContent = employeeCardHeading.text(data.empNo, data.applicant);
+        document.getElementById('leaveApprovalRecordStatus').replaceChildren(recordDetailStatus.create(data.docStatus));
       }
+
+      const remarks = document.getElementById('leaveApprovalPreviousRemarks');
+      const previous = category === 'offtime' ? String(data.approverRemarks ?? '').trim() : '';
+      remarks.hidden = !previous || previous === '—';
+      remarks.textContent = remarks.hidden ? '' : 'Approver Remarks: ' + previous;
+      document.getElementById('approvalActionCommentsInput').value = '';
     }
 
     function handleSingleApprovalAction(actionType) {
@@ -10670,7 +10258,7 @@
 
     document.addEventListener('approval-list-return', updateBatchApprovalCount);
     document.querySelectorAll('#teamApprovalsListContainer [data-submit-date]').forEach(card => {
-      recordSubmitDate.append(card.querySelector('.approval-card-details'), card.dataset.submitDate);
+      card.querySelector('.approval-record-link').prepend(recordSubmitDate.cardLine(card.dataset.submitDate));
     });
 
     window.addEventListener('DOMContentLoaded', () => PendingApprovalPage.register({

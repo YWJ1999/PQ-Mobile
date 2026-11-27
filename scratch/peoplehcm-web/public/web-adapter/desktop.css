@@ -581,6 +581,12 @@ html[data-web-native] .profile-details .profile-panel + .profile-panel {
 html[data-web-native] .profile-details .profile-panel {
   min-width: 0;
 }
+/* Guest Visit reuses its Cancel control for Back and changes the icon class. */
+html[data-web-native] :is(.form-cancel-btn, .btn-step-back, .attendance-form-cancel, #newUserCancel) > .fa-xmark,
+html[data-web-native] .detail-popout-actions > button[onclick^='closeOverlay('] > .fa-xmark,
+html[data-web-native] .action-btn-cancel > .fa-ban {
+  display: none !important;
+}
 html[data-web-native] .web-view-chart {
   display: inline-flex !important;
   align-items: center !important;
@@ -968,7 +974,7 @@ html[data-web-native] .web-record-submit-date {
   text-align: start;
   font-variant-numeric: tabular-nums;
 }
-html[data-web-native] :is(span, div).web-record-submit-date {
+html[data-web-native] :is(span, div).web-record-submit-date:not(.web-card-submit-date) {
   display: flex;
   flex-direction: column;
   grid-column: 1;
@@ -977,13 +983,19 @@ html[data-web-native] :is(span, div).web-record-submit-date {
   overflow-wrap: anywhere;
 }
 html[data-web-native] .web-record-submit-date > :is(dt, dd) { margin: 0; }
-html[data-web-native] .web-record-submit-date > :is(strong, dd) {
+html[data-web-native] .web-record-submit-date:not(.web-card-submit-date) > :is(strong, dd) {
   color: var(--text-primary);
   font-size: 12px;
 }
-html[data-web-native] :is(.web-record-submit-date, .web-record-event-date) > :is(span, strong, dt, dd) {
+html[data-web-native] :is(.web-record-submit-date:not(.web-card-submit-date), .web-record-event-date) > :is(span, strong, dt, dd) {
   font-weight: 600 !important;
 }
+html[data-web-native] .web-card-submit-date {
+  display: block;
+  margin: 10px 0;
+  grid-column: 1 / -1;
+}
+html[data-web-native] .web-card-submit-date > strong { font-weight: inherit; white-space: nowrap; }
 html[data-web-native] [data-web-submit-source] { display: none !important; }
 html[data-web-native] .phone-container.web-showing-history > :is(header, main, .main-content, .cal-top-header, .bonus-top-header, phone-bottom-nav):not(.web-history-page) {
   display: none !important;

@@ -73,7 +73,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function submissionDate(row) {
     const fields = fieldMap(row);
-    return fieldValue(fields, 'Submit Date', 'Submitted Date') || (row.kind === 'letter-request' && row.status !== 'draft' ? row.date : '');
+    const dates = [row.guestVisit?.submitDate, row.submitDate, row.submittedDate,
+      ...row.fields.filter(([label]) => /^(?:submit|submitted) date$/i.test(label.trim())).map(([, value]) => value),
+      row.guestVisit?.submittedAt, row.submittedAt];
+    const sample = row.id.startsWith('sample-');
+    if (row.kind === 'guest-visit' && (row.status !== 'draft' || sample)) {
+      // Local visits are created on submission. Sample creation times only order the list.
+      dates.push(sample ? '' : row.createdAt, row.date);
+    } else if (row.status !== 'draft') {
+      // The letter and inventory forms save the request day in date, separately from Required By.
+      dates.push(fields['Request Date'], row.date, sample ? '' : row.createdAt);
+    }
+    return dates.find(value => recordSubmitDate.format(value, true)) || '';
   }
 
   function cardContent(row) {
@@ -140,7 +151,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const yes = value => value.trim().toLowerCase() === 'yes';
     const people = pattern => row.fields.filter(([label]) => pattern.test(label)).map(([, value]) => value);
     return {
-      submitDate: saved.submitDate ?? submissionDate(row),
+      submitDate: submissionDate(row),
       visitDate: saved.visitDate ?? (fieldValue(fields, 'Visit Date') || row.date),
       startTime: saved.startTime ?? startTime,
       endTime: saved.endTime ?? endTime,
@@ -326,8 +337,7 @@ document.addEventListener('DOMContentLoaded', () => {
         line.append(node('span', '', label), node('strong', '', value || emptyValue));
         details.append(line);
       }
-      recordSubmitDate.append(details, submissionDate(row));
-      main.append(header, details);
+      main.append(header, recordSubmitDate.cardLine(submissionDate(row)), details);
       card.append(main);
       const actions = node('div', 'history-card-actions');
       if (appendHistoryActions(actions, row, 'card')) card.append(actions);

@@ -1,81 +1,56 @@
 const assert = require('node:assert/strict');
 const path = require('node:path');
+const { pathToFileURL } = require('node:url');
 const puppeteer = require('puppeteer');
 
-(async () => {
-  const browser = await puppeteer.launch({
-    headless: 'new',
-    executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || undefined,
-    args: ['--no-sandbox', '--disable-setuid-sandbox']
-  });
-
+async function checkCalendar(query, gridId, summaryId) {
+  const browser = await puppeteer.launch({ headless: true });
   try {
     const page = await browser.newPage();
     await page.setViewport({ width: 390, height: 844 });
-    const pageErrors = [];
-    page.on('pageerror', error => pageErrors.push(error.message));
-    await page.goto(`file://${path.resolve(__dirname, '../leave.html')}`, {
-      waitUntil: 'domcontentloaded'
-    });
+    await page.setRequestInterception(true);
+    page.on('request', request => /^https?:/.test(request.url()) ? request.abort() : request.continue());
+    const url = pathToFileURL(path.resolve(__dirname, '../leave.html'));
+    url.search = query;
+    await page.goto(url.href);
+    const grid = '#' + gridId;
+    const summary = '#' + summaryId;
 
-    async function inspect(itemData) {
-      return page.evaluate(data => {
-        openCalEventSheet('2026-09-10', data);
-        const card = document.querySelector('#calSheetEventsList .cal-leave-detail-card');
-        const purpleHeader = card?.querySelector('.leave-highlight-detail-date');
-        return {
-          modalDate: document.getElementById('calSheetDateTitle')?.textContent.trim() || '',
-          purpleHeaderText: purpleHeader?.textContent.replace(/\s+/g, ' ').trim() || '',
-          headerTitle: purpleHeader?.querySelector('.cal-leave-detail-header-title')?.textContent.trim() || '',
-          headerReference: purpleHeader?.querySelector('.cal-leave-detail-reference')?.textContent.trim() || '',
-          headerHeight: purpleHeader ? Math.round(purpleHeader.getBoundingClientRect().height) : 0,
-          contentTypeCount: card?.querySelectorAll('.cal-leave-detail-title').length || 0,
-          submitDate: card?.querySelector('.record-submit-date > strong')?.textContent,
-          bodyReferenceCount: card?.querySelectorAll('.cal-calendar-highlight-content .cal-leave-detail-reference').length || 0,
-          labels: [...(card?.querySelectorAll('.leave-highlight-detail-label') || [])]
-            .map(node => node.textContent.trim())
-        };
-      }, itemData);
+    for (const [day, title, name, duration, reference, submitted] of [
+      ['10', 'Thu, 10 Sep 2026', 'Annual leave', 'Full day · Approved', 'Ref: LV-2026-0041', '05/09/2026'],
+      ['22', 'Tue, 22 Sep 2026', 'Annual leave', 'Half day · 4.0 Hours (PM) · Approved', 'Ref: LV-2026-0047', '18/09/2026'],
+      ['12', 'Sat, 12 Sep 2026', 'Medical leave', 'Full day · Approved', 'Ref: LV-2026-0044', '12/09/2026'],
+      ['16', 'Wed, 16 Sep 2026', 'Malaysia Day', 'Full day', 'Ref: PH-2026-0009', null],
+      ['17', 'Thu, 17 Sep 2026', 'No leave scheduled', '', null, null]
+    ]) {
+      await page.click(grid + ' [data-date="2026-09-' + day + '"]');
+      const values = await page.$eval(summary, card => [
+        card.querySelector('h3').textContent,
+        card.querySelector('.cal-detail-name').textContent,
+        card.querySelector('.cal-detail-time').textContent,
+        card.querySelector('.leave-day-record p')?.textContent ?? null,
+        card.querySelector('.card-submit-date strong')?.textContent ?? null
+      ]);
+      assert.deepEqual(values, [title, name, duration, reference, submitted]);
+      assert.equal(await page.$eval(grid, (grid, id) =>
+        grid.closest('.calendar-card').nextElementSibling.id === id &&
+        grid.querySelector('[aria-pressed="true"]') === document.activeElement, summaryId), true);
+      assert.equal(await page.evaluate(() => !!document.querySelector('#calEventSheetOverlay')?.getClientRects().length), false);
     }
 
-    const annual = await inspect({
-      type: 'al', status: 'Approved', leaveType: 'Annual Leave',
-      ref: 'LV-2026-0041', submittedDate: '05/09/2026', duration: 'Full Day'
-    });
-    const medical = await inspect({
-      type: 'mc', status: 'Approved', leaveType: 'Medical Leave',
-      ref: 'LV-2026-0044', submittedDate: '09/09/2026', duration: 'Full Day'
-    });
-    const holiday = await inspect({
-      type: 'ph', status: 'Approved', phName: 'Malaysia Day',
-      ref: 'PH-2026-0009', submittedDate: '-', duration: 'Full Day'
-    });
-
-    assert.equal(annual.modalDate, 'Thursday, Sep 10, 2026');
-    assert.equal(annual.purpleHeaderText, 'Annual Leave Ref: LV-2026-0041');
-    assert.equal(annual.headerTitle, 'Annual Leave');
-    assert.equal(annual.headerReference, 'Ref: LV-2026-0041');
-    assert.equal(annual.contentTypeCount, 0, 'Leave type must not repeat in the card body');
-    assert.equal(annual.bodyReferenceCount, 0, 'Reference must not repeat in the card body');
-    assert.deepEqual(annual.labels, ['Duration']);
-    assert.equal(annual.submitDate, '05/09/2026');
-    assert.equal(holiday.submitDate, undefined);
-    assert.equal(medical.headerTitle, 'Medical Leave');
-    assert.equal(medical.headerReference, 'Ref: LV-2026-0044');
-    assert.equal(medical.bodyReferenceCount, 0);
-    assert.equal(holiday.headerTitle, 'Malaysia Day');
-    assert.equal(holiday.headerReference, 'Ref: PH-2026-0009');
-    assert.equal(holiday.bodyReferenceCount, 0);
-    assert.ok(annual.headerHeight >= 50 && annual.headerHeight <= 56, `Unexpected header height: ${annual.headerHeight}px`);
-    assert.equal(medical.headerHeight, annual.headerHeight);
-    assert.equal(holiday.headerHeight, annual.headerHeight);
-    assert.deepEqual(pageErrors, []);
-
-    console.log('PASS: Individual calendar detail uses leave type in the purple header without repeating the date or type.');
+    await page.click('.calendar-card:has(' + grid + ') [aria-label="Next month"]');
+    assert.equal(await page.$eval(summary + ' h3', node => node.textContent), 'Sat, 17 Oct 2026');
+    assert.equal(await page.$eval(summary + ' .cal-detail-name', node => node.textContent), 'No leave scheduled');
+    console.log('PASS: ' + gridId + ' shows the selected tile details below the calendar.');
   } finally {
     await browser.close();
   }
-})().catch(error => {
-  console.error(error);
-  process.exitCode = 1;
-});
+}
+
+module.exports = checkCalendar;
+if (require.main === module) {
+  checkCalendar('', 'indivCalDaysGrid', 'indivCalEventDetail').catch(error => {
+    console.error(error);
+    process.exitCode = 1;
+  });
+}

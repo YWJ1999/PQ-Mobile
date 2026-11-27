@@ -66,7 +66,7 @@ const tabs = [
             assert.deepEqual(cards.map(card => card.title), ['Fri, 12 Jul 2024', 'Tue, 24 Oct 2023', 'Fri, 12 Jul 2024']);
             cards.forEach(card => {
               assert.ok(card.statusAtRight);
-              assert.deepEqual(card.labels, ['OT Type', 'Submit Date', 'Plan Hours', 'Actual Hours']);
+              assert.deepEqual(card.labels, ['OT Type', 'Plan Hours', 'Actual Hours']);
             });
             assert.ok(cards[2].details.some(detail => detail.includes('Actual Hours') && detail.includes('4.00 hrs')));
           }

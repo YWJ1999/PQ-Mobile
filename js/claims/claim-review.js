@@ -142,9 +142,13 @@ const ClaimReview = (() => {
     return panel;
   }
 
-  function create(record) {
+  function create(record, { reference } = {}) {
     const form = element('div', 'claim-request-review');
     const general = ClaimApplicationFields.review(record);
+    const submitDate = recordSubmitDate.form(record.submitDate || record.submittedDate);
+    submitDate.classList.add('field-group');
+    general.querySelector('.form-section-heading').after(submitDate);
+    if (reference) submitDate.after(field('Reference No.', reference));
     for (const [label, key] of [['Required Date', 'requiredDate'], ['Settlement Date', 'settlementDate'], ['Other Reference', 'otherRef'],
       ['Merchant', 'merchant'], ['Tax Invoice', 'taxInvoice'], ['Mileage Rate', 'mileageRate'], ['Tolls / Parking', 'tollsParking']]) {
       if (record[key] != null && record[key] !== '') general.append(field(label, record[key]));

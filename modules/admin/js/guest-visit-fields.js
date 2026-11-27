@@ -162,13 +162,11 @@
       const $ = id => this.querySelector('#' + id);
       const general = $('visitPanel-general');
       const stack = general.querySelector('.claim-form-stack');
+      stack.prepend(recordSubmitDate.form(item.submitDate));
       if (requestDetails.length) {
         const metadata = detailRows(requestDetails);
         metadata.className = 'visit-submission-meta';
-        recordSubmitDate.append(metadata, item.submitDate);
         stack.prepend(metadata);
-      } else {
-        recordSubmitDate.prepend(stack, item.submitDate);
       }
 
       const location = node('input', 'claim-control');

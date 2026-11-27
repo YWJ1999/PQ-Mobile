@@ -21,7 +21,7 @@ async function assertCardActions(page, selector, expected) {
     return {
       labels: buttons.map(button => button.textContent.trim()),
       detailAction: !!footer.querySelector('.record-primary-action'),
-      icons: buttons.map(button => button.querySelector('.record-card-action-icon')?.className || ''),
+      icons: buttons.map(button => !!button.querySelector('i, svg, img')),
       right,
       width: right - rect.left - parseFloat(style.paddingLeft) - parseFloat(style.borderLeftWidth),
       buttons: buttons.map(button => {
@@ -35,7 +35,7 @@ async function assertCardActions(page, selector, expected) {
   assert.ok(Math.abs(layout.buttons.at(-1).right - layout.right) <= 1, selector);
   if (expected.length === 1) {
     assert.ok(layout.buttons[0].width < layout.width / 2, `${selector} single action is compact`);
-    assert.match(layout.icons[0], /fa-ban(?:\s|$)/, selector);
+    assert.equal(layout.icons[0], false, selector);
   } else {
     assert.ok(layout.icons.every(icon => !icon), `${selector} grouped actions keep their original labels`);
     for (const button of layout.buttons) {
@@ -54,16 +54,18 @@ async function assertPurpleActions(page, selector) {
       const rect = button.getBoundingClientRect();
       const appearance = getComputedStyle(button);
       const icon = button.querySelector('i[aria-hidden="true"]')?.getBoundingClientRect();
-      const label = button.querySelector('span')?.getBoundingClientRect();
+      const labelRange = document.createRange();
+      labelRange.selectNodeContents(button.querySelector('span') || button);
+      const label = labelRange.getBoundingClientRect();
       return {
         left: rect.left, right: rect.right, top: rect.top, width: rect.width, height: rect.height,
         colour: appearance.color,
         background: appearance.backgroundImage === 'none' ? appearance.backgroundColor : appearance.backgroundImage,
         primary: button.classList.contains('record-primary-action'),
         label: button.textContent.trim(),
-        cancelIcon: !!button.querySelector('i.fa-ban[aria-hidden="true"]'),
-        centeredIcon: !!icon && !!label && icon.right < label.left
-          && Math.abs(icon.left + label.right - rect.left - rect.right) <= 2,
+        hasIcon: !!button.querySelector('i, svg, img'),
+        centered: (!icon || icon.right < label.left)
+          && Math.abs((icon?.left ?? label.left) + label.right - rect.left - rect.right) <= 2,
         fits: button.scrollWidth <= button.clientWidth + 1
       };
     });
@@ -83,9 +85,10 @@ async function assertPurpleActions(page, selector) {
     assert.equal(action.colour, 'rgb(255, 255, 255)', selector);
     assert.match(action.background, /rgb\(124, 58, 237\)/, selector);
     assert.ok(action.fits, selector + ' label fits');
-    if (actions.length === 1 && action.label === 'Cancel') assert.ok(action.cancelIcon, selector + ' has the cancel icon');
+    if (action.label === 'Cancel') assert.equal(action.hasIcon, false, selector + ' Cancel is text only');
     if (action.primary) {
-      assert.ok(action.centeredIcon, selector + ' centered icon and label');
+      if (action.label !== 'Cancel') assert.ok(action.hasIcon, selector + ' primary action icon');
+      assert.ok(action.centered, selector + ' centered action label');
       assert.match(action.background, /rgb\(109, 40, 217\)/, selector);
       if (!pair) assert.ok(Math.abs(action.width - layout.width) <= 1 && action.height >= 44, selector + ' full-width primary action');
     }

@@ -103,6 +103,7 @@ window.EMPLOYEE_CAREER_TEAM_HISTORY_DATA = {
       interviewerName: 'Lee',
       interviewerPosition: 'Account Executive',
       status: 'Submitted',
+      submittedDate: '2026-10-12',
       interviewDate: '2026-10-08',
       flightRisk: 'Low',
       recommendation: 'Continue Development Plan'

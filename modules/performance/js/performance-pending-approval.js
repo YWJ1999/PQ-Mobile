@@ -194,7 +194,9 @@
     const request = node('div', 'performance-request-review');
     if (record.category === 'self-review') selfReviewDetails(record, request);
     else appraisalDetails(record, request);
-    request.querySelector('.form-section-heading').after(recordSubmitDate.create(record.submittedAt));
+    const submitDate = recordSubmitDate.form(record.submittedAt);
+    submitDate.classList.add('employee-career-field');
+    request.querySelector('.form-section-heading').after(submitDate);
     body.replaceChildren(request);
     const comments = node('section', 'detail-popout-comments approval-comments-card');
     const label = node('label', '', 'Approver Remarks'); label.htmlFor = 'performanceApprovalComments';

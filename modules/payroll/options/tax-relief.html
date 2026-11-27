@@ -8,14 +8,17 @@
   <script src="../../../js/history-record-page.js"></script>
   <script src="../../../js/components.js"></script>
   <script src="../../../js/app.js" defer></script>
-  <script src="../../../js/payroll/team-tax-relief.js?v=20261002-purple-tags" defer></script>
+  <script src="../../../js/payroll/payroll-request-fields.js" defer></script>
+  <script src="../../../js/payroll/team-tax-relief.js?v=20261127-request-forms" defer></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../../../assets/vendor/fontawesome-6.7.2/css/all.min.css">
   <link rel="stylesheet" href="../../../css/theme.css">
   <link rel="stylesheet" href="../../../css/app.css">
-  <link rel="stylesheet" href="../../../css/team-tax-relief.css?v=20261002-purple-tags">
+  <link rel="stylesheet" href="../../../css/claim-forms.css">
+  <link rel="stylesheet" href="../../../css/payroll-request-fields.css">
+  <link rel="stylesheet" href="../../../css/team-tax-relief.css?v=20261127-request-forms">
 </head>
 <body>
   <preview-top-bar active-page="payroll"></preview-top-bar>
@@ -120,9 +123,7 @@
             <h1 id="taxReliefDetailTitle" tabindex="-1">Tax Relief Detail</h1>
           </div>
         </header>
-        <div class="history-record-content tax-relief-detail-scroll">
-          <div id="taxReliefDetailTable" class="tax-relief-detail-table"></div>
-        </div>
+        <div id="taxReliefDetailBody" class="history-record-content tax-relief-detail-scroll payroll-request-fields"></div>
       </section>
     </main>
 

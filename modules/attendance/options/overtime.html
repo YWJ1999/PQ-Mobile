@@ -51,6 +51,15 @@
       transform: scale(1.05);
     }
 
+    .ot-review-status { margin: 0 2px 14px; }
+    .ot-readonly-form .modern-input { white-space: pre-wrap; overflow-wrap: anywhere; }
+    .ot-readonly-form .ot-switch-row > label { cursor: default; }
+    .ot-readonly-form .form-submit-date > strong {
+      min-height: 44px;
+      border-radius: 12px;
+      font-size: 13.5px;
+      line-height: 1.25;
+    }
   </style>
   <link rel="stylesheet" href="../../../css/attendance-overtime.css">
   <link rel="stylesheet" href="../../../css/form-section-headings.css">
@@ -117,7 +126,8 @@
         </section>
         <p class="attendance-history-empty-state" id="overtimeEmptyState" role="status" hidden>No overtime records for this period.</p>
 
-        <a data-history-link href="#history/overtime/2026-09-14" class="history-card-item history-item-card ot-record-card" data-status="unapproved-ot" aria-label="View overtime details for Mon, 14 Sep 2026">
+        <a data-history-link href="#history/overtime/2026-09-14" class="history-card-item history-item-card ot-record-card" data-status="unapproved-ot" aria-label="View overtime details for Mon, 14 Sep 2026"
+          data-ot-request='{"submitDate":"2026-09-14","reference":"AXTGEN000109598","planStatus":"Approved","finalStatus":"Draft","supervisor":"EBB04","startTime":"00:00","endTime":"00:00","reason":"System OT Reason","leaveCredit":"No","transport":"No","remarks":"UNAUTHORISED OT"}'>
           <div class="ot-record-top history-card-header">
             <div class="ot-record-heading history-card-heading">
               <h2 class="history-time-row ot-record-date"><time datetime="2026-09-14">Mon, 14 Sep 2026</time></h2>
@@ -222,7 +232,7 @@
             </div>
           </section>
           <div id="request-actions" class="ot-form-actions form-action-row">
-            <button type="button" class="form-cancel-btn" onclick="switchView('dashboard')"><i class="fa-solid fa-xmark" aria-hidden="true"></i><span>Cancel</span></button>
+            <button type="button" class="form-cancel-btn" onclick="switchView('dashboard')"><span>Cancel</span></button>
             <button type="submit" class="form-primary-btn"><span>Submit</span><i class="fa-solid fa-paper-plane" aria-hidden="true"></i></button>
           </div>
         </form>
@@ -231,99 +241,17 @@
 
     <phone-bottom-nav active="apps"></phone-bottom-nav>
 
-    <!-- Overtime Details Pop Out Modal -->
+    <!-- Read-only overtime request -->
     <main id="modal-ot-details" class="approval-record-page" data-history-page aria-labelledby="modal-ot-detailsTitle" hidden>
       <section class="approval-record-layout">
         <header class="approval-page-header">
           <phone-status-bar time="9:41"></phone-status-bar>
           <div class="approval-page-heading">
             <button type="button" data-history-back aria-label="Back to history"></button>
-            <h1 id="modal-ot-detailsTitle" tabindex="-1">Final OT Approval</h1>
+            <h1 id="modal-ot-detailsTitle" tabindex="-1">Overtime Details</h1>
           </div>
         </header>
-        <div class="history-record-content sheet-content" style="padding: 16px 20px 24px; overflow-y: auto; background: var(--bg-card); flex: 1;"><div id="overtimeRequestDetails">
-           <div style="display: flex; flex-direction: column;">
-              <div class="detail-popout-row"><span class="detail-popout-label">Submit Date</span><span class="detail-popout-value">14/09/2026</span></div>
-              <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--border-subtle);">
-                 <span style="font-size: 13px; font-weight: 600; color: var(--text-secondary);">Reference #</span>
-                 <span style="font-size: 13.5px; font-weight: 800; color: var(--purple-primary); font-family: monospace;">AXTGEN000109598</span>
-              </div>
-              <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--border-subtle);">
-                 <span style="font-size: 13px; font-weight: 600; color: var(--text-secondary);">Plan Status</span>
-                 <span data-record-detail-status>Approved</span>
-              </div>
-              <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--border-subtle);">
-                 <span style="font-size: 13px; font-weight: 600; color: var(--text-secondary);">Final Status</span>
-                 <span data-record-detail-status>Draft</span>
-              </div>
-              <div style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border-subtle);">
-                 <span style="font-size: 13px; font-weight: 600; color: var(--text-secondary);">Shift</span>
-                 <span style="font-size: 13.5px; font-weight: 700; color: var(--text-primary);">8.30AM-5.30PM (W01)</span>
-              </div>
-              <div style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border-subtle);">
-                 <span style="font-size: 13px; font-weight: 600; color: var(--text-secondary);">Supervisor</span>
-                 <span style="font-size: 13.5px; font-weight: 700; color: var(--text-primary);">EBB04</span>
-              </div>
-              <div style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border-subtle);">
-                 <span style="font-size: 13px; font-weight: 600; color: var(--text-secondary);">Date</span>
-                 <span style="font-size: 13.5px; font-weight: 700; color: var(--text-primary);">14 Sep 2026</span>
-              </div>
-              <div style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border-subtle);">
-                 <span style="font-size: 13px; font-weight: 600; color: var(--text-secondary);">Start Time</span>
-                 <span style="font-size: 13.5px; font-weight: 700; color: var(--text-primary);">00:00</span>
-              </div>
-              <div style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border-subtle);">
-                 <span style="font-size: 13px; font-weight: 600; color: var(--text-secondary);">End Time</span>
-                 <span style="font-size: 13.5px; font-weight: 700; color: var(--text-primary);">00:00</span>
-              </div>
-              <div style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border-subtle);">
-                 <span style="font-size: 13px; font-weight: 600; color: var(--text-secondary);">Plan Hours</span>
-                 <span style="font-size: 13.5px; font-weight: 700; color: var(--text-primary);">2.00</span>
-              </div>
-              <div style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border-subtle);">
-                 <span style="font-size: 13px; font-weight: 600; color: var(--text-secondary);">Actual Hours</span>
-                 <span style="font-size: 13.5px; font-weight: 700; color: var(--text-primary);">2.00</span>
-              </div>
-              <div style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border-subtle);">
-                 <span style="font-size: 13px; font-weight: 600; color: var(--text-secondary);">Approved Hours</span>
-                 <span style="font-size: 13.5px; font-weight: 800; color: #ef4444;">0.00</span>
-              </div>
-              <div style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border-subtle);">
-                 <span style="font-size: 13px; font-weight: 600; color: var(--text-secondary);">Override Method</span>
-                 <span style="font-size: 13.5px; font-weight: 700; color: var(--text-primary);">-</span>
-              </div>
-              <div style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border-subtle);">
-                 <span style="font-size: 13px; font-weight: 600; color: var(--text-secondary);">Type</span>
-                 <span style="font-size: 13.5px; font-weight: 800; color: var(--purple-primary);">1.5 OT</span>
-              </div>
-              <div style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border-subtle);">
-                 <span style="font-size: 13px; font-weight: 600; color: var(--text-secondary);">Reason</span>
-                 <span style="font-size: 13.5px; font-weight: 700; color: var(--text-primary);">System OT Reason</span>
-              </div>
-              <div style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border-subtle);">
-                 <span style="font-size: 13px; font-weight: 600; color: var(--text-secondary);">Task</span>
-                 <span style="font-size: 13.5px; font-weight: 700; color: var(--text-primary);">-</span>
-              </div>
-              <div style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border-subtle);">
-                 <span style="font-size: 13px; font-weight: 600; color: var(--text-secondary);">Allow Credit</span>
-                 <span style="font-size: 13.5px; font-weight: 700; color: var(--text-primary);">No</span>
-              </div>
-              <div style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border-subtle);">
-                 <span style="font-size: 13px; font-weight: 600; color: var(--text-secondary);">Need Transport</span>
-                 <span style="font-size: 13.5px; font-weight: 700; color: var(--text-primary);">No</span>
-              </div>
-              <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--border-subtle);">
-                 <span style="font-size: 13px; font-weight: 600; color: var(--text-secondary);">Remarks</span>
-                 <span style="background: rgba(239, 68, 68, 0.12); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.25); font-size: 10.5px; font-weight: 800; padding: 3px 8px; border-radius: 6px;">UNAUTHORISED OT</span>
-              </div>
-              <div style="display: flex; justify-content: space-between; padding: 12px 0;">
-                 <span style="font-size: 13px; font-weight: 600; color: var(--text-secondary);">Attachments</span>
-                 <span style="font-size: 13px; font-weight: 500; color: var(--text-muted);">No Data</span>
-              </div>
-           </div>
-          </div>
-          <table id="overtimeApprovedDetails" class="record-detail-table" data-icon-system-ignore hidden></table>
-        </div>
+        <div id="overtimeRequestDetails" class="history-record-content"></div>
       </section>
     </main>
   </div>
@@ -388,33 +316,95 @@
       updateOvertimeSummary();
     }
 
+    function otReadOnlyValue(value, isSwitch = false) {
+      const control = document.createElement(isSwitch ? 'strong' : 'div');
+      if (!isSwitch) control.className = 'modern-input';
+      control.textContent = value == null || value === '' ? '—' : value;
+      return control;
+    }
+
+    function otReadOnlyField(label, value) {
+      const field = document.createElement('div');
+      field.className = 'modern-form-group';
+      const caption = document.createElement('span');
+      caption.className = 'modern-label';
+      caption.textContent = label;
+      field.append(caption, otReadOnlyValue(value));
+      return field;
+    }
+
+    function otReadOnlyPair(first, second) {
+      const grid = document.createElement('div');
+      grid.className = 'time-picker-grid';
+      grid.append(otReadOnlyField(...first), otReadOnlyField(...second));
+      return grid;
+    }
+
+    function renderOvertimeForm(card) {
+      const request = JSON.parse(card.dataset.otRequest || '{}');
+      const form = document.querySelector('#otRequestForm .ot-form-card').cloneNode(true);
+      form.classList.add('ot-readonly-form');
+      const hours = Object.fromEntries([...card.querySelectorAll('.ot-record-hours .ot-record-detail')].map(field => [
+        field.querySelector('dt').textContent.trim(), field.querySelector('dd').textContent.trim()
+      ]));
+      const [shift, supervisor] = form.querySelectorAll('.ot-form-meta dd');
+      shift.textContent = card.querySelector('.ot-record-shift').textContent.trim();
+      supervisor.textContent = request.supervisor || '—';
+
+      const values = {
+        otRequestDate: card.querySelector('.ot-record-date time').textContent.trim(),
+        otStartTime: request.startTime,
+        otEndTime: request.endTime,
+        otBreakHours: request.breakHours,
+        otTotalHours: request.hours ?? hours['Plan Hours'],
+        otType: card.querySelector('.ot-record-code-value').textContent.trim(),
+        otReason: request.reason,
+        otLeaveCredit: request.leaveCredit,
+        otNeedTransport: request.transport,
+        otRemarks: request.remarks
+      };
+      if (request.hours == null) form.querySelector('label[for="otTotalHours"]').textContent = 'Plan Hours';
+      for (const [id, value] of Object.entries(values)) {
+        const field = form.querySelector('#' + id);
+        const control = otReadOnlyValue(value, field.matches('[role="switch"]'));
+        (field.closest('.ot-select-wrapper') || field).replaceWith(control);
+      }
+
+      const summary = [
+        otReadOnlyField('Clock Times', card.querySelector('.ot-record-clock-times').textContent.trim()),
+        otReadOnlyPair(['Actual Hours', hours['Actual Hours']], ['Approved Hours', hours['Approved Hours']])
+      ];
+      if (request.hours != null) summary.unshift(otReadOnlyField('Plan Hours', hours['Plan Hours']));
+      if (request.planStatus || request.finalStatus) {
+        summary.push(otReadOnlyPair(['Plan Status', request.planStatus], ['Final Status', request.finalStatus]));
+      }
+      const attachments = [].concat(request.attachments || [])
+        .map(file => typeof file === 'string' ? file : file?.name).filter(Boolean);
+      form.querySelector('#otAttachmentLabel').closest('.modern-form-group').replaceWith(
+        ...summary, otReadOnlyField('Attachments', attachments.join('\n') || 'No attachments')
+      );
+      form.querySelectorAll('.required').forEach(marker => marker.remove());
+      form.querySelectorAll('[for]').forEach(label => label.removeAttribute('for'));
+      form.querySelectorAll('[id]').forEach(element => element.removeAttribute('id'));
+      const heading = form.querySelector('.ot-form-heading');
+      heading.querySelector('h2').id = 'overtimeReadOnlyTitle';
+      form.setAttribute('aria-labelledby', 'overtimeReadOnlyTitle');
+
+      const submitDate = recordSubmitDate.form(request.submitDate);
+      submitDate.classList.add('modern-form-group');
+      heading.after(submitDate);
+      if (request.reference) submitDate.after(otReadOnlyField('Reference No.', request.reference));
+      return form;
+    }
+
     HistoryRecordPage.register((kind, id) => {
-      const page = document.getElementById('modal-ot-details');
       const card = [...document.querySelectorAll('.ot-record-card')].find(node => node.hash === HistoryRecordPage.href(kind, id));
       if (!card) return;
-      const approved = card.dataset.status === 'approved';
-      document.getElementById('overtimeRequestDetails').hidden = approved;
-      const table = document.getElementById('overtimeApprovedDetails');
-      table.hidden = !approved;
-      if (approved) {
-        table.replaceChildren();
-        const fields = [
-          ['Date', card.querySelector('.ot-record-date').textContent],
-          ['Status', card.querySelector('.ot-record-status').textContent],
-          ['Clock Times', card.querySelector('.ot-record-clock-times').textContent],
-          ['Shift', card.querySelector('.ot-record-shift').textContent],
-          ['OT Code', card.querySelector('.ot-record-code-value').textContent],
-          ...Array.from(card.querySelectorAll('.ot-record-hours .ot-record-detail'), field => [
-            field.querySelector('dt').textContent, field.querySelector('dd').textContent
-          ])
-        ];
-        for (const [label, value] of fields) {
-          const row = table.insertRow();
-          row.insertCell().textContent = label;
-          row.insertCell().textContent = value;
-        }
-      }
-      return page;
+      const status = document.createElement('div');
+      status.className = 'ot-review-status';
+      status.append(recordDetailStatus.create(card.querySelector('.ot-record-status').textContent.trim()));
+      document.getElementById('overtimeRequestDetails').replaceChildren(status, renderOvertimeForm(card));
+      return document.getElementById('modal-ot-details');
     });
 
     function triggerOtFileUpload(type) {

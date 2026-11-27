@@ -20,6 +20,30 @@
 .staff-feedback-card.history-card-item { min-width: 0; margin: 0; border-radius: 18px; padding: 16px; }
 .staff-feedback-details-trigger { display: block; min-width: 0; border-radius: 12px; color: inherit; text-decoration: none; }
 #staffFeedbackDetailsTitle:focus { outline: none; }
+.staff-feedback-details-identity { margin: 0 2px 14px; }
+.staff-feedback-details-identity h2 {
+  margin: 0 0 6px;
+  color: var(--text-primary);
+  font-size: 16px;
+  overflow-wrap: anywhere;
+}
+.staff-feedback-details-card .employee-career-label {
+  margin-bottom: 6px;
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+.staff-feedback-details-card .employee-career-control {
+  line-height: 1.45;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.staff-feedback-details-card .form-submit-date > strong {
+  min-height: 44px;
+  border-radius: 12px;
+  font-size: 13.5px;
+  font-weight: 600;
+}
 .staff-feedback-card-header { align-items: center; }
 .staff-feedback-name { color: var(--text-primary); font-size: 13px; font-weight: 800; line-height: 1.45; overflow-wrap: anywhere; }
 .staff-feedback-emp-no { display: block; margin-top: 3px; margin-bottom: 4px; color: var(--text-muted); opacity: .8; font: 700 11.5px monospace, sans-serif; }

@@ -476,6 +476,7 @@
         <!-- Card Body -->
         <div class="relief-card-body">
           <div style="margin-bottom: 12px;">${statusBadge}</div>
+          ${recordSubmitDate.cardHTML(item.submitDate)}
 
           <!-- 2-Column Info Grid -->
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 14px; padding: 10px 12px;">
@@ -489,7 +490,6 @@
                 <i class="fa-regular fa-calendar" style="font-size: 11px; margin-right: 3px;"></i>${item.claimDate}
               </div>
             </div>
-            ${recordSubmitDate.html(item.submitDate)}
           </div>
 
           <!-- Structured Amount & Statutory Limit Box -->

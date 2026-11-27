@@ -9409,7 +9409,8 @@ select option {
   font-size: 10.5px;
   color: var(--text-muted);
 }
-.change-history-date:has(> .record-submit-date:not([hidden])) {
+.change-history-date:has(> .record-submit-date:not([hidden])),
+.card-submit-date:not([hidden]) + .change-history-date {
   display: grid;
   gap: 4px;
   padding: 10px 12px;

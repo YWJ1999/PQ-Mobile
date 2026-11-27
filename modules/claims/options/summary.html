@@ -127,9 +127,39 @@
     .status-pill.approved { background: rgba(16, 185, 129, 0.16); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3); }
     .status-pill.rejected { background: rgba(239, 68, 68, 0.16); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3); }
 
-    /* The purple modal header now contains only the category name and close action. */
-    #summaryDetailsModalOverlay .summary-details-header { margin-bottom: 0; }
+    .individual-summary-sheet-header {
+      flex: 0 0 auto;
+      padding: 12px 22px 20px;
+    }
+    .individual-summary-sheet-header .summary-details-header { margin-bottom: 0; }
+    .individual-summary-sheet-header .summary-details-title { color: inherit; }
+    .individual-summary-sheet-header .summary-details-handle { background: currentColor; }
+    .individual-summary-sheet-header .summary-details-close {
+      border-radius: 12px;
+      font-size: inherit;
+    }
+    .individual-summary-sheet-header .summary-details-close::before { content: none; }
+    .individual-summary-sheet-header .summary-details-close:focus-visible {
+      outline: 2px solid #fff;
+      outline-offset: 3px;
+      box-shadow: none;
+    }
 
+    .claim-summary-variance {
+      flex: 0 0 auto;
+      margin-inline-start: auto;
+      color: inherit;
+      white-space: nowrap;
+    }
+
+    #modalRecordsListContainer { padding-top: 16px; }
+    #modalRecordItems { display: contents; }
+    .claim-summary-record-heading {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      margin-bottom: 12px;
+    }
+    .claim-summary-record-heading > :last-child { text-align: end; }
 
     .summary-filter-period-grid {
       display: grid;
@@ -239,22 +269,30 @@
     <!-- Category Details Modal -->
     <div class="modal-overlay" id="summaryDetailsModalOverlay" aria-hidden="true" onclick="if(event.target===this) closeDetailsModalForce()">
       <div class="modal-sheet summary-details-sheet" role="dialog" aria-modal="true" aria-labelledby="modalCategoryTitle" onclick="event.stopPropagation()">
-        <div class="summary-details-top">
+        <div class="individual-summary-sheet-header">
           <div class="summary-details-handle" aria-hidden="true"></div>
 
           <div class="summary-details-header">
             <div class="summary-details-category">
               <h2 id="modalCategoryTitle" class="summary-details-title">Category details</h2>
             </div>
-            <button type="button" class="summary-details-close" onclick="closeDetailsModalForce()" aria-label="Close details" title="Close details"></button>
+            <button type="button" class="summary-details-close" onclick="closeDetailsModalForce()" aria-label="Close details" title="Close details">
+              <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+            </button>
           </div>
         </div>
 
-        <div class="summary-details-records-header">
+        <div id="modalRecordsListContainer" class="summary-details-records" tabindex="0" aria-label="Itemized claim records">
+          <div class="record-summary-card record-summary-grid">
+            <div id="modalRecordsCount" class="record-summary-metric"></div>
+            <div class="summary-details-metric">
+              <div class="summary-details-metric-label">Total Claim Amount</div>
+              <div id="modalTotalClaimAmount" class="summary-details-metric-value"></div>
+            </div>
+          </div>
           <h3 class="summary-details-section-title">Itemized records</h3>
-          <span id="modalRecordsCount" class="summary-details-record-count"></span>
+          <div id="modalRecordItems"></div>
         </div>
-        <div id="modalRecordsListContainer" class="summary-details-records" tabindex="0" aria-label="Itemized claim records"></div>
       </div>
     </div>
 
@@ -280,6 +318,9 @@
       };
     });
 
+    const variancePercent = new Intl.NumberFormat('en-GB', {
+      style: 'percent', signDisplay: 'exceptZero', maximumFractionDigits: 1
+    });
     let currentPeriod = '2026-05';
 
     function syncSummaryPeriodControls() {
@@ -374,23 +415,9 @@
           card.className = 'history-card-item claim-summary-card';
           card.onclick = () => openDetailsModal(cat.id, targetStatus);
 
-          let variance = 0;
-          if (cat.lastAmount > 0) {
-            variance = ((catCurrentAmount - cat.lastAmount) / cat.lastAmount) * 100;
-          }
-          let varianceColor = 'var(--text-primary)';
-          let varianceSign = '';
-          if (variance > 0) {
-            varianceColor = '#ef4444';
-            varianceSign = '+';
-          } else if (variance < 0) {
-            varianceColor = '#10b981';
-            varianceSign = '-';
-          } else {
-            varianceColor = 'var(--text-muted)';
-            varianceSign = '';
-          }
-          let varianceDisplay = variance === 0 ? '-' : `${varianceSign}${Math.abs(variance).toFixed(1)}%`;
+          const varianceDisplay = cat.lastAmount > 0
+            ? variancePercent.format((catCurrentAmount - cat.lastAmount) / cat.lastAmount)
+            : '—';
 
           card.innerHTML = `
             <div class="claim-summary-card-head">
@@ -398,7 +425,7 @@
                 <div class="claim-summary-card-title">${cat.title}</div>
                 <div class="claim-summary-card-subtitle">${validRecords.length} record${validRecords.length === 1 ? '' : 's'} in ${displayPeriod}</div>
               </div>
-              <i class="fa-solid fa-chevron-right" style="font-size: 13px; opacity: 0.9;"></i>
+              <span class="claim-summary-stat-value claim-summary-variance">Variance: ${varianceDisplay}</span>
             </div>
             <div class="claim-summary-card-body">
               <div class="claim-summary-total">
@@ -407,9 +434,8 @@
               </div>
               <div class="claim-summary-stat-grid">
                 <div class="claim-summary-stat"><span class="claim-summary-stat-label">Last Amount</span><span class="claim-summary-stat-value">RM ${cat.lastAmount.toFixed(2)}</span></div>
-                <div class="claim-summary-stat"><span class="claim-summary-stat-label">Variance %</span><span class="claim-summary-stat-value" style="color: ${varianceColor};">${varianceDisplay}</span></div>
-                <div class="claim-summary-stat"><span class="claim-summary-stat-label">YTD Amount</span><span class="claim-summary-stat-value">RM ${cat.ytdAmount.toFixed(2)}</span></div>
                 <div class="claim-summary-stat"><span class="claim-summary-stat-label">Average Amount</span><span class="claim-summary-stat-value">RM ${cat.averageAmount.toFixed(2)}</span></div>
+                <div class="claim-summary-stat"><span class="claim-summary-stat-label">YTD Amount</span><span class="claim-summary-stat-value">RM ${cat.ytdAmount.toFixed(2)}</span></div>
               </div>
             </div>
           `;
@@ -445,9 +471,11 @@
       });
 
       document.getElementById('modalCategoryTitle').textContent = cat.title;
-      document.getElementById('modalRecordsCount').textContent = window.PeopleHcmRecordSummary.formatCount(recordsToDisplay.length);
+      window.PeopleHcmRecordSummary.renderCount(document.getElementById('modalRecordsCount'), recordsToDisplay.length);
+      const total = recordsToDisplay.reduce((sum, record) => sum + record.amount, 0);
+      document.getElementById('modalTotalClaimAmount').textContent = `RM ${total.toFixed(2)}`;
       
-      const recordsContainer = document.getElementById('modalRecordsListContainer');
+      const recordsContainer = document.getElementById('modalRecordItems');
       recordsContainer.innerHTML = '';
       
       recordsToDisplay.forEach(r => {
@@ -455,11 +483,13 @@
         recItem.className = 'claim-summary-record summary-colored-record claim-summary-detail-card';
         
         recItem.innerHTML = `
+          <dl class="summary-record-date claim-summary-record-heading">
+            <div class="summary-record-field"><dt class="sr-only">Claim Dates</dt><dd>${r.dateRange}</dd></div>
+            <div class="summary-record-field"><dt class="sr-only">Amount</dt><dd>RM ${r.amount.toFixed(2)}</dd></div>
+          </dl>
           <dl class="summary-record-fields claim-summary-detail-body">
-            <div class="summary-record-field summary-record-date"><dd>${r.dateRange}</dd></div>
             <div class="summary-record-field summary-record-period summary-detail-metric-card"><dt>Period</dt><dd>${r.period}</dd></div>
             <div class="summary-record-field summary-record-expense summary-detail-metric-card"><dt>Expense</dt><dd>${r.expense}</dd></div>
-            <div class="summary-record-field summary-record-amount summary-detail-metric-card summary-detail-metric-amount"><dt>Amount</dt><dd>RM ${r.amount.toFixed(2)}</dd></div>
           </dl>
         `;
         recordsContainer.appendChild(recItem);
@@ -472,7 +502,7 @@
       }
 
       summaryDetailsOpener = document.activeElement;
-      recordsContainer.scrollTop = 0;
+      document.getElementById('modalRecordsListContainer').scrollTop = 0;
       const modal = document.getElementById('summaryDetailsModalOverlay');
       modal.setAttribute('aria-hidden', 'false');
       modal.classList.add('active');

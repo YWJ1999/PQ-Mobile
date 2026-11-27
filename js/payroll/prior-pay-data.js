@@ -398,25 +398,35 @@
   function renderRecordDetails(id) {
     const record = records.find(item => item.id === id);
     if (!record || busy || activeRecord) return;
-    const fields = [
-      ['dateFrom', 'Start Date'], ['dateTo', 'End Date'], ['company', 'Company'],
-      ['position', 'Position'], ['lastPay', 'Last Pay'], ['yearExperience', 'Year Exp'],
-      ['industry', 'Industry'], ['reasonLeaving', 'Reason Leaving'], ['payRate', 'Pay Rate']
-    ];
-    $('priorRecordDetailsFields').replaceChildren(...fields.map(([key, label]) => {
-      const row = document.createElement('div');
-      const term = document.createElement('dt');
-      const value = document.createElement('dd');
-      const raw = record.general[key];
-      term.textContent = label;
+    const form = $('panel-general').cloneNode(true);
+    const values = {
+      ...record.general,
+      'prior-general-empNo': formatEmployeeNumber(record.empNo),
+      priorSerialNo: record.id
+    };
+    const payFormat = new Intl.NumberFormat('en-MY', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    for (const control of form.querySelectorAll('input, select, textarea')) {
+      const key = control.name || control.id;
+      const raw = values[key];
+      let display = raw;
+      if (control.type === 'date') display = dateText(raw);
+      if (key === 'lastPay' && raw != null && raw !== '') display = payFormat.format(raw);
+
+      const label = control.labels[0];
+      if (label) {
+        label.querySelector('.prior-required')?.remove();
+        const caption = document.createElement('span');
+        caption.className = 'prior-field-label';
+        caption.textContent = label.textContent.trim();
+        label.replaceWith(caption);
+      }
+      const value = document.createElement('div');
+      value.className = 'prior-readonly-value';
       value.dataset.detail = key;
-      value.textContent = key === 'dateFrom' || key === 'dateTo' ? dateText(raw)
-        : raw === '' || raw == null ? 'Not provided'
-        : key === 'lastPay' ? new Intl.NumberFormat('en-MY', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(raw)
-        : String(raw);
-      row.append(term, value);
-      return row;
-    }));
+      value.textContent = display == null || display === '' ? 'Not provided' : display;
+      control.replaceWith(value);
+    }
+    $('priorRecordDetailsFields').replaceChildren(...form.children);
     return $('priorRecordDetails');
   }
   function showDialog(title, message, callback = null) {

@@ -158,14 +158,62 @@
     });
     return files;
   }
+  function engagementField(label, value) {
+    const field = node('div', 'employee-career-field');
+    const control = node('div', 'employee-career-control');
+    control.append(value instanceof Node ? value : String(value == null || value === '' ? '—' : value));
+    field.append(node('span', 'employee-career-label', label), control);
+    return field;
+  }
+  function renderEngagementDetails(item, body) {
+    const header = node('header', 'career-pending-engagement-header');
+    header.append(node('h2', '', employeeCardHeading.text(item.empNo, item.employeeName)),
+      recordDetailStatus.create('Pending Approval'));
+
+    const form = node('div', 'employee-career-form-card career-pending-engagement-form');
+    const employee = node('section', 'employee-career-form-section');
+    const submitDate = recordSubmitDate.form(item.submitDate);
+    submitDate.classList.add('employee-career-field');
+    employee.append(
+      node('h2', 'form-section-heading', 'Employee Details'),
+      submitDate,
+      engagementField('Reference No.', item.reference || item.id),
+      engagementField('Employee No.', formatEmployeeNumber(item.empNo)),
+      engagementField('Name', item.employeeName),
+      engagementField('Position', item.position)
+    );
+
+    const details = node('section', 'employee-career-form-section');
+    details.append(node('h2', 'form-section-heading', 'Engagement Details'));
+    if (item.intervieweeNo) details.append(engagementField('Interviewee No.', formatEmployeeNumber(item.intervieweeNo)));
+    if (item.intervieweePosition) details.append(engagementField('Interviewee Position', item.intervieweePosition));
+    details.append(
+      engagementField('Interview Date', date(item.interviewDate)),
+      engagementField('Positive Feedback', item.positiveFeedback),
+      engagementField('Negative Feedback', item.negativeFeedback),
+      engagementField('Flight Risk', item.flightRisk),
+      engagementField('Recommendation', item.recommendation),
+      engagementField('Mitigation Action', item.mitigationAction),
+      engagementField('Remarks', item.remarks),
+      engagementField('Attachments', engagementAttachments(item.attachments))
+    );
+    form.append(employee, details);
+
+    const remarks = node('section', 'detail-popout-comments approval-comments-card');
+    const label = node('label', '', 'Approver Remarks');
+    label.htmlFor = 'careerPendingComments';
+    const comments = remarksControl(item);
+    comments.classList.add('detail-popout-comment-control');
+    comments.placeholder = 'Add approver action comments (optional)...';
+    remarks.append(label, comments);
+    body.append(header, form, remarks);
+  }
   function renderDetails(item) {
     const isEngagement = item.type === 'Staff Engagement';
     const overlay = $('careerPendingDetails');
-    overlay.classList.toggle('career-pending-engagement-details', isEngagement);
-    overlay.querySelector('.payroll-approval-details-body').classList.toggle('detail-popout-body', isEngagement);
     $('careerPendingDetailsActions').classList.toggle('detail-popout-footer', isEngagement);
     $('careerPendingDetailsTitle').textContent = item.approvalTitle || `${item.type || 'Request'} Approval`;
-    const body = $('careerPendingDetails').querySelector('.payroll-approval-details-body');
+    const body = overlay.querySelector('.payroll-approval-details-body');
     body.replaceChildren();
     const isProfile = item.type === 'CV Change Request';
     overlay.classList.toggle('change-request-page', isProfile);
@@ -184,25 +232,13 @@
       comments.placeholder = 'Add approver action comments (optional)...';
       remarks.append(label, comments);
       body.querySelector('#cv-panel-family').append(remarks);
+    } else if (isEngagement) {
+      renderEngagementDetails(item, body);
     } else {
       const table = node('table', 'payroll-approval-table');
       table.id = 'careerPendingDetailsTable';
       const tbody = node('tbody');
-      table.classList.toggle('career-pending-engagement-table', isEngagement);
-      table.classList.toggle('detail-popout-table', isEngagement);
-      const detailFields = isEngagement ? [
-        ['Employee No.', formatEmployeeNumber(item.empNo) || '—'],
-        ['Name', item.employeeName],
-        ['Position', item.position],
-        ['Interview Date', date(item.interviewDate)],
-        ['Positive Feedback', item.positiveFeedback],
-        ['Negative Feedback', item.negativeFeedback],
-        ['Flight Risk', item.flightRisk],
-        ['Recommendation', item.recommendation],
-        ['Mitigation Action', item.mitigationAction],
-        ['Remarks', item.remarks],
-        ['Attachment', engagementAttachments(item.attachments)]
-      ] : [
+      const detailFields = [
         ['Employee', identity(item.employeeName, item.empNo, item.position)],
         ['Type', item.type],
         ...(item.details || []),
@@ -210,9 +246,9 @@
       ];
       detailFields.forEach(([label, value]) => {
         const row = node('tr');
-        const heading = node('th', isEngagement ? 'detail-popout-label' : '', label);
+        const heading = node('th', '', label);
         heading.scope = 'row';
-        const cell = node('td', isEngagement ? 'detail-popout-value' : '');
+        const cell = node('td');
         cell.append(value instanceof HTMLElement ? value : document.createTextNode(value == null || value === '' ? '—' : String(value)));
         row.append(heading, cell);
         tbody.append(row);
@@ -220,16 +256,6 @@
       recordSubmitDate.prepend(tbody, item.submitDate);
       table.append(tbody);
       body.append(table);
-      if (isEngagement) {
-        const remarks = node('section', 'detail-popout-comments approval-comments-card');
-        const label = node('label', '', 'Approver Remarks');
-        label.htmlFor = 'careerPendingComments';
-        const comments = remarksControl(item);
-        comments.classList.add('detail-popout-comment-control');
-        comments.placeholder = 'Add approver action comments (optional)...';
-        remarks.append(label, comments);
-        body.append(remarks);
-      }
     }
     $('careerPendingDetailsActions').replaceChildren(detailActionButtons(isEngagement));
     body.scrollTop = 0;

@@ -13,10 +13,13 @@
 }
 .claim-summary-card:hover { transform: translateY(-1px); border-color: rgba(167, 139, 250, 0.5); }
 .claim-summary-card:active { transform: scale(0.99); }
-.claim-summary-card-head {
-  padding: 15px 16px;
+.claim-summary-card-head,
+.individual-summary-sheet-header {
   background: linear-gradient(135deg, #6d28d9 0%, #5b21b6 100%);
   color: #fff;
+}
+.claim-summary-card-head {
+  padding: 15px 16px;
   display: flex;
   align-items: center;
   justify-content: space-between;

@@ -339,12 +339,11 @@
   function selectStatusSamples(records) {
     const unique = records.filter((record, index) => records.findIndex(candidate => candidate.id === record.id) === index);
     return unique
-      .filter(record => historyActions.get(record.id) !== 'discard')
+      .filter(record => historyActions.get(record.id)?.key !== 'discard')
       .map(record => {
         const action = historyActions.get(record.id);
-        if (action === 'submit') return { ...record, status: 'Submitted' };
-        if (action === 'cancel') return { ...record, status: 'Cancelled' };
-        return record;
+        if (!action) return record;
+        return { ...record, status: action.key === 'submit' ? 'Submitted' : 'Cancelled', submittedAt: action.submittedAt };
       });
   }
 
@@ -503,7 +502,9 @@
       } else if (kind === 'timesheet' && current.id === 'TS-DRAFT-LOCAL' && action.key === 'discard') {
         localStorage.removeItem('pq_project_timesheet_draft');
       } else {
-        historyActions.set(current.id, action.key);
+        historyActions.set(current.id, {
+          key: action.key, submittedAt: action.key === 'submit' ? new Date().toISOString() : current.submittedAt
+        });
       }
     } catch {
       window.showToast?.('Unable to update the request. Check its status and try again.');
@@ -558,8 +559,7 @@
       createDataRow('Scheduled', formatSchedule(record)),
       createDataRow('Deadline', formatDate(record.deadline))
     );
-    recordSubmitDate.append(details, record.submittedAt);
-    card.append(createCardTop(record.title, record.id, record.status), details);
+    card.append(createCardTop(record.title, record.id, record.status), recordSubmitDate.cardLine(record.submittedAt), details);
     const actions = createCardActions(record, 'work-plan');
     if (actions) card.append(actions);
     makeCardInteractive(card, () => HistoryRecordPage.open('work-plan', record.id, card));
@@ -577,8 +577,7 @@
       createDataRow('Normal Hours', formatMinutes(record.normalMinutes)),
       createDataRow('OT Hours', formatMinutes(record.overtimeMinutes))
     );
-    recordSubmitDate.append(details, record.submittedAt);
-    card.append(createCardTop(formatDate(record.date), record.id, record.status), details);
+    card.append(createCardTop(formatDate(record.date), record.id, record.status), recordSubmitDate.cardLine(record.submittedAt), details);
     const actions = createCardActions(record, 'timesheet');
     if (actions) card.append(actions);
     makeCardInteractive(card, () => HistoryRecordPage.open('timesheet', record.id, card));
@@ -674,13 +673,21 @@
     updateTimesheetFilterSummary(filters);
   }
 
-  function createDetailRow(label, value) {
-    const row = createNode('div', 'project-history-detail-row');
-    const detailValue = createNode('strong');
-    if (value instanceof Node) detailValue.append(value);
-    else detailValue.textContent = displayValue(value);
-    row.append(createNode('span', '', label), detailValue);
-    return row;
+  function createDetailField(label, value) {
+    const field = createNode('div', 'field-group');
+    field.append(
+      createNode('span', 'field-label', label),
+      createNode('div', 'form-ctrl project-review-value', displayValue(value))
+    );
+    return field;
+  }
+
+  function recordMetadataFields(record) {
+    const fields = [];
+    const submitted = recordSubmitDate.format(record.submittedAt, true);
+    if (submitted) fields.push(createDetailField('Submit Date', submitted));
+    if (record.id) fields.push(createDetailField('Reference No.', record.id));
+    return fields;
   }
 
   function createAttachments(attachments) {
@@ -697,79 +704,55 @@
   }
 
   function renderWorkPlanDetails(record) {
-    const section = createNode('section', 'project-history-detail-section');
+    const section = createWorkPlanFields();
     section.dataset.detailSection = 'work-plan';
-    section.append(
-      createDetailRow('Reference #', record.id),
-      createDetailRow('Status', recordDetailStatus.create(record.status)),
-      createDetailRow('Task Category', record.taskCategory),
-      createDetailRow('Sub Task', record.subTask),
-      createDetailRow('Project', record.project),
-      createDetailRow('Milestone', record.milestone),
-      createDetailRow('Schedule From', formatDate(record.scheduleFrom)),
-      createDetailRow('Schedule To', formatDate(record.scheduleTo)),
-      createDetailRow('Assignee', record.assignee),
-      createDetailRow('Est. Complete', formatDate(record.estimatedComplete)),
-      createDetailRow('Act. Complete', formatDate(record.actualComplete)),
-      createDetailRow('Allocated Hour', formatHours(record.allocatedHours)),
-      createDetailRow('Actual Hour', formatHours(record.actualHours)),
-      createDetailRow('Priority', record.priority),
-      createDetailRow('Completion %', record.completion + '%'),
-      createDetailRow('Remarks', record.remarks),
-      createDetailRow('Hours', formatHours(record.hours)),
-      createDetailRow('OT Hours', formatHours(record.otHours)),
-      createDetailRow('Reassign?', record.reassign ? 'Yes' : 'No'),
-      createDetailRow('Reassign Remarks', record.reassignRemarks),
-      createDetailRow('Reassign To', record.reassignTo),
-      createDetailRow('Reassign Date', formatDate(record.reassignDate)),
-      createDetailRow('Attachments', createAttachments(record.attachments))
+    const values = {
+      ...record,
+      task: record.subTask,
+      scheduleFrom: formatDate(record.scheduleFrom),
+      scheduleTo: formatDate(record.scheduleTo),
+      deadline: formatDate(record.deadline || record.estimatedComplete),
+      allocatedHours: formatHours(record.allocatedHours)
+    };
+    for (const control of section.querySelectorAll('[name]')) {
+      const label = section.querySelector(`label[for="${control.id}"]`);
+      label.removeAttribute('for');
+      label.querySelector('.req')?.remove();
+      const value = createNode('div', 'form-ctrl project-review-value', displayValue(values[control.name]));
+      (control.closest('.select-wrapper') || control).replaceWith(value);
+    }
+    section.querySelector('.section-header-bar').after(...recordMetadataFields(record));
+
+    const attachments = section.querySelector('#workPlanAttachments').closest('fieldset');
+    const attachmentHeading = attachments.querySelector('legend');
+    attachmentHeading.textContent = 'Attachments';
+    attachments.replaceChildren(attachmentHeading, createAttachments(record.attachments));
+    const separateEstimate = record.deadline && record.estimatedComplete !== record.deadline ? record.estimatedComplete : '';
+    const details = [
+      ['Assignee', record.assignee],
+      ['Estimated Completion', separateEstimate && formatDate(separateEstimate)],
+      ['Actual Completion', record.actualComplete && formatDate(record.actualComplete)],
+      ['Actual Hours', formatHours(record.actualHours)],
+      ['Completion %', record.completion + '%'],
+      ['Hours', formatHours(record.hours)],
+      ['OT Hours', formatHours(record.otHours)],
+      ['Reassign?', record.reassign ? 'Yes' : 'No'],
+      ['Reassign Remarks', record.reassignRemarks],
+      ['Reassign To', record.reassignTo],
+      ['Reassign Date', record.reassignDate && formatDate(record.reassignDate)]
+    ];
+    attachments.before(
+      ...details.filter(([, value]) => value !== '').map(([label, value]) => createDetailField(label, value))
     );
     return section;
   }
 
-  function renderTimesheetDetails(record) {
-    const summary = createNode('section', 'project-history-detail-section');
-    summary.dataset.detailSection = 'timesheet-summary';
-    summary.append(
-      createDetailRow('Reference #', record.id),
-      createDetailRow('Status', recordDetailStatus.create(record.status)),
-      createDetailRow('Date', formatDate(record.date)),
-      createDetailRow('Remark', record.remark),
-      createDetailRow('Normal Hours', formatMinutes(record.normalMinutes)),
-      createDetailRow('OT Hours', formatMinutes(record.overtimeMinutes))
-    );
-
-    const content = [summary, createNode('h3', 'project-history-detail-subtitle', 'Work Details')];
-    if (record.approverComments) summary.append(createDetailRow('Approver Action Comments', record.approverComments));
-    if (!record.activities.length) {
-      const empty = createNode('section', 'project-history-detail-activity');
-      empty.append(createNode('div', 'project-history-detail-activity-header', 'No work details recorded'));
-      content.push(empty);
-      return content;
-    }
-
-    record.activities.forEach((activity, index) => {
-      const item = createNode('section', 'project-history-detail-activity');
-      item.dataset.detailActivity = String(index);
-      const header = createNode('div', 'project-history-detail-activity-header');
-      const icon = createNode('i', 'fa-solid fa-list-check');
-      icon.setAttribute('aria-hidden', 'true');
-      header.append(icon, createNode('span', '', 'Work Item ' + (index + 1)));
-      item.append(
-        header,
-        createDetailRow('Title', activity.title),
-        createDetailRow('Description', activity.description),
-        createDetailRow('Project', activity.project),
-        createDetailRow('Is AdHocTask?', activity.adhoc ? 'Yes' : 'No'),
-        createDetailRow('Task', activity.task),
-        createDetailRow('Is Overtime?', activity.overtime ? 'Yes' : 'No'),
-        createDetailRow('Time From', activity.timeFrom),
-        createDetailRow('Completion %', activity.completion + '%'),
-        createDetailRow('Time To', activity.timeTo)
-      );
-      content.push(item);
-    });
-    return content;
+  function renderTimesheetDetails(root, record) {
+    TimesheetView.review(root, { ...record, dateLabel: formatDate(record.date) });
+    const details = root.querySelector('.form-card');
+    details.dataset.detailSection = 'timesheet-summary';
+    details.querySelector('.form-submit-date').replaceWith(...recordMetadataFields(record));
+    if (record.approverComments) details.append(createDetailField('Approver Action Comments', record.approverComments));
   }
 
   function renderProjectDetailActions(record, kind) {
@@ -780,10 +763,15 @@
   }
 
   function replaceProjectHistoryDetailContent(record, kind) {
-    const content = kind === 'work-plan' ? [renderWorkPlanDetails(record)] : renderTimesheetDetails(record);
-    const submitted = recordSubmitDate.format(record.submittedAt);
-    if (submitted) content[0].prepend(createDetailRow('Submit Date', submitted));
-    byId('projectHistoryDetailContent').replaceChildren(...content);
+    const content = byId('projectHistoryDetailContent');
+    if (kind === 'work-plan') content.replaceChildren(renderWorkPlanDetails(record));
+    else renderTimesheetDetails(content, record);
+
+    const summary = createNode('div', 'project-history-form-summary');
+    const employee = employeeCardHeading.text(record.empNo || record.employeeId, record.employeeName);
+    if (employee !== '—') summary.append(createNode('h2', '', employee));
+    summary.append(recordDetailStatus.create(record.status));
+    content.prepend(summary);
     renderProjectDetailActions(record, kind);
   }
 

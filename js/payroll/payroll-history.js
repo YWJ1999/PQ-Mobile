@@ -33,9 +33,7 @@
   const reference = record => record.localDraft ? 'Saved draft' : (record.reference ?? record.id);
   const deductionPeriod = record => record.period || record.stopPeriod || '';
   const deductionCycle = record => record.cycle || record.stopCycle || '';
-  const deductionDate = record => record.deductionDate || record.stopDate || '';
   const recordDate = record => record.submitDate || record.savedDate || record.transactionDate || '';
-  const row = (label, value, markup = false) => `<tr><th scope="row">${escape(label)}</th><td>${markup ? value : escape(value === '' || value == null ? '—' : value)}</td></tr>`;
   const getHistoryActions = record => {
     if (record.status === 'draft') {
       return [
@@ -187,7 +185,12 @@
       const referenceLine = kind === 'tax'
         ? `<div class="history-card-ref">${record.localDraft ? 'Saved draft' : `Ref: ${escape(reference(record))}`}</div>`
         : '';
-      card.innerHTML = `<a class="history-card-main" data-history-link href="${escape(HistoryRecordPage.href(kind, record.id))}" aria-label="View ${escape(typeLabel(record))} details"><div class="history-card-header"><div class="history-card-heading"><div class="history-card-title-row"><h3 class="history-card-title">${escape(typeLabel(record))}</h3></div>${referenceLine}</div><span class="status-pill ${escape(record.status)}"><i class="fa-solid ${statusIcons[record.status] || 'fa-circle'}" aria-hidden="true"></i>${escape(statuses[record.status] || record.status)}</span></div><div class="history-card-details">${fields.map(([label, value]) => `<div class="history-card-row"><span>${escape(label)}</span><strong class="${label === 'Amount' ? 'history-card-amount' : ''}">${escape(value || '—')}</strong></div>`).join('')}${recordSubmitDate.html(record.submitDate)}</div>${record.localDraft ? `<p class="history-draft-note">Saved on this device · ${escape(date(record.savedDate))}</p>` : ''}</a>${renderCardActions(record)}`;
+      card.innerHTML = `<a class="history-card-main" data-history-link href="${escape(HistoryRecordPage.href(kind, record.id))}" aria-label="View ${escape(typeLabel(record))} details">
+        <div class="history-card-header"><div class="history-card-heading"><div class="history-card-title-row"><h3 class="history-card-title">${escape(typeLabel(record))}</h3></div>${referenceLine}</div><span class="status-pill ${escape(record.status)}"><i class="fa-solid ${statusIcons[record.status] || 'fa-circle'}" aria-hidden="true"></i>${escape(statuses[record.status] || record.status)}</span></div>
+        ${recordSubmitDate.cardHTML(record.submitDate)}
+        <div class="history-card-details">${fields.map(([label, value]) => `<div class="history-card-row"><span>${escape(label)}</span><strong class="${label === 'Amount' ? 'history-card-amount' : ''}">${escape(value || '—')}</strong></div>`).join('')}</div>
+        ${record.localDraft ? `<p class="history-draft-note">Saved on this device · ${escape(date(record.savedDate))}</p>` : ''}
+      </a>${renderCardActions(record)}`;
       card.querySelectorAll('[data-history-action]').forEach(button => button.addEventListener('click', selectCardAction));
       $('payrollHistoryList').append(card);
     });
@@ -224,56 +227,62 @@
     footer.hidden = !footer.childElementCount;
   }
 
+  function detailField(label, value) {
+    const field = document.createElement('div');
+    field.className = 'claim-field';
+    field.innerHTML = `<span class="claim-field-label">${escape(label)}</span><div class="claim-control payroll-review-value">${escape(value)}</div>`;
+    return field;
+  }
+
   function renderDetail(record, recordKind) {
     releaseAttachmentUrls();
-    const employeeName = `<span class="history-employee-name">${escape(record.employeeName || '—')}</span>`;
-    const employeeId = `<span class="history-employee-id">${escape(formatEmployeeNumber(record.empNo) || '—')}</span>`;
-    const attachments = (record.attachments || []).map(attachment => {
-      const icon = /\.docx?$/i.test(attachment.name) ? 'fa-file-word' : 'fa-file-lines';
-      if (attachment.file instanceof Blob) {
-        const url = URL.createObjectURL(attachment.file);
-        attachmentUrls.push(url);
-        return `<a class="history-attachment" href="${escape(url)}" download="${escape(attachment.name)}"><i class="fa-solid ${icon}" aria-hidden="true"></i><span>${escape(attachment.name)}</span></a>`;
-      }
-      return `<span class="history-attachment"><i class="fa-solid ${icon}" aria-hidden="true"></i><span>${escape(attachment.name)}<small class="history-attachment-note">Original file unavailable</small></span></span>`;
-    }).join('') || '—';
-    const body = [
-      row('Reference #', reference(record)),
-      row('Status', recordDetailStatus.html(statuses[record.status]), true),
-      row('Emp No.', employeeId, true),
-      row('Name', employeeName, true)
-    ];
-    if (recordKind === 'tax') {
-      body.push(
-        row('Rebate Item', record.rebateItem),
-        row('Transaction Date', date(record.transactionDate)),
-        row('Description', record.description),
-        row('Receipt #', record.receiptNo),
-        row('Amount', money(record.amount)),
-        row('Attachments', attachments, true),
-        row('Process', record.process ? 'Yes' : 'No'),
-        row('Period', record.period),
-        row('Cycle', record.cycle),
-        row('Approval Date', record.approvalDateLabel || date(record.approvalDate)),
-        row('Approver Remarks', record.approverRemarks)
-      );
-    } else {
-      body.push(
-        row('Request Type', record.requestType),
-        row('Deduction Type', record.deductionType),
-        row('Period', deductionPeriod(record)),
-        row('Cycle', deductionCycle(record)),
-        row('Deduction Date', date(deductionDate(record))),
-        row('Account No', record.accountNo),
-        row('Amount', money(record.amount)),
-        row('Attachments', attachments, true)
-      );
+    const body = $('historyDetailBody');
+    const summary = document.createElement('div');
+    summary.className = 'payroll-history-detail-summary';
+    const employee = employeeCardHeading.text(record.empNo, record.employeeName);
+    if (employee !== '—') {
+      const heading = document.createElement('h2');
+      heading.textContent = employee;
+      summary.append(heading);
     }
+    summary.append(recordDetailStatus.create(statuses[record.status] || record.status));
+
+    const card = PayrollRequestFields.create(recordKind, record, attachmentUrls);
+    const metadata = [
+      ['Submit Date', recordSubmitDate.format(record.submitDate, true)],
+      ['Reference No.', record.localDraft ? record.reference : reference(record)]
+    ];
+    card.querySelector('.claim-form-stack').prepend(
+      ...metadata.filter(([, value]) => value).map(([label, value]) => detailField(label, value))
+    );
+
+    const details = [];
+    if (recordKind === 'tax') {
+      details.push(
+        ['Process', record.process == null ? '' : record.process ? 'Yes' : 'No'],
+        ['Period', record.period],
+        ['Cycle', record.cycle],
+        ['Approval Date', record.approvalDateLabel || (record.approvalDate && date(record.approvalDate))],
+        ['Approver Remarks', record.approverRemarks]
+      );
+    } else if (record.amount != null && record.amount !== '' && !card.querySelector('[data-payroll-field="amount"]')) {
+      details.push(['Amount', money(record.amount)]);
+    }
+    details.push(['Approver Action Comments', record.approverActionComments]);
+    card.querySelector('.payroll-upload').before(
+      ...details.filter(([, value]) => value != null && value !== '').map(([label, value]) => detailField(label, value))
+    );
+
+    for (const file of card.querySelectorAll('span.payroll-file-name')) {
+      const note = document.createElement('small');
+      note.className = 'history-attachment-note';
+      note.textContent = 'Original file unavailable';
+      file.append(note);
+    }
+
     $('historyDetailTitle').textContent = categories[recordKind].detail;
-    if (record.category && record.remarks) body.push(row('Remarks', record.remarks));
-    if (record.approverActionComments) body.push(row('Approver Action Comments', record.approverActionComments));
-    $('historyDetailBody').innerHTML = `<table class="history-detail-table"><tbody>${recordSubmitDate.html(record.submitDate, 'tr')}${body.join('')}</tbody></table>`;
-    $('historyDetailBody').scrollTop = 0;
+    body.replaceChildren(summary, card);
+    body.scrollTop = 0;
     renderDetailActions(record, recordKind);
   }
 

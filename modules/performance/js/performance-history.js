@@ -91,11 +91,13 @@
     else $('incidentHistoryFilterTrigger').focus({ preventScroll: true });
     returnFocus = null;
   }
-  function detailRow(label, value, key) {
-    const row = element('tr'), heading = element('th', 'detail-popout-label', label), cell = element('td', 'detail-popout-value');
-    heading.scope = 'row'; if (key) cell.dataset.detail = key;
-    if (value instanceof Node) cell.append(value); else cell.textContent = text(value);
-    row.append(heading, cell); return row;
+  function detailField(label, value) {
+    const field = element('div', 'employee-career-field');
+    field.append(
+      element('span', 'incident-history-form-label', label),
+      element('div', 'employee-career-control incident-history-form-value', text(value))
+    );
+    return field;
   }
   function safeAttachmentUrl(value) {
     if (typeof value !== 'string' || !value.trim()) return null;
@@ -121,15 +123,48 @@
     return list;
   }
   function renderDetails(record) {
-    const created = dateText(record.createdDate), time = /(?:T|\s)(\d{2}:\d{2})/.exec(String(record.createdDate || ''))?.[1];
-    const yesNo = value => value === true ? 'Yes' : value === false ? 'No' : null;
-    $('incidentHistoryDetailsRows').replaceChildren(
-      detailRow('Reference #', record.reference), detailRow('Emp No.', employeeId(record), 'empNo'), detailRow('Name', record.name),
-      detailRow('Incident Date', dateText(record.incidentDate)), detailRow('Created Date', time ? `${created} ${time}` : created),
-      detailRow('Incident Type', record.incidentType), detailRow('Incident Action', record.incidentAction), detailRow('Measure Value', record.measureValue),
-      detailRow('Merit', yesNo(record.merit)), detailRow('Value', record.value), detailRow('Remarks', record.remarks),
-      detailRow('Is Closed?', yesNo(record.isClosed)), detailRow('Attachment', attachmentList(record))
+    const summary = element('div', 'incident-history-form-summary');
+    const employee = employeeCardHeading.text(record.empNo, record.name);
+    if (employee !== '—') summary.append(element('h2', '', employee));
+    if (typeof record.isClosed === 'boolean') {
+      summary.append(recordDetailStatus.create(record.isClosed ? 'Closed' : 'Open'));
+    }
+
+    const form = element('div', 'employee-career-form-card');
+    const employeeDetails = element('section', 'employee-career-form-section');
+    employeeDetails.append(element('h2', 'form-section-heading', 'Employee Details'));
+    const submitted = recordSubmitDate.format(record.submitDate || record.submittedAt, true);
+    if (submitted) employeeDetails.append(detailField('Submit Date', submitted));
+    if (record.reference) employeeDetails.append(detailField('Reference No.', record.reference));
+    employeeDetails.append(
+      detailField('Employee', employeeId(record)),
+      detailField('Name', record.name),
+      detailField('Position', record.position)
     );
+
+    const incidentDetails = element('section', 'employee-career-form-section');
+    incidentDetails.append(
+      element('h2', 'form-section-heading', 'Incident Details'),
+      detailField('Incident Date', dateText(record.incidentDate)),
+      detailField('Incident Type', record.incidentType),
+      detailField('Action Type', record.incidentAction),
+      detailField('Value / Measure', record.measureValue),
+      detailField('Remarks', record.remarks)
+    );
+    if (record.createdDate) {
+      const created = dateText(record.createdDate);
+      const time = /(?:T|\s)(\d{2}:\d{2})/.exec(record.createdDate)?.[1];
+      incidentDetails.append(detailField('Created Date', time ? `${created} ${time}` : created));
+    }
+    const yesNo = value => value === true ? 'Yes' : value === false ? 'No' : null;
+    incidentDetails.append(detailField('Merit', yesNo(record.merit)), detailField('Value', record.value));
+
+    const attachments = element('fieldset', 'employee-career-field employee-career-fieldset');
+    attachments.append(element('legend', 'form-section-heading', 'Attachments'), attachmentList(record));
+    form.append(employeeDetails, incidentDetails, attachments);
+    const content = $('incidentHistoryDetailsForm');
+    content.replaceChildren(summary, form);
+    content.parentElement.scrollTop = 0;
     return $('incidentHistoryDetailsModal');
   }
   const fields = { keyword: 'incidentHistoryKeyword', type: 'incidentHistoryType', start: 'incidentHistoryStart', end: 'incidentHistoryEnd' };

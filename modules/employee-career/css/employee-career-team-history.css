@@ -205,12 +205,31 @@
   border-radius: inherit;
 }
 
-.team-history-detail-overlay {
-  display: flex;
+.team-history-form-header {
+  margin: 0 2px 14px;
 }
 
-.team-history-detail-overlay .detail-popout-value {
-  white-space: pre-line;
+.team-history-form-header h2 {
+  margin: 0 0 6px;
+  color: var(--text-primary);
+  font-size: 16px;
+  overflow-wrap: anywhere;
+}
+
+.team-history-form .employee-career-label {
+  margin-bottom: 6px;
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.team-history-form .employee-career-control {
+  min-width: 0;
+  min-height: 0;
+  font-size: 13px;
+  line-height: 1.45;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
 }
 
 .team-history-detail-attachments {

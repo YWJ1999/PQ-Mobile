@@ -39,6 +39,30 @@
 .career-history-employee strong { display: block; font-size: 14px; }
 .career-history-employee-id { display: block; font: 700 11.5px monospace, sans-serif; color: var(--text-muted); opacity: .8; margin: 4px 0; }
 .career-plan-history-details .history-detail-table td { white-space: pre-line; }
+.career-history-form-identity { margin: 0 2px 14px; }
+.career-history-form-identity h2 {
+  margin: 0 0 6px;
+  color: var(--text-primary);
+  font-size: 16px;
+  overflow-wrap: anywhere;
+}
+.career-history-request-form .employee-career-label {
+  margin-bottom: 6px;
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+.career-history-request-form .employee-career-control {
+  line-height: 1.45;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.career-history-request-form .form-submit-date > strong {
+  min-height: 44px;
+  border-radius: 12px;
+  font-size: 13.5px;
+  font-weight: 600;
+}
 #feedbackHistoryFields, #cvHistoryFields { display: grid; gap: 16px; }
 #cvHistoryFields[hidden] { display: none; }
 .cv-history-card-employee { display: block; }

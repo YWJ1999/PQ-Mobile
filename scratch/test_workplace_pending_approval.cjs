@@ -28,7 +28,7 @@ async function shot(page, name) {
       ]);
       assert.equal(await page.$$eval('#workplacePendingQueue .approval-request-card', n => n.length), 1);
       assert.match(await page.$eval('#workplacePendingQueue', n => n.textContent), /EBB12 - Farhan binti rahmat.*FGV0000000000013.*Pending/s);
-      assert.equal(await page.$eval('#workplacePendingQueue .record-submit-date dd', n => n.textContent), '16/08/2024');
+      assert.equal(await page.$eval('#workplacePendingQueue .card-submit-date > strong', n => n.textContent), '16/08/2024');
       assert.equal(await page.$eval('.employee-name', n => n.textContent), 'EBB12 - Farhan binti rahmat');
       await shot(page, `workplace-pending-list-${theme}-${width}.png`);
       await page.focus('[data-workplace-tab="guest-visit"]');

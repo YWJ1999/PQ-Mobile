@@ -40,7 +40,7 @@ const employeeCardHeading = (() => {
 const recordDeleteLabel = 'Delete Record';
 const recordDeleteLabelHTML = `<i class="fa-regular fa-trash-can" aria-hidden="true"></i><span>${recordDeleteLabel}</span>`;
 const recordCardActionLabels = {
-  cancel: '<i class="record-card-action-icon fa-solid fa-ban" aria-hidden="true"></i><span>Cancel</span>',
+  cancel: '<span>Cancel</span>',
   edit: '<i class="record-card-action-icon fa-solid fa-pencil" aria-hidden="true"></i><span>Edit</span>',
   delete: '<i class="record-card-action-icon fa-regular fa-trash-can" aria-hidden="true"></i><span>Delete</span>'
 };
@@ -60,7 +60,7 @@ function setRecordLegend(view, heading, entries) {
 const recordSubmitDate = (() => {
   const months = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
   const pad = number => String(number).padStart(2, '0');
-  function format(value) {
+  function format(value, dateOnly = false) {
     const text = String(value ?? '').trim();
     if (!text || /^(?:[-–—]|not submitted|dd\/mm\/yyyy)$/i.test(text)) return '';
     const iso = /^(\d{4})-(\d{2})-(\d{2})$/.exec(text);
@@ -70,14 +70,20 @@ const recordSubmitDate = (() => {
       if (!Number.isNaN(instant.getTime())) return instant.toLocaleDateString('en-GB');
     }
     // Leave records can include a time after the calendar date.
-    const dated = /^(?:(?:Mon|Tue|Wed|Thu|Fri|Sat|Sun),?\s+)?(\d{1,2})[ /]([a-z]+|\d{1,2})[ /](\d{4})(.*)$/i.exec(text);
-    if (!dated) return text;
-    const [, day, month, year, time] = dated;
-    const number = /^\d+$/.test(month) ? Number(month) : months.indexOf(month.slice(0, 3).toLowerCase()) + 1;
-    return number ? `${pad(day)}/${pad(number)}/${year}${time}` : text;
+    const dated = /^(?:(?:Mon|Tue|Wed|Thu|Fri|Sat|Sun)[a-z]*,?\s+)?(\d{1,2})[ /-]([a-z]+|\d{1,2})[ /-](\d{4})(.*)$/i.exec(text);
+    if (dated) {
+      const [, day, month, year, time] = dated;
+      const number = /^\d+$/.test(month) ? Number(month) : months.indexOf(month.slice(0, 3).toLowerCase()) + 1;
+      if (number) return `${pad(day)}/${pad(number)}/${year}${dateOnly ? '' : time}`;
+    }
+    if (!dateOnly) return text;
+    const parsed = new Date(text);
+    return /\b\d{4}\b/.test(text) && !Number.isNaN(parsed.getTime()) ? parsed.toLocaleDateString('en-GB') : '';
   }
   function set(element, value) {
-    const date = format(value);
+    const isCardLine = element.classList.contains('card-submit-date');
+    const isFormField = element.classList.contains('form-submit-date');
+    const date = format(value, isCardLine || isFormField) || (isCardLine ? '—' : '');
     element.classList.add('record-submit-date');
     element.hidden = !date;
     if (!date) {
@@ -93,23 +99,34 @@ const recordSubmitDate = (() => {
       label.className = 'detail-popout-label';
       detail.className = 'detail-popout-value';
     }
-    label.textContent = tableRow ? 'Submit Date:' : 'Submit Date';
+    label.textContent = tableRow || isCardLine ? 'Submit Date:' : 'Submit Date';
     detail.textContent = date;
     element.replaceChildren(label, ' ', detail);
     return element;
   }
   const create = (value, tag = 'span') => set(document.createElement(tag), value);
+  function form(value) {
+    const field = document.createElement('span');
+    field.className = 'form-submit-date';
+    return set(field, value);
+  }
+  function cardLine(value) {
+    const line = document.createElement('span');
+    line.className = 'card-submit-date';
+    return set(line, value);
+  }
   function insert(panel, value, before = null) {
     const tag = { dl: 'div', tbody: 'tr' }[panel.localName] || 'span';
     const field = create(value, tag);
     if (!field.hidden) panel.insertBefore(field, before);
     return field;
   }
-  function html(value, tag) {
-    const line = create(value, tag);
-    return line.hidden ? '' : line.outerHTML;
-  }
-  return { format, set, create, html, append: insert, prepend: (panel, value) => insert(panel, value, panel.firstChild) };
+  const visibleHTML = line => line.hidden ? '' : line.outerHTML;
+  return {
+    format, set, create, form, html: (value, tag) => visibleHTML(create(value, tag)),
+    cardLine, cardHTML: value => visibleHTML(cardLine(value)),
+    append: insert, prepend: (panel, value) => insert(panel, value, panel.firstChild)
+  };
 })();
 
 // Read-only record details share a palette independent of the card header and action buttons.
@@ -1622,7 +1639,7 @@ function createApprovalCardDetails(fields) {
     row.append(term, description);
     details.append(row);
   }
-  if (submitDate) recordSubmitDate.append(details, submitDate).classList.add('approval-card-submitted');
+  summary.append(recordSubmitDate.cardLine(submitDate));
   if (details.childElementCount) summary.append(details);
   return summary;
 }

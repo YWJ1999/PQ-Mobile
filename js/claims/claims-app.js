@@ -6,7 +6,11 @@
 
 (function () {
   let activeScope = 'individual'; // 'individual' or 'team'
-  let activeBreakdownCategory = 'benefits'; // 'benefits' or 'claims'
+  const snapshotPeriod = '202609';
+  const defaultSpendingFilters = { tab: 'benefits', period: snapshotPeriod, status: 'approved', employee: '', category: '' };
+  const spendingFilters = Object.fromEntries(['individual', 'team'].map(scope => [
+    scope, { ...defaultSpendingFilters }
+  ]));
   let activeOptionId = 'benefit';
   let activeSubCategoryObj = null;
   let isAttachmentUploaded = false;
@@ -31,7 +35,14 @@
   }
 
   function initClaimsApp() {
-    renderDashboardScope(document.getElementById('approveAllTeamClaims') ? 'team' : activeScope);
+    initSpendingFilters();
+    const params = new URLSearchParams(location.search);
+    const returnScope = params.has('individualTravelDay') ? 'individual' : 'team';
+    const returnDay = Number(params.get('individualTravelDay') ?? params.get('staffTravelDay'));
+    const returningToTravel = document.getElementById(returnScope + '-calendar-grid') && returnDay >= 1 && returnDay <= 30 && Number.isInteger(returnDay);
+    const defaultScope = document.getElementById('approveAllTeamClaims') ? 'team' : activeScope;
+    renderDashboardScope(returningToTravel ? returnScope : defaultScope);
+    if (returningToTravel) selectTravelDay(returnScope, returnDay);
     populateFormDropdowns();
   }
 
@@ -77,7 +88,7 @@
       const value = card.querySelector('strong');
       if (value) value.textContent = count;
     });
-    renderBreakdownDonutChart('individual', activeBreakdownCategory);
+    renderBreakdownDonutChart('individual');
     renderTravelCalendar('individual');
     renderOptionSquareGrid();
     renderMySubmissions('all');
@@ -89,7 +100,7 @@
    * ==========================================
    */
   function renderTeamDashboard() {
-    renderBreakdownDonutChart('team', activeBreakdownCategory);
+    renderBreakdownDonutChart('team');
     renderTravelCalendar('team');
     renderManagerSquareGrid();
     renderTeamQueue();
@@ -101,7 +112,8 @@
    * ==========================================
    */
   function toggleBreakdownCategory(scope, cat) {
-    activeBreakdownCategory = cat;
+    if (spendingFilters[scope].tab !== cat) spendingFilters[scope].category = '';
+    spendingFilters[scope].tab = cat;
     
     // Update button states
     const benefitsBtn = document.getElementById(`${scope}-breakdown-benefits-btn`);
@@ -117,17 +129,189 @@
       }
     }
 
-    renderBreakdownDonutChart(scope, cat);
+    renderBreakdownDonutChart(scope);
   }
 
-  function renderBreakdownDonutChart(scope, cat) {
-    const dataSet = window.CLAIM_BREAKDOWN_DATA?.[scope]?.[cat];
-    if (!dataSet) return;
+  function spendingRecords(scope) {
+    const personal = window.CLAIM_STATUS_RECORDS || [];
+    const samples = scope === 'team'
+      ? [...(window.CLAIM_SUMMARY_RECORDS || []), ...teamQueue.filter(record => !record.savedClaim)]
+      : personal;
+    return [...samples, ...ClaimRequestStore.list()].flatMap(record => {
+      const type = record.optionName || record.tab;
+      if (!type || type === 'Travel Request' || type === 'travelRequest') return [];
+      const foreign = record.currency && !/MYR|MALAYSIAN RINGGIT|RINGGIT MALAYSIA/i.test(record.currency);
+      const amount = Number(foreign ? record.localAmount : record.amount);
+      if (!Number.isFinite(amount) || amount <= 0) return [];
+      const date = recordSubmitDate.format(record.isoDate || record.claimDateFrom || record.date, true);
+      const period = formatPendingClaimPeriod(record.period, date) || date.slice(6) + date.slice(3, 5);
+      if (!/^\d{4}(0[1-9]|1[0-2])$/.test(period)) return [];
+      return [{
+        period, empNo: record.empNo, saved: record.savedClaim,
+        tab: /^(benefit|benefit claim)$/i.test(type) ? 'benefits' : 'claims',
+        status: record.status === 'submitted' ? 'pending' : record.status,
+        category: record.subCatName || record.category || record.expense || type,
+        cents: Math.round(amount * 100)
+      }];
+    });
+  }
 
+  function spendingBreakdown(scope, filters) {
+    const base = window.CLAIM_BREAKDOWN_DATA[scope][filters.tab];
+    const groups = new Map();
+    function add(category, cents, color) {
+      const key = category.trim().toLowerCase();
+      const item = groups.get(key) || { category, cents: 0, color: color || base.items[groups.size % base.items.length].color };
+      item.cents += cents;
+      groups.set(key, item);
+    }
+    // The September approved summaries contain category totals without employee IDs.
+    const useSummary = filters.period === snapshotPeriod && filters.status !== 'pending' && !filters.employee;
+    const label = { approved: 'Approved amount', pending: 'Pending amount', all: 'Total amount' }[filters.status];
+    const records = spendingRecords(scope).filter(record =>
+      record.tab === filters.tab && record.period === filters.period &&
+      (filters.status === 'all' || record.status === filters.status) &&
+      (!filters.employee || record.empNo === filters.employee) &&
+      (!useSummary || record.status !== 'approved' || record.saved)
+    );
+    if (useSummary && !filters.category && !records.length) return { ...base, label, staffCount: null };
+
+    let totalCents = 0;
+    if (useSummary) {
+      for (const item of base.items) add(item.category, Math.round(item.value * 100), item.color);
+      totalCents = Math.round(Number(base.total.replace(/[^\d.]/g, '')) * 100);
+    }
+    const employees = new Set();
+    for (const record of records) {
+      add(record.category, record.cents);
+      totalCents += record.cents;
+      if (record.empNo && (!filters.category || filters.category === record.category.trim().toLowerCase())) employees.add(record.empNo);
+    }
+    const selected = filters.category ? [groups.get(filters.category)].filter(Boolean) : [...groups.values()];
+    const sum = filters.category ? (selected[0]?.cents || 0) : totalCents;
+    const money = cents => 'RM' + (cents / 100).toLocaleString('en-MY', { maximumFractionDigits: 2 });
+    return {
+      total: money(sum), label,
+      staffCount: useSummary ? null : employees.size,
+      items: selected.map(item => ({
+        category: item.category, color: item.color, value: item.cents / 100,
+        amount: money(item.cents), share: (Math.round(item.cents / sum * 1000) / 10) + '%'
+      }))
+    };
+  }
+
+  function spendingPeriodLabel(period) {
+    return window.CLAIM_PERIOD_MONTHS[Number(period.slice(4)) - 1].slice(0, 3) + ' ' + period.slice(0, 4);
+  }
+
+  function initSpendingFilters() {
+    const dialog = document.getElementById('spendingFilters');
+    if (!dialog) return;
+    const form = dialog.querySelector('form');
+    const closeButton = form.querySelector('.claim-filter-close');
+    const resetButton = form.querySelector('.claim-filter-reset');
+    const applyButton = form.querySelector('.claim-filter-apply');
+    const { period, status, employee, category } = form.elements;
+    const draft = () => ({
+      ...spendingFilters[dialog.dataset.scope], period: period.value, status: status.value, employee: employee.value, category: ''
+    });
+    function updateCategories(value) {
+      const { items } = spendingBreakdown(dialog.dataset.scope, draft());
+      category.replaceChildren(new Option('All categories', ''), ...items.map(item => new Option(item.category, item.category.trim().toLowerCase())));
+      if ([...category.options].some(option => option.value === value)) category.value = value;
+    }
+    function fillFields(filters) {
+      period.value = filters.period;
+      status.value = filters.status;
+      employee.value = filters.employee;
+      updateCategories(filters.category);
+    }
+    function closeSheet() {
+      dialog.classList.remove('active');
+      document.getElementById(dialog.dataset.scope + 'SpendingFilterButton').focus({ preventScroll: true });
+      dialog.setAttribute('aria-hidden', 'true');
+    }
+    closeButton.onclick = closeSheet;
+    dialog.onclick = event => { if (event.target === dialog) closeSheet(); };
+    dialog.onkeydown = event => {
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        closeSheet();
+      } else if (event.key === 'Tab' && event.target === (event.shiftKey ? resetButton : applyButton)) {
+        event.preventDefault();
+        (event.shiftKey ? applyButton : resetButton).focus();
+      }
+    };
+    for (const [scope, filters] of Object.entries(spendingFilters)) {
+      const monthSelect = document.getElementById(scope + 'SpendingMonth');
+      const statusSelect = document.getElementById(scope + 'SpendingStatus');
+      const rows = spendingRecords(scope);
+      const periods = [...new Set([snapshotPeriod, '202608', ...rows.map(row => row.period)])].sort().reverse();
+      monthSelect.replaceChildren(...periods.map(key => new Option(spendingPeriodLabel(key), key)));
+      monthSelect.value = filters.period;
+      statusSelect.value = filters.status;
+      function changeFilter() {
+        Object.assign(filters, { period: monthSelect.value, status: statusSelect.value, category: '' });
+        renderBreakdownDonutChart(scope);
+      }
+      monthSelect.onchange = changeFilter;
+      statusSelect.onchange = changeFilter;
+      document.getElementById(scope + 'SpendingFilterButton').onclick = () => {
+        dialog.dataset.scope = scope;
+        period.replaceChildren(...[...monthSelect.options].map(option => option.cloneNode(true)));
+        status.replaceChildren(...[...statusSelect.options].map(option => option.cloneNode(true)));
+        document.getElementById('spendingEmployeeField').hidden = scope !== 'team';
+        employee.replaceChildren(new Option('All staff', ''));
+        if (scope === 'team') {
+          for (const person of Object.values(window.CLAIM_EMPLOYEES)) {
+            employee.add(new Option(employeeCardHeading.text(person.empNo, person.name), person.empNo));
+          }
+        }
+        fillFields(filters);
+        dialog.setAttribute('aria-hidden', 'false');
+        dialog.classList.add('active');
+        form.scrollTop = 0;
+        closeButton.focus({ preventScroll: true });
+      };
+    }
+    form.onchange = event => {
+      if (event.target !== category) updateCategories(category.value);
+    };
+    form.onreset = event => {
+      event.preventDefault();
+      fillFields(defaultSpendingFilters);
+    };
+    form.onsubmit = event => {
+      event.preventDefault();
+      const scope = dialog.dataset.scope;
+      Object.assign(spendingFilters[scope], draft(), { category: category.value });
+      document.getElementById(scope + 'SpendingMonth').value = period.value;
+      document.getElementById(scope + 'SpendingStatus').value = status.value;
+      renderBreakdownDonutChart(scope);
+      closeSheet();
+    };
+  }
+
+  function spendingCategoryHTML(category) {
+    const text = document.createElement('span');
+    text.textContent = category;
+    return text.innerHTML;
+  }
+
+  function renderBreakdownDonutChart(scope) {
     const chartContainer = document.getElementById(`${scope}-donut-svg-container`);
     const legendContainer = document.getElementById(`${scope}-breakdown-legend-container`);
     if (!chartContainer || !legendContainer) return;
 
+    const filters = spendingFilters[scope];
+    const dataSet = spendingBreakdown(scope, filters);
+    if (scope === 'team') {
+      const person = window.CLAIM_EMPLOYEES[filters.employee];
+      let summary = person ? employeeCardHeading.text(person.empNo, person.name) : 'All staff';
+      if (!person && dataSet.staffCount !== null) summary += ' • ' + dataSet.staffCount + (dataSet.staffCount === 1 ? ' employee' : ' employees');
+      else if (!person && !filters.category && filters.status === 'approved') summary += ' • 6 employees';
+      document.getElementById('teamSpendingStaffSummary').textContent = summary;
+    }
     const items = dataSet.items;
     const totalVal = items.reduce((acc, i) => acc + i.value, 0);
 
@@ -176,11 +360,12 @@
         </div>
       </div>
       <div style="display: flex; flex-direction: column; gap: 8px;">
+        ${items.length ? '' : '<p>No itemized spending matches these filters.</p>'}
         ${items.map(item => `
           <div style="display: flex; align-items: center; justify-content: space-between; font-size: 12px; padding: 2px 4px;">
             <div style="display: flex; align-items: center; gap: 8px;">
               <span style="width: 10px; height: 10px; border-radius: 3px; background: ${item.color}; display: inline-block;"></span>
-              <span style="font-weight: 700; color: var(--text-primary);">${item.category}</span>
+              <span style="font-weight: 700; color: var(--text-primary);">${spendingCategoryHTML(item.category)}</span>
             </div>
             <div style="display: flex; gap: 24px; font-weight: 800;">
               <span style="color: var(--text-primary); text-align: right; min-width: 60px;">${item.amount}</span>
@@ -193,8 +378,9 @@
   }
 
   function openChartBreakdownSheet(scope) {
-    const category = activeBreakdownCategory;
-    const dataSet = window.CLAIM_BREAKDOWN_DATA?.[scope]?.[category];
+    const filters = spendingFilters[scope];
+    const category = filters.tab;
+    const dataSet = spendingBreakdown(scope, filters);
     const overlay = document.getElementById('chartBreakdownModalOverlay');
     const context = document.getElementById('chartBreakdownContext');
     const rows = document.getElementById('chartBreakdownRows');
@@ -202,17 +388,18 @@
 
     const scopeLabel = scope === 'team' ? 'Team' : 'Individual';
     const categoryLabel = category === 'claims' ? 'Claims' : 'Benefits';
-    context.textContent = `${scopeLabel} • ${categoryLabel}`;
-    rows.innerHTML = dataSet.items.map(item => `
+    context.textContent = [scopeLabel, categoryLabel, spendingPeriodLabel(filters.period), dataSet.label,
+      window.CLAIM_EMPLOYEES[filters.employee]?.name].filter(Boolean).join(' • ');
+    rows.innerHTML = dataSet.items.length ? dataSet.items.map(item => `
       <div class="chart-breakdown-grid chart-breakdown-row">
         <div class="chart-breakdown-category">
           <span class="chart-breakdown-dot" style="background: ${item.color};" aria-hidden="true"></span>
-          <span>${item.category}</span>
+          <span>${spendingCategoryHTML(item.category)}</span>
         </div>
         <span class="chart-breakdown-amount">${item.amount}</span>
         <span class="chart-breakdown-share">${item.share}</span>
       </div>
-    `).join('');
+    `).join('') : '<p>No itemized spending matches these filters.</p>';
 
     overlay.classList.remove('active');
     overlay.style.display = 'flex';
@@ -237,10 +424,10 @@
    * INDIVIDUAL TRAVEL CALENDAR (Screenshot 1)
    * ==========================================
    */
-  function formatCalendarDate(scope, day) {
+  function formatCalendarDate(scope, day, style = 'long') {
     return travelCalendars[scope].month.date(day).toLocaleDateString('en-GB', {
-      weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
-    });
+      weekday: style, day: 'numeric', month: style, year: 'numeric'
+    }).replace(' Sept ', ' Sep ');
   }
 
   function renderTravelCalendar(scope) {
@@ -323,78 +510,29 @@
   }
 
   function updateIndividualTripDetail(day) {
-    const detailBox = document.getElementById('individual-trip-detail-card');
-    if (!detailBox) return;
+    const card = document.getElementById('individual-trip-detail-card');
+    if (!card) return;
 
-    const travelDays = window.INDIVIDUAL_TRAVEL_DATA?.travelDays || [28, 29, 30];
+    const data = window.INDIVIDUAL_TRAVEL_DATA;
     const month = travelCalendars.individual.month;
-    if (month.label === window.INDIVIDUAL_TRAVEL_DATA.month && travelDays.includes(day)) {
-      const trip = window.INDIVIDUAL_TRAVEL_DATA?.trips?.[0] || {
-        route: 'Kuala Lumpur ➔ Penang',
-        destination: 'Penang Branch',
-        dateToDate: '28 Sep 2026 – 30 Sep 2026',
-        dates: '28–30 Sep 2026 • 3 days',
-        reason: 'Official Outstation Travel',
-        purpose: 'Client visit',
-        status: 'Approved'
-      };
+    const today = month.key === '2026-09' && day === 24;
+    const date = calendarDateKey(month.date(day));
+    const trip = data.trips.find(item => item.travelDateFrom <= date && date <= item.travelDateTo);
+    const link = card.querySelector('[data-trip-link]');
+    const empty = document.getElementById('individualTripEmpty');
 
-      detailBox.innerHTML = `
-        <div style="font-size: 13px; font-weight: 800; color: var(--text-primary); margin-bottom: 8px;">
-          ${formatCalendarDate('individual', day)}
-        </div>
-        <div style="background: var(--bg-input); border-radius: 18px; padding: 14px 16px; border: 1px solid var(--border-subtle);">
-          <div style="display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 12px;">
-            <div style="display: flex; align-items: center; gap: 10px;">
-              <div style="width: 36px; height: 36px; border-radius: 10px; background: rgba(124, 58, 237, 0.15); color: var(--purple-primary); display: flex; align-items: center; justify-content: center; font-size: 15px; flex-shrink: 0;">
-                <i class="fa-solid fa-plane-departure"></i>
-              </div>
-              <div>
-                <div style="font-size: 14px; font-weight: 800; color: var(--text-primary);">${trip.route || 'Kuala Lumpur ➔ Penang'}</div>
-                <div style="font-size: 11.5px; font-weight: 600; color: var(--text-muted); margin-top: 1px;">${trip.dates || '28–30 Sep 2026 • 3 days'}</div>
-              </div>
-            </div>
-            ${recordDetailStatus.html(trip.status || 'Approved')}
-          </div>
-
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding-top: 12px; border-top: 1px dashed var(--border-subtle); font-size: 11.5px;">
-            <div>
-              <span style="color: var(--text-muted); font-weight: 600;">Destination:</span>
-              <div style="font-weight: 800; color: var(--text-primary); margin-top: 2px;">${trip.destination || 'Penang Branch'}</div>
-            </div>
-            <div>
-              <span style="color: var(--text-muted); font-weight: 600;">Date to Date:</span>
-              <div style="font-weight: 800; color: var(--text-primary); margin-top: 2px;">${trip.dateToDate || '28 Sep 2026 – 30 Sep 2026'}</div>
-            </div>
-            <div>
-              <span style="color: var(--text-muted); font-weight: 600;">Reason:</span>
-              <div style="font-weight: 800; color: var(--text-primary); margin-top: 2px;">${trip.reason || 'Official Outstation Travel'}</div>
-            </div>
-            <div>
-              <span style="color: var(--text-muted); font-weight: 600;">Purpose:</span>
-              <div style="font-weight: 800; color: var(--purple-primary); margin-top: 2px;">${trip.purpose || 'Client visit'}</div>
-            </div>
-          </div>
-        </div>
-      `;
-    } else if (month.key === '2026-09' && day === 24) {
-      detailBox.innerHTML = `
-        <div style="font-size: 13px; font-weight: 800; color: var(--text-primary); margin-bottom: 8px;">
-          ${formatCalendarDate('individual', day)} (Today)
-        </div>
-        <div style="background: var(--bg-input); border-radius: 16px; padding: 12px 14px; border: 1px solid var(--border-subtle); font-size: 12px; color: var(--text-muted);">
-          No travel schedules for today. Office working day.
-        </div>
-      `;
-    } else {
-      detailBox.innerHTML = `
-        <div style="font-size: 13px; font-weight: 800; color: var(--text-primary); margin-bottom: 8px;">
-          ${formatCalendarDate('individual', day)}
-        </div>
-        <div style="background: var(--bg-input); border-radius: 16px; padding: 12px 14px; border: 1px solid var(--border-subtle); font-size: 12px; color: var(--text-muted);">
-          No travel records for this date.
-        </div>
-      `;
+    document.getElementById('individualTripDay').textContent = formatCalendarDate('individual', day, 'short') + (today ? ' (Today)' : '');
+    link.hidden = !trip;
+    empty.hidden = Boolean(trip);
+    if (!trip) {
+      link.removeAttribute('href');
+      empty.textContent = today ? 'No travel schedules for today. Office working day.' : 'No travel records for this date.';
+      return;
+    }
+    link.href = 'options/travel-request.html?' + new URLSearchParams({ trip: trip.id, scope: 'individual', day });
+    link.setAttribute('aria-label', 'View travel request for ' + trip.route + ', ' + trip.dates);
+    for (const field of link.querySelectorAll('[data-trip-field]')) {
+      field.textContent = trip[field.dataset.tripField] || '—';
     }
   }
 
@@ -403,12 +541,6 @@
    * TEAM TRAVEL CALENDAR (Screenshot 2)
    * ==========================================
    */
-  function teamTripIncludesDay(trip, day) {
-    const match = String(trip.dates || '').match(/(\d{1,2})\s*[-–—]\s*(\d{1,2})\s+Sep/i);
-    if (!match) return false;
-    return day >= Number(match[1]) && day <= Number(match[2]);
-  }
-
   function updateTeamTripDetail(day) {
     const detailBox = document.getElementById('team-trip-detail-card');
     if (!detailBox) return;
@@ -417,34 +549,24 @@
     if (!data) return;
 
     const month = travelCalendars.team.month;
-    const staffList = month.label === data.month ? data.staffTrips.filter(staff => teamTripIncludesDay(staff, day)) : [];
-    if (staffList.length) {
-      detailBox.innerHTML = `
-        <div style="font-size: 13.5px; font-weight: 800; color: var(--text-primary); margin-bottom: 10px;">
-          ${formatCalendarDate('team', day)} · ${staffList.length} staff
-        </div>
-        <div style="display: flex; flex-direction: column; gap: 8px;">
-          ${staffList.map(s => `
-            <div class="team-trip-record" style="background: var(--bg-input); border-radius: 14px; padding: 10px 12px; border: 1px solid var(--border-subtle); display: flex; justify-content: space-between; align-items: center;">
-              <div>
-                <div style="font-size: 13px; font-weight: 800; color: var(--text-primary); line-height: 1.2;">${employeeCardHeading.html(s.empNo, s.name)}</div>
-                <div style="font-size: 11px; font-weight: 600; color: var(--text-muted);">${s.trip}</div>
-              </div>
-              ${recordDetailStatus.html(s.status)}
-            </div>
-          `).join('')}
-        </div>
-      `;
-    } else {
-      detailBox.innerHTML = `
-        <div style="font-size: 13.5px; font-weight: 800; color: var(--text-primary); margin-bottom: 8px;">
-          ${formatCalendarDate('team', day)}${month.key === '2026-09' && day === 24 ? ' (Today)' : ''}
-        </div>
-        <div style="background: var(--bg-input); border-radius: 16px; padding: 12px 14px; border: 1px solid var(--border-subtle); font-size: 12px; color: var(--text-muted);">
-          No staff travel scheduled for this date.
-        </div>
-      `;
-    }
+    const date = calendarDateKey(month.date(day));
+    const staffList = data.staffTrips.filter(staff => staff.travelDateFrom <= date && date <= staff.travelDateTo);
+    const today = month.key === '2026-09' && day === 24;
+    const count = staffList.length ? ' · ' + staffList.length + ' staff' : '';
+    const dayLabel = formatCalendarDate('team', day, 'short') + (today ? ' (Today)' : '');
+    document.getElementById('teamTripDay').textContent = dayLabel + count;
+    document.getElementById('teamTripEmpty').hidden = staffList.length > 0;
+    const template = document.getElementById('teamTripRecord');
+    const rows = staffList.map(staff => {
+      const row = template.content.firstElementChild.cloneNode(true);
+      row.querySelector('[data-trip-employee]').textContent = employeeCardHeading.text(staff.empNo, staff.name);
+      row.querySelector('[data-trip-description]').textContent = staff.trip;
+      const link = row.querySelector('[data-trip-link]');
+      link.href = 'options/travel-request.html?' + new URLSearchParams({ trip: staff.id, day });
+      link.setAttribute('aria-label', 'View travel request for ' + employeeCardHeading.text(staff.empNo, staff.name) + ', ' + staff.trip);
+      return row;
+    });
+    document.getElementById('teamTripRecords').replaceChildren(...rows);
   }
 
   /**
@@ -1057,9 +1179,6 @@
     if (bodyEl) {
       bodyEl.innerHTML = renderClaimApproverComments();
       const review = optLower.includes('benefit') ? BenefitClaimForm.create(data) : ClaimReview.create(data);
-      const heading = review.querySelector('.form-section-heading');
-      const headingRow = heading.closest('.benefit-claim-fields') ? heading.parentElement : heading;
-      headingRow.after(recordSubmitDate.create(data.submitDate));
       bodyEl.prepend(review);
       bodyEl.closest('.phone-container').scrollTop = 0;
     }

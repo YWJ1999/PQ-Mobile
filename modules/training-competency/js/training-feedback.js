@@ -119,13 +119,12 @@
     const details = element('div', 'training-feedback-card-details history-card-details');
     const response = responses[record.id] || record.response;
     details.append(createDetail('Description', record.description, 'description'));
-    recordSubmitDate.append(details, response?.submittedAt);
     const footer = element('footer', 'training-feedback-card-footer history-card-actions');
     const action = element('a', 'training-feedback-action', 'Feedback');
     action.href = responseUrl(record.id);
     action.setAttribute('aria-label', `Provide feedback for ${record.course}`);
     footer.append(action);
-    card.append(header, details, footer);
+    card.append(header, recordSubmitDate.cardLine(response?.submittedAt), details, footer);
     return card;
   }
 

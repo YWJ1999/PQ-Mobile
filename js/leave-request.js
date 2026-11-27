@@ -1,7 +1,8 @@
 const LeaveRequest = (() => {
   const storageKey = 'peoplehcm.leave.requests.v1';
   const employee = { applicant: 'Farhan binti rahmat', empNo: 'EBB12', department: 'Human Resource', branch: 'Times Square Branch' };
-  const source = () => document.querySelector('#viewApplyLeaveForm [data-leave-form]');
+  const formViews = { leave: 'viewApplyLeaveForm', credit: 'viewCreditLeaveForm', offtime: 'viewApplyOffTimeForm' };
+  const source = (category = 'leave') => document.querySelector('#' + formViews[category] + ' [data-leave-form]');
   const display = value => value == null || value === '' ? '—' : String(value);
   const medical = type => ['medical leave', 'sick leave', 'hospitalization leave', 'unpaid mc', 'unpaid hospitalization'].includes(String(type).toLowerCase());
   const dateLabel = date => date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
@@ -27,17 +28,41 @@ const LeaveRequest = (() => {
     return data;
   }
 
-  function review(data) {
-    const form = source().cloneNode(true);
-    form.querySelector('[data-leave-heading]').textContent = data.leaveYear ? 'Leave Details (' + data.leaveYear + ')' : 'Leave Details';
-    form.querySelector('[data-leave-heading]').after(recordSubmitDate.create(data.submitDate));
-    form.querySelector('#mainFormChecklistText').remove();
-    const medicalGroup = form.querySelector('#mainMedicalFieldsGroup');
-    if (medical(data.type) || [...medicalGroup.querySelectorAll('[data-leave-field]')].some(el => data[el.dataset.leaveField])) {
-      medicalGroup.style.display = 'flex';
-    } else medicalGroup.remove();
-    const total = form.querySelector('#mainTotalDaysBanner');
-    total.textContent = data.leaveDays != null && data.leaveDays !== '' ? 'Total: ' + data.leaveDays + (Number(data.leaveDays) === 1 ? ' Day' : ' Days') : '';
+  function reviewField(label, value, key) {
+    const field = document.createElement('div');
+    field.className = 'leave-review-field';
+    const caption = document.createElement('span');
+    caption.textContent = label;
+    const output = document.createElement('div');
+    output.className = 'leave-review-value';
+    if (key) output.dataset.reviewField = key;
+    output.textContent = display(value);
+    field.append(caption, output);
+    return field;
+  }
+
+  function review(data, category = 'leave') {
+    const form = source(category).cloneNode(true);
+    const heading = form.querySelector('[data-leave-heading]');
+    const submitDate = recordSubmitDate.form(data.submitDate);
+    heading.after(submitDate);
+    if (data.reference) {
+      const field = reviewField('Reference No.', data.reference, 'reference');
+      field.classList.add('leave-review-reference');
+      submitDate.after(field);
+    }
+    if (category === 'leave') {
+      heading.textContent = data.leaveYear ? 'Leave Details (' + data.leaveYear + ')' : 'Leave Details';
+      form.querySelector('#mainFormChecklistText').remove();
+      const medicalGroup = form.querySelector('#mainMedicalFieldsGroup');
+      if (medical(data.type) || [...medicalGroup.querySelectorAll('[data-leave-field]')].some(el => data[el.dataset.leaveField])) {
+        medicalGroup.style.display = 'flex';
+      } else medicalGroup.remove();
+      const total = form.querySelector('#mainTotalDaysBanner');
+      total.textContent = data.leaveDays != null && data.leaveDays !== '' ? 'Total: ' + data.leaveDays + (Number(data.leaveDays) === 1 ? ' Day' : ' Days') : '';
+    } else if (category === 'credit' && data.effectiveDateLabel) {
+      form.querySelector('[data-leave-field="effectiveDate"]').parentElement.querySelector('label').textContent = data.effectiveDateLabel;
+    }
     for (const field of form.querySelectorAll('[data-leave-field]')) {
       const key = field.dataset.leaveField;
       const value = document.createElement('div');
@@ -68,6 +93,7 @@ const LeaveRequest = (() => {
     if (!names.length) { list.className = 'leave-review-value'; list.textContent = 'No attachments'; }
     attachment.replaceChildren(label, list);
     form.querySelectorAll('[id]').forEach(el => el.removeAttribute('id'));
+    form.querySelectorAll('label[for]').forEach(el => el.removeAttribute('for'));
     return form;
   }
 
@@ -151,5 +177,5 @@ const LeaveRequest = (() => {
     updateCategoryTabCounts();
   }
 
-  return { storageKey, review, submit, setStatus, history, syncQueue, medical, files };
+  return { storageKey, review, reviewField, submit, setStatus, history, syncQueue, medical, files };
 })();

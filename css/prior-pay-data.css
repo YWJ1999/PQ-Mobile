@@ -53,9 +53,10 @@ button:disabled { cursor: wait; opacity: .65; }
 .prior-subsection { border-top: 1px dashed var(--border-subtle); padding-top: 14px; margin-top: 20px; }
 .prior-fields { display: grid; gap: 16px; }
 .prior-field { display: flex; flex-direction: column; min-width: 0; gap: 6px; }
-.prior-field label { font-size: 13px; line-height: 1.5; font-weight: 700; color: var(--text-muted); }
+.prior-field label, .prior-field .prior-field-label { font-size: 13px; line-height: 1.5; font-weight: 700; color: var(--text-muted); }
 .prior-required { color: var(--status-action-text); }
-.prior-field input, .prior-field select, .prior-field textarea { width: 100%; min-width: 0; min-height: 44px; padding: 12px 14px; background: var(--bg-input); border: 1px solid var(--border-subtle); border-radius: 12px; color: var(--text-primary); font-size: 13.5px; font-weight: 600; outline: none; line-height: normal; transition: border-color .18s ease, box-shadow .18s ease; }
+.prior-field input, .prior-field select, .prior-field textarea, .prior-field .prior-readonly-value { width: 100%; min-width: 0; min-height: 44px; padding: 12px 14px; background: var(--bg-input); border: 1px solid var(--border-subtle); border-radius: 12px; color: var(--text-primary); font-size: 13.5px; font-weight: 600; outline: none; line-height: normal; transition: border-color .18s ease, box-shadow .18s ease; }
+.prior-readonly-value { white-space: pre-wrap; overflow-wrap: anywhere; }
 .prior-field textarea { resize: vertical; min-height: 90px; }
 .prior-field input:focus, .prior-field select:focus, .prior-field textarea:focus { border-color: var(--border-focus); box-shadow: 0 0 0 3px var(--purple-subtle); }
 .prior-form > .prior-employee-field { margin-bottom: 16px; }
@@ -103,12 +104,7 @@ button:disabled { cursor: wait; opacity: .65; }
 .prior-record-modal-header { flex-shrink: 0; display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 14px 16px; background: linear-gradient(135deg, #7c3aed, #6d28d9); color: #fff; }
 .prior-record-modal-header h2 { flex: 1; min-width: 0; font-size: 16px; font-weight: 800; text-transform: uppercase; letter-spacing: .3px; }
 .prior-record-modal-header button { display: flex; align-items: center; justify-content: center; padding: 0; border: 0; background: transparent; color: #fff; font-size: 20px; }
-.prior-record-modal-body { flex: 1 1 auto; min-height: 0; overflow-y: auto; padding: 12px 12px 24px; background: var(--bg-card); color: var(--text-primary); }
-.prior-record-details { border: 1px solid var(--border-subtle); font-family: sans-serif; }
-.prior-record-details > div { display: grid; grid-template-columns: minmax(0,40%) minmax(0,1fr); font-size: 11.5px; line-height: 1.35; }
-.prior-record-details > div + div { border-top: 1px solid var(--border-subtle); }
-.prior-record-details dt { display: flex; align-items: center; padding: 6px 10px; border-right: 1px solid var(--border-subtle); background: var(--bg-card); color: var(--text-muted); font-weight: 700; }
-.prior-record-details dd { display: flex; align-items: center; min-width: 0; padding: 6px 10px; background: var(--bg-card); color: var(--text-primary); font-weight: 500; overflow-wrap: anywhere; }
+.prior-record-modal-body { padding: 12px 12px 24px; background: var(--bg-phone); }
 .prior-sheet { width: 100%; padding: 12px 22px 28px; border: 1px solid var(--border-subtle); border-radius: 28px 28px 0 0; background: var(--bg-sheet); box-shadow: var(--shadow-sheet); }
 .prior-sheet-handle { height: 4px; width: 32px; margin: 0 auto 16px; border-radius: 4px; background: var(--text-muted); opacity: .4; }
 .prior-sheet-header { display: flex; justify-content: space-between; align-items: center; gap: 12px; }

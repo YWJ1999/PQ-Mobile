@@ -38,6 +38,12 @@
   html.setAttribute('data-peoplehcm-web', '');
   html.setAttribute('data-web-native', '');
   const adapterSource = document.currentScript?.src;
+  if (/\/modules\/payroll\/options\/(?:history|tax-relief)\.html$/.test(location.pathname) && !window.PAYROLL_PENDING_DATA) {
+    const approvalData = document.createElement('script');
+    approvalData.src = new URL('../../../js/payroll/payroll-pending-data.js', location.href).href;
+    approvalData.onload = schedule;
+    document.head.append(approvalData);
+  }
   if (adapterSource && /\/(?:[\w-]*history|tax-relief|prior-pay-data|overtime|change-request|leave)\.html$/.test(location.pathname)) {
     const historyPages = document.createElement('script');
     historyPages.src = new URL('history-pages.js', adapterSource).href;
@@ -334,20 +340,37 @@
   const submitDateLines = new Map();
   function adaptSubmitDates() {
     const current = new Set();
-    function show(source, panel, raw, hideSource = true) {
-      if (!panel) return;
-      const text = raw.trim();
-      const match = text.match(/^(?:[a-z]{3},?\s+)?(\d{1,2})[ /]([a-z]+|\d{1,2})[ /](\d{4})(.*)$/i);
+    const datedCards = new Set();
+    const cards = '.history-card-item,.history-item-card,.approval-request-card,.team-relief-card,.tax-relief-record-card,.change-history-item,.leave-highlight-detail-record';
+    function formatDate(raw, onCard) {
+      const text = String(raw ?? '').trim();
+      const match = text.match(/^(?:[a-z]+,?\s+)?(\d{1,2})[ /-]([a-z]+|\d{1,2})[ /-](\d{4})(.*)$/i);
       let formatted = '';
       if (match) {
         let [, day, month, year, suffix] = match;
         if (!/^\d+$/.test(month)) {
           const date = new Date(day + ' ' + month + ' ' + year + ' 12:00 UTC');
-          if (Number.isNaN(date.getTime())) return;
+          if (Number.isNaN(date.getTime())) return '';
           month = String(date.getUTCMonth() + 1);
         }
-        formatted = day.padStart(2, '0') + '/' + month.padStart(2, '0') + '/' + year + suffix;
-      } else if (!/^(?:[-–—]|not submitted)?$/i.test(text)) return;
+        formatted = day.padStart(2, '0') + '/' + month.padStart(2, '0') + '/' + year + (onCard ? '' : suffix);
+      } else if (onCard && /\b\d{4}\b/.test(text)) {
+        const iso = /^(\d{4})-(\d{2})-(\d{2})$/.exec(text);
+        if (iso) formatted = iso[3] + '/' + iso[2] + '/' + iso[1];
+        else {
+          const date = new Date(text);
+          if (Number.isNaN(date.getTime())) return '';
+          formatted = date.toLocaleDateString('en-GB');
+        }
+      }
+      return formatted;
+    }
+    function show(source, panel, raw, hideSource = true) {
+      if (!panel) return;
+      const card = source.closest(cards);
+      const onCard = !!card;
+      if (card) datedCards.add(card);
+      const formatted = formatDate(raw, onCard) || (onCard ? '—' : '');
       current.add(source);
       source.toggleAttribute('data-web-submit-source', hideSource);
       if (!formatted) {
@@ -357,25 +380,32 @@
       }
       let line = submitDateLines.get(source);
       if (!line) {
-        const tableRow = source.matches('tr');
-        const definition = panel.matches('dl');
+        const tableRow = !onCard && source.matches('tr');
+        const definition = !onCard && panel.matches('dl');
         line = document.createElement(tableRow ? 'tr' : definition ? 'div' : 'span');
         line.className = 'web-record-submit-date';
+        if (onCard) line.classList.add('web-card-submit-date');
         const label = document.createElement(tableRow ? 'th' : definition ? 'dt' : 'span');
         const value = document.createElement(tableRow ? 'td' : definition ? 'dd' : 'strong');
         if (tableRow) label.scope = 'row';
-        label.textContent = tableRow ? 'Submit Date:' : 'Submit Date';
+        label.textContent = tableRow || onCard ? 'Submit Date:' : 'Submit Date';
         line.append(label, ' ', value);
         submitDateLines.set(source, line);
       }
       if (line.lastElementChild.textContent !== formatted) line.lastElementChild.textContent = formatted;
-      if (line.localName === 'tr') {
+      if (onCard) {
+        if (panel !== line && line.nextElementSibling !== panel) panel.before(line);
+      } else if (line.localName === 'tr') {
         if (panel.firstElementChild !== line) panel.prepend(line);
       } else if (panel.lastElementChild !== line) {
         panel.append(line);
       }
     }
     const panels = '.history-card-details,.card-details-box,.payroll-approval-field-grid,.tax-relief-detail-table,.leave-highlight-detail-body';
+    const taxDates = new Map();
+    for (const record of [...(window.PAYROLL_PENDING_DATA?.tax || []), ...(window.PAYROLL_HISTORY_DATA?.tax || [])]) {
+      if (record.submitDate) taxDates.set(record.id, record.submitDate);
+    }
     for (const label of document.querySelectorAll(
       '.history-card-row > :first-child,.history-card-details span:first-child,.attendance-history-fact dt,#myHistoryCardsList .card-details-box > div > span:first-child,' +
       'tr > :first-child,.payroll-approval-field > :first-child,.tax-relief-detail-row > :first-child,.leave-highlight-detail-label,.sheet-content div > span:first-child'
@@ -389,8 +419,49 @@
       if (!/^(?:submit date|submitted(?: date| on)?|submission date|提交日期)\s*[:：]?$/i.test(name)) continue;
       const value = label.nextElementSibling;
       const field = label.parentElement;
-      const panel = field.matches('tr') ? field.parentElement : label.closest(panels) || field.parentElement;
-      if (value) show(field, panel, value.textContent);
+      const panel = field.closest(cards) ? label.closest(panels) || field
+        : field.matches('tr') ? field.parentElement : label.closest(panels) || field.parentElement;
+      if (!value || field.closest('#workplaceHistoryList')) continue;
+      const raw = value.textContent.trim();
+      const taxDetails = taxDates.size && /^[-–—]?$/.test(raw) && field.closest('#historyDetailBody,#taxReliefDetailTable');
+      const reference = taxDetails && taxDetails.textContent.match(/RBT\d+/)?.[0];
+      show(field, panel, reference ? formatDate(taxDates.get(reference), true) : raw);
+    }
+    const workplaceList = document.querySelector('#workplaceHistoryList');
+    if (workplaceList?.childElementCount && window.WorkplaceHistoryStore) {
+      const records = new Map(window.WorkplaceHistoryStore.list().map(row => [row.id, row]));
+      const detailRows = document.querySelector('#historyDetailsModal.is-open .history-detail-main-table tbody');
+      const activeId = location.hash.split('/')[2];
+      for (const card of workplaceList.querySelectorAll('[data-record-id]')) {
+        const row = records.get(card.dataset.recordId);
+        const panel = card.querySelector('.history-card-details');
+        if (!row || !panel) continue;
+        const fields = Object.fromEntries(row.fields);
+        const dates = [row.guestVisit?.submitDate, row.submitDate, row.submittedDate,
+          ...row.fields.filter(([name]) => /^(?:submit|submitted) date$/i.test(name.trim())).map(([, value]) => value),
+          row.guestVisit?.submittedAt, row.submittedAt];
+        const sample = row.id.startsWith('sample-');
+        if (row.kind === 'guest-visit' && (row.status !== 'draft' || sample)) dates.push(sample ? '' : row.createdAt, row.date);
+        else if (row.status !== 'draft') dates.push(fields['Request Date'], row.date, sample ? '' : row.createdAt);
+        const source = Array.from(panel.children).find(field => {
+          const label = field.firstElementChild?.textContent.trim().replace(/\s*[:：]$/, '');
+          return /^(?:(?:submit|submitted) date|提交日期)$/i.test(label)
+            || (row.kind === 'inventory-request' && !fields['Request Date'] && /^(?:request date|申请日期)$/i.test(label));
+        });
+        const submitted = dates.find(value => formatDate(value, true));
+        show(source || panel, panel, submitted, !!source);
+        if (detailRows && activeId === encodeURIComponent(row.id)) {
+          const dateRow = Array.from(detailRows.rows).find(field => !field.matches('.web-record-submit-date') &&
+            /^(?:(?:submit|submitted) date|提交日期)\s*[:：]?$/i.test(field.cells[0]?.textContent.trim()));
+          const anchor = dateRow || detailRows.querySelector('tr:not(.web-record-submit-date)');
+          if (anchor) show(anchor, detailRows, formatDate(submitted, true), !!dateRow);
+        }
+      }
+    }
+    for (const card of document.querySelectorAll('#payrollHistoryList [data-reference], #taxReliefRecords [data-reference]')) {
+      if (datedCards.has(card)) continue;
+      const panel = card.querySelector('.history-card-details, .tax-relief-card-body');
+      if (panel) show(panel, panel, taxDates.get(card.dataset.reference), false);
     }
     for (const source of document.querySelectorAll(
       '.payroll-approval-date,.approval-request-card span:has(>strong:only-child),.relief-card-body span:has(>strong:only-child),' +
@@ -403,8 +474,18 @@
       if (!match) continue;
       const field = source.previousElementSibling?.matches('i.fa-calendar-check') ? source.parentElement : source;
       const statusRow = source.closest('.payroll-approval-status-row') || (field !== source && field.parentElement);
-      const panel = source.closest(panels) || statusRow?.nextElementSibling || source.closest('.history-card-item')?.querySelector(panels) || field.parentElement;
+      const card = source.closest(cards);
+      const panel = source.closest(panels) || card?.querySelector(panels + ',.payroll-approval-facts,.history-time-row ~ div')
+        || statusRow?.nextElementSibling || (card ? field : field.parentElement);
       show(field, panel, match[1]);
+    }
+    // The archived OT detail handler carries the submit date for every status.
+    for (const card of document.querySelectorAll('#viewOtHistory .history-card-item[onclick^="openOtDetailsModal("]')) {
+      const details = card.querySelectorAll('.ot-time ~ div');
+      const tail = details[1]?.lastChild;
+      if (tail?.nodeType === Node.TEXT_NODE && /^\s*•\s*Submitted:/i.test(tail.textContent)) tail.remove();
+      const submitDate = card.getAttribute('onclick').match(/^openOtDetailsModal\(\s*(?:'[^']*'\s*,\s*){4}'([^']+)'/)?.[1];
+      if (details[0]) show(details[0], details[0], submitDate, false);
     }
     for (const note of document.querySelectorAll('#changeRequestHistoryList .change-history-date')) {
       const dated = note.textContent.trim().match(/^Submitted on (.+?)\s*•\s*(.+)$/i);
@@ -422,7 +503,15 @@
           }
         } catch { /* The original relative date stays visible when local history is unavailable. */ }
       }
-      if (note.dataset.webSubmitDate) show(note, note, note.dataset.webSubmitDate, false);
+      show(note, note, note.dataset.webSubmitDate, false);
+    }
+    // Keep the date row on every sibling in lists that display submission dates.
+    for (const list of new Set(Array.from(datedCards, card => card.parentElement))) {
+      for (const card of list.children) {
+        if (!card.matches(cards) || datedCards.has(card)) continue;
+        const panel = card.querySelector(panels);
+        if (panel) show(panel, panel, '', false);
+      }
     }
     for (const [source, line] of submitDateLines) {
       if (current.has(source)) continue;

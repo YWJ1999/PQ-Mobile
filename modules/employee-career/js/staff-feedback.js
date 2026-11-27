@@ -60,7 +60,6 @@
     return node;
   };
   const formatDate = value => value ? new Date(value + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : '—';
-  const employeeNumber = row => formatEmployeeNumber(row.empNo) || '—';
   const feedback = window.EmployeeCareerFeedbackStore;
   const recordKey = row => String(row.id || [row.empNo, row.date, row.title].join('|'));
   const savedReviews = stored(reviewStorageKey, []);
@@ -110,7 +109,6 @@
         field.append(element('dt', '', label), element('dd', '', value || '-'));
         body.append(field);
       });
-      recordSubmitDate.append(body, row.submitDate);
       const actions = element('footer', 'staff-feedback-card-actions');
       const reviewButton = element('button', 'staff-feedback-review-button');
       reviewButton.type = 'button';
@@ -121,7 +119,7 @@
         window.location.href = recordPageUrl('review', key);
       });
       actions.append(reviewButton);
-      detailsTrigger.append(header, body);
+      detailsTrigger.append(header, recordSubmitDate.cardLine(row.submitDate), body);
       card.append(detailsTrigger, actions);
       detailsTrigger.addEventListener('click', () => rememberRecord(row, 'details'));
       detailsTrigger.addEventListener('keydown', event => {
@@ -153,30 +151,71 @@
     return null;
   }
 
+  function detailsField(label, value) {
+    const field = element('div', 'employee-career-field');
+    const control = element('div', 'employee-career-control');
+    if (value instanceof Node) control.append(value);
+    else control.textContent = value == null || value === '' ? '—' : String(value);
+    field.append(element('span', 'employee-career-label', label), control);
+    return field;
+  }
+
+  function detailsGrid(...fields) {
+    const grid = element('div', 'employee-career-form-grid');
+    grid.append(...fields);
+    return grid;
+  }
+
+  function detailsCard(title) {
+    const card = element('section', 'employee-career-form-card staff-feedback-details-card');
+    const heading = element('div', 'employee-career-form-heading');
+    const accent = element('span', '');
+    accent.setAttribute('aria-hidden', 'true');
+    heading.append(accent, element('h2', '', title));
+    card.append(heading);
+    return card;
+  }
+
   function renderDetails(record) {
-    const fields = [
-      ['Name', record.name], ['Status', feedback.statusLabel(record)], ['Emp No.', employeeNumber(record)], ['Type', record.type], ['Category', record.category],
-      ['Title', record.title], ['Feedback Date 1', formatDate(record.feedbackDate1 ?? record.date)],
-      ['Feedback Date 2', formatDate(record.feedbackDate2)], ['Feedback Note', record.feedbackNote ?? record.feedback],
-      ['Feedback Remarks', record.feedbackRemarks],
-      ['Reviewer Comment', record.reviewerComment], ['Reviewed By', record.reviewedBy],
-      ['Reviewed Date', formatDate(record.reviewedDate)], ['Rating', record.rating], ['Reward', record.reward]
-    ];
-    const rows = fields.map(([label, value]) => {
-      const row = element('tr', '');
-      const cell = element('td', 'detail-popout-value');
-      if (label === 'Status') cell.append(recordDetailStatus.create(value));
-      else cell.textContent = value === '' || value == null ? '—' : String(value);
-      row.append(element('td', 'detail-popout-label', label), cell);
-      return row;
-    });
-    const attachmentRow = element('tr', '');
-    const attachmentCell = element('td', 'detail-popout-value');
-    attachmentCell.append(attachmentList(record.attachments));
-    attachmentRow.append(element('td', 'detail-popout-label', 'Attachment'), attachmentCell);
-    rows.push(attachmentRow);
-    recordSubmitDate.set($('staffFeedbackDetailsSubmitDate'), record.submitDate);
-    $('staffFeedbackDetailsRows').replaceChildren(...rows);
+    const header = element('header', 'staff-feedback-details-identity');
+    header.append(
+      element('h2', '', employeeCardHeading.text(record.empNo, record.name)),
+      recordDetailStatus.create(feedback.statusLabel(record))
+    );
+
+    const form = detailsCard('Feedback Details');
+    const submitDate = recordSubmitDate.form(record.submitDate || record.submittedDate);
+    submitDate.classList.add('employee-career-field');
+    form.append(submitDate);
+    const reference = record.referenceNo || record.reference || record.docRef;
+    if (reference) form.append(detailsField('Reference No.', reference));
+    form.append(
+      detailsGrid(detailsField('Feedback Type', record.type), detailsField('Category', record.category)),
+      detailsField('Title', record.title),
+      detailsGrid(
+        detailsField('Feedback Date 1', formatDate(record.feedbackDate1 ?? record.date)),
+        detailsField('Feedback Date 2', formatDate(record.feedbackDate2))
+      ),
+      detailsGrid(detailsField('Reference 1', record.reference1), detailsField('Reference 2', record.reference2)),
+      detailsField('Your Feedback', record.feedbackNote ?? record.note ?? record.feedback),
+      detailsField('Remarks', record.feedbackRemarks ?? record.remarks),
+      detailsField('Attachments', attachmentList(record.attachments))
+    );
+
+    const content = $('staffFeedbackDetailsForm');
+    content.replaceChildren(header, form);
+    const reviewFields = [
+      ['Reviewer Comment', record.reviewerComment],
+      ['Reviewed By', record.reviewedBy],
+      ['Reviewed Date', record.reviewedDate && formatDate(record.reviewedDate)],
+      ['Rating', record.rating],
+      ['Reward', record.reward]
+    ].filter(([, value]) => value != null && value !== '');
+    if (reviewFields.length) {
+      const review = detailsCard('Review Information');
+      review.append(...reviewFields.map(([label, value]) => detailsField(label, value)));
+      content.append(review);
+    }
   }
 
   function attachmentList(attachments) {
@@ -229,7 +268,7 @@
     syncLinks();
     if (!record) { window.location.replace(document.querySelector('[data-feedback-list-link]').href); return; }
     new MutationObserver(syncLinks).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
-    if ($('staffFeedbackDetailsRows')) {
+    if ($('staffFeedbackDetailsForm')) {
       renderDetails(record);
       $('staffFeedbackDetailsTitle').focus({ preventScroll: true });
       return;

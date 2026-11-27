@@ -13,7 +13,7 @@ const records = [
     title: 'Head Office',
     date: '2026-10-06',
     status: 'submitted',
-    createdAt: '2026-10-06T09:30:00+08:00',
+    createdAt: '2026-10-04T12:00:00',
     fields: [
       ['Visit Date', '2026-10-06'],
       ['Time', '09:00 \u2013 10:00'],
@@ -61,6 +61,28 @@ const detailLabels = () => [...document.querySelectorAll('#historyDetailBody .hi
     page.on('pageerror', error => errors.push(error.message));
     await page.setViewport({ width: 390, height: 950 });
     await page.goto(pageUrl + '?category=guest-visit&theme=light', { waitUntil: 'load' });
+    // Reopen a history that was saved before the missing sample dates were added.
+    await page.evaluate(key => {
+      const rows = JSON.parse(localStorage.getItem(key));
+      const cancelled = rows.find(row => row.id === 'sample-guest-0002');
+      cancelled.fields = cancelled.fields.filter(([label]) => label !== 'Submit Date');
+      cancelled.status = 'cancelled';
+      const other = rows.find(row => row.id === 'sample-guest-0003');
+      other.fields.find(([label]) => label === 'Submit Date')[1] = '2024-01-23';
+      const laptop = rows.find(row => row.id === 'sample-inventory-0065');
+      laptop.fields = laptop.fields.filter(([label]) => label !== 'Submit Date');
+      laptop.fields.push(['Required By', '2026-12-01']);
+      laptop.createdAt = '2026-11-14T10:00:00Z';
+      localStorage.setItem(key, JSON.stringify(rows));
+    }, historyKey);
+    await page.reload({ waitUntil: 'load' });
+    const cancelledCard = '[data-record-id="sample-guest-0002"][data-status="cancelled"]';
+    assert.equal(await page.$eval(cancelledCard + ' .card-submit-date', node => node.textContent), 'Submit Date: 29/01/2024');
+    assert.equal(await page.$eval('[data-record-id="sample-guest-0003"] .card-submit-date', node => node.textContent), 'Submit Date: 23/01/2024');
+    await page.click(cancelledCard + ' .history-card-main');
+    assert.equal(await page.$eval('.visit-submission-meta .record-submit-date dd', node => node.textContent), '29/01/2024');
+    await page.click('#closeHistoryDetails');
+    await page.waitForFunction(() => !HistoryRecordPage.active);
     await page.click('[data-history-kind="inventory-request"]');
     assert.deepEqual(await page.$$eval('[data-record-id="sample-inventory-0064"] .history-card-row', rows =>
       rows.map(row => [row.querySelector('span').textContent, row.querySelector('strong').textContent])
@@ -69,6 +91,12 @@ const detailLabels = () => [...document.querySelectorAll('#historyDetailBody .hi
       ['UOM', 'Piece'], ['Reason', 'Inventory Request Reason 1']
     ]);
     assert.equal(await page.$eval('[data-record-id="sample-inventory-0064"] .record-submit-date > strong', node => node.textContent), '08/09/2026');
+    const laptop = '[data-record-id="sample-inventory-0065"]';
+    assert.equal(await page.$eval(laptop + ' .card-submit-date > strong', node => node.textContent), '10/09/2026');
+    await page.click(laptop + ' .history-card-main');
+    assert.equal(await page.$eval('#historyDetailBody .record-submit-date td', node => node.textContent), '10/09/2026');
+    await page.click('#closeHistoryDetails');
+    await page.waitForFunction(() => !HistoryRecordPage.active);
     await page.click('[data-history-kind="guest-visit"]');
     await page.evaluate((key, seededRecords) => localStorage.setItem(key, JSON.stringify(seededRecords)), historyKey, records);
     await page.reload({ waitUntil: 'load' });
@@ -86,6 +114,7 @@ const detailLabels = () => [...document.querySelectorAll('#historyDetailBody .hi
       ['Location', 'Head Office']
     ]);
     assert.equal(await page.$eval('.history-card-item .status-pill', node => node.textContent.trim()), 'Pending');
+    assert.equal(await page.$eval('.history-card-main .card-submit-date', node => node.textContent), 'Submit Date: 04/10/2026');
 
     await page.click('.history-card-main');
     assert.equal(await page.$eval('#historyDetailTitle', node => node.textContent.trim()), 'Guest Visit Details');
@@ -123,7 +152,7 @@ const detailLabels = () => [...document.querySelectorAll('#historyDetailBody .hi
     await page.click('#closeHistoryDetails');
     await page.click('[data-history-kind="letter-request"]');
     assert.equal(await page.$eval('.history-card-title', node => node.textContent.trim()), 'Guarantee Letter');
-    assert.equal(await page.$eval('.history-card-details > .record-submit-date > strong', node => node.textContent), '05/10/2026');
+    assert.equal(await page.$eval('.history-card-main > .card-submit-date > strong', node => node.textContent), '05/10/2026');
     assert.deepEqual(await page.$$eval('.history-card-item .history-card-row', rows => rows.map(row => [
       row.querySelector('span').textContent.replace(':', '').trim(),
       row.querySelector('strong').textContent.trim()

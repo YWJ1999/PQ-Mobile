@@ -18,6 +18,10 @@ async function filter(page, values) {
 async function refs(page) {
   return page.$$eval('.history-card-item', nodes => nodes.map(node => node.dataset.reference));
 }
+async function backToHistory(page) {
+  await page.click('#closeHistoryDetails');
+  await page.waitForFunction(() => !HistoryRecordPage.active);
+}
 
 async function run() {
   const browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox'] });
@@ -76,7 +80,7 @@ async function run() {
     assert.equal(await page.$('.history-filter-help'), null, 'Tax Relief filter must not show explanatory date copy');
     await page.keyboard.press('Escape');
     await page.click('[data-reference="RBT000000000039"] .history-card-main');
-    await page.waitForFunction(() => document.activeElement?.id === 'closeHistoryDetails');
+    await page.waitForFunction(() => document.activeElement?.id === 'historyDetailTitle');
     const detail = await page.$eval('#historyDetailsModal', node => node.textContent.replace(/\s+/g, ' '));
     for (const expected of ['Tax Relief Detail', 'Farhan binti rahmat', 'EBB12', 'Submit Date: 07/01/2026', 'Medical Relief', 'Invoice.docx', 'Process', 'No', 'Approval Date', 'Approver Remarks', 'Reason required']) {
       assert.ok(detail.includes(expected), `Details must preserve ${expected}`);
@@ -87,7 +91,7 @@ async function run() {
     assert.equal(taxRows.Name, 'Farhan binti rahmat');
     assert.equal(taxRows['Rebate Item'], 'BASIC SUPPORTING EQUIPMENT');
     assert.equal(taxRows['Approval Date'], '1 Jan 1');
-    await page.keyboard.press('Escape');
+    await backToHistory(page);
     assert.equal(await shown(page, '#historyDetailsModal'), false);
     assert.equal(await page.$eval('[data-reference="RBT000000000039"] .history-card-main', node => node === document.activeElement), true);
     await filter(page, { historyRebateItem: 'TXR05' });
@@ -128,7 +132,8 @@ async function run() {
             .map(node => node.className));
           assert.deepEqual(overflow, [], `${theme} ${width}px ${state} must fit horizontally`);
           if (width === 390) await page.screenshot({ path: path.join(process.env.PAYROLL_SCREENSHOTS || __dirname, `payroll_history_${state}_${theme}.png`) });
-          if (state !== 'list') await page.keyboard.press('Escape');
+          if (state === 'filter') await page.keyboard.press('Escape');
+          if (state === 'details') await backToHistory(page);
         }
       }
     }
@@ -137,7 +142,7 @@ async function run() {
     await page.click('[data-history-kind="deduction"]');
     assert.deepEqual(await refs(page), ['PDR000000000004', 'deduction-202008-asb', 'deduction-202112-absent', 'deduction-202205-advance', 'deduction-202507-uniform']);
     const deductionCards = await page.$$eval('.history-card-item', cards => cards.map(card => card.textContent.replace(/\s+/g, ' ')));
-    for (const expected of ['HOUSE DEDUCTION', '202007', 'Submit Date 11/06/2020', 'MONTH END', 'RM 200.00', 'Draft']) assert.ok(deductionCards[0].includes(expected));
+    for (const expected of ['HOUSE DEDUCTION', '202007', 'Submit Date: 11/06/2020', 'MONTH END', 'RM 200.00', 'Draft']) assert.ok(deductionCards[0].includes(expected));
     const draftLayout = await page.$$eval('[data-reference="PDR000000000004"] .history-card-action', buttons => buttons.map(button => {
       const { top, width } = button.getBoundingClientRect();
       return { top, width, label: button.textContent.trim() };
@@ -148,14 +153,15 @@ async function run() {
     await page.click('[data-reference="PDR000000000004"] .history-card-main');
     assert.deepEqual(await page.$$eval('#historyDetailActions [data-history-action]', nodes => nodes.map(node => node.textContent.trim())), ['Submit', 'Delete Record']);
     const deductionRows = await page.$$eval('#historyDetailBody tr', rows => Object.fromEntries(rows.map(row => [row.querySelector('th').textContent.trim(), row.querySelector('td').textContent.replace(/\s+/g, ' ').trim()])));
-    assert.deepEqual(Object.keys(deductionRows), ['Reference #', 'Status', 'Emp No.', 'Name', 'Request Type', 'Deduction Type', 'Period', 'Cycle', 'Deduction Date', 'Account No', 'Amount', 'Attachments']);
+    assert.deepEqual(Object.keys(deductionRows), ['Submit Date:', 'Reference #', 'Status', 'Emp No.', 'Name', 'Request Type', 'Deduction Type', 'Period', 'Cycle', 'Deduction Date', 'Account No', 'Amount', 'Attachments']);
+    assert.equal(deductionRows['Submit Date:'], '11/06/2020');
     assert.equal(deductionRows['Reference #'], 'PDR000000000004');
     assert.equal(deductionRows['Emp No.'], 'EBB12');
     assert.equal(deductionRows.Name, 'Farhan binti rahmat');
     assert.equal(deductionRows['Request Type'], 'Start Deduction');
     assert.equal(deductionRows['Deduction Date'], '1 Jul 2020');
     assert.ok(deductionRows.Attachments.includes('test.txt'));
-    await page.keyboard.press('Escape');
+    await backToHistory(page);
     await page.click('#historyFilterTrigger');
     const deductionFilter = await page.evaluate(() => ({
       fromLabel: document.querySelector('label[for="historyDateFrom"]').textContent.trim(),
@@ -200,7 +206,7 @@ async function run() {
     for (const expected of ['Sarah Jenkins', 'EBB01', 'Stop Deduction', '202610', '1 Oct 2026', 'MONTH END', '001235', 'deduction.txt', 'Please stop the housing loan deduction.']) assert.ok(savedDetail.includes(expected));
     assert.equal(await page.$eval('.history-attachment', async link => (await fetch(link.href)).text()), 'Payroll deduction attachment');
     assert.equal(await page.$('#historyDetailActions [data-history-detail-aux]'), null);
-    await page.keyboard.press('Escape');
+    await backToHistory(page);
     await filter(page, { historyDateFrom: '2026-10', historyDateTo: '2026-10', historyRebateItem: 'HOUSING LOAN' });
     assert.deepEqual(await refs(page), [submitted]);
     await page.evaluate(() => window.dispatchEvent(new PageTransitionEvent('pageshow', { persisted: true })));

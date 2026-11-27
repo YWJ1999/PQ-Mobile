@@ -271,7 +271,7 @@ const chrome = process.env.PUPPETEER_EXECUTABLE_PATH || 'C:/Program Files/Google
     assert.equal(shiftForm.hasCancel, true);
     assert.equal(shiftForm.hasSubmit, true);
     assert.deepEqual(shiftForm.actions.map(action => action.text), ['Cancel', 'Draft', 'Submit']);
-    assert.equal(shiftForm.actions.every(action => action.hasIcon), true, 'Shift Change action pills include Leave-style icons');
+    assert.deepEqual(shiftForm.actions.map(action => action.hasIcon), [false, true, true]);
     assert.equal(shiftForm.actions.every(action => action.radius === '999px'), true, 'Shift Change actions use pill buttons');
     assert.equal(shiftForm.hasBottomNav, true, 'Shift Change form keeps the standard bottom navigation');
 

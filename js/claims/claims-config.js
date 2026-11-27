@@ -77,8 +77,13 @@ window.INDIVIDUAL_TRAVEL_DATA = {
   selectedDayLabel: 'Monday, 28 September 2026',
   trips: [
     {
+      id: 'my-penang-client-visit',
+      empNo: 'EBB12',
       route: 'Kuala Lumpur ➔ Penang',
+      origin: 'Kuala Lumpur',
       destination: 'Penang Branch',
+      travelDateFrom: '2026-09-28',
+      travelDateTo: '2026-09-30',
       dateToDate: '28 Sep 2026 – 30 Sep 2026',
       dates: '28–30 Sep 2026 • 3 days',
       duration: '3 days',
@@ -944,30 +949,26 @@ window.CLAIM_HISTORY_RECORDS = window.CLAIM_SUMMARY_RECORDS.reduce((groups, reco
 }, {});
 
 const sharedTravelTrips = [
-  { empNo: 'EBB01', dept: 'Senior Product Designer', trip: 'Melaka • Product workshop', dates: '7-7 Sep 2026', status: 'Approved' },
-  { empNo: '004177', dept: 'Senior Engineer', trip: 'Johor Bahru • Site inspection', dates: '8-8 Sep 2026', status: 'Approved' },
-  { empNo: '0000101', dept: 'Product Designer', trip: 'Penang • User research', dates: '10-11 Sep 2026', status: 'Approved' },
-  { empNo: '000582', dept: 'Operations Specialist', trip: 'Ipoh • Vendor audit', dates: '14-16 Sep 2026', status: 'Pending' },
-  { empNo: '001290', dept: 'Account Manager', trip: 'Kuantan • Client meeting', dates: '25-26 Sep 2026', status: 'Approved' },
-  { empNo: '007216', dept: 'Finance Executive', trip: 'Penang • Branch review', dates: '28-28 Sep 2026', status: 'Approved' },
-  { empNo: 'EBB01', dept: 'Senior Product Designer', trip: 'Penang • Client visit', dates: '28-30 Sep 2026', status: 'Approved' },
-  { empNo: '004177', dept: 'Senior Engineer', trip: 'Singapore • Tech conference', dates: '28-30 Sep 2026', status: 'Pending' }
-].map(record => ({ ...record, name: claimEmployee(record.empNo).name }));
+  { id: 'melaka-workshop', empNo: 'EBB01', dept: 'Senior Product Designer', destination: 'Melaka', purpose: 'Product workshop', travelDateFrom: '2026-09-07', travelDateTo: '2026-09-07', status: 'Approved' },
+  { id: 'johor-site-inspection', empNo: '004177', dept: 'Senior Engineer', destination: 'Johor Bahru', purpose: 'Site inspection', travelDateFrom: '2026-09-08', travelDateTo: '2026-09-08', status: 'Approved' },
+  { id: 'penang-user-research', empNo: '0000101', dept: 'Product Designer', destination: 'Penang', purpose: 'User research', travelDateFrom: '2026-09-10', travelDateTo: '2026-09-11', status: 'Approved' },
+  { id: 'ipoh-vendor-audit', empNo: '000582', dept: 'Operations Specialist', destination: 'Ipoh', purpose: 'Vendor audit', travelDateFrom: '2026-09-14', travelDateTo: '2026-09-16', status: 'Pending' },
+  { id: 'kuantan-client-meeting', empNo: '001290', dept: 'Account Manager', destination: 'Kuantan', purpose: 'Client meeting', travelDateFrom: '2026-09-25', travelDateTo: '2026-09-26', status: 'Approved' },
+  { id: 'penang-branch-review', empNo: '007216', dept: 'Finance Executive', destination: 'Penang', purpose: 'Branch review', travelDateFrom: '2026-09-28', travelDateTo: '2026-09-28', status: 'Approved' },
+  { id: 'penang-client-visit', empNo: 'EBB01', dept: 'Senior Product Designer', destination: 'Penang', purpose: 'Client visit', travelDateFrom: '2026-09-28', travelDateTo: '2026-09-30', status: 'Approved' },
+  { id: 'singapore-tech-conference', empNo: '004177', dept: 'Senior Engineer', destination: 'Singapore', purpose: 'Tech conference', travelDateFrom: '2026-09-28', travelDateTo: '2026-09-30', status: 'Pending' }
+].map(record => ({
+  ...record, name: claimEmployee(record.empNo).name, trip: record.destination + ' • ' + record.purpose
+}));
 window.TEAM_TRAVEL_DATA.staffTrips = sharedTravelTrips;
 window.TEAM_TRAVEL_DATA.staffCount = new Set(sharedTravelTrips.map(record => record.empNo)).size;
 window.TEAM_TRAVEL_DATA.tripsCount = sharedTravelTrips.length;
 window.TEAM_TRAVEL_DATA.travelBadges = {};
 sharedTravelTrips.forEach(record => {
-  const match = record.dates.match(/(\d{1,2})\s*-\s*(\d{1,2})\s+Sep/i);
-  if (!match) return;
-  for (let day = Number(match[1]); day <= Number(match[2]); day += 1) {
+  for (let day = Number(record.travelDateFrom.slice(-2)); day <= Number(record.travelDateTo.slice(-2)); day += 1) {
     window.TEAM_TRAVEL_DATA.travelBadges[day] = (window.TEAM_TRAVEL_DATA.travelBadges[day] || 0) + 1;
   }
 });
-
-for (const scope of ['individual', 'team']) {
-  window.CLAIM_BREAKDOWN_DATA[scope].benefits.items.forEach(item => { item.color = '#7c3aed'; });
-}
 
 
 

@@ -4,18 +4,18 @@
 .work-plan-page .project-header-row { gap: 12px; }
 .work-plan-page .project-header h1 { font-size: 17px; letter-spacing: normal; }
 .work-plan-page .project-back { background: rgba(255, 255, 255, .18); }
-.work-plan-page .work-plan-divider {
+.work-plan-fields .work-plan-divider {
   margin-top: 20px;
   padding-top: 20px;
   border-top: 1px dashed var(--border-subtle);
 }
-.work-plan-page .project-form-grid > .field-group:last-child { margin-bottom: 16px; }
-.work-plan-page .project-form-sub-label { color: var(--text-muted); }
+.work-plan-fields .project-form-grid > .field-group:last-child { margin-bottom: 16px; }
+.work-plan-fields .project-form-sub-label { color: var(--text-muted); }
 .work-plan-page .form-ctrl::placeholder { color: var(--text-caption); font-weight: 500; }
 .work-plan-page .form-cancel-btn { text-decoration: none; }
 .work-plan-page :is(button, a):focus-visible { outline: 3px solid var(--border-focus); outline-offset: 3px; }
 .work-plan-page input[type="date"] { color-scheme: light; }
 [data-theme="dark"] .work-plan-page input[type="date"] { color-scheme: dark; }
 @media (max-width: 380px) {
-  .work-plan-page .form-card { padding: 20px 18px; }
+  .work-plan-fields.form-card { padding: 20px 18px; }
 }

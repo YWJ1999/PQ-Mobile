@@ -108,7 +108,7 @@ async function checkSubmittedCV(browser) {
       const card = await page.$eval('.approval-request-card', n => ({
         text: n.textContent.replace(/\s+/g, ' ').trim(),
         heading: n.querySelector('.employee-name').textContent,
-        submitDate: n.querySelector('.approval-card-submitted dd')?.textContent,
+        submitDate: n.querySelector('.card-submit-date > strong')?.textContent,
         details: [...n.querySelectorAll('.career-pending-review .approval-card-details > div')].map(field => ({
           label: field.querySelector('dt')?.textContent.trim(),
           value: field.querySelector('dd')?.textContent.trim()
@@ -126,9 +126,8 @@ async function checkSubmittedCV(browser) {
       assert.equal(card.heading, 'EBB12 - Farhan binti rahmat');
       assert.equal(card.submitDate, '13/10/2026');
       assert.deepEqual(card.details, [
-        { label: 'Reference #', value: 'ECR00000000000000563' },
-        { label: 'Submit Date', value: '13/10/2026' }
-      ], 'Submit Date follows the request reference');
+        { label: 'Reference #', value: 'ECR00000000000000563' }
+      ], 'The request reference stays in the details panel');
       assert.equal(card.hasStatusRow, false, 'The card no longer repeats a Pending Approval status row');
       assert.equal(card.hasBackupAssignment, false, 'The card details stay limited to the two requested fields');
       assert.equal((card.text.match(/13\/10\/2026/g) || []).length, 1);

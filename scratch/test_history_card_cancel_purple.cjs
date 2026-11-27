@@ -22,17 +22,18 @@ async function open(page, file, theme) {
   assert.equal(await page.$eval('html', node => node.dataset.theme), theme);
 }
 
-async function checkList(page, listSelector, context, tabId) {
+async function checkList(page, listSelector, context) {
   const footers = await page.$$eval(listSelector + ' :is(.history-card-actions, .record-card-actions, .project-history-card-actions, .career-history-card-actions)', nodes => nodes.map(footer => {
     const style = getComputedStyle(footer);
     const right = footer.getBoundingClientRect().right - parseFloat(style.paddingRight) - parseFloat(style.borderRightWidth);
     return [...footer.querySelectorAll('button, a')].map(button => {
-      const icon = button.querySelector('.record-card-action-icon[aria-hidden="true"]');
+      const icon = button.querySelector('i, svg, img');
       const rect = button.getBoundingClientRect();
       return {
         label: button.textContent.trim(),
         cancelsRecord: button.dataset.historyAction === 'cancel' || button.dataset.claimHistoryAction === 'cancel' || button.classList.contains('record-card-cancel'),
-        icon: icon?.className || '',
+        icon: icon ? icon.getAttribute('class') || icon.localName : '',
+        decorativeIcon: icon?.matches('.record-card-action-icon[aria-hidden="true"]'),
         rightInset: right - rect.right,
         width: rect.width,
         top: rect.top,
@@ -45,9 +46,10 @@ async function checkList(page, listSelector, context, tabId) {
     if (buttons.length === 1) {
       const [button] = buttons;
       if (button.cancelsRecord) assert.equal(button.label, 'Cancel', context);
-      const icons = { Cancel: tabId === 'histTabCredit' ? /^$/ : /fa-ban/, Delete: /fa-trash-can/, Edit: /fa-pencil/ };
+      const icons = { Cancel: /^$/, Delete: /fa-trash-can/, Edit: /fa-pencil/ };
       assert.ok(Object.hasOwn(icons, button.label), context);
       assert.match(button.icon, icons[button.label], context);
+      if (button.icon) assert.ok(button.decorativeIcon, context);
       assert.match(button.background, /rgb\(124, 58, 237\).*rgb\(109, 40, 217\)/, context);
       assert.equal(button.color, 'rgb(255, 255, 255)', context);
       assert.ok(Math.abs(button.rightInset) <= 1 && button.width >= 96 && button.width <= 120, context);
@@ -79,12 +81,12 @@ async function run() {
           const tabs = await page.$$(tabSelector);
           assert.ok(tabs.length, file);
           for (const tab of tabs) {
-            const [id, label] = await tab.evaluate(button => {
+            const label = await tab.evaluate(button => {
               button.click();
-              return [button.id, button.textContent.trim()];
+              return button.textContent.trim();
             });
             await page.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))));
-            count += await checkList(page, listSelector, [theme, file, label].join(' / '), id);
+            count += await checkList(page, listSelector, [theme, file, label].join(' / '));
           }
         } else {
           count = await checkList(page, listSelector, theme + ' / ' + file);

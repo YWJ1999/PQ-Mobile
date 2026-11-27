@@ -47,8 +47,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const listPage = name === 'guest' || name === 'attendee';
     $('visitPageActions').classList.toggle('is-list-page', listPage);
     $('visitSaveDraft').hidden = listPage;
-    $('visitPrevious').querySelector('span').textContent = listPage ? 'Back to Categories' : 'Cancel';
-    $('visitPrevious').querySelector('i').className = listPage ? 'fa-solid fa-arrow-left' : 'fa-solid fa-xmark';
+    $('visitPrevious').innerHTML = listPage
+      ? '<i class="fa-solid fa-arrow-left" aria-hidden="true"></i><span>Back to Categories</span>'
+      : '<span>Cancel</span>';
     $('visitCancel').hidden = step !== 0;
     $('visitPrevious').hidden = step === 0;
     $('visitNext').hidden = step === tabs.length - 1;

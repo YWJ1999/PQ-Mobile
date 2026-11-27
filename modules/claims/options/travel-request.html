@@ -7,6 +7,8 @@
   <script src="../../../js/components.js"></script>
   <script src="../../../js/claims/claim-request-store.js"></script>
   <script src="../../../js/claims/claim-application-fields.js"></script>
+  <script src="../../../js/claims/claims-config.js?v=individual-trip-links"></script>
+  <script src="../../../js/claims/claim-review.js"></script>
   <script src="../../../js/app.js" defer></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -480,8 +482,17 @@
     html[data-theme="light"] .claim-stepper-card .stepper-item.completed .stepper-label { color: #059669; }
     html[data-theme="light"] .claim-stepper-card .stepper-item.active .stepper-circle { background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%); border-color: #a855f7; color: #ffffff; box-shadow: 0 4px 14px rgba(124, 58, 237, 0.34); }
     html[data-theme="light"] .claim-stepper-card .stepper-item.active .stepper-label { color: #6d28d9; font-weight: 900; }
+    .form-card.travel-request-heading {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .travel-request-heading > h2 { flex: 1; min-width: 0; margin: 0; overflow-wrap: anywhere; }
+    .travel-request-heading > :last-child { flex-shrink: 0; white-space: nowrap; }
   </style>
   <link rel="stylesheet" href="../../../css/form-section-headings.css">
+  <link rel="stylesheet" href="../../../css/claim-request-review.css">
 </head>
 <body>
 
@@ -559,7 +570,6 @@
         <!-- BOTTOM ACTION BUTTONS -->
         <div class="claim-step-actions form-action-row">
           <button type="button" class="btn-submit-primary" data-page-form-cancel onclick="handleHeaderBack()">
-            <i class="fa-solid fa-xmark"></i>
             <span>Cancel</span>
           </button>
           <button type="button" class="btn-submit-primary" onclick="saveDraft()">
@@ -697,7 +707,6 @@
         <!-- BOTTOM ACTION BUTTONS FOR ENTRY FORM -->
         <div class="form-action-row" style="justify-content: space-between; margin-top: 24px;">
           <button type="button" class="btn-submit-primary" onclick="switchView('view-3-list')">
-            <i class="fa-solid fa-xmark"></i>
             <span>Cancel</span>
           </button>
           <button type="button" class="btn-submit-primary" onclick="saveSubItem()">
@@ -723,7 +732,11 @@
 
   <!-- DRILL-DOWN NAVIGATION & FORM STATE MANAGEMENT SCRIPT -->
   <script>
-    ClaimApplicationFields.mount('Travel Request');
+    const calendarParams = new URLSearchParams(location.search);
+    const calendarTripId = calendarParams.get('trip');
+    const calendarScope = calendarParams.get('scope') === 'individual' ? 'individual' : 'team';
+    const calendarTrips = calendarScope === 'individual' ? window.INDIVIDUAL_TRAVEL_DATA.trips : window.TEAM_TRAVEL_DATA.staffTrips;
+    const calendarTrip = calendarTrips.find(trip => trip.id === calendarTripId);
     const formData = {
       applicationInfo: {
         periodYear: '2026',
@@ -853,6 +866,18 @@
     }
 
     function handleHeaderBack() {
+      if (calendarTripId !== null) {
+        const dashboard = new URL('../index.html', location.href);
+        if (history.length > 1 && document.referrer && new URL(document.referrer).pathname === dashboard.pathname) {
+          history.back();
+        } else {
+          const dayParam = calendarScope === 'individual' ? 'individualTravelDay' : 'staffTravelDay';
+          dashboard.searchParams.set(dayParam, calendarParams.get('day') || calendarTrip?.travelDateFrom.slice(-2) || '28');
+          dashboard.hash = calendarScope + '-trip-detail-card';
+          location.replace(dashboard.href);
+        }
+        return;
+      }
       if (formData.currentView === 'view-4-entry') {
         switchView('view-3-list', getCategoryTitle(formData.activeCategory));
       } else if (formData.currentView === 'view-3-list') {
@@ -1927,8 +1952,33 @@
       }, 1400);
     }
 
-    // Initialize passenger list rendering on page load
-    renderSelectedPassengers();
+    if (calendarTripId === null) {
+      ClaimApplicationFields.mount('Travel Request');
+      renderSelectedPassengers();
+    } else {
+      document.getElementById('headerTitleText').textContent = 'Travel Request Details';
+      document.title = 'PeopleHCM - Travel Request Details';
+      const content = document.querySelector('.main-content');
+      if (calendarTrip) {
+        const heading = document.createElement('header');
+        heading.className = 'form-card travel-request-heading';
+        const employeeName = calendarTrip.name ?? window.CLAIM_EMPLOYEES[calendarTrip.empNo]?.name;
+        heading.innerHTML = '<h2 class="form-section-heading">' + employeeCardHeading.html(calendarTrip.empNo, employeeName) + '</h2>' +
+          recordDetailStatus.html(calendarTrip.status);
+        const review = ClaimReview.create({
+          ...calendarTrip,
+          optionName: 'Travel Request',
+          period: calendarTrip.travelDateFrom.slice(0, 7),
+          requestTravelItems: [{
+            orig: calendarTrip.origin, dest: calendarTrip.destination,
+            depDate: calendarTrip.travelDateFrom, arrDate: calendarTrip.travelDateTo, noOfDays: calendarTrip.duration
+          }]
+        });
+        content.replaceChildren(heading, review);
+      } else {
+        content.textContent = 'This travel request could not be found.';
+      }
+    }
   </script>
 </body>
 </html>

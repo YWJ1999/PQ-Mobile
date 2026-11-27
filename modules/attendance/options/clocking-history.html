@@ -119,6 +119,7 @@
     #viewFeedbackHistory .card-status-badge { font-size: 11.5px; }
     #viewFeedbackHistory .feedback-chevron { width: 12px; flex: none; font-size: 12px; }
     #viewFeedbackHistory .feedback-history-facts { margin: 10px 12px 12px !important; }
+    #viewFeedbackHistory .card-submit-date { margin-inline: 12px; }
     .feedback-history-facts dl { min-width: 0; }
     .feedback-history-facts dt {
       color: var(--text-muted);
@@ -150,6 +151,7 @@
       #viewFeedbackHistory .history-card-header { padding-inline: 12px !important; }
       #viewFeedbackHistory .card-status-badge { max-width: 78px; white-space: normal; }
       #viewFeedbackHistory .feedback-history-facts { margin-inline: 8px !important; column-gap: 8px !important; }
+      #viewFeedbackHistory .card-submit-date { margin-inline: 8px; }
       .feedback-history-facts dt { font-size: 11px; }
       .feedback-history-facts dd, .feedback-history-dates dt { font-size: 12.5px; }
     }
@@ -413,7 +415,6 @@
           </div>
           <dl class="history-card-details ot-plan-history-facts">
             <div><dt>OT Type</dt><dd>OT 1.5 BEFORE WORK</dd></div>
-            <div class="record-date-field"><dt>Submit Date</dt><dd><time datetime="2024-07-12">12 Jul 2024</time></dd></div>
             <div><dt>Plan Hours</dt><dd>16.00 hrs</dd></div>
             <div><dt>Actual Hours</dt><dd>0.00 hrs</dd></div>
           </dl>
@@ -430,7 +431,6 @@
           </div>
           <dl class="history-card-details ot-plan-history-facts">
             <div><dt>OT Type</dt><dd>1.5 OT</dd></div>
-            <div class="record-date-field"><dt>Submit Date</dt><dd><time datetime="2023-10-24">24 Oct 2023</time></dd></div>
             <div><dt>Plan Hours</dt><dd>3.00 hrs</dd></div>
             <div><dt>Actual Hours</dt><dd>0.00 hrs</dd></div>
           </dl>
@@ -905,9 +905,9 @@
           card.querySelector('[data-feedback-shift]').textContent = record.amendedShift || record.shift;
           card.querySelector('[data-feedback-times]').textContent = record.amendedClockTimes || '—';
 
+          card.querySelector('.feedback-history-facts').before(recordSubmitDate.cardLine(record.submittedDate));
           const dates = card.querySelector('.feedback-history-dates');
           for (const [label, date] of [
-            ['Submitted Date', record.submittedDate],
             ['Approved Date', record.approvedDate],
             ['Declined Date', record.declinedDate]
           ]) {
@@ -916,9 +916,9 @@
             term.textContent = label;
             const value = document.createElement('dd');
             value.append(feedbackHistoryTime(date));
-            if (label === 'Submitted Date') value.className = 'record-date-field';
             dates.append(term, value);
           }
+          if (!dates.childElementCount) dates.remove();
           list.append(card);
         }
       }
@@ -1182,6 +1182,11 @@
         ]
       }
     };
+    for (const card of document.querySelectorAll('#viewOtHistory [data-history-link]')) {
+      const reference = card.hash.split('/').pop();
+      const submitDate = attendanceHistoryFields.ot[reference]?.[3];
+      card.querySelector('.history-card-details').before(recordSubmitDate.cardLine(submitDate));
+    }
     renderFeedbackHistoryCards(attendanceHistoryFields.feedback);
   </script>
   <script src="../../../js/attendance/history-record-route.js"></script>

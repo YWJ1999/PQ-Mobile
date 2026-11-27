@@ -11,27 +11,27 @@ window.WORKPLACE_HISTORY_DATA = [
   },
   {
     id: 'sample-guest-0002', kind: 'guest-visit', title: 'Guest Visit', date: '2024-01-29', status: 'submitted', createdAt: '2026-09-10T00:00:14.000Z',
-    fields: [['Reference #', 'FGV0000000000002'], ['Visit Date', '2024-01-29'], ['Visit Time', '0000-0000'], ['Visitor', '1']]
+    fields: [['Reference #', 'FGV0000000000002'], ['Visit Date', '2024-01-29'], ['Visit Time', '0000-0000'], ['Visitor', '1'], ['Submit Date', '2024-01-29']]
   },
   {
     id: 'sample-guest-0003', kind: 'guest-visit', title: 'Guest Visit', date: '2024-01-28', status: 'submitted', createdAt: '2026-09-10T00:00:13.000Z',
-    fields: [['Reference #', 'FGV0000000000003'], ['Visit Date', '2024-01-28'], ['Visit Time', '0000-0000'], ['Visitor', '2']]
+    fields: [['Reference #', 'FGV0000000000003'], ['Visit Date', '2024-01-28'], ['Visit Time', '0000-0000'], ['Visitor', '2'], ['Submit Date', '2024-01-28']]
   },
   {
     id: 'sample-guest-0006', kind: 'guest-visit', title: 'Guest Visit', date: '2024-04-18', status: 'draft', createdAt: '2026-09-10T00:00:12.000Z',
-    fields: [['Reference #', 'FGV0000000000006'], ['Visit Date', '2024-04-18'], ['Visit Time', '0000-0000'], ['Visitor', '0']]
+    fields: [['Reference #', 'FGV0000000000006'], ['Visit Date', '2024-04-18'], ['Visit Time', '0000-0000'], ['Visitor', '0'], ['Submit Date', '2024-04-18']]
   },
   {
     id: 'sample-guest-0007', kind: 'guest-visit', title: 'Guest Visit', date: '2024-06-06', status: 'submitted', createdAt: '2026-09-10T00:00:11.000Z',
-    fields: [['Reference #', 'FGV0000000000007'], ['Visit Date', '2024-06-06'], ['Visit Time', '1100-1400'], ['Visitor', '0']]
+    fields: [['Reference #', 'FGV0000000000007'], ['Visit Date', '2024-06-06'], ['Visit Time', '1100-1400'], ['Visitor', '0'], ['Submit Date', '2024-06-06']]
   },
   {
     id: 'sample-guest-0008', kind: 'guest-visit', title: 'Guest Visit', date: '2024-07-03', status: 'submitted', createdAt: '2026-09-10T00:00:10.000Z',
-    fields: [['Reference #', 'FGV0000000000008'], ['Visit Date', '2024-07-03'], ['Visit Time', '0000-1600'], ['Visitor', '1']]
+    fields: [['Reference #', 'FGV0000000000008'], ['Visit Date', '2024-07-03'], ['Visit Time', '0000-1600'], ['Visitor', '1'], ['Submit Date', '2024-07-03']]
   },
   {
     id: 'sample-guest-0009', kind: 'guest-visit', title: 'Guest Visit', date: '2024-07-03', status: 'submitted', createdAt: '2026-09-10T00:00:09.000Z',
-    fields: [['Reference #', 'FGV0000000000009'], ['Visit Date', '2024-07-03'], ['Visit Time', '0000-0000'], ['Visitor', '0']]
+    fields: [['Reference #', 'FGV0000000000009'], ['Visit Date', '2024-07-03'], ['Visit Time', '0000-0000'], ['Visitor', '0'], ['Submit Date', '2024-07-03']]
   },
   {
     id: 'sample-letter-0001', kind: 'letter-request', title: 'Guarantee Letter', date: '2022-10-15', status: 'approved', createdAt: '2026-09-10T00:00:08.000Z',
@@ -69,6 +69,6 @@ window.WORKPLACE_HISTORY_DATA = [
   },
   {
     id: 'sample-inventory-0065', kind: 'inventory-request', title: 'Laptop', date: '2026-09-10', status: 'submitted', createdAt: '2026-09-10T00:00:01.000Z',
-    fields: [['Reference #', 'IRQ0000000000065'], ['Inventory Item', 'Laptop'], ['Quantity', '1']]
+    fields: [['Reference #', 'IRQ0000000000065'], ['Inventory Item', 'Laptop'], ['Quantity', '1'], ['Submit Date', '2026-09-10']]
   }
 ];

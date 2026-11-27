@@ -48,6 +48,8 @@ html body :is(
     padding-inline: 14px !important;
 
     &.record-card-cancel,
+    &[data-history-action="cancel"],
+    &[data-claim-history-action="cancel"],
     &:has(> .record-card-action-icon) {
       width: clamp(96px, 40%, 120px) !important;
       gap: 8px;
